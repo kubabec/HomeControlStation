@@ -1,5 +1,5 @@
-#include <os/app/deviceProvider.hpp>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/app/DeviceProvider.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
 

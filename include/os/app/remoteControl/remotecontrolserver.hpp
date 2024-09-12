@@ -1,12 +1,12 @@
 #ifndef REMOTECONTROLSERVER_H
 #define REMOTECONTROLSERVER_H
 #include <Arduino.h>
-#include <os/drivers/networkdriver.hpp>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/drivers/NetworkDriver.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 #include <map>
-#include <os/datacontainer/sigmessages.hpp>
-#include <os/app/remoteControl/rc_dataTypes.hpp>
-#include <devices/onoffdevice.hpp>
+#include <os/datacontainer/SigMessages.hpp>
+#include <os/app/remoteControl/rc_DataTypes.hpp>
+#include <devices/OnOffDevice.hpp>
 
 #define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
 #define TIME_TO_REPEAT_DETAILED_DATA_REQEST 500

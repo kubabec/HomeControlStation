@@ -1,11 +1,11 @@
 #ifndef REMOTE_CONTROL_CLIENT_H
 #define REMOTE_CONTROL_CLIENT_H
 #include <Arduino.h>
-#include <os/drivers/networkdriver.hpp>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/drivers/NetworkDriver.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 #include <map>
-#include <os/datacontainer/sigmessages.hpp>
-#include <os/app/config/configprovider.hpp>
+#include <os/datacontainer/SigMessages.hpp>
+#include <os/app/config/ConfigProvider.hpp>
 
 
 

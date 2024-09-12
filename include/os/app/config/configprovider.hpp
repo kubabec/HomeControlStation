@@ -1,7 +1,7 @@
 #ifndef CONFIG_PROVIDER_H
 #define CONFIG_PROVIDER_H
 #include <Arduino.h>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 
 
 #define SSID_LENGTH 30

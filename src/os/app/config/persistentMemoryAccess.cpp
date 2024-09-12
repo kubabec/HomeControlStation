@@ -1,4 +1,4 @@
-#include <os/app/config/persistentMemoryAccess.hpp>
+#include <os/app/config/PersistentMemoryAccess.hpp>
 
 #include <EEPROM.h>
 

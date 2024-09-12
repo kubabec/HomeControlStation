@@ -1,6 +1,6 @@
-#include <os/app/config/configprovider.hpp>
+#include <os/app/config/ConfigProvider.hpp>
 
-#include <os/app/config/persistentMemoryAccess.hpp>
+#include <os/app/config/PersistentMemoryAccess.hpp>
 
 #include <Regexp.h>
 

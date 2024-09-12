@@ -1,5 +1,5 @@
-#include <os/app/devicemanager.hpp>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/app/DeviceManager.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 
 
 

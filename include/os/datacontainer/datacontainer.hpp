@@ -9,8 +9,8 @@
 #include <chrono>
 #include <iostream>
 #include <Arduino.h>
-#include "datacontainertypes.hpp"
-#include "signals.hpp"
+#include "DataContainerTypes.hpp"
+#include "Signals.hpp"
 
 
 class DataContainer

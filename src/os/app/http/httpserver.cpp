@@ -1,9 +1,9 @@
-#include <os/app/http/httpserver.hpp>
+#include <os/app/http/HttpServer.hpp>
 
-#include "os/app/http/configPageHttp.h"
-#include "os/app/http/pageHead.h"
-#include "os/app/http/style.h"
-#include "os/app/http/javascript.h"
+#include "os/app/http/ConfigPageHttp.h"
+#include "os/app/http/PageHead.h"
+#include "os/app/http/Style.h"
+#include "os/app/http/JavaScript.h"
 
 WiFiServer HomeLightHttpServer::server(80);
 String HomeLightHttpServer::header = "";

@@ -1,6 +1,6 @@
-#include <os/drivers/networkdriver.hpp>
-#include <os/app/remoteControl/remotecontrolserver.hpp>
-#include <os/app/remoteControl/remoteControlClient.hpp>
+#include <os/drivers/NetworkDriver.hpp>
+#include <os/app/remoteControl/RemoteControlServer.hpp>
+#include <os/app/remoteControl/RemoteControlClient.hpp>
 
 bool NetworkDriver::networkConnected = false;
 bool NetworkDriver::networkConnectionRequested = false;

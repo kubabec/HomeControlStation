@@ -1,4 +1,4 @@
-#include <os/homelight_os.hpp>
+#include <os/HomeStation_os.hpp>
 
 SystemNetworkModeEnum OperatingSystem::networkMode = SystemNetworkModeEnum::eWIFI_UNKNOWN;
 

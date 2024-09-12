@@ -1,4 +1,4 @@
-#include <devices/onoffdevice.hpp>
+#include <devices/OnOffDevice.hpp>
 
 
 Adafruit_NeoPixel testMemoryConsumption;

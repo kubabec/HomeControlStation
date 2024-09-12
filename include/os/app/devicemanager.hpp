@@ -1,8 +1,8 @@
 #ifndef DEVICE_MANAGER_H
 #define DEVICE_MANAGER_H
 #include <Arduino.h>
-#include <devices/onoffdevice.hpp>
-#include <os/datacontainer/datacontainertypes.hpp>
+#include <devices/OnOffDevice.hpp>
+#include <os/datacontainer/DataContainerTypes.hpp>
 
 
 typedef enum

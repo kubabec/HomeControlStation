@@ -2,7 +2,7 @@
 #define ONOFF_DEVICE_H
 
 #include "Arduino.h"
-#include "device.hpp"
+#include "Device.hpp"
 
 #include <Adafruit_NeoPixel.h>
 

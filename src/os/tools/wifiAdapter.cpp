@@ -1,5 +1,5 @@
-#include <os/tools/wifiAdapter.hpp>
-#include <os/datacontainer/datacontainer.hpp>
+#include <os/tools/WifiAdapter.hpp>
+#include <os/datacontainer/DataContainer.hpp>
 
 
 bool WiFiAdapter::isConnectedFlag = false;

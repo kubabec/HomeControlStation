@@ -1,7 +1,7 @@
-#include <os/app/remoteControl/remoteControlClient.hpp>
-#include <os/datacontainer/datacontainer.hpp>
-#include <os/datacontainer/sigmessages.hpp>
-#include <os/app/remoteControl/rc_dataTypes.hpp>
+#include <os/app/remoteControl/RemoteControlClient.hpp>
+#include <os/datacontainer/DataContainer.hpp>
+#include <os/datacontainer/SigMessages.hpp>
+#include <os/app/remoteControl/rc_DataTypes.hpp>
 
 
 

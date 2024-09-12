@@ -1,8 +1,8 @@
 #ifndef NETWORK_DRIVER_H
 #define NETWORK_DRIVER_H
 
-#include <os/tools/wifiAdapter.hpp>
-#include <os/tools/udpAdapter.hpp>
+#include <os/tools/WifiAdapter.hpp>
+#include <os/tools/UdpAdapter.hpp>
 #include <functional>
 
 enum PacketRangeDefinition {
