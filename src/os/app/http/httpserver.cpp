@@ -1,6 +1,7 @@
 #include <os/app/http/HttpServer.hpp>
 
 #include "os/app/http/ConfigPageHttp.h"
+#include "os/app/http/SlotsViewPageHttp.h"
 #include "os/app/http/PageHead.h"
 #include "os/app/http/Style.h"
 #include "os/app/http/JavaScript.h"
@@ -17,6 +18,7 @@ int HomeLightHttpServer::pos3 = 150;
 std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
 std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
+ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
 
 void HomeLightHttpServer::cyclic()
@@ -41,6 +43,8 @@ void HomeLightHttpServer::init()
   );
 
   DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
+
+  DataContainer::subscribe(SIG_CONFIG_SLOTS, "HTTPServer", HomeLightHttpServer::onSlotConfigChange);
 
 
   /* Get IP address from DataContainer to have it for further client redirections */
@@ -90,7 +94,7 @@ void HomeLightHttpServer::handleClientRequest()
             client.println("<body><div class=\"wrapper\">");
 
             // NO config page requested?
-            if(header.indexOf("GET /config") < 0){
+            if((header.indexOf("GET /config") < 0) && (header.indexOf("GET /localDevices") < 0)){
 
               if(header.indexOf("GET /?pending") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
               { 
@@ -163,11 +167,15 @@ void HomeLightHttpServer::handleClientRequest()
               <br><a href=\"/config\" class=\"button\">Configuration</a><br>";
               client.println(configButtonLink);
 
-            }else
+            }else if (header.indexOf("GET /config") >= 0)
             {
               // Print config page if it is requested
               printConfigPage(client);
+            }else if (header.indexOf("GET /localDevices") >= 0)
+            {
+              printSlotsConfigPage(client);
             }
+
 
             client.println("</div></body></html>");            
             client.println();
@@ -194,6 +202,15 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
     onOff.print();
   }
 }
+
+void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
+{
+  pinConfigSlotsCopy_HttpServer = (std::any_cast<ConfigSlotsDataType>(newSlotConfig));
+  for(auto& slot : pinConfigSlotsCopy_HttpServer.slots) {
+    slot.print();
+  }
+}
+
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
 void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client) {
   client.println("<div class=\"container\">"); // container
@@ -218,6 +235,100 @@ void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, W
   client.println("</div>"); // container 
 }
 
+
+void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
+{
+// <div class=\"device-container\">\
+//             <label>\
+//                 <input type=\"checkbox\" checked>\
+//                 Device 1 - <span class=\"status-text\">Enabled</span>\
+//             </label>\
+//             <label>Identifier:\
+//                 <input type=\"text\" name=\"identifier1\" placeholder=\"ID-001\">\
+//             </label>\
+//             <label>Name:\
+//                 <input type=\"text\" name=\"name1\" placeholder=\"Device 1\">\
+//             </label>\
+//             <label>Room Number:\
+//                 <input type=\"text\" name=\"room1\" placeholder=\"101\">\
+//             </label>\
+//         </div>
+
+  // bool isEmpty = true;            /* 1 byte */
+  //   char deviceName[25] = {'\0'};   /* 25 bytes */
+  //   uint8_t deviceType = 255;       /* 1 byte */
+  //   uint8_t pinNumber = 255;        /* 1 byte */
+  //   uint8_t deviceId = 255;         /* 1 byte */
+  //   uint8_t roomId = 255;           /* 1 byte */
+
+  const char* labelStart = "<label>";
+  const char* labelEnd = "</label>";
+
+  client.println("<div class=\"device-container\">");
+  
+  if(!slot.isEmpty)
+  {
+    /* Slot is active */
+    client.println(labelStart);
+    client.println("<input type=\"checkbox\" checked> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println(labelEnd);
+
+  }else
+  {
+    /* Slot is inactive */
+    client.println(labelStart);
+    client.println("<input type=\"checkbox\"> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println(labelEnd);
+  }
+
+  client.println(labelStart);
+  client.println("Device ID:<input type=\"text\" name=\"identifier"+String(slotNumber)+"\"\
+    value=\""+ String((int)slot.deviceId) + "\">");
+  client.println(labelEnd);
+
+  client.println(labelStart);
+  client.println("Name:<input type=\"text\" maxlength=\"24\" name=\"name"+String(slotNumber)+"\"\
+  value=\""+ String(slot.deviceName) +"\">");
+  client.println(labelEnd);
+
+  client.println(labelStart);
+  client.println("Type: <select id=\"type"+String(slotNumber)+"\" >");
+  if(slot.deviceType == 43){
+    client.println("<option value=\"43\" selected>On/Off Device</option>");
+  }else
+  {
+    client.println("<option value=\"43\">On/Off Device</option>");
+  }
+  
+  if(slot.deviceType == 44){
+    client.println("<option value=\"44\" selected>LED strip</option>");
+  }else
+  {
+    client.println("<option value=\"44\">LED strip</option>");
+  }
+
+  if(slot.deviceType != 43 && slot.deviceType != 44){
+    client.println("<option value=\"255\" selected>UNKNOWN</option>");
+  }else {
+    client.println("<option value=\"255\">UNKNOWN</option>");
+  }
+  client.println("</select>");
+
+  client.println(labelEnd);
+
+  client.println(labelStart);
+  client.println("Pin:<input type=\"text\" name=\"pin"+String(slotNumber)+"\"\
+  value=\""+ String((int)slot.pinNumber) +"\">");
+  client.println(labelEnd);
+
+  client.println(labelStart);
+  client.println("Room ID:<input type=\"text\" name=\"room"+String(slotNumber)+"\"\
+  value=\""+ String((int)slot.roomId) +"\">");
+  client.println(labelEnd);
+
+  client.println("</div>");
+
+}
 
 /* ========= CONFIG POC ==============*/
 
@@ -260,4 +371,21 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   /* Display return button */
   client.println("<br><a href=\"http://"+ipAddressString+"\" class=\"button\">Home page</a><br>");
 
+}
+
+void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
+{
+  client.println("<div class=\"wrapper\">\
+        <div class=\"header\">Device Configuration</div>");
+  //client.println(slotsViewPage);
+
+  uint8_t slotIdx = 1;
+  for(auto slot : pinConfigSlotsCopy_HttpServer.slots)
+  {
+    generateConfigSlotUi(slotIdx, slot, client);
+    slotIdx++;
+  }
+
+
+  client.println("</div>");
 }

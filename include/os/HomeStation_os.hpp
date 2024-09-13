@@ -14,7 +14,6 @@ class   OperatingSystem
 {
 
 private:
-    static SystemNetworkModeEnum networkMode;
     static bool isHttpServerRunning;
     static bool isRCServerRunning;
 

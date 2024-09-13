@@ -207,6 +207,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nv
             {
                 DeviceConfigSlotType& configSlotRef = pinConfigSlotsRamMirror.slots.at(configSlotID);
 
+                configSlotRef.isEmpty = false;
                 configSlotRef.deviceId = nvmData.deviceId;
                 configSlotRef.deviceType = nvmData.deviceType;
                 configSlotRef.pinNumber = nvmData.pinNumber;

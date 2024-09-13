@@ -4,35 +4,7 @@
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
 
-enum LightStatus
-{
-    eUNKNOWN,
-    eON,
-    eOFF
-};
-
-enum ConnectionStatus
-{
-    NEVER_CONNECTED,
-    CONNECTED,
-    CONNECTION_LOST
-};
-
-typedef enum
-{
-    eENABLE_REQUEST,
-    eDISABLE_REQUEST,
-    eNOT_REQESTED,
-    eREQEST_RECEIVED
-}StateChangeRequest;
-
-typedef enum
-{
-    eWIFI_UNKNOWN = 7,
-    eWIFI_SAVED_NOT_CONNECTED,
-    eWIFI_SAVED_CONNECTED
-}SystemNetworkModeEnum;
-
+/* Description of ON/OFF device */
 typedef struct
 {
     uint8_t nodeId = 255;
@@ -54,12 +26,14 @@ typedef struct
 }OnOffDeviceDescription;
 
 // aktualny stan przerabianego requesta
+/* State of request processing */
 enum RequestProcessingState {
     eNO_REQUEST,
     eREQUEST_PENDING,
     eREQUEST_COMPLETED
 };
 
+/* Basic node (ESP32) configuration data */
 typedef struct {
     bool isHttpServer = 0;
     bool isRcServer = 0;
@@ -68,7 +42,7 @@ typedef struct {
     String networkPassword = "";
 }NodeConfiguration;
 
-
+/* NVM datablocks identifiers */
 typedef enum
 {
     e_PERSISTENT_BLOCK_FIRST = 0,
@@ -80,8 +54,10 @@ typedef enum
     e_PERSISTENT_BLOCK_LAST = e_BLOCK_DEVICE_5
 }PersistentDatablockID;
 
+/* Description of single configuration NVM slot */
 typedef struct 
 {
+    bool isEmpty = true;            /* 1 byte */
     char deviceName[25] = {'\0'};   /* 25 bytes */
     uint8_t deviceType = 255;       /* 1 byte */
     uint8_t pinNumber = 255;        /* 1 byte */
@@ -90,12 +66,46 @@ typedef struct
     struct customData{
         uint8_t bytes[10];          /* 10 bytes */
     };
+
+    void print()
+    {
+        Serial.println("--> Config SLOT <--");
+        if(isEmpty){
+            Serial.println("IsEmpty: YES ");
+        }else
+        {
+            Serial.println("IsEmpty: NO ");
+        }
+        
+        Serial.print("Device Type: "); 
+        switch(deviceType)
+        {
+            case 43:
+            Serial.println("ON/OFF");
+            break;
+
+            case 44:
+            Serial.println("LED STRIP");
+            break;
+
+            case 255:
+            Serial.println("Not configured");
+            break;
+
+            default: 
+            Serial.println("UNKNOWN");
+            break;
+        }
+        Serial.println("Device ID " + String(deviceId)); 
+    }
 }DeviceConfigSlotType;
 
+/* Array of available configuration slots wrapper */
 typedef struct {
     std::array<DeviceConfigSlotType, NUMBER_OF_CONFIG_SLOTS> slots;
 }ConfigSlotsDataType;
 
+/* Generic datatype for NVM PERSISTENT_DATABLOCK_SIZE-bytes long block */
 typedef struct
 {
     uint8_t data[PERSISTENT_DATABLOCK_SIZE];

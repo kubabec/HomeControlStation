@@ -1,13 +1,11 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 22
+#define NUMBER_OF_SIGNALS 21
 enum Signal
 {
-    /* Type: SystemNetworkModeEnum , wifi mode status AP/connected to other */
-    SIG_SYSTEM_NETWORK_MODE = 0,
     /* Type: bool , somme description */
-    SIG_KEEP_ALIVE_RECEIVED,
+    SIG_KEEP_ALIVE_RECEIVED = 0,
     /* Type: int , not used yet */
     SIG_CONNECTION_STATUS,
     
@@ -64,7 +62,6 @@ enum Signal
 };
 
 const std::string signalNames[NUMBER_OF_SIGNALS] = {
-    "SYSTEM_NETWORK_MODE",
     "KEEP_ALIVE_RECEIVED",
     "CONNECTION_STATUS",
     "CBK_LOCAL_DEVICE_ENABLE",

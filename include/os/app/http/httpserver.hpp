@@ -19,20 +19,26 @@ class HomeLightHttpServer
     static int pos3;
     
     static std::vector<OnOffDeviceDescription> onOffDescriptionVector;
+    static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
 
     static String ipAddressString;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
 
-    static void generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client);
+    
 
 
     static void printConfigPage(WiFiClient& client);
+    static void printSlotsConfigPage(WiFiClient& client);
 public:
     static void cyclic();
     static void init();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
+    static void onSlotConfigChange(std::any newSlotConfig);
+
+    static void generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client);
+    static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
 };
 
 #endif

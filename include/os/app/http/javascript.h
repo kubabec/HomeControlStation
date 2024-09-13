@@ -24,6 +24,34 @@ const char* javascript = "\
         value = parseInt(value);\
         window.location.assign(\"/?bri\"+value+\"DEV\"+devId+\"&\");\
     }\
+    function toggleDeviceConfig(checkbox) {\
+        var container = checkbox.closest('.device-container');\
+        var statusText = container.querySelector('.status-text');\
+        if (checkbox.checked) {\
+            container.classList.remove('disabled');\
+            statusText.textContent = 'Enabled';\
+            container.querySelectorAll('input[type=\"text\"]').forEach(input => input.disabled = false);\
+        } else {\
+            container.classList.add('disabled');\
+            statusText.textContent = 'Disabled';\
+            container.querySelectorAll('input[type=\"text\"]').forEach(input => input.disabled = true);\
+        }\
+    }\
+    window.onload = function() {\
+        document.querySelectorAll('.device-container').forEach(container => {\
+            var checkbox = container.querySelector('input[type=\"checkbox\"]');\
+            toggleDeviceConfig(checkbox);\
+            checkbox.addEventListener('change', function() {\
+                toggleDeviceConfig(this);\
+            });\
+        });\
+        document.getElementById('button1').addEventListener('click', function() {\
+            window.location.href = 'http://example.com/link1';\
+        });\
+        document.getElementById('button2').addEventListener('click', function() {\
+            window.location.href = 'http://example.com/link2';\
+        });\
+    };\
 </script>";
 
 #endif

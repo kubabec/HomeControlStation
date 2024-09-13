@@ -181,6 +181,27 @@ input[type=\"range\"]:focus {\
     left: 0;\
     transform: translateY(-50%);\
 }\
+.device-container {\
+    display: flex;\
+    flex-direction: column;\
+    padding: 20px;\
+    background: #fff;\
+    border-radius: 15px;\
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\
+    margin-bottom: 20px;\
+    width: 300px;\
+    opacity: 0;\
+    transform: translateY(20px);\
+    animation: fadeInSlide 2s forwards;\
+    transition: background-color 0.3s, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;\
+    overflow: hidden;\
+    max-height: 350px;\
+}\
+.device-container.disabled {\
+    background-color: #f2f2f2;\
+    max-height: 40px;\
+    padding: 10px 20px;\
+}\
 </style>\
 ";
 

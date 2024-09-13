@@ -1,6 +1,5 @@
 #include <os/HomeStation_os.hpp>
 
-SystemNetworkModeEnum OperatingSystem::networkMode = SystemNetworkModeEnum::eWIFI_UNKNOWN;
 
 bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
@@ -65,7 +64,6 @@ void OperatingSystem::task20ms()
 
 void OperatingSystem::task50ms()
 {
-    DataContainer::setSignalValue(SIG_SYSTEM_NETWORK_MODE, "OperatingSystem", networkMode);
-    //DataContainer::setSignalValue(CBK_DEVICE_ENABLE, "OperatingSystem", ....);
+
     
 }
