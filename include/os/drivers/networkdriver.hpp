@@ -29,6 +29,7 @@ class NetworkDriver
 
 public:
     static void init();
+    static void deinit();
     static void cyclic();
 
     static void udpReceive(MessageUDP data);

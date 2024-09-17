@@ -15,6 +15,10 @@ std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
 
 std::vector<OnOffDevice> vecOnOffDevices = {OnOffDevice(13,"RCDev1",0,8),OnOffDevice(10,"RCDevice2",1,9),OnOffDevice(11,"RCDev3",2,10)};
 
+void RemoteControlServer::deinit() {
+    
+}
+
 void RemoteControlServer::init(){
     //to robi ze funkcje sa widoczne w datacontainer
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, bool)> > (RemoteControlServer::deviceEnable));

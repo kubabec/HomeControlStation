@@ -59,6 +59,7 @@ class DeviceManager
     static bool extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nvmData, uint8_t configSlotID);
 public:
     static void init();
+    static void deinit();
     static void cyclic();
     static bool deviceEnable(uint8_t deviceId, bool state);
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);

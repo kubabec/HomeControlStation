@@ -84,6 +84,7 @@ class ConfigProvider
     static bool readRamMirrorFromNvm();
 public:
     static void init();
+    static void deinit();
     static void cyclic();
 
     static void setConfigViaString(String& configString);

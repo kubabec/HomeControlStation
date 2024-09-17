@@ -163,7 +163,7 @@ void ConfigProvider::setConfigViaString(String& configString)
         configRamMirror.serialPrint();
 
         /* Save changed configuration + all the rest of RAM mirrors to NVM */
-        saveRamMirrorToNvm();
+        //saveRamMirrorToNvm();
 
     }else
     {
@@ -270,7 +270,8 @@ bool ConfigProvider::setDatablock(PersistentDatablockID blockID, uint8_t* data)
             PersistentDataBlock::getSize()
         );
 
-        retVal = saveRamMirrorToNvm();
+        //retVal = saveRamMirrorToNvm();
+        retVal = true;
     }
 
     return retVal;
@@ -313,6 +314,10 @@ void ConfigProvider::eraseDatablockMemory()
     nvmDataAvailable = false;
 
     Serial.println("Datablock erase done.");
+}
+
+void ConfigProvider::deinit() {
+    saveRamMirrorToNvm();
 }
 
 

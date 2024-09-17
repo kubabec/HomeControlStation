@@ -9,6 +9,10 @@ ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
     // OnOffDevice(10,"WC",1,9),
     // OnOffDevice(11,"Dev",3,10)};
 
+void DeviceManager::deinit() {
+    
+}
+
 void DeviceManager::init()
 {
     /* TESTBLOCK TO BE REMOVED IN THE FUTURE */

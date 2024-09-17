@@ -19,6 +19,7 @@ private:
 
 public:
     static void init();
+    static void reset();
 
 
     static void task10ms();

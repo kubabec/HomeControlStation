@@ -24,6 +24,7 @@ class RemoteControlClient
     
 public:
     static void init();
+    static void deinit();
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
     

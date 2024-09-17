@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 21
+#define NUMBER_OF_SIGNALS 22
 enum Signal
 {
     /* Type: bool , somme description */
@@ -58,7 +58,10 @@ enum Signal
     CBK_GET_NVM_DATABLOCK,
 
     /* TYpe: ConfigSlotsDataType - container with hardware pins configuration and logical devices extraction */
-    SIG_CONFIG_SLOTS
+    SIG_CONFIG_SLOTS,
+
+    /* Type: std:function<void()> - callback to reboot */
+    CBK_RESET_DEVICE
 };
 
 const std::string signalNames[NUMBER_OF_SIGNALS] = {
@@ -82,7 +85,8 @@ const std::string signalNames[NUMBER_OF_SIGNALS] = {
     "SIG_IP_ADDRESS",
     "CBK_SET_NVM_DATABLOCK",
     "CBK_GET_NVM_DATABLOCK",
-    "SIG_CONFIG_SLOTS"
+    "SIG_CONFIG_SLOTS",
+    "CBK_RESET_DEVICE"
 };
 
 

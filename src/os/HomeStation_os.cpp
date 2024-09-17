@@ -6,6 +6,8 @@ bool OperatingSystem::isRCServerRunning = false;
 
 void OperatingSystem::init()
 {
+    DataContainer::setSignalValue(CBK_RESET_DEVICE, "OperatingSystem", static_cast<std::function<void()>>(OperatingSystem::reset));
+
     DataContainer::subscribe(SIG_IS_HTTP_SERVER, "OperatingSystem", [](std::any signal) {
         isHttpServerRunning = (std::any_cast<bool>(signal));
     });
@@ -66,4 +68,27 @@ void OperatingSystem::task50ms()
 {
 
     
+}
+
+void OperatingSystem::reset() {
+
+    DeviceProvider::deinit();
+
+    if(isRCServerRunning){
+        RemoteControlServer::deinit();
+    }else{
+        RemoteControlClient::deinit();
+    }
+
+    DeviceManager::deinit();
+
+    if(isHttpServerRunning){
+        HomeLightHttpServer::deinit();
+    }
+
+    NetworkDriver::deinit();
+    ConfigProvider::deinit();
+
+    ESP.restart();
+
 }

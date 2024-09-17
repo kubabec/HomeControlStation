@@ -34,6 +34,7 @@ class HomeLightHttpServer
 public:
     static void cyclic();
     static void init();
+    static void deinit();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
     static void onSlotConfigChange(std::any newSlotConfig);
 

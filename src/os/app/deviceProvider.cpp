@@ -10,6 +10,9 @@ std::function<bool(uint8_t, uint8_t)> DeviceProvider::rcServer_BrightnessChange;
 
 bool DeviceProvider::isRCServer = false;
 
+void DeviceProvider::deinit() {
+    
+}
 
 void DeviceProvider::init()
 {
@@ -17,6 +20,8 @@ void DeviceProvider::init()
 
     DataContainer::setSignalValue(CBK_DEVICE_ENABLE,"DeviceProvider", static_cast<std::function<bool(uint8_t, bool)> > (DeviceProvider::deviceEnable));
     DataContainer::setSignalValue(CBK_DEVICE_BRIGHTNESS_CHANGE,"DeviceProvider", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceProvider::deviceBrightnessChange));
+
+   
 
     std::any rcServerCoding = DataContainer::getSignalValue(SIG_IS_RC_SERVER);
     isRCServer = std::any_cast<bool> (rcServerCoding);
@@ -181,6 +186,11 @@ void DeviceProvider::printIdMap() {
             DeviceTranslationDetails value = pair.second;            
             Serial.println("Unique ID: " + String(key) + ", Original ID: " + String(value.originalID) + ", Is Local: " + String (value.isLocal ? "true" : "false"));            
         }
+}
+
+void DeviceProvider::deviceReset() {
+
+    Serial.println(" -> DeviceProvider.deviceReset");
 }
 
 // uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {

@@ -27,6 +27,10 @@ void HomeLightHttpServer::cyclic()
     handleClientRequest();
 }
 
+void HomeLightHttpServer::deinit() {
+    
+}
+
 void HomeLightHttpServer::init()
 {
   //std::any deviceEnable = DataContainer::getSignalValue(CBK_DEVICE_ENABLE);
@@ -152,7 +156,10 @@ void HomeLightHttpServer::handleClientRequest()
                 std::any_cast<std::function<void(String&)>>
                   (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_STRING))(header);
 
+
                 client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+                std::any_cast<std::function<void()>>
+                  (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
               }
 
               /* Generate UI for every available device */

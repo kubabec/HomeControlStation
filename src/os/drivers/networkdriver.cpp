@@ -12,6 +12,9 @@ void dummyTobeRemoved(MessageUDP& data){
 
 }
 
+void NetworkDriver::deinit() {
+    
+}
 
 void NetworkDriver::init()
 {

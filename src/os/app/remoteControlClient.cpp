@@ -9,6 +9,10 @@ static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 
+void RemoteControlClient::deinit() {
+    
+}
+
 void RemoteControlClient::init()
 {       
     currentState = STATE_NODE_INITIAL_DATA;
