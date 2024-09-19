@@ -52,6 +52,33 @@ const char* javascript = "\
             window.location.href = 'http://example.com/link2';\
         });\
     };\
+    function showExtraFields(select, deviceId) {\
+        const deviceContainer = document.getElementById(deviceId);\
+        const extraFields = deviceContainer.querySelectorAll('.extra-fields');\
+        extraFields.forEach(field => {\
+            field.classList.remove('visible');\
+        });\
+        const selectedValue = select.value;\
+        const fieldsToShow = deviceContainer.querySelector(`.extra-${selectedValue}`);\
+        if (fieldsToShow) {\
+            fieldsToShow.classList.add('visible');\
+        }\
+    };\
+    function createConfigurationString()\
+    {\
+        var configStr = '';\
+        var url = '/config';\
+        for (let i = 1; i <= 6; i++) {\
+            const container = document.getElementById(\"device-\"+i);\
+            var enable = \"enabled\" + i;\
+            console.log(enable);\
+            var enableValue = document.getElementById(enable).checked;\
+            var fieldname = 'identifier' + i;\
+            var devName = document.querySelector('input[name='+fieldname+']').value;\
+            url = url + enableValue;\
+        }\
+        window.location.href = url;\
+    };\
 </script>";
 
 #endif

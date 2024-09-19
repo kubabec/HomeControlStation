@@ -271,20 +271,22 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   const char* labelStart = "<label>";
   const char* labelEnd = "</label>";
 
-  client.println("<div class=\"device-container\">");
+  client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
+
+  //client.println("<script onload=\"showExtraFields(type"+String(slotNumber)+", 'device-"+String((int)slotNumber)+"');\"></script>");
   
   if(!slot.isEmpty)
   {
     /* Slot is active */
     client.println(labelStart);
-    client.println("<input type=\"checkbox\" checked> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println("<input id=\"enabled"+String((int)slotNumber)+"\" type=\"checkbox\" checked> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
 
   }else
   {
     /* Slot is inactive */
     client.println(labelStart);
-    client.println("<input type=\"checkbox\"> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println("<input id=\"enabled"+String((int)slotNumber)+"\" type=\"checkbox\"> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
   }
 
@@ -299,7 +301,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Type: <select id=\"type"+String(slotNumber)+"\" >");
+  client.println("Type: <select onchange=\"showExtraFields(this, 'device-"+String((int)slotNumber)+"');\" id=\"type"+String(slotNumber)+"\" >");
   if(slot.deviceType == 43){
     client.println("<option value=\"43\" selected>On/Off Device</option>");
   }else
@@ -332,6 +334,21 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("Room ID:<input type=\"text\" name=\"room"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.roomId) +"\">");
   client.println(labelEnd);
+
+  /*<!-- Extra fields for ON/OFF -->*/
+  client.println("<div class=\"extra-fields extra-43\">");
+  client.println("<label>Brightness support:");
+  client.println("<input id=\"extra-43-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"1\">");
+  client.println("</label>");
+  client.println("</div>");
+
+  /*<!-- Extra fields for LED Strip -->*/
+  client.println("<div class=\"extra-fields extra-44\">");
+  client.println("<label>LEDs num.:");
+  client.println("<input id=\"extra-43-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\">");
+  client.println("</label>");
+  client.println("</div>");
+
 
   client.println("</div>");
 
@@ -393,6 +410,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
     slotIdx++;
   }
 
+  client.println("<button id=\"confirmationButton\" onclick=\"createConfigurationString();\">Save config</button>");
 
   client.println("</div>");
 }

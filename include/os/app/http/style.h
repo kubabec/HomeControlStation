@@ -195,12 +195,40 @@ input[type=\"range\"]:focus {\
     animation: fadeInSlide 2s forwards;\
     transition: background-color 0.3s, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;\
     overflow: hidden;\
-    max-height: 350px;\
+    max-height: 500px;\
 }\
 .device-container.disabled {\
     background-color: #f2f2f2;\
     max-height: 40px;\
     padding: 10px 20px;\
+}\
+.collapsed {\
+    max-height: 40px;\
+    overflow: hidden;\
+    padding: 20px;\
+}\
+.collapsed input[type=\"text\"],\
+.collapsed select {\
+    opacity: 0;\
+    pointer-events: none;\
+}\
+.collapsed .button {\
+    opacity: 0;\
+    pointer-events: none;\
+}\
+.disabled {\
+    background: #f0f0f0;\
+    color: #999;\
+}\
+.extra-fields {\
+    max-height: 0;\
+    overflow: hidden;\
+    opacity: 0;\
+    transition: max-height 1.5s ease, opacity 1.5s ease;\
+}\
+.visible {\
+    max-height: 500px;\
+    opacity: 1;\
 }\
 </style>\
 ";
