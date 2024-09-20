@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+#define REQUEST_DATA_SIZE 30
+#define RESPONSE_DATA_SIZE 10
+#define REQEST_SIZE (REQUEST_DATA_SIZE + 8)
 
 typedef enum {
     REQUEST_NODE_INITIAL_DATA = 50,
@@ -10,7 +13,9 @@ typedef enum {
     REQUEST_KEEP_ALIVE,
     RESPONSE_NODE_INITIAL_DATA,
     RESPONSE_NODE_DETAILED_DATA,
-    RESPONSE_KEEP_ALIVE
+    RESPONSE_KEEP_ALIVE,
+    RC_REQUEST,
+    RC_RESPONSE
 }UdpFrames_RCS; //Remote Control Server
 
 typedef struct {
@@ -28,5 +33,59 @@ typedef struct {
     uint16_t nodeId = 255;
 
 } KeepAliveData;
+
+
+
+typedef enum {
+    ENABLE_REQ,
+    DISABLE_REQ,
+    BRIGHTNESS_CHANGE_REQ,
+    COLOR_CHANGE_REQ,
+    RESET_REQ,
+    UNKNOWN_REQ
+}RequestType;
+
+
+
+typedef struct {
+    uint8_t requestId = 255;
+    uint16_t targetNodeId = 255;
+    uint8_t targetDeviceId = 255;
+    uint8_t type = UNKNOWN_REQ;
+    uint8_t data[REQUEST_DATA_SIZE] {0xFF};
+    uint8_t requestSendCount = 0;
+    uint16_t crc = 5;
+    
+    void print() {
+        Serial.println("### Request ###");
+        Serial.println("requestId :" + String((int)requestId));
+        Serial.println("targetNodeId :" + String((int)targetNodeId));
+        Serial.println("targetDeviceId :" + String((int)targetDeviceId));
+        Serial.println("type :" + String((int)type));
+        for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
+            Serial.print((int)data[i]);
+        }
+        Serial.println("");
+        Serial.println("requestSendCount :" + String((int)requestSendCount));
+        Serial.println("crc :" + String((int)crc));
+        Serial.println("###############");
+    }
+
+}RcRequest;
+
+typedef enum {
+    POSITIVE_RESP,
+    NEGATIVE_RESP,
+    INVALID_REQ_RESP,
+    UNKNOWN_RESP
+}ResponseType;
+
+typedef struct {
+    uint8_t responseId; 
+    ResponseType type = UNKNOWN_RESP;   
+    uint8_t data[RESPONSE_DATA_SIZE] = {0xFF};
+    uint8_t requestSendCount = 0;
+    uint16_t crc ;
+}RcResponse;
 
 #endif

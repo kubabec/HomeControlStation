@@ -7,6 +7,7 @@
 #include <os/datacontainer/SigMessages.hpp>
 #include <os/app/remoteControl/rc_DataTypes.hpp>
 #include <devices/OnOffDevice.hpp>
+#include <os/app/remoteControl/ReqestProcessor.hpp>
 
 #define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
 #define TIME_TO_REPEAT_DETAILED_DATA_REQEST 500
@@ -50,6 +51,8 @@ class RemoteControlServer
     static std::queue<MessageUDP> receivedBuffer;
 
     static std::vector<OnOffDevice> vecRemoteOnOffDevices;
+
+    static RequestProcessor requestProcessor;
 
     /* Kontener na informacje o zdalnych Nodach*/
     static std::map<uint16_t, RemoteNodeInformation> remoteNodes;

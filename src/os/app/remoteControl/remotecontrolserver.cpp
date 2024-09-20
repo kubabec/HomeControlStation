@@ -13,6 +13,8 @@ std::map<uint8_t, RCTranslation> RemoteControlServer::currentIdMapping;
 ServerState RemoteControlServer::currentState = STATE_REQUEST_NODE_INITIAL_DATA;
 std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
 
+RequestProcessor RemoteControlServer::requestProcessor;
+
 std::vector<OnOffDevice> vecOnOffDevices = {OnOffDevice(13,"RCDev1",0,8),OnOffDevice(10,"RCDevice2",1,9),OnOffDevice(11,"RCDev3",2,10)};
 
 void RemoteControlServer::deinit() {
@@ -352,6 +354,18 @@ bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     
     RCTranslation val = getTranslationFromUnique(deviceId);
     Serial.println("->Remote Control Server Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onDeviceLocalId));
+
+    RcRequest newRequest;
+    newRequest.requestId = 77;
+    newRequest.targetNodeId = val.nodeId;
+    newRequest.targetDeviceId = val.onDeviceLocalId;
+    newRequest.type = DISABLE_REQ;
+
+    newRequest.data[15] = 123;
+    newRequest.print();
+
+    requestProcessor.setCurrentRequest(newRequest);
+
     return true;
 }
 
