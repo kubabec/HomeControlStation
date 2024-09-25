@@ -55,6 +55,35 @@ typedef struct {
     uint8_t data[REQUEST_DATA_SIZE] {0xFF};
     uint8_t requestSendCount = 0;
     uint16_t crc = 5;
+
+    bool toByteArray(uint8_t* buffer, uint8_t sizeCheck){
+        if((buffer != 0) && (sizeCheck == this->getSize())) {
+            buffer[0] = requestId;
+            memcpy(&buffer[1], &targetNodeId, 2);
+            buffer[3] = targetDeviceId;
+            buffer[4] = type;
+            memcpy(&buffer[5], data, REQUEST_DATA_SIZE);
+            buffer[36] = requestSendCount;
+            calculateCrc();
+            memcpy(&buffer[37], &crc, 2);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void calculateCrc(){
+        crc = requestId + targetNodeId + targetDeviceId + type + requestSendCount;
+        for(uint8_t i=0; i< REQUEST_DATA_SIZE; i++){
+            crc += data[i];
+        }
+    }
+
+    uint8_t getSize(){
+             
+        return (1+2+1+1+REQUEST_DATA_SIZE+1+2);
+    }
     
     void print() {
         Serial.println("### Request ###");

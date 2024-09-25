@@ -364,7 +364,7 @@ bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     newRequest.data[15] = 123;
     newRequest.print();
 
-    requestProcessor.setCurrentRequest(newRequest);
+    //requestProcessor.setCurrentRequest(newRequest);
 
     return true;
 }

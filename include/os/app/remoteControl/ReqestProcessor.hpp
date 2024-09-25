@@ -7,12 +7,14 @@
 class RequestProcessor
 {
     RcRequest currentRequest ;
+    unsigned long lastSendTime = 0;
+    
     bool isProcessingStarted = false;
 
 public:
    RequestProcessor();
-   bool processReqest();
-   void setCurrentRequest(RcRequest& newReqest);
+   bool processReqest(RcRequest& newReqest);
+   //void setCurrentRequest(RcRequest& newReqest);
 
 };
 
