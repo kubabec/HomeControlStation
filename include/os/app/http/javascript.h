@@ -37,21 +37,6 @@ const char* javascript = "\
             container.querySelectorAll('input[type=\"text\"]').forEach(input => input.disabled = true);\
         }\
     }\
-    window.onload = function() {\
-        document.querySelectorAll('.device-container').forEach(container => {\
-            var checkbox = container.querySelector('input[type=\"checkbox\"]');\
-            toggleDeviceConfig(checkbox);\
-            checkbox.addEventListener('change', function() {\
-                toggleDeviceConfig(this);\
-            });\
-        });\
-        document.getElementById('button1').addEventListener('click', function() {\
-            window.location.href = 'http://example.com/link1';\
-        });\
-        document.getElementById('button2').addEventListener('click', function() {\
-            window.location.href = 'http://example.com/link2';\
-        });\
-    };\
     function showExtraFields(select, deviceId) {\
         const deviceContainer = document.getElementById(deviceId);\
         const extraFields = deviceContainer.querySelectorAll('.extra-fields');\
@@ -70,6 +55,7 @@ const char* javascript = "\
         var url = '/configUpload';\
         for (let i = 1; i <= 6; i++) {\
             const container = document.getElementById(\"device-\"+i);\
+            var crc = 0;\
             var enable = \"enabled\" + i;\
             var enableValue = document.getElementById(enable).checked;\
             \
@@ -77,21 +63,56 @@ const char* javascript = "\
             if(enableValue == true){\
                 dataEnable = '1';\
             }\
+            crc = crc + Number(enableValue);\
 \
             var dataId = document.getElementById('identifier' + i).value;\
+            crc = crc + Number(dataId);\
+            if(dataId < 10) { dataId = '0' + dataId; }\
             var dataName = document.getElementById('name' + i).value;\
             var dataType = document.getElementById('type' + i).value;\
+            crc = crc + Number(dataType);\
             var dataPin = document.getElementById('pin' + i).value;\
+            crc = crc + Number(dataPin);\
+            if(dataPin < 10) { dataPin = '0' + dataPin; }\
             var dataRoom = document.getElementById('room' + i).value;\
+            if(dataRoom < 10) { dataRoom = '0' + dataRoom; }\
+            crc = crc + Number(dataRoom);\
             \
 \
-            deviceConfigurationString = dataEnable + dataId + dataName.length + dataName + dataType + dataPin + dataRoom;\
-            var lengthCount = deviceConfigurationString.length;\
+            var data43 =  document.getElementById('extra-43-' + i).value;\
+            var data44 =  document.getElementById('extra-44-' + i).value;\
+            var extraValue = '';\
+            if(dataType == 43) { extraValue = data43;}\
+            if(dataType == 44) { extraValue = data44;}\
+            crc = crc + Number(extraValue);\
+            if(extraValue < 10) { extraValue = '0' + extraValue; }\
+            var nameLength = dataName.length;\
+            crc = crc + Number(nameLength);\
+            if(nameLength < 10) { nameLength = '0' + nameLength; }\
+            deviceConfigurationString = dataEnable + dataId + nameLength + dataName + dataType + dataPin + dataRoom + extraValue;\
+            for(let i = 0; i < dataName.length; i++){\
+                crc = crc + dataName.charCodeAt(i);\
+                console.log(crc);\
+            }\
+            var lengthCount = deviceConfigurationString.length + 2;\
+            crc = crc + Number(lengthCount);\
             deviceConfigurationString = lengthCount + deviceConfigurationString;\
+            deviceConfigurationString = deviceConfigurationString + crc.toString().length + crc + \" \";\
             url = url + deviceConfigurationString;\
         }\
-        window.location.href = url;\
+        console.log(url);\
+    };\
+    window.onload = function() {\
+        document.querySelectorAll('.device-container').forEach(container => {\
+            var checkbox = container.querySelector('input[type=\"checkbox\"]');\
+            toggleDeviceConfig(checkbox);\
+            checkbox.addEventListener('change', function() {\
+                toggleDeviceConfig(this);\
+            });\
+        });\
     };\
 </script>";
 
 #endif
+
+        //window.location.href = url;\

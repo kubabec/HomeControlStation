@@ -328,8 +328,15 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Pin:<input type=\"text\" id=\"pin"+String(slotNumber)+"\"\
+  client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
+  client.println("<option value=\"1\">1</option>");
+  client.println("<option value=\"2\">2</option>");
+  client.println("<option value=\"3\">3</option>");
+  client.println("<option value=\"4\">4</option>");
+  client.println("<option value=\"5\">5</option>");
+  client.println("<option value=\"6\">6</option>");
+  client.println("</select>");
   client.println(labelEnd);
 
   client.println(labelStart);
@@ -340,7 +347,10 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   /*<!-- Extra fields for ON/OFF -->*/
   client.println("<div class=\"extra-fields extra-43\">");
   client.println("<label>Brightness support:");
-  client.println("<input id=\"extra-43-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"1\">");
+  client.println("<select id=\"extra-43-"+String((int)slotNumber)+"\">");
+  client.println("<option value=\"0\" selected>No</option>");
+  client.println("<option value=\"1\">Yes</option>");
+  client.println("</select>");
 
   client.println("</label>");
   client.println("</div>");
