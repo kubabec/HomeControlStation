@@ -67,15 +67,28 @@ const char* javascript = "\
     function createConfigurationString()\
     {\
         var configStr = '';\
-        var url = '/config';\
+        var url = '/configUpload';\
         for (let i = 1; i <= 6; i++) {\
             const container = document.getElementById(\"device-\"+i);\
             var enable = \"enabled\" + i;\
-            console.log(enable);\
             var enableValue = document.getElementById(enable).checked;\
-            var fieldname = 'identifier' + i;\
-            var devName = document.querySelector('input[name='+fieldname+']').value;\
-            url = url + enableValue;\
+            \
+            var dataEnable = '0';\
+            if(enableValue == true){\
+                dataEnable = '1';\
+            }\
+\
+            var dataId = document.getElementById('identifier' + i).value;\
+            var dataName = document.getElementById('name' + i).value;\
+            var dataType = document.getElementById('type' + i).value;\
+            var dataPin = document.getElementById('pin' + i).value;\
+            var dataRoom = document.getElementById('room' + i).value;\
+            \
+\
+            deviceConfigurationString = dataEnable + dataId + dataName.length + dataName + dataType + dataPin + dataRoom;\
+            var lengthCount = deviceConfigurationString.length;\
+            deviceConfigurationString = lengthCount + deviceConfigurationString;\
+            url = url + deviceConfigurationString;\
         }\
         window.location.href = url;\
     };\

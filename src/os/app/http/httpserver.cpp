@@ -274,6 +274,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
 
   //client.println("<script onload=\"showExtraFields(type"+String(slotNumber)+", 'device-"+String((int)slotNumber)+"');\"></script>");
+
   
   if(!slot.isEmpty)
   {
@@ -291,17 +292,18 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   }
 
   client.println(labelStart);
-  client.println("Device ID:<input type=\"text\" name=\"identifier"+String(slotNumber)+"\"\
+  client.println("Device ID:<input type=\"text\" id=\"identifier"+String(slotNumber)+"\"\
     value=\""+ String((int)slot.deviceId) + "\">");
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Name:<input type=\"text\" maxlength=\"24\" name=\"name"+String(slotNumber)+"\"\
+  client.println("Name:<input type=\"text\" maxlength=\"24\" id=\"name"+String(slotNumber)+"\"\
   value=\""+ String(slot.deviceName) +"\">");
   client.println(labelEnd);
 
   client.println(labelStart);
   client.println("Type: <select onchange=\"showExtraFields(this, 'device-"+String((int)slotNumber)+"');\" id=\"type"+String(slotNumber)+"\" >");
+
   if(slot.deviceType == 43){
     client.println("<option value=\"43\" selected>On/Off Device</option>");
   }else
@@ -326,12 +328,12 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Pin:<input type=\"text\" name=\"pin"+String(slotNumber)+"\"\
+  client.println("Pin:<input type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Room ID:<input type=\"text\" name=\"room"+String(slotNumber)+"\"\
+  client.println("Room ID:<input type=\"text\" id=\"room"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.roomId) +"\">");
   client.println(labelEnd);
 
@@ -339,13 +341,15 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("<div class=\"extra-fields extra-43\">");
   client.println("<label>Brightness support:");
   client.println("<input id=\"extra-43-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"1\">");
+
   client.println("</label>");
   client.println("</div>");
 
   /*<!-- Extra fields for LED Strip -->*/
   client.println("<div class=\"extra-fields extra-44\">");
   client.println("<label>LEDs num.:");
-  client.println("<input id=\"extra-43-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\">");
+  client.println("<input id=\"extra-44-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\">");
+
   client.println("</label>");
   client.println("</div>");
 
