@@ -162,6 +162,21 @@ void HomeLightHttpServer::handleClientRequest()
                   (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
               }
 
+              if(header.indexOf("GET /localSetup") >= 0)
+              {
+                // Configuration to be handled here
+
+                Serial.println("Applying new device configuration!");
+                /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
+                std::any_cast<std::function<void(String&)>>
+                  (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_STRING))(header);
+
+
+                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+                // std::any_cast<std::function<void()>>
+                //   (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+              }
+
               /* Generate UI for every available device */
               for(OnOffDeviceDescription& description : onOffDescriptionVector) 
               {

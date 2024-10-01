@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 22
+#define NUMBER_OF_SIGNALS 23
 enum Signal
 {
     /* Type: bool , somme description */
@@ -45,6 +45,9 @@ enum Signal
     /* Type: std:function<void(String&)> - callback to parse and apply device configuration using String class */
     CBK_SET_CONFIG_VIA_STRING,
 
+    /* Type: std:function<void(String&)> - callback to parse and apply local devices configuration using String class */
+    CBK_SET_DEVICES_CONFIG_VIA_STRING,
+
     /* Type: String - current IP Address */
     SIG_IP_ADDRESS_STRING,
 
@@ -81,6 +84,7 @@ const std::string signalNames[NUMBER_OF_SIGNALS] = {
     "SIG_CURRENT_REQUEST_PROCESSING_STATE",
     "SIG_DEVICE_CONFIGURATION",
     "CBK_SET_CONFIG_VIA_STRING",
+    "CBK_SET_DEVICES_CONFIG_VIA_STRING",
     "SIG_IP_ADDRESS_STRING",
     "SIG_IP_ADDRESS",
     "CBK_SET_NVM_DATABLOCK",

@@ -52,10 +52,11 @@ const char* javascript = "\
     function createConfigurationString()\
     {\
         var configStr = '';\
-        var url = '/configUpload';\
+        var url = '';\
+        var lengthCount = 0;\
+        var crc = 0;\
         for (let i = 1; i <= 6; i++) {\
             const container = document.getElementById(\"device-\"+i);\
-            var crc = 0;\
             var enable = \"enabled\" + i;\
             var enableValue = document.getElementById(enable).checked;\
             \
@@ -92,15 +93,18 @@ const char* javascript = "\
             deviceConfigurationString = dataEnable + dataId + nameLength + dataName + dataType + dataPin + dataRoom + extraValue;\
             for(let i = 0; i < dataName.length; i++){\
                 crc = crc + dataName.charCodeAt(i);\
-                console.log(crc);\
             }\
-            var lengthCount = deviceConfigurationString.length + 2;\
-            crc = crc + Number(lengthCount);\
-            deviceConfigurationString = lengthCount + deviceConfigurationString;\
-            deviceConfigurationString = deviceConfigurationString + crc.toString().length + crc + \" \";\
+            lengthCount = lengthCount + deviceConfigurationString.length;\
             url = url + deviceConfigurationString;\
         }\
-        console.log(url);\
+        var lengthCountLength = 2;\
+        if(lengthCount > 99){\
+            lengthCountLength = 3;\
+        }\
+        url = lengthCountLength.toString() + lengthCount.toString() + url;\
+        url = '/localSetup' + url;\
+        url = url + crc.toString().length + crc;\
+        window.location.href = url;\
     };\
     window.onload = function() {\
         document.querySelectorAll('.device-container').forEach(container => {\
@@ -114,5 +118,6 @@ const char* javascript = "\
 </script>";
 
 #endif
+            //        deviceConfigurationString = deviceConfigurationString + crc.toString().length + crc + \" \";\
 
         //window.location.href = url;\

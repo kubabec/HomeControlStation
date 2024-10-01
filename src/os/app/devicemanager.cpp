@@ -100,6 +100,11 @@ void DeviceManager::init()
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_ENABLE,"DeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable));
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE,"DeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceManager::deviceBrightnessChange));
     
+
+    DataContainer::setSignalValue(
+        CBK_SET_DEVICES_CONFIG_VIA_STRING,
+        "DeviceManager", 
+        static_cast<std::function<void(String&)>>(DeviceManager::setLocalConfigViaString));
    
 
     updateDeviceDescriptionSignal();
@@ -224,5 +229,29 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nv
     }
 
     return isValidDeviceGiven;
+}
+
+
+void DeviceManager::setLocalConfigViaString(String& config)
+{
+    Serial.println("setLocalConfigViaString called!");
+    Serial.println(config);
+    const String part1 = "GET /localSetup";
+    const String part2 = "&isRCServer=";
+    const String part3 = "&SSID=";
+    const String part4 = "&Password=";
+    const String part5 = " HTTP/1.1";
+
+    String configExtracted =  config.substring(part1.length());
+    Serial.println(configExtracted);
+    uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
+    uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
+
+    Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
+
+    configExtracted = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
+
+    Serial.println("Final Config:" + configExtracted);
+
 }
 

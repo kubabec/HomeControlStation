@@ -63,6 +63,8 @@ public:
     static void cyclic();
     static bool deviceEnable(uint8_t deviceId, bool state);
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
+
+    static void setLocalConfigViaString(String& config);
     
 
 };
