@@ -10,59 +10,54 @@ RequestProcessor::RequestProcessor() {
 
 bool RequestProcessor::processReqest(RcRequest& newReqest) {
     //new request asrrived
+    //currentRequest.print();
+    
+
     if(currentRequest.requestId != newReqest.requestId) {
         memcpy(&currentRequest, &newReqest, REQEST_SIZE);
-        currentRequest.print();
+        
 
         MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
         uint8_t reqestSize = currentRequest.getSize();
-        uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
+        // deklarujemy zmienną dataBuffer która jest pointerem typu uint8, malloc alokuje pamiec na stercie o rozmiarze requestSize i kastujemy na uint8 tzn informujemy kompilator ze bedziemy pod tym adresem przechowywać wartisci uint8
+        //uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
+        currentRequest.calculateCrc();
 
-        if(currentRequest.toByteArray(dataBuffer, reqestSize)){
-            if(message.pushData(dataBuffer,reqestSize)){
-                NetworkDriver::sendBroadcast(message);
-                currentRequest.requestSendCount ++;
-                lastSendTime = millis();
-            }
-            else{
-                Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
-            }
+        if(message.pushData((byte*)(&currentRequest),reqestSize)){
+            NetworkDriver::sendBroadcast(message);
+            currentRequest.requestSendCount ++;
+            lastSendTime = millis();
         }
         else{
-            Serial.println("Unable to serialize Request Id : " + String((int) currentRequest.requestId));
+            Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
         }
-
-        free(dataBuffer);
+        
     } else{
         /* Processing allready known request */
         if(currentRequest.requestSendCount >= 3){
             /* Max number reqests exceed , timeout request*/
+            currentRequest = {};
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 300){
+            if(millis() - lastSendTime > 1000){
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
                 uint8_t reqestSize = currentRequest.getSize();
-                uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
-
-                if(currentRequest.toByteArray(dataBuffer, reqestSize)){
-                    if(message.pushData(dataBuffer,reqestSize)){
-                        NetworkDriver::sendBroadcast(message);
-                        currentRequest.requestSendCount ++;
-                        lastSendTime = millis();
-                    }
-                    else{
-                        Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
-                    }
+                
+                if(message.pushData((byte*)(&currentRequest),reqestSize)){
+                    NetworkDriver::sendBroadcast(message);
+                    currentRequest.requestSendCount ++;
+                    lastSendTime = millis();
                 }
                 else{
-                    Serial.println("Unable to serialize Request Id : " + String((int) currentRequest.requestId));
+                    Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
                 }
+                
 
-                free(dataBuffer);
+                
             }
         }
     }

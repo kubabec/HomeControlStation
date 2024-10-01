@@ -49,6 +49,7 @@ class RemoteControlServer
    
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
+    static std::queue<RcRequest> pendingRequestsQueue;
 
     static std::vector<OnOffDevice> vecRemoteOnOffDevices;
 
@@ -63,6 +64,7 @@ class RemoteControlServer
     static void requestKeepAliveData();
    
     static void processUDPMessage(MessageUDP& msg);
+    static bool processPendingRequest(RcRequest& request);
 
     static void handleRequestNodeInitialDataState();
     static void handleRequestNodeDetailedDataState();

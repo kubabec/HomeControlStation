@@ -13,6 +13,8 @@ std::map<uint8_t, RCTranslation> RemoteControlServer::currentIdMapping;
 ServerState RemoteControlServer::currentState = STATE_REQUEST_NODE_INITIAL_DATA;
 std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
 
+std::queue<RcRequest> RemoteControlServer::pendingRequestsQueue;
+
 RequestProcessor RemoteControlServer::requestProcessor;
 
 std::vector<OnOffDevice> vecOnOffDevices = {OnOffDevice(13,"RCDev1",0,8),OnOffDevice(10,"RCDevice2",1,9),OnOffDevice(11,"RCDev3",2,10)};
@@ -37,6 +39,13 @@ void RemoteControlServer::cyclic(){
      if(!receivedBuffer.empty()){
         processUDPMessage(receivedBuffer.front());
         receivedBuffer.pop();
+    }
+
+     if(!pendingRequestsQueue.empty()){
+        if(processPendingRequest(pendingRequestsQueue.front()) == false){
+            pendingRequestsQueue.pop();
+        }
+        
     }
 
     switch (currentState) {
@@ -362,9 +371,11 @@ bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     newRequest.type = DISABLE_REQ;
 
     newRequest.data[15] = 123;
+    
     newRequest.print();
 
-    //requestProcessor.setCurrentRequest(newRequest);
+    pendingRequestsQueue.push(newRequest);
+    
 
     return true;
 }
@@ -376,5 +387,13 @@ bool RemoteControlServer::deviceBrightnessChange(uint8_t deviceId, uint8_t brigh
     //Serial.println(" Changing Brightness RC Device ID : " + String(deviceId) + " Level : " + String(brightnessLevel));
 
     return true;
+}
+
+
+bool RemoteControlServer::processPendingRequest(RcRequest& request){
+    return requestProcessor.processReqest(request);
+    //request.print();
+    //return false;
+    
 }
 

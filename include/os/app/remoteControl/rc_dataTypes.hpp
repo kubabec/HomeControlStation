@@ -52,7 +52,7 @@ typedef struct {
     uint16_t targetNodeId = 255;
     uint8_t targetDeviceId = 255;
     uint8_t type = UNKNOWN_REQ;
-    uint8_t data[REQUEST_DATA_SIZE] {0xFF};
+    uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
     uint8_t requestSendCount = 0;
     uint16_t crc = 5;
 
@@ -82,7 +82,7 @@ typedef struct {
 
     uint8_t getSize(){
              
-        return (1+2+1+1+REQUEST_DATA_SIZE+1+2);
+        return (1+2+1+1+REQUEST_DATA_SIZE+1+3);
     }
     
     void print() {
