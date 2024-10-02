@@ -152,12 +152,11 @@ void HomeLightHttpServer::handleClientRequest()
                 // Configuration to be handled here
 
                 Serial.println("Applying new config!");
+                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
                 /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
                 std::any_cast<std::function<void(String&)>>
                   (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_STRING))(header);
-
-
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+              
                 std::any_cast<std::function<void()>>
                   (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
               }
@@ -168,11 +167,10 @@ void HomeLightHttpServer::handleClientRequest()
 
                 Serial.println("Applying new device configuration!");
                 /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
+                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
                 std::any_cast<std::function<void(String&)>>
                   (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_STRING))(header);
 
-
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
                 // std::any_cast<std::function<void()>>
                 //   (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
               }
@@ -291,7 +289,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   //client.println("<script onload=\"showExtraFields(type"+String(slotNumber)+", 'device-"+String((int)slotNumber)+"');\"></script>");
 
   
-  if(!slot.isActive)
+  if(slot.isActive)
   {
     /* Slot is active */
     client.println(labelStart);
@@ -429,7 +427,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 {
   client.println("<div class=\"wrapper\">\
-        <div class=\"header\">Device Configuration</div>");
+        <div class=\"header\">Node Local Configuration</div>");
   //client.println(slotsViewPage);
 
   uint8_t slotIdx = 1;
@@ -439,7 +437,9 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
     slotIdx++;
   }
 
-  client.println("<button id=\"confirmationButton\" onclick=\"createConfigurationString();\">Save config</button>");
+  client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"createConfigurationString();\">Save config</button>");
+  client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
+
 
   client.println("</div>");
 }

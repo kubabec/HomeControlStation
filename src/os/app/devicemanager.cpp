@@ -10,13 +10,26 @@ ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
     // OnOffDevice(11,"Dev",3,10)};
 
 void DeviceManager::deinit() {
-    
+    for(uint8_t i = e_BLOCK_DEVICE_1; i < e_BLOCK_DEVICE_5; i++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        bool success = std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK)
+        )(
+            (PersistentDatablockID)i, // Datablock ID
+            (uint8_t*)&pinConfigSlotsRamMirror.slots.at(i) // local memory buffer for datablock data
+        );
+
+        if(!success){
+            Serial.println("Error during saving "+ String((int)i) + " datablock");
+        }
+    }
 }
 
 void DeviceManager::init()
 {
     /* TESTBLOCK TO BE REMOVED IN THE FUTURE */
-    // OnOffConfigDatablock configData;
+    // DeviceConfigSlotType configData;
     // char* devicename = "TestDev";
     // configData.deviceId = 15;
     // memcpy(configData.deviceName, devicename, 7);
@@ -37,11 +50,11 @@ void DeviceManager::init()
 
 
 
-    /* Protection against PersistentDataBlock size modification without OnOffConfigDatablock update */
-    if(PersistentDataBlock::getSize() == OnOffConfigDatablock::getSize() )
+    /* Protection against PersistentDataBlock size modification without DeviceConfigSlotType update */
+    if(PersistentDataBlock::getSize() == DeviceConfigSlotType::getSize() )
     {
         /* Reserve buffer for a single config block */
-        OnOffConfigDatablock* configBlock = (OnOffConfigDatablock*) malloc (OnOffConfigDatablock::getSize());
+        DeviceConfigSlotType* configBlock = (DeviceConfigSlotType*) malloc (DeviceConfigSlotType::getSize());
 
         if(configBlock != nullptr)
         {
@@ -51,7 +64,7 @@ void DeviceManager::init()
             /* For each DEVICE relevant datablock */
             for(uint8_t datablock = e_BLOCK_DEVICE_1; datablock < e_PERSISTENT_BLOCK_LAST; datablock ++){
                 /* Fill memory area with default 0xFF values */
-                memset(configBlock, 0xFF, OnOffConfigDatablock::getSize());
+                memset(configBlock, 0xFF, DeviceConfigSlotType::getSize());
 
                 /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
                 std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
@@ -82,7 +95,7 @@ void DeviceManager::init()
         }
     }else
     {
-        Serial.println("OnOffConfigDatablock size does not match length of PersistentDataBlock");
+        Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
 
 
@@ -181,7 +194,7 @@ bool DeviceManager::deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessL
 }
 
 
-bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nvmData, uint8_t configSlotID)
+bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nvmData, uint8_t configSlotID)
 {
     bool isValidDeviceGiven = false;
 
@@ -191,44 +204,53 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nv
         /* Is known and valid device type inside?*/
         if(nvmData.deviceType >= e_DEVICE_TYPE_FIRST && nvmData.deviceType <= e_DEVICE_TYPE_LAST)
         {
-            switch(nvmData.deviceType)
-            {
-                case e_ON_OFF_DEVICE :
-                    vecOnOffDevices.push_back(OnOffDevice(
-                        nvmData.pinNumber,          /* Pin number */
-                        String(nvmData.deviceName), /* Device name */
-                        nvmData.deviceId,           /* Device unique identifier */
-                        nvmData.roomId              /* Room unique identifier */
-                    ));
+            if(nvmData.isActive){
+                switch(nvmData.deviceType)
+                {
+                    case e_ON_OFF_DEVICE :
+                        vecOnOffDevices.push_back(OnOffDevice(
+                            nvmData.pinNumber,          /* Pin number */
+                            String(nvmData.deviceName), /* Device name */
+                            nvmData.deviceId,           /* Device unique identifier */
+                            nvmData.roomId              /* Room unique identifier */
+                        ));
 
-                    isValidDeviceGiven = true;
-                break;
+                        if(nvmData.customBytes[0] == 1)
+                        {
+                            vecOnOffDevices.back().setBrightnessLevelSupport(true);
+                        }else 
+                        {
+                           vecOnOffDevices.back().setBrightnessLevelSupport(false); 
+                        }
 
-                case e_LED_STRIP :
-                    /*TBD*/
-                break;
+                        isValidDeviceGiven = true;
+                    break;
 
-                default:break;
-            }
+                    case e_LED_STRIP :
+                        /*TBD*/
+                    break;
+
+                    default:break;
+                }
+
+                /* TODO more NVM Data to be extracted here ! */
+
+            }else { /* Ignore inactive slot whenever creating new device instance */}
 
             /* Save valid ConfigSlot configuration to relevant config slot */
             if(configSlotID >= 0 && configSlotID < pinConfigSlotsRamMirror.slots.size())
             {
-                DeviceConfigSlotType& configSlotRef = pinConfigSlotsRamMirror.slots.at(configSlotID);
+                /* Save retrieved NVM config to ram mirror */
+                pinConfigSlotsRamMirror.slots.at(configSlotID) = nvmData;
 
-                configSlotRef.isActive = false;
-                configSlotRef.deviceId = nvmData.deviceId;
-                configSlotRef.deviceType = nvmData.deviceType;
-                configSlotRef.pinNumber = nvmData.pinNumber;
-                configSlotRef.roomId = nvmData.roomId;
-                memcpy(configSlotRef.deviceName, nvmData.deviceName, 25);
 
-                /* TODO more NVM Data to be extracted here ! */
 
             }else
-            { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ }
-        }
-    }
+            { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
+                Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
+            }
+        }else {Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); }
+    }else { Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));}
 
     return isValidDeviceGiven;
 }
@@ -246,13 +268,13 @@ void DeviceManager::setLocalConfigViaString(String& config)
     uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
     uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
 
-    Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
+    //Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
     String deviceConfigOnlyStr = "";
 
     deviceConfigOnlyStr = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
 
     //Serial.println("Device only:" + deviceConfigOnlyStr);
-    Serial.println("Extracted : " + configExtracted);
+    //Serial.println("Extracted : " + configExtracted);
 
     charIndex = 0;
     for(int i = 0; i < numberOfDevicesExpected; i ++)
@@ -293,10 +315,26 @@ void DeviceManager::setLocalConfigViaString(String& config)
         /* further data extraction possible */
 
         Serial.println(deviceConfigOnlyStr);
+        bool atLeastOneValid = false;
         for(int i = 0 ; i < 6 ; i++)
         {
-            Serial.println(devicesConfigStrings[i]);
-            extractDeviceConfigFromString(devicesConfigStrings[i]);
+            //Serial.println(devicesConfigStrings[i]);
+            DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
+            if(slotData.isValid())
+            {
+                atLeastOneValid = true;
+                pinConfigSlotsRamMirror.slots[i] = slotData;
+            }
+        }
+
+        if(atLeastOneValid){
+            /* Publish retrieved DeviceConfigSlots signal to the system */
+            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
+
+
+            Serial.println("New config found, reboot ...");
+            std::any_cast<std::function<void()>>
+                  (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
         }
 
     }else 
@@ -331,7 +369,7 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
     /* move config by 1 */
     confStr = confStr.substring(1);
 
-    if(newConfig.isActive){
+    //if(newConfig.isActive){
         /* Parse device ID */
         uint8_t deviceId = confStr.substring(0, 2).toInt();
         newConfig.deviceId = deviceId;
@@ -351,11 +389,24 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
         newConfig.deviceType = deviceType;
         confStr = confStr.substring(2);
 
+        /* Parse PIN */
+        uint8_t devicePin = confStr.substring(0, 2).toInt();
+        newConfig.pinNumber = devicePin;
+        confStr = confStr.substring(2);
+
+        /* Parse Room */
+        uint8_t deviceRoom = confStr.substring(0, 2).toInt();
+        newConfig.roomId = deviceRoom;
+        confStr = confStr.substring(2);
+
+
+        /* Parse Extra Data */
+        uint8_t extraData = confStr.substring(0, 2).toInt();
+        newConfig.customBytes[0] = extraData;
+
         //Serial.println(String(deviceName));
         newConfig.print();
-    }
-
-
+    //}
 
     return newConfig;
 }

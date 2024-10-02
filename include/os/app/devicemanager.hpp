@@ -13,42 +13,6 @@ typedef enum
     e_DEVICE_TYPE_LAST = e_LED_STRIP
 }DeviceType;
 
-typedef struct
-{
-    char deviceName[25] = {'\0'};   /* 25 bytes */
-    uint8_t deviceType = 255;       /* 1 byte */
-    uint8_t pinNumber = 255;        /* 1 byte */
-    uint8_t deviceId = 255;         /* 1 byte */
-    uint8_t roomId = 255;           /* 1 byte */
-    bool brightnessSupport = false; /* 1 byte */
-    uint8_t lastBrightness = 0;     /* 1 byte */
-    uint8_t lastState = 0;          /* 1 byte */
-                                    /* ---------- 32 bytes */
-
-    uint8_t customBytes[10] = {0};  /* 10 bytes */
-                                    /* ---------- 42 bytes */
-    uint8_t reserved[8];           /*  8 bytes to align with PERSISTENT_DATABLOCK_SIZE */
-
-    static uint16_t getSize()
-    {
-        return 25 + 
-            sizeof(deviceType) +
-            sizeof(pinNumber) + 
-            sizeof(deviceId) + 
-            sizeof(roomId) + 
-            sizeof(brightnessSupport) + 
-            sizeof(lastBrightness) +
-            sizeof(lastState) +
-            10 + /*custom bytes */
-            8; // reserved;
-    }
-
-    bool isValid()
-    {
-        return (pinNumber != 255 && deviceId != 255);
-    }
-}OnOffConfigDatablock;
-
 class DeviceManager 
 {
 
@@ -56,10 +20,11 @@ class DeviceManager
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
     static void updateDeviceDescriptionSignal();
 
-    static bool extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nvmData, uint8_t configSlotID);
+    static bool extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nvmData, uint8_t configSlotID);
 
     static uint16_t configCrcCalculation(uint8_t* data, uint16_t size);
     static DeviceConfigSlotType extractDeviceConfigFromString(String& confStr);
+
 public:
     static void init();
     static void deinit();
