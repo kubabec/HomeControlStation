@@ -216,12 +216,14 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nv
             {
                 DeviceConfigSlotType& configSlotRef = pinConfigSlotsRamMirror.slots.at(configSlotID);
 
-                configSlotRef.isEmpty = false;
+                configSlotRef.isActive = false;
                 configSlotRef.deviceId = nvmData.deviceId;
                 configSlotRef.deviceType = nvmData.deviceType;
                 configSlotRef.pinNumber = nvmData.pinNumber;
                 configSlotRef.roomId = nvmData.roomId;
                 memcpy(configSlotRef.deviceName, nvmData.deviceName, 25);
+
+                /* TODO more NVM Data to be extracted here ! */
 
             }else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ }
@@ -234,24 +236,126 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nv
 
 void DeviceManager::setLocalConfigViaString(String& config)
 {
-    Serial.println("setLocalConfigViaString called!");
-    Serial.println(config);
     const String part1 = "GET /localSetup";
-    const String part2 = "&isRCServer=";
-    const String part3 = "&SSID=";
-    const String part4 = "&Password=";
     const String part5 = " HTTP/1.1";
+    const uint8_t numberOfDevicesExpected = 6;
+    String devicesConfigStrings[numberOfDevicesExpected];
 
+    uint16_t charIndex = 0;
     String configExtracted =  config.substring(part1.length());
-    Serial.println(configExtracted);
     uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
     uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
 
     Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
+    String deviceConfigOnlyStr = "";
 
-    configExtracted = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
+    deviceConfigOnlyStr = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
 
-    Serial.println("Final Config:" + configExtracted);
+    //Serial.println("Device only:" + deviceConfigOnlyStr);
+    Serial.println("Extracted : " + configExtracted);
 
+    charIndex = 0;
+    for(int i = 0; i < numberOfDevicesExpected; i ++)
+    {
+        uint8_t numberOfBytesForSingleConfigLength = String(deviceConfigOnlyStr.charAt(charIndex)).toInt();
+        uint8_t singleConfigLength = String(deviceConfigOnlyStr.substring(charIndex+1, (charIndex+1 + numberOfBytesForSingleConfigLength))).toInt();
+        /* Copy single device config string to string array */
+        devicesConfigStrings[i] = String(deviceConfigOnlyStr.substring(
+            (charIndex + 1 + numberOfBytesForSingleConfigLength), // [CONFLENGTH] [LENGTH ...] [CONFIG ...]
+            (charIndex + 1 + numberOfBytesForSingleConfigLength + singleConfigLength))
+            );
+
+        // Serial.println("Single Length : " + String((int)numberOfBytesForSingleConfigLength) + " , lenght: " + String((int)singleConfigLength));
+    
+        /*Move char index by this particular length + 1 (length count byte)*/
+        charIndex += singleConfigLength + 1 + numberOfBytesForSingleConfigLength;
+    }
+
+    uint8_t crcLength = String(configExtracted.charAt(charIndex + 1 + numberOfBytesForDataLength)).toInt();
+
+    // Serial.println("CRC length: " + String((int)crcLength));
+    charIndex++;
+    uint16_t crc = String(
+        configExtracted.substring(
+            charIndex + 1 + numberOfBytesForDataLength,
+            (charIndex + 1 + numberOfBytesForDataLength + crcLength))
+            ).toInt();
+    // Serial.println("CRC : " + String((int)crc));
+
+    uint16_t localCrc = configCrcCalculation(
+        (uint8_t*)configExtracted.c_str(), 
+        dataLength + 1 + numberOfBytesForDataLength);
+    // Serial.println("Local Crc : " + String((int)localCrc));
+
+    /* Proceed with data analysis STARTs here */
+    /* Based on known algorithm, check if received CRC is equal to locally calculated */
+    if(crc == localCrc) {
+        /* further data extraction possible */
+
+        Serial.println(deviceConfigOnlyStr);
+        for(int i = 0 ; i < 6 ; i++)
+        {
+            Serial.println(devicesConfigStrings[i]);
+            extractDeviceConfigFromString(devicesConfigStrings[i]);
+        }
+
+    }else 
+    {
+        /* invalid CRC, reject the request */
+        Serial.println("Invalid CRC received for local config: " + String((int)crc) + " != " + String((int)localCrc));
+    }
 }
 
+
+uint16_t DeviceManager::configCrcCalculation(uint8_t* data, uint16_t size)
+{
+    uint16_t crc = 0;
+    // Serial.println("Crc calculation");
+    for(uint i = 0; i < size; i ++)
+    {
+        // Serial.print((char)data[i]);
+        crc += (char)data[i];
+    }
+    // Serial.println();
+    return crc;
+}
+
+DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confStr)
+{
+    DeviceConfigSlotType newConfig;
+    newConfig.isActive = false;
+
+    if(String(confStr.charAt(0)).toInt() == 1){
+        newConfig.isActive = true;
+    }
+    /* move config by 1 */
+    confStr = confStr.substring(1);
+
+    if(newConfig.isActive){
+        /* Parse device ID */
+        uint8_t deviceId = confStr.substring(0, 2).toInt();
+        newConfig.deviceId = deviceId;
+        confStr = confStr.substring(2);
+
+        /* Parse name length */
+        uint8_t nameLength = confStr.substring(0, 2).toInt();
+        confStr = confStr.substring(2);
+
+        /* Parse name */
+        String deviceName = confStr.substring(0, nameLength);
+        memcpy(newConfig.deviceName, deviceName.c_str(), deviceName.length());
+        confStr = confStr.substring(nameLength);
+
+        /* Parse type */
+        uint8_t deviceType = confStr.substring(0, 2).toInt();
+        newConfig.deviceType = deviceType;
+        confStr = confStr.substring(2);
+
+        //Serial.println(String(deviceName));
+        newConfig.print();
+    }
+
+
+
+    return newConfig;
+}

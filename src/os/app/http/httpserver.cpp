@@ -276,7 +276,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 //             </label>\
 //         </div>
 
-  // bool isEmpty = true;            /* 1 byte */
+  // bool isActive = true;            /* 1 byte */
   //   char deviceName[25] = {'\0'};   /* 25 bytes */
   //   uint8_t deviceType = 255;       /* 1 byte */
   //   uint8_t pinNumber = 255;        /* 1 byte */
@@ -291,7 +291,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   //client.println("<script onload=\"showExtraFields(type"+String(slotNumber)+", 'device-"+String((int)slotNumber)+"');\"></script>");
 
   
-  if(!slot.isEmpty)
+  if(!slot.isActive)
   {
     /* Slot is active */
     client.println(labelStart);

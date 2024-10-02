@@ -57,7 +57,7 @@ typedef enum
 /* Description of single configuration NVM slot */
 typedef struct 
 {
-    bool isEmpty = true;            /* 1 byte */
+    bool isActive = true;            /* 1 byte */
     char deviceName[25] = {'\0'};   /* 25 bytes */
     uint8_t deviceType = 255;       /* 1 byte */
     uint8_t pinNumber = 255;        /* 1 byte */
@@ -70,11 +70,11 @@ typedef struct
     void print()
     {
         Serial.println("--> Config SLOT <--");
-        if(isEmpty){
-            Serial.println("IsEmpty: YES ");
+        if(isActive){
+            Serial.println("isActive: YES ");
         }else
         {
-            Serial.println("IsEmpty: NO ");
+            Serial.println("isActive: NO ");
         }
         
         Serial.print("Device Type: "); 
@@ -97,6 +97,14 @@ typedef struct
             break;
         }
         Serial.println("Device ID " + String(deviceId)); 
+        Serial.println("Name: " + String(deviceName));
+        Serial.println("PIN : " + String((int)pinNumber));
+        Serial.println("Room : " + String((int)roomId));
+        Serial.println("Extra data:");
+        // for(int i = 0 ; i < 10; i ++)
+        // {
+        //     Serial.print(String((int)customData.bytes[i]));
+        // }
     }
 }DeviceConfigSlotType;
 

@@ -57,6 +57,9 @@ class DeviceManager
     static void updateDeviceDescriptionSignal();
 
     static bool extractDeviceInstanceBasedOnNvmData(OnOffConfigDatablock& nvmData, uint8_t configSlotID);
+
+    static uint16_t configCrcCalculation(uint8_t* data, uint16_t size);
+    static DeviceConfigSlotType extractDeviceConfigFromString(String& confStr);
 public:
     static void init();
     static void deinit();

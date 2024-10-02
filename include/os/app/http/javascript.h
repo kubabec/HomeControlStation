@@ -64,20 +64,15 @@ const char* javascript = "\
             if(enableValue == true){\
                 dataEnable = '1';\
             }\
-            crc = crc + Number(enableValue);\
 \
             var dataId = document.getElementById('identifier' + i).value;\
-            crc = crc + Number(dataId);\
             if(dataId < 10) { dataId = '0' + dataId; }\
             var dataName = document.getElementById('name' + i).value;\
             var dataType = document.getElementById('type' + i).value;\
-            crc = crc + Number(dataType);\
             var dataPin = document.getElementById('pin' + i).value;\
-            crc = crc + Number(dataPin);\
             if(dataPin < 10) { dataPin = '0' + dataPin; }\
             var dataRoom = document.getElementById('room' + i).value;\
             if(dataRoom < 10) { dataRoom = '0' + dataRoom; }\
-            crc = crc + Number(dataRoom);\
             \
 \
             var data43 =  document.getElementById('extra-43-' + i).value;\
@@ -85,24 +80,30 @@ const char* javascript = "\
             var extraValue = '';\
             if(dataType == 43) { extraValue = data43;}\
             if(dataType == 44) { extraValue = data44;}\
-            crc = crc + Number(extraValue);\
             if(extraValue < 10) { extraValue = '0' + extraValue; }\
             var nameLength = dataName.length;\
-            crc = crc + Number(nameLength);\
             if(nameLength < 10) { nameLength = '0' + nameLength; }\
             deviceConfigurationString = dataEnable + dataId + nameLength + dataName + dataType + dataPin + dataRoom + extraValue;\
-            for(let i = 0; i < dataName.length; i++){\
-                crc = crc + dataName.charCodeAt(i);\
+            stringLength = deviceConfigurationString.length;\
+            stringLengthBytes = 1;\
+            if(stringLength > 10){\
+                stringLengthBytes = 2;\
             }\
-            lengthCount = lengthCount + deviceConfigurationString.length;\
-            url = url + deviceConfigurationString;\
+\
+\
+            lengthCount = lengthCount + 1 + stringLengthBytes + deviceConfigurationString.length;\
+            url = url + stringLengthBytes + stringLength + deviceConfigurationString;\
         }\
         var lengthCountLength = 2;\
         if(lengthCount > 99){\
             lengthCountLength = 3;\
         }\
         url = lengthCountLength.toString() + lengthCount.toString() + url;\
+        for(let i = 0; i < url.length; i++){\
+            crc = crc + Number(url.charCodeAt(i));\
+        }\
         url = '/localSetup' + url;\
+\
         url = url + crc.toString().length + crc;\
         window.location.href = url;\
     };\
@@ -121,3 +122,16 @@ const char* javascript = "\
             //        deviceConfigurationString = deviceConfigurationString + crc.toString().length + crc + \" \";\
 
         //window.location.href = url;\
+
+
+            // crc = crc + Number(enableValue);\
+            // crc = crc + Number(dataId);\
+            // crc = crc + Number(dataType);\
+            // crc = crc + Number(dataPin);\
+            // crc = crc + Number(dataRoom);\
+            // crc = crc + Number(nameLength);\
+            // crc = crc + Number(extraValue);\
+            // for(let i = 0; i < dataName.length; i++){\
+            //     crc = crc + dataName.charCodeAt(i);\
+            // }\
+            // crc = crc + Number(stringLength) + Number(stringLengthBytes);\
