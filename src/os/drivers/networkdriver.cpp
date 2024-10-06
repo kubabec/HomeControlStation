@@ -34,11 +34,11 @@ void NetworkDriver::init()
         }else 
         {
             // Connect to defaults
-            WiFiAdapter::connectToNetwork( "GedUPC", "EmilaEryk2005");
+            WiFiAdapter::connectToNetwork( "Orange_Swiatlowod_DA2C", "2FYXFG6MAGVZ");
         }
 
     }catch (const std::bad_any_cast& e){ 
-        WiFiAdapter::connectToNetwork( "GedUPC", "EmilaEryk2005");
+        WiFiAdapter::connectToNetwork( "Orange_Swiatlowod_DA2C", "2FYXFG6MAGVZ");
     }
     
 

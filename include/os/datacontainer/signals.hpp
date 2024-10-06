@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 23
+#define NUMBER_OF_SIGNALS 26
 enum Signal
 {
     /* Type: bool , somme description */
@@ -64,34 +64,45 @@ enum Signal
     SIG_CONFIG_SLOTS,
 
     /* Type: std:function<void()> - callback to reboot */
-    CBK_RESET_DEVICE
+    CBK_RESET_DEVICE,
+
+    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)> - callback to reboot */
+    CBK_ERROR_REPORT,
+
+    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode)> - callback to reboot */
+    CBK_ERROR_CLEAR,
+
+    /* TYpe: std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> - container with actual system error data */
+    SIG_SYSTEM_ERROR_LIST
 };
 
-const std::string signalNames[NUMBER_OF_SIGNALS] = {
-    "KEEP_ALIVE_RECEIVED",
-    "CONNECTION_STATUS",
-    "CBK_LOCAL_DEVICE_ENABLE",
-    "CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE",
-    "SIG_LOCAL_COLLECTION_ONOFF",
-    "CBK_REMOTE_DEVICE_ENABLE",
-    "CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE",
-    "SIG_REMOTE_COLLECTION_ONOFF",
-    "CBK_DEVICE_ENABLE",
-    "CBK_DEVICE_BRIGHTNESS_CHANGE",
-    "SIG_COLLECTION_ONOFF",
-    "SIG_IS_HTTP_SERVER",
-    "SIG_IS_RC_SERVER",
-    "SIG_CURRENT_REQUEST_PROCESSING_STATE",
-    "SIG_DEVICE_CONFIGURATION",
-    "CBK_SET_CONFIG_VIA_STRING",
-    "CBK_SET_DEVICES_CONFIG_VIA_STRING",
-    "SIG_IP_ADDRESS_STRING",
-    "SIG_IP_ADDRESS",
-    "CBK_SET_NVM_DATABLOCK",
-    "CBK_GET_NVM_DATABLOCK",
-    "SIG_CONFIG_SLOTS",
-    "CBK_RESET_DEVICE"
-};
+// const std::string signalNames[NUMBER_OF_SIGNALS] = {
+//     "KEEP_ALIVE_RECEIVED",
+//     "CONNECTION_STATUS",
+//     "CBK_LOCAL_DEVICE_ENABLE",
+//     "CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE",
+//     "SIG_LOCAL_COLLECTION_ONOFF",
+//     "CBK_REMOTE_DEVICE_ENABLE",
+//     "CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE",
+//     "SIG_REMOTE_COLLECTION_ONOFF",
+//     "CBK_DEVICE_ENABLE",
+//     "CBK_DEVICE_BRIGHTNESS_CHANGE",
+//     "SIG_COLLECTION_ONOFF",
+//     "SIG_IS_HTTP_SERVER",
+//     "SIG_IS_RC_SERVER",
+//     "SIG_CURRENT_REQUEST_PROCESSING_STATE",
+//     "SIG_DEVICE_CONFIGURATION",
+//     "CBK_SET_CONFIG_VIA_STRING",
+//     "CBK_SET_DEVICES_CONFIG_VIA_STRING",
+//     "SIG_IP_ADDRESS_STRING",
+//     "SIG_IP_ADDRESS",
+//     "CBK_SET_NVM_DATABLOCK",
+//     "CBK_GET_NVM_DATABLOCK",
+//     "SIG_CONFIG_SLOTS",
+//     "CBK_RESET_DEVICE",
+//     "CBK_ERROR_REPORT",
+//     "CBK_ERROR_CLEAR"
+// };
 
 
 #endif

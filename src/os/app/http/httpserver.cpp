@@ -18,8 +18,28 @@ int HomeLightHttpServer::pos3 = 150;
 std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
 std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
+std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
+uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
+
+String errorCodeDescription[ERR_MONT_ERROR_COUNT] = 
+{
+  "Unexpected reset",
+  "Invalid NVM data",
+  "Invalid local devices config",
+  "Wrong config string received",
+  "Wrong local devices config string received",
+  "Invalid error reported"
+};
+
+
+// ERR_MON_UNEXPECTED_RESET = 1,
+// ERR_MON_INVALID_NVM_DATA,
+// ERR_MON_INVALID_LOCAL_CONFIG,
+// ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
+// ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
+// ERR_MON_INVALID_ERROR_REPORTED,
 
 void HomeLightHttpServer::cyclic()
 {
@@ -46,8 +66,42 @@ void HomeLightHttpServer::init()
   }
   );
 
-  DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
+  DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, "HTTPServer", [](std::any signal) {
+    systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
+    activeErrorsCount = 0;
 
+    /* Count errors with occurrence > 0 */
+    for(auto& error : systemErrorList)
+    {
+      if(error.occurrenceCount > 0)
+      {
+        activeErrorsCount ++;
+      }
+    }
+  }
+  );
+
+  /* Explicit read of system error needed due to init order ->  ErrorMon -> ConfigProvider -> HttpServer */
+  std::any errorsAsAny = DataContainer::getSignalValue(SIG_SYSTEM_ERROR_LIST);
+  try {
+    systemErrorList = std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(errorsAsAny);
+    activeErrorsCount = 0;
+    /* Count errors with occurrence > 0 */
+    for(auto& error : systemErrorList)
+    {
+      if(error.occurrenceCount > 0)
+      {
+        activeErrorsCount ++;
+      }
+    }
+  }catch (std::bad_any_cast ex)
+  {
+    Serial.println("Unable to access SYSTEM ERRORS");
+  }
+
+
+
+  DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
   DataContainer::subscribe(SIG_CONFIG_SLOTS, "HTTPServer", HomeLightHttpServer::onSlotConfigChange);
 
 
@@ -60,6 +114,11 @@ void HomeLightHttpServer::init()
   server.begin();
   currentTime = millis();
   //DataContainer::subscribe(CBK_DEVICE_ENABLE, "DeviceManager", ...);
+}
+
+void HomeLightHttpServer::requestErrorList()
+{
+  
 }
 
 void HomeLightHttpServer::handleClientRequest()
@@ -461,28 +520,39 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 {
   client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
-  client.println("<thead>\
-                    <tr>\
-                        <th>Code</th>\
-                        <th>Description</th>\
-                        <th>Count</th>\
-                        <th>Extra Data</th>\
-                    </tr>\
-                </thead><tbody>");
-      
+  
+  if(activeErrorsCount > 0){
+  
+    client.println("<thead>\
+                      <tr>\
+                          <th>Code</th>\
+                          <th>Description</th>\
+                          <th>Count</th>\
+                          <th>Extra Data</th>\
+                          <th>Time</th>\
+                      </tr>\
+                  </thead><tbody>");
+        
 
-  client.println("<tr>\
-                        <td>ERR-101</td>\
-                        <td>Network Disconnected</td>\
-                        <td>5</td>\
-                        <td>Last occurred: 10:15 AM</td>\
-                    </tr>\
-                    <tr>\
-                        <td>ERR-102</td>\
-                        <td>Overheating</td>\
-                        <td>3</td>\
-                        <td>Max Temp: 85°C</td>\
-                    </tr>");
+    for(uint i = 0 ; i < ERR_MONT_ERROR_COUNT; i++)
+    {
+      if(systemErrorList.at(i).occurrenceCount > 0) {
+        client.println("<tr>\
+                          <td>ERR-"+ String(i) +"</td>\
+                          <td>" + errorCodeDescription[i] + "</td>\
+                          <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
+                          <td>"+ String((int)systemErrorList.at(i).extendedData) +"</td>\
+                          <td>"+ String((int)systemErrorList.at(i).lastOccurrenceTime) +"</td>\
+                      </tr>");
 
-  client.println("</tbody></table></div>");
+      }
+    }
+    client.println("</tbody>");
+
+  }else 
+  {
+    /* no errors */
+    client.println("No active errors.");
+  }
+  client.println("</table></div>");
 }

@@ -6,7 +6,7 @@
 
 
 
-ConfigData ConfigProvider::configRamMirror = {0, 0, "\0", "\0"};
+ConfigData ConfigProvider::configRamMirror = {255, 0, 0, "\0", "\0"};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[NUMBER_OF_PERSISTENT_DATABLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
@@ -33,9 +33,24 @@ void ConfigProvider::init()
 
     if(readRamMirrorFromNvm())
     {
+        Serial.println("safe flag : " + String((int)configRamMirror.safeShutdownFlag ));
+        if(configRamMirror.safeShutdownFlag != 37)
+        {
+            /* Unexpected reset detected! */
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT))(ERR_MON_UNEXPECTED_RESET, 0);
+        }
+
+        configRamMirror.safeShutdownFlag = 0;
+        saveRamMirrorToNvm();
         configRamMirror.serialPrint();
     }else 
     {
+        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            DataContainer::getSignalValue(CBK_ERROR_REPORT)
+            )(ERR_MON_INVALID_NVM_DATA, 0);
+
+    
         Serial.println("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
         NodeConfiguration emptyConfiguration;
         // Master device as default;
@@ -167,6 +182,10 @@ void ConfigProvider::setConfigViaString(String& configString)
 
     }else
     {
+        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            DataContainer::getSignalValue(CBK_ERROR_REPORT)
+            )(ERR_MON_WRONG_CONFIG_STRING_RECEIVED, 0);
+
         Serial.println("Invalid config passed! Rejecting...");
     }
 
@@ -317,6 +336,7 @@ void ConfigProvider::eraseDatablockMemory()
 }
 
 void ConfigProvider::deinit() {
+    configRamMirror.safeShutdownFlag = 37;
     saveRamMirrorToNvm();
 }
 

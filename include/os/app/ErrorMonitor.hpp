@@ -4,11 +4,15 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <array>
 
-
 class ErrorMonitor 
 {
-    std::array<uint8_t, ERR_MONT_ERROR_COUNT> errorList;
+    static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> errorList;
 
+    
+    static void errorReport(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData);
+    static void errorClear(ERR_MON_ERROR_TYPE errorCode);
+
+    static void updateSystemErrorSignal();
 
 public:
     static void init();

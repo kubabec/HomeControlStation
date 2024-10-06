@@ -24,7 +24,7 @@ DataContainer::DataContainer()
 
 void DataContainer::subscribe(Signal sigName, std::string subscriberName, std::function<void (std::any)> dupa)
 {
-    Serial.println(String(subscriberName.c_str()) + " has been subscribed to signal " + String(signalNames[sigName].c_str()));
+    //Serial.println(String(subscriberName.c_str()) + " has been subscribed to signal " + String(signalNames[sigName].c_str()));
     subscribers.at(sigName).push_back({subscriberName, dupa});
 }
 
@@ -35,7 +35,7 @@ std::any DataContainer::getSignalValue(Signal sigName)
         return dataTable.at(sigName);
     }else
     {
-        Serial.println("Data Container - No signal "+ String(signalNames[sigName].c_str()) + " value set");
+        //Serial.println("Data Container - No signal "+ String(signalNames[sigName].c_str()) + " value set");
         return std::any();
     }
 }

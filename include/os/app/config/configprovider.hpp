@@ -9,6 +9,7 @@
 #define NUMBER_OF_PERSISTENT_DATABLOCKS 5
 typedef struct
 {
+    uint8_t safeShutdownFlag = 255;
     uint8_t isHttpServer = 0;
     uint8_t isRcServer = 0;
     char networkSSID[SSID_LENGTH] = {'\0'};

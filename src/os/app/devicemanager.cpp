@@ -252,6 +252,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
         }else {Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); }
     }else { Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));}
 
+    if(!isValidDeviceGiven){
+        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            DataContainer::getSignalValue(CBK_ERROR_REPORT)
+            )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
+    }
+
     return isValidDeviceGiven;
 }
 
@@ -261,6 +267,7 @@ void DeviceManager::setLocalConfigViaString(String& config)
     const String part1 = "GET /localSetup";
     const String part5 = " HTTP/1.1";
     const uint8_t numberOfDevicesExpected = 6;
+    bool isValidConfigReceived = false;
     String devicesConfigStrings[numberOfDevicesExpected];
 
     uint16_t charIndex = 0;
@@ -338,6 +345,7 @@ void DeviceManager::setLocalConfigViaString(String& config)
                 /* Temporary config validated correctly, settings can be applied */
 
                 pinConfigSlotsRamMirror = temporaryConfigurationSet;
+                isValidConfigReceived = true;
 
                 /* Publish retrieved DeviceConfigSlots signal to the system */
                 DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
@@ -356,6 +364,14 @@ void DeviceManager::setLocalConfigViaString(String& config)
     {
         /* invalid CRC, reject the request */
         Serial.println("Invalid CRC received for local config: " + String((int)crc) + " != " + String((int)localCrc));
+    }
+
+
+    if(!isValidConfigReceived)
+    {
+        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            DataContainer::getSignalValue(CBK_ERROR_REPORT)
+            )(ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED, localCrc);
     }
 }
 

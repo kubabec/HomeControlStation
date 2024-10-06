@@ -16,8 +16,9 @@ void OperatingSystem::init()
         isRCServerRunning = (std::any_cast<bool>(signal));
     });
 
-    ConfigProvider::init();
     ErrorMonitor::init();
+    ConfigProvider::init();
+    
 
     // Initialize network settings such as 
     // WiFi network connection etc.
@@ -41,6 +42,9 @@ void OperatingSystem::init()
 
     DeviceProvider::init();
     
+
+    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(ERR_MON_UNEXPECTED_RESET, 2);
 }
 
 

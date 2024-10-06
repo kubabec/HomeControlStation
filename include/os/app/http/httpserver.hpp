@@ -19,12 +19,15 @@ class HomeLightHttpServer
     static int pos3;
     
     static std::vector<OnOffDeviceDescription> onOffDescriptionVector;
+    static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
+    static uint8_t activeErrorsCount;
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
 
     static String ipAddressString;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
+    static void requestErrorList();
 
     
 
