@@ -27,7 +27,7 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedDa
 {
     errorCode = (ERR_MON_ERROR_TYPE)(errorCode - 1);
     Serial.println("Reported error: " + String((int)errorCode) + " with extended data " + String((int)extendedData));
-    if(errorCode <= ERR_MON_LAST_ERROR){
+    if(errorCode < ERR_MON_LAST_ERROR){
         SystemErrorType& errorRef = errorList.at(errorCode);
         errorRef.occurrenceCount ++;
         errorRef.extendedData = extendedData;
@@ -41,12 +41,13 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedDa
 
 void ErrorMonitor::errorClear(ERR_MON_ERROR_TYPE errorCode)
 {
+    Serial.println("Clearing error : " + String((int)errorCode));
     errorCode = (ERR_MON_ERROR_TYPE)(errorCode - 1);
-    if(errorCode <= ERR_MON_LAST_ERROR){
+    if(errorCode < ERR_MON_LAST_ERROR){
         SystemErrorType& errorRef = errorList.at(errorCode);
-        errorRef.occurrenceCount = 0;
-        errorRef.extendedData = 0;
-        errorRef.lastOccurrenceTime = 0;
+        errorList.at(errorCode).occurrenceCount = 0;
+        errorList.at(errorCode).extendedData = 0;
+        errorList.at(errorCode).lastOccurrenceTime = 0;
 
         updateSystemErrorSignal();
     }

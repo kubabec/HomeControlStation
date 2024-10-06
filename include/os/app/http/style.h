@@ -277,6 +277,26 @@ input[type=\"range\"]:focus {\
     margin-bottom: 15px;\
     text-align: center;\
 }\
+.error-button {\
+    padding: 10px 20px;\
+    margin-top: 15px;\
+    background: linear-gradient(135deg, #ff6666, #ff3333);\
+    border: none;\
+    border-radius: 25px;\
+    color: white;\
+    text-align: center;\
+    text-decoration: none;\
+    font-size: 16px;\
+    cursor: pointer;\
+    transition: background 0.3s, box-shadow 0.3s;\
+    font-family: inherit;\
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);\
+}\
+\
+.error-button:hover {\
+    background: linear-gradient(135deg, #ff4d4d, #e60000);\
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);\
+}\
 </style>\
 ";
 

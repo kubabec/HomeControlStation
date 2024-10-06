@@ -10,7 +10,7 @@ ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
     // OnOffDevice(11,"Dev",3,10)};
 
 void DeviceManager::deinit() {
-    for(uint8_t i = e_BLOCK_DEVICE_1; i < e_BLOCK_DEVICE_5; i++)
+    for(uint8_t i = e_BLOCK_DEVICE_1; i <= e_BLOCK_DEVICE_6; i++)
     {
         /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
         bool success = std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
@@ -62,7 +62,7 @@ void DeviceManager::init()
             uint8_t numberOfSuccessfullyRetrievedDevices = 0;
 
             /* For each DEVICE relevant datablock */
-            for(uint8_t datablock = e_BLOCK_DEVICE_1; datablock < e_PERSISTENT_BLOCK_LAST; datablock ++){
+            for(uint8_t datablock = e_BLOCK_DEVICE_1; datablock <= e_BLOCK_DEVICE_6; datablock ++){
                 /* Fill memory area with default 0xFF values */
                 memset(configBlock, 0xFF, DeviceConfigSlotType::getSize());
 
@@ -249,14 +249,21 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
                 Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
             }
-        }else {Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); }
-    }else { Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));}
+        }else {
+            Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            DataContainer::getSignalValue(CBK_ERROR_REPORT)
+            )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
+        }
+    }else 
+    { 
 
-    if(!isValidDeviceGiven){
+        Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));
         std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
             DataContainer::getSignalValue(CBK_ERROR_REPORT)
             )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
     }
+
 
     return isValidDeviceGiven;
 }
@@ -352,6 +359,14 @@ void DeviceManager::setLocalConfigViaString(String& config)
 
 
                 Serial.println("New config found, reboot ...");
+
+
+                Serial.println("Applying new config !!!!");
+                for(auto& element : pinConfigSlotsRamMirror.slots)
+                {
+                    element.print();
+                }
+
                 std::any_cast<std::function<void()>>
                     (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
             }else 

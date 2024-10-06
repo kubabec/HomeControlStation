@@ -18,6 +18,10 @@ private:
     static bool isHttpServerRunning;
     static bool isRCServerRunning;
 
+    static bool resetPending;
+    static uint8_t resetCountdown;
+
+    static void performReset();
 public:
     static void init();
     static void reset();

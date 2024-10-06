@@ -51,7 +51,8 @@ typedef enum
     e_BLOCK_DEVICE_3,
     e_BLOCK_DEVICE_4,
     e_BLOCK_DEVICE_5,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DEVICE_5
+    e_BLOCK_DEVICE_6,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DEVICE_6
 }PersistentDatablockID;
 
 /* Description of single configuration NVM slot */
@@ -107,7 +108,7 @@ typedef struct
 
     bool isValid()
     {
-        return (deviceType == 43 || deviceType == 44);
+        return (!isActive) || (deviceType == 43 || deviceType == 44);
     }
 
     static uint8_t getSize()

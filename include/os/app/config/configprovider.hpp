@@ -6,7 +6,7 @@
 
 #define SSID_LENGTH 30
 #define PASSWORD_LENGTH 30
-#define NUMBER_OF_PERSISTENT_DATABLOCKS 5
+#define NUMBER_OF_PERSISTENT_DATABLOCKS 6
 typedef struct
 {
     uint8_t safeShutdownFlag = 255;

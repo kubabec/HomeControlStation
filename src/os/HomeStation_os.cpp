@@ -3,6 +3,8 @@
 
 bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
+bool OperatingSystem::resetPending = false;
+uint8_t OperatingSystem::resetCountdown = 10;
 
 void OperatingSystem::init()
 {
@@ -73,11 +75,23 @@ void OperatingSystem::task20ms()
 void OperatingSystem::task50ms()
 {
 
-    
+    if(resetPending){
+        resetCountdown --;
+
+        if(resetCountdown == 0)
+        {
+            performReset();
+        }
+    }
 }
 
 void OperatingSystem::reset() {
+    resetPending = true;
+}
 
+
+void OperatingSystem::performReset()
+{
     DeviceProvider::deinit();
 
     if(isRCServerRunning){
@@ -98,5 +112,4 @@ void OperatingSystem::reset() {
     ConfigProvider::deinit();
 
     ESP.restart();
-
 }

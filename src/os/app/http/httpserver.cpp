@@ -165,6 +165,19 @@ void HomeLightHttpServer::handleClientRequest()
                     jezeli sygnał SIG_CURRENT_REQUEST_PROCESSING_STATE nie jest pending to przekieruj na strone główną,
                     w każdym innym razie przekieruj ponownie na pending (/?pending) */
               }
+
+              if(header.indexOf("GET /errclrbtn") >= 0) 
+              {
+                for(uint8_t i = 1; i <= ERR_MON_LAST_ERROR; i++)
+                {  
+                  std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(
+                  DataContainer::getSignalValue(CBK_ERROR_CLEAR)
+                  )((ERR_MON_ERROR_TYPE)i);
+                }
+
+                client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+              }
+
               // Check brightness changeCondition
               if(header.indexOf("GET /?bri") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
               {
@@ -538,7 +551,7 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
     {
       if(systemErrorList.at(i).occurrenceCount > 0) {
         client.println("<tr>\
-                          <td>ERR-"+ String(i) +"</td>\
+                          <td>ERR-"+ String(i+1) +"</td>\
                           <td>" + errorCodeDescription[i] + "</td>\
                           <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
                           <td>"+ String((int)systemErrorList.at(i).extendedData) +"</td>\
@@ -547,12 +560,18 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 
       }
     }
-    client.println("</tbody>");
+    client.println("</tbody></table>");
+
+    /* Display error clear button */
+    const char* errorClearBtn = "\
+    <a href=\"/errclrbtn\" class=\"error-button\">Clear errors</a>";
+    client.println(errorClearBtn);
 
   }else 
   {
     /* no errors */
     client.println("No active errors.");
+    client.println("</table>");
   }
-  client.println("</table></div>");
+  client.println("</div>");
 }
