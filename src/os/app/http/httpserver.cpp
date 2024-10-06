@@ -184,7 +184,7 @@ void HomeLightHttpServer::handleClientRequest()
 
               /* Display configuration button */
               const char* configButtonLink = "\
-              <br><a href=\"/config\" class=\"button\">Configuration</a><br>";
+              <br><a href=\"/config\" class=\"button\">Settings</a><br>";
               client.println(configButtonLink);
 
             }else if (header.indexOf("GET /config") >= 0)
@@ -343,12 +343,24 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
-  client.println("<option value=\"1\">1</option>");
-  client.println("<option value=\"2\">2</option>");
-  client.println("<option value=\"3\">3</option>");
-  client.println("<option value=\"4\">4</option>");
-  client.println("<option value=\"5\">5</option>");
-  client.println("<option value=\"6\">6</option>");
+  for(uint8_t i = 1 ; i <= 10 ; i ++){
+    String pinStr = "";
+    if(slot.pinNumber != i)
+    {
+      pinStr = "<option value=\"" + String(i) + "\">" + String(i) + "</option>";
+    }
+    else
+    {
+      pinStr = "<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>";
+    }
+      client.println(pinStr);
+  }
+  // client.println("<option value=\"1\">1</option>");
+  // client.println("<option value=\"2\">2</option>");
+  // client.println("<option value=\"3\">3</option>");
+  // client.println("<option value=\"4\">4</option>");
+  // client.println("<option value=\"5\">5</option>");
+  // client.println("<option value=\"6\">6</option>");
   client.println("</select>");
   client.println(labelEnd);
 

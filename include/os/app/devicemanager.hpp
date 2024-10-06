@@ -25,6 +25,8 @@ class DeviceManager
     static uint16_t configCrcCalculation(uint8_t* data, uint16_t size);
     static DeviceConfigSlotType extractDeviceConfigFromString(String& confStr);
 
+    static bool validateConfigurationData(ConfigSlotsDataType& data);
+
 public:
     static void init();
     static void deinit();

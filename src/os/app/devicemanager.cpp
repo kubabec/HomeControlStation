@@ -314,6 +314,10 @@ void DeviceManager::setLocalConfigViaString(String& config)
     if(crc == localCrc) {
         /* further data extraction possible */
 
+        /* This temp config set needs to be used in order to validate dependencies
+        between separate slots and to apply or reject the whole configuration*/
+        ConfigSlotsDataType temporaryConfigurationSet;
+
         Serial.println(deviceConfigOnlyStr);
         bool atLeastOneValid = false;
         for(int i = 0 ; i < 6 ; i++)
@@ -323,18 +327,29 @@ void DeviceManager::setLocalConfigViaString(String& config)
             if(slotData.isValid())
             {
                 atLeastOneValid = true;
-                pinConfigSlotsRamMirror.slots[i] = slotData;
+                //pinConfigSlotsRamMirror.slots[i] = slotData;
+                temporaryConfigurationSet.slots[i] = slotData;
             }
         }
 
         if(atLeastOneValid){
-            /* Publish retrieved DeviceConfigSlots signal to the system */
-            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
+            if(validateConfigurationData(temporaryConfigurationSet))
+            {
+                /* Temporary config validated correctly, settings can be applied */
+
+                pinConfigSlotsRamMirror = temporaryConfigurationSet;
+
+                /* Publish retrieved DeviceConfigSlots signal to the system */
+                DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
 
 
-            Serial.println("New config found, reboot ...");
-            std::any_cast<std::function<void()>>
-                  (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+                Serial.println("New config found, reboot ...");
+                std::any_cast<std::function<void()>>
+                    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+            }else 
+            {
+                Serial.println("Invalid configuration set detected, ignoring.");
+            }
         }
 
     }else 
@@ -409,4 +424,75 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
     //}
 
     return newConfig;
+}
+
+bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
+{
+    /* All dependencies in config need to be analyzed and verified before applying */
+    const uint8_t numberOfPinsAllowed = 10;
+    const uint8_t pinsAllowed[numberOfPinsAllowed] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; 
+    uint8_t pinsUsageCount[numberOfPinsAllowed] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    bool validationSuccess = false;
+    uint8_t errorFlag = 0;
+
+    for(uint8_t slot = 0; slot < 6; slot++)
+    {
+        if(data.slots[slot].isActive){
+            if(data.slots[slot].deviceName[24] != '\0'){
+                /* EOS sign missing at the end of a name */
+                Serial.println("Error:EOS sign missing at the end of a name");
+                errorFlag |= 1;
+            }
+
+            if(data.slots[slot].deviceType != 255)
+            {
+                if(data.slots[slot].deviceType < e_DEVICE_TYPE_FIRST || 
+                data.slots[slot].deviceType > e_DEVICE_TYPE_LAST){
+                    /* In case of type different than unknown, type must be between FIRST and LAST types */
+                    Serial.println("Error: Wrong device type");
+                    errorFlag |= 1;
+                }
+            }
+
+            bool pinValid = false;
+            for(uint8_t i = 0; i < numberOfPinsAllowed; i ++)
+            {
+                if(data.slots[slot].pinNumber == pinsAllowed[i])
+                {
+                    pinsUsageCount[i] ++;
+                    pinValid = true;
+                    break;
+                }
+            }
+
+            if(!pinValid){
+                /* Pin value is out of allowed pins range */
+                Serial.println("Error: Pin value is out of allowed pins range ");
+                errorFlag |= 1;
+            }
+        }
+    }
+
+
+    if(errorFlag == 0)
+    {
+        for(uint8_t i = 0 ; i < numberOfPinsAllowed; i++)
+        {
+            if(pinsUsageCount[i] > 1)
+            {
+                /* Pin used more than once */
+                Serial.println("Error: Pin used more than once ");
+                errorFlag |= 1;
+                break;
+            }
+        }
+    }
+    
+    if(errorFlag == 0)
+    {
+        validationSuccess = true;
+    }
+
+    return validationSuccess;
 }
