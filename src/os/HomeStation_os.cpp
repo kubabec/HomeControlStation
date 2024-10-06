@@ -17,6 +17,7 @@ void OperatingSystem::init()
     });
 
     ConfigProvider::init();
+    ErrorMonitor::init();
 
     // Initialize network settings such as 
     // WiFi network connection etc.
@@ -46,6 +47,7 @@ void OperatingSystem::init()
 void OperatingSystem::task10ms()
 {
     NetworkDriver::cyclic();
+    ErrorMonitor::cyclic();
 
     if(isHttpServerRunning){
         HomeLightHttpServer::cyclic();
@@ -87,6 +89,8 @@ void OperatingSystem::reset() {
     }
 
     NetworkDriver::deinit();
+
+    ErrorMonitor::deinit();
     ConfigProvider::deinit();
 
     ESP.restart();

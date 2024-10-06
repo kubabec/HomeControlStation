@@ -431,6 +431,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(currentConfig.networkPassword);
   client.println(configPageContent5);
 
+  printErrorTable(client);
+
   /* Display return button */
   client.println("<br><a href=\"http://"+ipAddressString+"\" class=\"button\">Home page</a><br>");
 
@@ -454,4 +456,33 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 
 
   client.println("</div>");
+}
+
+void HomeLightHttpServer::printErrorTable(WiFiClient& client)
+{
+  client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
+  client.println("<thead>\
+                    <tr>\
+                        <th>Code</th>\
+                        <th>Description</th>\
+                        <th>Count</th>\
+                        <th>Extra Data</th>\
+                    </tr>\
+                </thead><tbody>");
+      
+
+  client.println("<tr>\
+                        <td>ERR-101</td>\
+                        <td>Network Disconnected</td>\
+                        <td>5</td>\
+                        <td>Last occurred: 10:15 AM</td>\
+                    </tr>\
+                    <tr>\
+                        <td>ERR-102</td>\
+                        <td>Overheating</td>\
+                        <td>3</td>\
+                        <td>Max Temp: 85°C</td>\
+                    </tr>");
+
+  client.println("</tbody></table></div>");
 }

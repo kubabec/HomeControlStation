@@ -31,6 +31,7 @@ class HomeLightHttpServer
 
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
+    static void printErrorTable(WiFiClient& client);
 public:
     static void cyclic();
     static void init();

@@ -9,6 +9,7 @@
 #include <os/app/config/ConfigProvider.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DeviceProvider.hpp>
+#include <os/app/ErrorMonitor.hpp>
 
 class   OperatingSystem
 {

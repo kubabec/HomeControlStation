@@ -230,6 +230,53 @@ input[type=\"range\"]:focus {\
     max-height: 500px;\
     opacity: 1;\
 }\
+.error-table-container {\
+    display: flex;\
+    flex-direction: column;\
+    align-items: center;\
+    width: 700px;\
+    padding: 20px;\
+    background: #ffe6e6;\
+    border-radius: 15px;\
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);\
+    margin: 10px 0;\
+    border: 2px solid #ffcccc;\
+    transition: all 0.5s ease;\
+}\
+\
+.error-table {\
+    width: 100%;\
+    border-collapse: collapse;\
+}\
+\
+.error-table thead {\
+    background: #ff9999;\
+    font-weight: bold;\
+    color: #990000;\
+}\
+\
+.error-table th,\
+.error-table td {\
+    padding: 10px;\
+    text-align: center;\
+    border: 1px solid #ffcccc;\
+}\
+\
+.error-table tbody tr {\
+    background: #ffcccc;\
+}\
+\
+.error-table tbody tr:nth-child(even) {\
+    background: #ffb3b3;\
+}\
+\
+.error-header {\
+    font-size: 18px;\
+    font-weight: bold;\
+    color: #b30000;\
+    margin-bottom: 15px;\
+    text-align: center;\
+}\
 </style>\
 ";
 
