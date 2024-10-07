@@ -130,3 +130,40 @@ String WiFiAdapter::getLastConnectedPassword()
 {
     return lastConnectedPassword;
 }
+
+void WiFiAdapter::createAccessPoint()
+{
+    // const char* accessPointSSID = "ESP32_HomeStation";
+    // Serial.println("Access Point initialization ...");
+    //WiFi.mode(WIFI_AP);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(IPAddress(192, 168, 0, 1), IPAddress(192, 168, 0, 1), IPAddress(255,255,255,0));
+    WiFi.softAP("ESP32_HomeStation", "HomeStation");
+    Serial.println("AP created successfully");
+
+
+    Serial.println("======== IP Adres =========");
+    Serial.println(WiFi.softAPIP());
+    DataContainer::setSignalValue(
+        SIG_IP_ADDRESS_STRING,
+        "WiFiAdapter",
+        static_cast<String>(WiFi.softAPIP().toString())
+    );
+
+    uint32_t ip;
+    memcpy((uint8_t*)&ip, &WiFi.softAPIP()[0], 1);
+    memcpy((uint8_t*)&ip+1, &WiFi.softAPIP()[1], 1);
+    memcpy((uint8_t*)&ip+2, &WiFi.softAPIP()[2], 1);
+    memcpy((uint8_t*)&ip+3, &WiFi.softAPIP()[3], 1);
+
+    DataContainer::setSignalValue(SIG_IP_ADDRESS, "WiFiAdapter", static_cast<uint32_t>(ip));
+    
+    // isConnectedFlag = true;
+    // lastConnectedSSID = String("ESP32_HomeStation");
+    // lastConnectedPassword = "";
+    // connectionLostNotificationSent = false;
+
+    //Serial.println("WiFi AccessPoint created, IP: " + WiFi.softAPIP());
+    
+    delay(1000);
+}

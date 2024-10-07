@@ -89,9 +89,12 @@ void ConfigProvider::updateNodeConfigurationSignal()
     NodeConfiguration validConfiguration;
     validConfiguration.isHttpServer = configRamMirror.isHttpServer;
     validConfiguration.isRcServer = configRamMirror.isRcServer;
-    validConfiguration.networkCredentialsAvailable = true;
     validConfiguration.networkSSID = String(configRamMirror.networkSSID);
     validConfiguration.networkPassword = String(configRamMirror.networkPassword);
+
+    if(validConfiguration.networkPassword.length() > 0  && validConfiguration.networkSSID.length() > 0){
+        validConfiguration.networkCredentialsAvailable = true;
+    }
     Serial.println(validConfiguration.networkPassword);
 
     /* Write valid  configuration to DataContainer */

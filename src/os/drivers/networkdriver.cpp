@@ -27,6 +27,10 @@ void NetworkDriver::init()
         std::any nodeConfiguration = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
         NodeConfiguration config = std::any_cast<NodeConfiguration>(nodeConfiguration);
 
+        // Serial.println("SSID Length : " + String(config.networkSSID.length()));
+        // Serial.println("Password Length : " + String(config.networkPassword.length()));
+        // Serial.println("Config available: " + String((int)config.networkCredentialsAvailable));
+
         // Is config valid?
         if(config.networkCredentialsAvailable)
         {
@@ -34,11 +38,16 @@ void NetworkDriver::init()
         }else 
         {
             // Connect to defaults
-            WiFiAdapter::connectToNetwork( "Orange_Swiatlowod_DA2C", "2FYXFG6MAGVZ");
+            /* Host accesspoint */
+            Serial.println("Starting AP due to invalid WiFi credentials");
+            WiFiAdapter::createAccessPoint();
+            //WiFiAdapter::connectToNetwork( "", "");
         }
 
     }catch (const std::bad_any_cast& e){ 
-        WiFiAdapter::connectToNetwork( "Orange_Swiatlowod_DA2C", "2FYXFG6MAGVZ");
+        //WiFiAdapter::connectToNetwork( "", "");
+        Serial.println("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
+        WiFiAdapter::createAccessPoint();
     }
     
 
@@ -102,15 +111,15 @@ void NetworkDriver::udpReceive(MessageUDP data)
 /*This is accessor function for UDPAdapter.send()*/
 bool NetworkDriver::send(MessageUDP& data)
 {
-    if(WiFiAdapter::isConnected()){
-        UDPAdapter::send(data);
-        return true;
-    }
-    else
-    {
-        Serial.println("No network connection. Sending data failed.");
-        return false;
-    }
+    // if(WiFiAdapter::isConnected()){
+    //     UDPAdapter::send(data);
+    //     return true;
+    // }
+    // else
+    // {
+    //     Serial.println("No network connection. Sending data failed.");
+    //     return false;
+    // }
 }
 
 bool NetworkDriver::sendBroadcast(MessageUDP& data)

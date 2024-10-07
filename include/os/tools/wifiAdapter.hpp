@@ -20,6 +20,8 @@ public:
     static String getLastConnectedSSID();
     static String getLastConnectedPassword();
 
+    static void createAccessPoint();
+
 
     static void task();
 };
