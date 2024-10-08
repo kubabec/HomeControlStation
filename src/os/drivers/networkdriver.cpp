@@ -111,15 +111,15 @@ void NetworkDriver::udpReceive(MessageUDP data)
 /*This is accessor function for UDPAdapter.send()*/
 bool NetworkDriver::send(MessageUDP& data)
 {
-    // if(WiFiAdapter::isConnected()){
-    //     UDPAdapter::send(data);
-    //     return true;
-    // }
-    // else
-    // {
-    //     Serial.println("No network connection. Sending data failed.");
-    //     return false;
-    // }
+    if(WiFiAdapter::isConnected()){
+        UDPAdapter::send(data);
+        return true;
+    }
+    else
+    {
+        Serial.println("No network connection. Sending data failed.");
+        return false;
+    }
 }
 
 bool NetworkDriver::sendBroadcast(MessageUDP& data)
