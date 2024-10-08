@@ -5,7 +5,7 @@
 
 #define REQUEST_DATA_SIZE 30
 #define RESPONSE_DATA_SIZE 10
-#define REQEST_SIZE (REQUEST_DATA_SIZE + 8)
+#define REQEST_SIZE (REQUEST_DATA_SIZE + 9)
 
 typedef enum {
     REQUEST_NODE_INITIAL_DATA = 50,
@@ -37,12 +37,14 @@ typedef struct {
 
 
 typedef enum {
-    ENABLE_REQ,
+    REQ_FIRST,
+    ENABLE_REQ = REQ_FIRST,
     DISABLE_REQ,
     BRIGHTNESS_CHANGE_REQ,
     COLOR_CHANGE_REQ,
     RESET_REQ,
-    UNKNOWN_REQ
+    UNKNOWN_REQ,
+    REQ_COUNT = UNKNOWN_REQ
 }RequestType;
 
 

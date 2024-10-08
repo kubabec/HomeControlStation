@@ -1,13 +1,14 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/datacontainer/SigMessages.hpp>
-#include <os/app/remoteControl/rc_DataTypes.hpp>
 
 
 
 static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
+std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
+
 
 void RemoteControlClient::deinit() {
     
@@ -45,6 +46,10 @@ void RemoteControlClient::cyclic()
 
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     switch(msg.getId()) {
+        case RC_REQUEST:
+            processGenericRequest(msg);
+            break;
+
         case REQUEST_NODE_INITIAL_DATA:
             sendInitialDataResponse();
 
@@ -64,9 +69,33 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     
 }
 
+void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
+    if(msg.getPayload().size() == REQEST_SIZE) {
+        RcRequest newRequest;
+        memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE);
+        newRequest.print();
+        const uint8_t myId = 10;
+        if(newRequest.targetNodeId == myId) {
+            if(newRequest.type >= REQ_FIRST && newRequest.type < UNKNOWN_REQ) {
+                if(requestReceivers.at(newRequest.type)) {
+                    (requestReceivers.at(newRequest.type))(newRequest);
+
+                }
+            }
+        }
+
+    }else {
+        Serial.println("Request with invalid lenght received");
+    }
+
+}
+
 void RemoteControlClient::receiveUDP(MessageUDP& msg){
     receivedBuffer.push(msg);
-    MessageUDP::serialPrintMessageUDP(msg);
+
+    if(msg.getId() == RC_REQUEST) {
+        MessageUDP::serialPrintMessageUDP(msg);
+    }
 }
 
 void RemoteControlClient::handleNodeInitialDataState(){    
@@ -141,4 +170,19 @@ void RemoteControlClient::sendKeepAlive() {
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));
     NetworkDriver::sendBroadcast(keepAliveResponse);
+}
+
+bool RemoteControlClient::registerRequestReceiver(RequestType request, std::function<bool(RcRequest&)> receiverCallback) {
+    if(request >= REQ_FIRST && request < UNKNOWN_REQ) {
+        if(requestReceivers.at(request)) { 
+            //receiver allready registered
+            return false;
+            
+
+        } else {
+            requestReceivers.at(request) = receiverCallback;
+            return true;
+        }
+    }
+    return false;
 }
