@@ -82,6 +82,11 @@ void ConfigProvider::init()
         CBK_GET_NVM_DATABLOCK,
         "ConfigProvider", 
         static_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(ConfigProvider::getDatablock));
+
+    DataContainer::setSignalValue(
+        CBK_MASS_ERASE,
+        "ConfigProvider",
+        static_cast<std::function<void(void)>>(ConfigProvider::massErase));
 }
 
 void ConfigProvider::updateNodeConfigurationSignal()
@@ -343,6 +348,11 @@ void ConfigProvider::deinit() {
     saveRamMirrorToNvm();
 }
 
+
+void ConfigProvider::massErase()
+{
+    PersistentMemoryAccess::massErase(totalNvmSize);
+}
 
 
 

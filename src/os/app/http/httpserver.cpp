@@ -155,6 +155,7 @@ void HomeLightHttpServer::handleClientRequest()
 
             // Web Page Heading
             client.println("<body><div class=\"wrapper\">");
+            client.println(popupContent);
 
             // NO config page requested?
             if((header.indexOf("GET /config") < 0) && (header.indexOf("GET /localDevices") < 0)){
@@ -176,6 +177,25 @@ void HomeLightHttpServer::handleClientRequest()
                 }
 
                 client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+              }
+
+              if(header.indexOf("GET /masseraseviahttp" >= 0))
+              {
+                /* Erase flash callback */
+                try{
+                  // Serial.println("Erasing flash!");
+                  // /* erase flash */
+                  // std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
+                  // /* redirect */
+                  // client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+                  // /* restart */
+                  // std::any_cast<std::function<void()>>
+                  // (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+                }catch (std::bad_any_cast ex)
+                {
+
+                }
+                
               }
 
               // Check brightness changeCondition
@@ -477,6 +497,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String yesSelected = "<option selected=\"selected\" value=\"yes\">Yes</option>";
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
+  client.println("<div class=\"header\">General configuration</div>");
+
   client.println(configPageContent1);
   if(currentConfig.isHttpServer)
   {
@@ -503,6 +525,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(currentConfig.networkPassword);
   client.println(configPageContent5);
 
+
   printErrorTable(client);
 
   /* Display return button */
@@ -523,7 +546,8 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
     slotIdx++;
   }
 
-  client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"createConfigurationString();\">Save config</button>");
+  client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"showPopup('Do you wanna change node devices configuration?\
+   GPIO pin setup will be loaded according to options selected on this page.', createConfigurationString);\">Save config</button>");
   client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
 
 
@@ -564,7 +588,8 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 
     /* Display error clear button */
     const char* errorClearBtn = "\
-    <a href=\"/errclrbtn\" class=\"error-button\">Clear errors</a>";
+    <button class=\"error-button\" \
+    onclick=\"showPopup('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
     client.println(errorClearBtn);
 
   }else 

@@ -297,6 +297,96 @@ input[type=\"range\"]:focus {\
     background: linear-gradient(135deg, #ff4d4d, #e60000);\
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);\
 }\
+.popup-overlay {\
+    position: fixed;\
+    top: 0;\
+    left: 0;\
+    width: 100%;\
+    height: 100%;\
+    background: rgba(0, 0, 0, 0.6);\
+    display: none;\
+    justify-content: center;\
+    align-items: center;\
+    z-index: 1000;\
+    transition: opacity 0.3s ease;\
+}\
+\
+.popup-content {\
+    background: #ffffff;\
+    width: 400px;\
+    padding: 20px;\
+    border-radius: 10px;\
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);\
+    text-align: center;\
+    position: relative;\
+    transform: scale(0.8);\
+    transition: transform 0.3s ease;\
+}\
+\
+.popup-content.show {\
+    transform: scale(1);\
+}\
+\
+.popup-header {\
+    font-size: 20px;\
+    margin-bottom: 15px;\
+    color: #333;\
+}\
+\
+.popup-message {\
+    font-size: 16px;\
+    color: #666;\
+    margin-bottom: 25px;\
+}\
+\
+.popup-button {\
+    padding: 10px 20px;\
+    background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
+    border: none;\
+    border-radius: 25px;\
+    color: white;\
+    text-align: center;\
+    text-decoration: none;\
+    font-size: 16px;\
+    cursor: pointer;\
+    transition: background 0.3s;\
+    font-family: inherit;\
+    display: inline-block;\
+}\
+\
+.popup-button:hover {\
+    background: linear-gradient(135deg, #5aa9d4, #337bbf);\
+}\
+\
+.popup-close {\
+    position: absolute;\
+    top: 10px;\
+    right: 10px;\
+    width: 25px;\
+    height: 25px;\
+    background: #ff6666;\
+    color: white;\
+    font-size: 18px;\
+    line-height: 25px;\
+    text-align: center;\
+    border-radius: 50%;\
+    cursor: pointer;\
+    transition: background 0.3s;\
+}\
+\
+.popup-close:hover {\
+    background: #ff4d4d;\
+}\
+\
+.visible-popup {\
+    display: flex;\
+    opacity: 1;\
+}\
+\
+.hidden-popup {\
+    display: none;\
+    opacity: 0;\
+}\
 </style>\
 ";
 

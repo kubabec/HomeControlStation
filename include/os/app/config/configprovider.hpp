@@ -94,6 +94,7 @@ public:
     static bool getDatablock(PersistentDatablockID blockID, uint8_t* buffer);
 
     static void eraseDatablockMemory();
+    static void massErase();
         
 };
 

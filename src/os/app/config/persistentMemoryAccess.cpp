@@ -121,3 +121,12 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
         return false;
     }
 }
+
+void PersistentMemoryAccess::massErase(uint16_t eepromSize)
+{
+    for(uint16_t i = 0; i < eepromSize; i ++){
+        EEPROM.write(i, 0);
+    }
+
+    EEPROM.commit();
+}

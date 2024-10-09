@@ -16,6 +16,10 @@ const char* javascript = "\
         var url = `/localDevices`;\
         window.location.href = url;\
     }\
+    function massErase(){\
+        var url = `/masseraseviahttp`;\
+        window.location.href = url;\
+    }\
     function onRangeTimChanged(value) {\
         value = parseInt(value);\
         window.location.assign(\"/?tim\"+value+\"&\");\
@@ -116,6 +120,43 @@ const char* javascript = "\
             });\
         });\
     };\
+\
+\
+        function showPopup(message, action) {\
+            const popupOverlay = document.getElementById('popup-overlay');\
+            const popupContent = document.getElementById('popup-content');\
+            const popupMessage = document.getElementById('popup-message');\
+            const popupButton = document.getElementById('popup-button');\
+\
+            popupMessage.textContent = message;\
+\
+            if (typeof action === 'string') {\
+                popupButton.onclick = function () {\
+                    window.location.href = action;\
+                };\
+            } else if (typeof action === 'function') {\
+                popupButton.onclick = function () {\
+                    action();\
+                };\
+            }\
+\
+            popupOverlay.classList.remove('hidden-popup');\
+            popupOverlay.classList.add('visible-popup');\
+            popupContent.classList.add('show');\
+\
+            document.getElementById('popup-close').onclick = function () {\
+                hidePopup();\
+            };\
+        }\
+\
+        function hidePopup() {\
+            const popupOverlay = document.getElementById('popup-overlay');\
+            const popupContent = document.getElementById('popup-content');\
+\
+            popupOverlay.classList.remove('visible-popup');\
+            popupOverlay.classList.add('hidden-popup');\
+            popupContent.classList.remove('show');\
+        };\
 </script>";
 
 #endif

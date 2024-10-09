@@ -12,6 +12,7 @@ public:
 
     static bool saveData(uint8_t* data, uint16_t size);
     static bool readData(uint8_t* buffer, uint16_t size);
+    static void massErase(uint16_t eepromSize);
         
 };
 
