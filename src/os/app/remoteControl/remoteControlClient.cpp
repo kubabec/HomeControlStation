@@ -85,7 +85,7 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
         }
 
     }else {
-        Serial.println("Request with invalid lenght received");
+        Serial.println("Request with invalid lenght received, received : " + String((int)msg.getPayload().size()) + ", expected: " + String((int)REQEST_SIZE) );
     }
 
 }

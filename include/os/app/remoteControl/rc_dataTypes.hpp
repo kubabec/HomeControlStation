@@ -5,7 +5,7 @@
 
 #define REQUEST_DATA_SIZE 30
 #define RESPONSE_DATA_SIZE 10
-#define REQEST_SIZE (REQUEST_DATA_SIZE + 9)
+#define REQEST_SIZE (REQUEST_DATA_SIZE + 8)
 
 typedef enum {
     REQUEST_NODE_INITIAL_DATA = 50,
@@ -84,7 +84,7 @@ typedef struct {
 
     uint8_t getSize(){
              
-        return (1+2+1+1+REQUEST_DATA_SIZE+1+3);
+        return REQEST_SIZE;
     }
     
     void print() {
