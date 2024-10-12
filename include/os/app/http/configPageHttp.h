@@ -4,12 +4,12 @@
 const char* configPageContent1 = "\
     <div class=\"container\">\
     <form onsubmit=\"return false;\">\
-        <label>isHTTPServer:\
+        <label>HTTP Server:\
             <select name=\"isHTTPServer\">";
 
 const char* configPageContent2 = "</select>\
         </label>\
-        <label>isRCServer:\
+        <label>RC Server:\
             <select name=\"isRCServer\">";
 const char* configPageContent3 = "</select>\
         </label>\

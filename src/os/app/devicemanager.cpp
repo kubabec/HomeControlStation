@@ -198,71 +198,71 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
 {
     bool isValidDeviceGiven = false;
 
-    /* isn't nvm block empty ? */
-    if(nvmData.isValid())
+    /* isn't nvm block active ? */
+    if(nvmData.isActive)
     {
         /* Is known and valid device type inside?*/
-        if(nvmData.deviceType >= e_DEVICE_TYPE_FIRST && nvmData.deviceType <= e_DEVICE_TYPE_LAST)
+        if(nvmData.isValid())
         {
-            if(nvmData.isActive){
-                switch(nvmData.deviceType)
-                {
-                    case e_ON_OFF_DEVICE :
-                        vecOnOffDevices.push_back(OnOffDevice(
-                            nvmData.pinNumber,          /* Pin number */
-                            String(nvmData.deviceName), /* Device name */
-                            nvmData.deviceId,           /* Device unique identifier */
-                            nvmData.roomId              /* Room unique identifier */
-                        ));
+            
+            switch(nvmData.deviceType)
+            {
+                case e_ON_OFF_DEVICE :
+                    vecOnOffDevices.push_back(OnOffDevice(
+                        nvmData.pinNumber,          /* Pin number */
+                        String(nvmData.deviceName), /* Device name */
+                        nvmData.deviceId,           /* Device unique identifier */
+                        nvmData.roomId              /* Room unique identifier */
+                    ));
 
-                        if(nvmData.customBytes[0] == 1)
-                        {
-                            vecOnOffDevices.back().setBrightnessLevelSupport(true);
-                        }else 
-                        {
-                           vecOnOffDevices.back().setBrightnessLevelSupport(false); 
-                        }
+                    if(nvmData.customBytes[0] == 1)
+                    {
+                        vecOnOffDevices.back().setBrightnessLevelSupport(true);
+                    }else 
+                    {
+                        vecOnOffDevices.back().setBrightnessLevelSupport(false); 
+                    }
 
-                        isValidDeviceGiven = true;
-                    break;
+                    isValidDeviceGiven = true;
+                break;
 
-                    case e_LED_STRIP :
-                        /*TBD*/
-                    break;
+                case e_LED_STRIP :
+                    /*TBD*/
+                break;
 
-                    default:break;
-                }
-
+                default:break;
+            }
                 /* TODO more NVM Data to be extracted here ! */
 
-            }else { /* Ignore inactive slot whenever creating new device instance */}
-
+        
             /* Save valid ConfigSlot configuration to relevant config slot */
             if(configSlotID >= 0 && configSlotID < pinConfigSlotsRamMirror.slots.size())
             {
                 /* Save retrieved NVM config to ram mirror */
                 pinConfigSlotsRamMirror.slots.at(configSlotID) = nvmData;
-
-
-
             }else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
                 Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
+                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT)
+                )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
             }
-        }else {
+        }
+        else {
             Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
             std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
             DataContainer::getSignalValue(CBK_ERROR_REPORT)
             )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
         }
-    }else 
-    { 
-
-        Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));
-        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-            DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
     }
+    // else 
+    // { 
+
+    //     Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));
+    //     std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+    //         DataContainer::getSignalValue(CBK_ERROR_REPORT)
+    //         )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
+    // }
 
 
     return isValidDeviceGiven;

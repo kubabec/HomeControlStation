@@ -110,7 +110,7 @@ typedef struct
 
     bool isValid()
     {
-        return (!isActive) || (deviceType == 43 || deviceType == 44);
+        return (deviceType == 43 || deviceType == 44);
     }
 
     static uint8_t getSize()
