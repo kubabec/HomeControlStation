@@ -463,8 +463,13 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("<div class=\"extra-fields extra-43\">");
   client.println("<label>Brightness support:");
   client.println("<select id=\"extra-43-"+String((int)slotNumber)+"\">");
-  client.println("<option value=\"0\" selected>No</option>");
-  client.println("<option value=\"1\">Yes</option>");
+  if(slot.customBytes[0]){
+    client.println("<option value=\"0\" >No</option>");
+    client.println("<option value=\"1\" selected>Yes</option>");
+  }else {
+    client.println("<option value=\"0\" selected>No</option>");
+    client.println("<option value=\"1\">Yes</option>");
+  }
   client.println("</select>");
 
   client.println("</label>");

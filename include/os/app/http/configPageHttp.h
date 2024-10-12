@@ -9,7 +9,7 @@ const char* configPageContent1 = "\
 
 const char* configPageContent2 = "</select>\
         </label>\
-        <label>RC Server:\
+        <label>RC Mode:\
             <select name=\"isRCServer\">";
 const char* configPageContent3 = "</select>\
         </label>\

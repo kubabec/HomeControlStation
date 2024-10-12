@@ -121,6 +121,13 @@ const char* javascript = "\
                 toggleDeviceConfig(this);\
             });\
         });\
+\
+        showExtraFields(document.getElementById('type1'), 'device-1');\
+        showExtraFields(document.getElementById('type2'), 'device-2');\
+        showExtraFields(document.getElementById('type3'), 'device-3');\
+        showExtraFields(document.getElementById('type4'), 'device-4');\
+        showExtraFields(document.getElementById('type5'), 'device-5');\
+        showExtraFields(document.getElementById('type6'), 'device-6');\
     };\
 \
 \
