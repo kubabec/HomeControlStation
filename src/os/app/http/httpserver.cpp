@@ -1,7 +1,6 @@
 #include <os/app/http/HttpServer.hpp>
 
 #include "os/app/http/ConfigPageHttp.h"
-#include "os/app/http/SlotsViewPageHttp.h"
 #include "os/app/http/PageHead.h"
 #include "os/app/http/Style.h"
 #include "os/app/http/JavaScript.h"
@@ -396,10 +395,9 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     client.println(labelEnd);
   }
 
-  client.println(labelStart);
-  client.println("Device ID:<input type=\"text\" id=\"identifier"+String(slotNumber)+"\"\
-    value=\""+ String((int)slot.deviceId) + "\">");
-  client.println(labelEnd);
+  /* intentionally hidden to prevent user from using IDs other than 0 - 5 */
+  client.println("<input type=\"text\" style=\"visibility:hidden;display:none;\" id=\"identifier"+String(slotNumber)+"\"\
+    value=\""+ String((int)slotNumber) + "\">");
 
   client.println(labelStart);
   client.println("Name:<input type=\"text\" maxlength=\"24\" id=\"name"+String(slotNumber)+"\"\
@@ -541,7 +539,6 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 {
   client.println("<div class=\"wrapper\">\
         <div class=\"header\">Node Local Configuration</div>");
-  //client.println(slotsViewPage);
 
   uint8_t slotIdx = 1;
   for(auto slot : pinConfigSlotsCopy_HttpServer.slots)

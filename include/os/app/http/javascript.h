@@ -71,7 +71,7 @@ const char* javascript = "\
                 dataEnable = '1';\
             }\
 \
-            var dataId = document.getElementById('identifier' + i).value;\
+            var dataId = i;\
             if(dataId < 10) { dataId = '0' + dataId; }\
             var dataName = document.getElementById('name' + i).value;\
             var dataType = document.getElementById('type' + i).value;\
