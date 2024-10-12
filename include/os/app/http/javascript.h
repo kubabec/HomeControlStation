@@ -7,9 +7,11 @@ const char* javascript = "\
     function applySettings() {\
         var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;\
         var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;\
+        var nodeId = document.querySelector('input[name=\"nodeid\"]').value;\
+        var nodeType = document.querySelector('input[name=\"nodetype\"]').value;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
-        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}`;\
+        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&nodeId=${encodeURIComponent(nodeId)}&nodeType=${encodeURIComponent(nodeType)}`;\
         window.location.href = url;\
     }\
     function goToDevicesManagement() {\

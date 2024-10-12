@@ -6,7 +6,7 @@
 
 
 
-ConfigData ConfigProvider::configRamMirror = {255, 0, 0, "\0", "\0"};
+ConfigData ConfigProvider::configRamMirror = {255, 0, 0, 255, 255, "\0", "\0"};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[NUMBER_OF_PERSISTENT_DATABLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
@@ -57,6 +57,8 @@ void ConfigProvider::init()
         emptyConfiguration.isHttpServer = true;
         emptyConfiguration.isRcServer = true;
         emptyConfiguration.networkCredentialsAvailable = false;
+        emptyConfiguration.nodeId = 255;
+        emptyConfiguration.nodeType = 255;
         
         /* Write DEFAULT configuration to DataContainer */
         // Obsolete signal to be removed
@@ -96,6 +98,8 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.isRcServer = configRamMirror.isRcServer;
     validConfiguration.networkSSID = String(configRamMirror.networkSSID);
     validConfiguration.networkPassword = String(configRamMirror.networkPassword);
+    validConfiguration.nodeId = configRamMirror.nodeId;
+    validConfiguration.nodeType = configRamMirror.nodeType;
 
     if(validConfiguration.networkPassword.length() > 0  && validConfiguration.networkSSID.length() > 0){
         validConfiguration.networkCredentialsAvailable = true;
@@ -110,6 +114,8 @@ void ConfigProvider::updateNodeConfigurationSignal()
     
     // New signal to be used in the future implementation
     DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, "ConfigProvider", validConfiguration);
+
+    Serial.println("NVM configuration restored successfully.");
 }
 
 void ConfigProvider::cyclic()
@@ -120,7 +126,7 @@ void ConfigProvider::cyclic()
 
 void ConfigProvider::setConfigViaString(String& configString)
 {
-    String str_isHttpServer, str_isRcServer, str_Ssid, str_Passwd;
+    String str_isHttpServer, str_isRcServer, str_Ssid, str_Passwd, str_nodeId, str_nodeType;
     MatchState matcher;
     matcher.Target(const_cast<char*>(configString.c_str()));
     /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
@@ -129,7 +135,9 @@ void ConfigProvider::setConfigViaString(String& configString)
     const String part2 = "&isRCServer=";
     const String part3 = "&SSID=";
     const String part4 = "&Password=";
-    const String part5 = " HTTP/1.1";
+    const String part5 = "&nodeId=";
+    const String part6 = "&nodeType=";
+    const String part7 = " HTTP/1.1";
 
     char searchResult = matcher.Match(part2.c_str());
     uint16_t readStartIndex = 0;
@@ -176,11 +184,37 @@ void ConfigProvider::setConfigViaString(String& configString)
             //Serial.println("str_Passwd : " + str_Passwd);
         }
 
+
+        // Move start read index by part4 length
+        readStartIndex = matcher.MatchStart + part5.length();
+        // Search for next value
+        searchResult = matcher.Match(part6.c_str());
+        if(searchResult > 0)
+        {
+            // Read RC server config
+            str_nodeId = configString.substring(readStartIndex, matcher.MatchStart);
+            //Serial.println("str_Passwd : " + str_Passwd);
+        }
+
+
+        // Move start read index by part4 length
+        readStartIndex = matcher.MatchStart + part6.length();
+        // Search for next value
+        searchResult = matcher.Match(part7.c_str());
+        if(searchResult > 0)
+        {
+            // Read RC server config
+            str_nodeType = configString.substring(readStartIndex, matcher.MatchStart);
+            //Serial.println("str_Passwd : " + str_Passwd);
+        }
+
         /* Prepare configuration data */
         configRamMirror.isHttpServer = str_isHttpServer == "yes" ? 1 : 0;
         configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
         configRamMirror.setSSID(str_Ssid);
         configRamMirror.setPassword(str_Passwd);
+        configRamMirror.nodeId = str_nodeId.toInt() < 254 ? str_nodeId.toInt() : 255;
+        configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
 
         Serial.println("Applying following configuration :");
         configRamMirror.serialPrint();

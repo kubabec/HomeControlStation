@@ -12,6 +12,8 @@ typedef struct
     uint8_t safeShutdownFlag = 255;
     uint8_t isHttpServer = 0;
     uint8_t isRcServer = 0;
+    uint8_t nodeId = 255;
+    uint8_t nodeType = 255;
     char networkSSID[SSID_LENGTH] = {'\0'};
     char networkPassword[PASSWORD_LENGTH] = {'\0'};
 
@@ -19,6 +21,9 @@ typedef struct
     {
         return sizeof(uint8_t)  + //isHttpServer
             sizeof(uint8_t) + //isRcServer
+            sizeof(uint8_t) + //safeShutdownFlag
+            sizeof(uint8_t) + //nodeId
+            sizeof(uint8_t) + //nodeType
             SSID_LENGTH + // networkSSID
             PASSWORD_LENGTH; // Password
     }
@@ -28,6 +33,8 @@ typedef struct
         Serial.println("<<<<< - - - - CONFIGURATION - - - - >>>>>");
         Serial.println("isHttpServer : " + String(isHttpServer));
         Serial.println("isRcServer : " + String(isRcServer));
+        Serial.println("Node ID : " + String((int)nodeId));
+        Serial.println("Type : " + String((int)nodeType));
         Serial.println("network SSID : " + String(networkSSID));
         Serial.println("network Password : " + String(networkPassword));
         Serial.println("<<<<< - - - - - - - - - - - - - - - >>>>>");

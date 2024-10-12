@@ -524,6 +524,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(configPageContent4);
   client.println(currentConfig.networkPassword);
   client.println(configPageContent5);
+  client.println((int)currentConfig.nodeId);
+  client.println(configPageContent6);
+  client.println((int)currentConfig.nodeType);
+  client.println(configPageContent7);
 
 
   printErrorTable(client);

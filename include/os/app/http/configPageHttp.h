@@ -22,6 +22,14 @@ const char* configPageContent4 = "\" type=\"text\" name=\"SSID\">\
             <input value=\"";
 const char* configPageContent5  = "\" type=\"text\" name=\"Password\">\
         </label>\
+        <label>Node ID:\
+            <input value=\"";
+const char* configPageContent6 = "\" type=\"text\" name=\"nodeid\">\
+        </label>\
+        <label>Type:\
+            <input value=\"";
+const char* configPageContent7 = "\" type=\"text\" name=\"nodetype\">\
+        </label>\
         <div class=\"button-link\" onclick=\"showPopup('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>\
         <div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>\
     </form><br><button onclick=\"showPopup('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will reboot in AccessPoint mode.', massErase)\" class=\"error-button\">Restore default</button></div><hr>";
