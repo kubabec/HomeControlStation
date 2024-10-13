@@ -131,13 +131,13 @@ void ConfigProvider::setConfigViaString(String& configString)
     matcher.Target(const_cast<char*>(configString.c_str()));
     /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
     Serial.println("New config received :");
-    const String part1 = "GET /apply?isHTTPServer=";
+    const String part1 = "apply?isHTTPServer=";
     const String part2 = "&isRCServer=";
     const String part3 = "&SSID=";
     const String part4 = "&Password=";
     const String part5 = "&nodeId=";
     const String part6 = "&nodeType=";
-    const String part7 = " HTTP/1.1";
+    const String part7 = "";
 
     char searchResult = matcher.Match(part2.c_str());
     uint16_t readStartIndex = 0;

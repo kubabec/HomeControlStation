@@ -35,6 +35,11 @@ class HomeLightHttpServer
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
     static void printErrorTable(WiFiClient& client);
+
+    static void processLinkRequestData(WiFiClient& client);
+    static bool processConstantRequests(const String& request, WiFiClient& client);
+    static bool processParameterizedRequests(String& request, WiFiClient& client);
+
 public:
     static void cyclic();
     static void init();
@@ -44,6 +49,19 @@ public:
 
     static void generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
+
+
+    static void constantHandler_mainPage(WiFiClient& client);
+    static void constantHandler_clearErrors(WiFiClient& client);
+    static void constantHandler_configPage(WiFiClient& client);
+    static void constantHandler_devicesSetup(WiFiClient& client);
+    static void constantHandler_massErase(WiFiClient& client);
+
+    static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);
+    static void parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client);
+    static void parameterizedHandler_deviceSwitch(String& request, WiFiClient& client);
+    static void parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client);
+    
 };
 
 #endif

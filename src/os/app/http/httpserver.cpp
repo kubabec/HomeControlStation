@@ -1,4 +1,6 @@
 #include <os/app/http/HttpServer.hpp>
+#include <Regexp.h>
+
 
 #include "os/app/http/ConfigPageHttp.h"
 #include "os/app/http/PageHead.h"
@@ -22,6 +24,13 @@ uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
 
+
+// ERR_MON_UNEXPECTED_RESET = 1,
+// ERR_MON_INVALID_NVM_DATA,
+// ERR_MON_INVALID_LOCAL_CONFIG,
+// ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
+// ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
+// ERR_MON_INVALID_ERROR_REPORTED,
 String errorCodeDescription[ERR_MONT_ERROR_COUNT] = 
 {
   "Unexpected reset",
@@ -32,13 +41,36 @@ String errorCodeDescription[ERR_MONT_ERROR_COUNT] =
   "Invalid error reported"
 };
 
+std::vector<String> constantRequests = {
+  "", /* Main page with no parameter */
+  "config",
+  "errclrbtn",
+  "localDevices",
+  "masseraseviahttp"
+};
 
-// ERR_MON_UNEXPECTED_RESET = 1,
-// ERR_MON_INVALID_NVM_DATA,
-// ERR_MON_INVALID_LOCAL_CONFIG,
-// ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
-// ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
-// ERR_MON_INVALID_ERROR_REPORTED,
+std::vector<String> parameterizedRequests = {
+  "apply",
+  "localSetup",
+  "dev",
+  "?bri"
+};
+
+std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
+  HomeLightHttpServer::constantHandler_mainPage,
+  HomeLightHttpServer::constantHandler_configPage,
+  HomeLightHttpServer::constantHandler_clearErrors,
+  HomeLightHttpServer::constantHandler_devicesSetup,
+  HomeLightHttpServer::constantHandler_massErase
+};
+
+std::vector<std::function<void(String&, WiFiClient&)>> parameterizedRequestHandlers = {
+  HomeLightHttpServer::parameterizedHandler_newConfigApply,
+  HomeLightHttpServer::parameterizedHandler_newDevicesSetup,
+  HomeLightHttpServer::parameterizedHandler_deviceSwitch,
+  HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange
+};
+
 
 void HomeLightHttpServer::cyclic()
 {
@@ -120,6 +152,78 @@ void HomeLightHttpServer::requestErrorList()
   
 }
 
+void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
+{
+  /* Retrieve request from pattern : 'GET /request HTTP/1.1' */
+  String linkRequest = header.substring(
+    String("GET /").length(), 
+    (header.length() - (String(" HTTP/1.1").length()+2) )
+  );
+
+  /* If request is not known in list of constant commands */
+  if(!processConstantRequests(linkRequest, client))
+  {
+    /* Process request in terms of parameterized command (e.g. brightness&VALUE )*/
+    if(!processParameterizedRequests(linkRequest, client))
+    {
+      Serial.println("Invalid request received : " + linkRequest);
+    }
+  }
+}
+
+bool HomeLightHttpServer::processConstantRequests(const String& request, WiFiClient& client)
+{
+  bool retVal = false;
+  /* Iterate through known requests (commands) array */
+  for(uint8_t knownRequest = 0; knownRequest < constantRequests.size(); knownRequest ++)
+  {
+    /* Does received request match to current known request from table? */
+    if(request == constantRequests[knownRequest]) {
+      /* Check if there is known handler function for matched request */
+      if(knownRequest < constantRequestHandlers.size())
+      {
+        /* Run function assigned to received command */
+        constantRequestHandlers.at(knownRequest)(client);
+        retVal = true;
+        break;
+      }
+    }
+  }
+
+  /* Return FALSE in case of unknown request received, otherwise TRUE */
+  return retVal;
+}
+
+bool HomeLightHttpServer::processParameterizedRequests(String& request, WiFiClient& client)
+{
+  MatchState matcher;
+  bool retVal = false;
+
+  /* Set received request as target for search engine */
+  matcher.Target(const_cast<char*>(request.c_str()));
+
+  /* Iterate through known requests (commands) array */
+  for(uint8_t knownRequest = 0; knownRequest < parameterizedRequests.size(); knownRequest ++)
+  {
+    /* Try to find currently inspected knownRequest in the request string */
+    char matchReqult = matcher.Match(parameterizedRequests[knownRequest].c_str());
+
+    /* Substring with known command found in received 'request' */
+    if(matchReqult > 0)
+    {
+      /* Handler for received request is not missing */
+      if(knownRequest < parameterizedRequestHandlers.size())
+      {
+        parameterizedRequestHandlers.at(knownRequest)(request, client);
+        retVal = true;
+        break;
+      }
+    }
+  }
+
+  return retVal;
+}
+
 void HomeLightHttpServer::handleClientRequest()
 {
   WiFiClient client = server.available(); 
@@ -131,7 +235,7 @@ void HomeLightHttpServer::handleClientRequest()
       currentTime = millis();
       if (client.available()) {             
         char requestLine = client.read();          
-        Serial.write("request " + requestLine);                   
+        //Serial.write("request " + requestLine);                   
         header += requestLine;
         if (requestLine == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -156,137 +260,14 @@ void HomeLightHttpServer::handleClientRequest()
             client.println("<body><div class=\"wrapper\">");
             client.println(popupContent);
 
-            // NO config page requested?
-            if((header.indexOf("GET /config") < 0) && (header.indexOf("GET /localDevices") < 0)){
+            processLinkRequestData(client);
 
-              if(header.indexOf("GET /?pending") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
-              { 
-                  /* TODO :
-                    jezeli sygnał SIG_CURRENT_REQUEST_PROCESSING_STATE nie jest pending to przekieruj na strone główną,
-                    w każdym innym razie przekieruj ponownie na pending (/?pending) */
-              }
-
-              if(header.indexOf("GET /errclrbtn") >= 0) 
-              {
-                for(uint8_t i = 1; i <= ERR_MON_LAST_ERROR; i++)
-                {  
-                  std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(
-                  DataContainer::getSignalValue(CBK_ERROR_CLEAR)
-                  )((ERR_MON_ERROR_TYPE)i);
-                }
-
-                client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-              }
-
-              if(header.indexOf("GET /masseraseviahttp" >= 0))
-              {
-                /* Erase flash callback */
-                try{
-                  // Serial.println("Erasing flash!");
-                  // /* erase flash */
-                  // std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
-                  // /* redirect */
-                  // client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-                  // /* restart */
-                  // std::any_cast<std::function<void()>>
-                  // (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-                }catch (std::bad_any_cast ex)
-                {
-
-                }
-                
-              }
-
-              // Check brightness changeCondition
-              if(header.indexOf("GET /?bri") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
-              {
-                pos1 = header.indexOf("bri"); //Wyszukuje pozycję, na której występuje ciąg znaków 'bri' w nagłówku.
-                pos2 = header.indexOf("DEV"); //Wyszukuje pozycję, na której występuje ciąg znaków 'DEV' w nagłówku.
-                pos3 = header.indexOf("&"); //Wyszukuje pozycję, na której występuje ciąg znaków '&' w nagłówku.             
-                String brightnessString = header.substring(pos1+3, pos2); 
-                String idDeviceString = header.substring(pos2+3, pos3);
-                
-                uint8_t newbrightness = brightnessString.toInt(); 
-                uint8_t idString = idDeviceString.toInt();
-
-                deviceBrightnessChangeCallback(idString,newbrightness);
-                // TODO : Przekieruj zawsze na pending a nie na stronę główną
-                client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-              }
-              
-              // Check timer changeCondition
-              if(header.indexOf("GET /?tim") >= 0) {
-                pos1 = header.indexOf("tim");
-                pos2 = header.indexOf("&");
-                String timerString = header.substring(pos1+1, pos2);
-                uint8_t newtimer = timerString.toInt(); 
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
-              }
-        
-              if(header.indexOf("GET /dev") >= 0) {
-                
-                pos1 = header.indexOf("dev"); 
-                pos2 = header.indexOf("state"); 
-                pos3 = header.indexOf("&");         
-                String devId = header.substring(pos1+3 , pos2);
-                String state = header.substring(pos2+5 , pos3);
-                uint8_t deviceId = devId.toInt();
-                uint8_t deviceState = state.toInt();
-                
-                deviceEnableCallback(deviceId, deviceState);
-                Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
-              } 
-
-              if(header.indexOf("GET /apply") >= 0)
-              {
-                // Configuration to be handled here
-
-                Serial.println("Applying new config!");
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
-                /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-                std::any_cast<std::function<void(String&)>>
-                  (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_STRING))(header);
-              
-                std::any_cast<std::function<void()>>
-                  (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-              }
-
-              if(header.indexOf("GET /localSetup") >= 0)
-              {
-                // Configuration to be handled here
-
-                Serial.println("Applying new device configuration!");
-                /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-                client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
-                std::any_cast<std::function<void(String&)>>
-                  (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_STRING))(header);
-
-                // std::any_cast<std::function<void()>>
-                //   (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-              }
-
-              /* Generate UI for every available device */
-              for(OnOffDeviceDescription& description : onOffDescriptionVector) 
-              {
-                generateOnOffUi(description, client);       
-              }
-
-
-              /* Display configuration button */
-              const char* configButtonLink = "\
-              <br><a href=\"/config\" class=\"button\">Settings</a><br>";
-              client.println(configButtonLink);
-
-            }else if (header.indexOf("GET /config") >= 0)
-            {
-              // Print config page if it is requested
-              printConfigPage(client);
-            }else if (header.indexOf("GET /localDevices") >= 0)
-            {
-              printSlotsConfigPage(client);
+            if(header.indexOf("GET /?pending") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
+            { 
+                /* TODO :
+                  jezeli sygnał SIG_CURRENT_REQUEST_PROCESSING_STATE nie jest pending to przekieruj na strone główną,
+                  w każdym innym razie przekieruj ponownie na pending (/?pending) */
             }
-
 
             client.println("</div></body></html>");            
             client.println();
@@ -349,36 +330,10 @@ void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, W
 
 void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
-// <div class=\"device-container\">\
-//             <label>\
-//                 <input type=\"checkbox\" checked>\
-//                 Device 1 - <span class=\"status-text\">Enabled</span>\
-//             </label>\
-//             <label>Identifier:\
-//                 <input type=\"text\" name=\"identifier1\" placeholder=\"ID-001\">\
-//             </label>\
-//             <label>Name:\
-//                 <input type=\"text\" name=\"name1\" placeholder=\"Device 1\">\
-//             </label>\
-//             <label>Room Number:\
-//                 <input type=\"text\" name=\"room1\" placeholder=\"101\">\
-//             </label>\
-//         </div>
-
-  // bool isActive = true;            /* 1 byte */
-  //   char deviceName[25] = {'\0'};   /* 25 bytes */
-  //   uint8_t deviceType = 255;       /* 1 byte */
-  //   uint8_t pinNumber = 255;        /* 1 byte */
-  //   uint8_t deviceId = 255;         /* 1 byte */
-  //   uint8_t roomId = 255;           /* 1 byte */
-
   const char* labelStart = "<label>";
   const char* labelEnd = "</label>";
 
   client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
-
-  //client.println("<script onload=\"showExtraFields(type"+String(slotNumber)+", 'device-"+String((int)slotNumber)+"');\"></script>");
-
   
   if(slot.isActive)
   {
@@ -445,12 +400,6 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     }
       client.println(pinStr);
   }
-  // client.println("<option value=\"1\">1</option>");
-  // client.println("<option value=\"2\">2</option>");
-  // client.println("<option value=\"3\">3</option>");
-  // client.println("<option value=\"4\">4</option>");
-  // client.println("<option value=\"5\">5</option>");
-  // client.println("<option value=\"6\">6</option>");
   client.println("</select>");
   client.println(labelEnd);
 
@@ -488,7 +437,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 
 }
 
-/* ========= CONFIG POC ==============*/
+/* ========= CONFIG ==============*/
 
 void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 {
@@ -605,4 +554,124 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
     client.println("</table>");
   }
   client.println("</div>");
+}
+
+
+/*** CONSTANT HANDLERS */
+
+void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
+{
+  /* Generate UI for every available device */
+  for(OnOffDeviceDescription& description : onOffDescriptionVector) 
+  {
+    generateOnOffUi(description, client);       
+  }
+
+
+  /* Display configuration button */
+  const char* configButtonLink = "\
+  <br><a href=\"/config\" class=\"button\">Settings</a><br>";
+  client.println(configButtonLink);
+}
+
+void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
+{
+  for(uint8_t i = 1; i <= ERR_MON_LAST_ERROR; i++)
+  {  
+    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(
+    DataContainer::getSignalValue(CBK_ERROR_CLEAR)
+    )((ERR_MON_ERROR_TYPE)i);
+  }
+
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+}
+
+void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)
+{
+  // Print config page if it is requested
+  printConfigPage(client);
+}
+
+void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient& client)
+{
+  printSlotsConfigPage(client);
+}
+
+void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
+{
+  /* Erase flash callback */
+  try{
+    Serial.println("Erasing flash!");
+    /* erase flash */
+    std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
+    /* redirect */
+    client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+    /* restart */
+    // std::any_cast<std::function<void()>>
+    // (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+  }catch (std::bad_any_cast ex)
+  {
+
+  }
+}
+
+
+
+/** parameterized requests */ 
+
+void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, WiFiClient& client)
+{
+  // Configuration to be handled here
+
+  Serial.println("Applying new config!");
+  /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
+  std::any_cast<std::function<void(String&)>>
+    (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_STRING))(request);
+
+  std::any_cast<std::function<void()>>
+    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+
+  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+}
+
+void HomeLightHttpServer::parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client)
+{
+  Serial.println("Applying new device configuration!");
+  /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
+  std::any_cast<std::function<void(String&)>>
+    (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_STRING))(request);
+
+  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+}
+
+
+void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiFiClient& client)
+{
+  pos1 = request.indexOf("dev"); 
+  pos2 = request.indexOf("state"); 
+  pos3 = request.indexOf("&");         
+  String devId = request.substring(pos1+3 , pos2);
+  String state = request.substring(pos2+5 , pos3);
+  uint8_t deviceId = devId.toInt();
+  uint8_t deviceState = state.toInt();
+  
+  deviceEnableCallback(deviceId, deviceState);
+  Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
+  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+}
+
+void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client)
+{
+  pos1 = request.indexOf("bri"); //Wyszukuje pozycję, na której występuje ciąg znaków 'bri' w nagłówku.
+  pos2 = request.indexOf("DEV"); //Wyszukuje pozycję, na której występuje ciąg znaków 'DEV' w nagłówku.
+  pos3 = request.indexOf("&"); //Wyszukuje pozycję, na której występuje ciąg znaków '&' w nagłówku.             
+  String brightnessString = request.substring(pos1+3, pos2); 
+  String idDeviceString = request.substring(pos2+3, pos3);
+  
+  uint8_t newbrightness = brightnessString.toInt(); 
+  uint8_t idString = idDeviceString.toInt();
+
+  deviceBrightnessChangeCallback(idString,newbrightness);
+  // TODO : Przekieruj zawsze na pending a nie na stronę główną
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }

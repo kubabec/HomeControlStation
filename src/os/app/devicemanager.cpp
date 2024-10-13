@@ -271,8 +271,8 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
 
 void DeviceManager::setLocalConfigViaString(String& config)
 {
-    const String part1 = "GET /localSetup";
-    const String part5 = " HTTP/1.1";
+    const String part1 = "localSetup";
+    const String part5 = "";
     const uint8_t numberOfDevicesExpected = 6;
     bool isValidConfigReceived = false;
     String devicesConfigStrings[numberOfDevicesExpected];

@@ -124,6 +124,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
+    Serial.println("NVM :: ERASING " + String((int)eepromSize) + " BYTES FROM FLASH MEMORY ... ");
     for(uint16_t i = 0; i < eepromSize; i ++){
         EEPROM.write(i, 0);
     }
