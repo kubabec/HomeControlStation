@@ -4,11 +4,12 @@
 
 
 
-static uint16_t nodeId = 10;
+//static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
-std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
+std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
 
+uint8_t RemoteControlClient::localNodeId =255;
 
 void RemoteControlClient::deinit() {
     
@@ -16,8 +17,11 @@ void RemoteControlClient::deinit() {
 
 void RemoteControlClient::init()
 {       
+    DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER,"RemoteControlClient", static_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
+
+
     currentState = STATE_NODE_INITIAL_DATA;
-         
+    localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
 }
 
 void RemoteControlClient::cyclic()
@@ -69,16 +73,26 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     
 }
 
+SystemRequest mapRcToSystemRequest(RcRequest& request){
+    SystemRequest retVal;
+    retVal.requestId = request.requestId;
+    retVal.type = request.type;
+    memcpy(retVal.data, request.data,request.getSize());
+    return retVal;
+}
+
 void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
     if(msg.getPayload().size() == REQEST_SIZE) {
         RcRequest newRequest;
-        memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE);
+        memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE); //memcopy(dokad, co, wielkosc)
         newRequest.print();
-        const uint8_t myId = 10;
-        if(newRequest.targetNodeId == myId) {
+        if(newRequest.targetNodeId == localNodeId) {
             if(newRequest.type >= REQ_FIRST && newRequest.type < UNKNOWN_REQ) {
+                //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
                 if(requestReceivers.at(newRequest.type)) {
-                    (requestReceivers.at(newRequest.type))(newRequest);
+                    // jeżeli istnieje to ja wywoluje z parametrem newRequest
+                    SystemRequest newSystemRequest = mapRcToSystemRequest(newRequest);
+                    (requestReceivers.at(newRequest.type))(newSystemRequest);
 
                 }
             }
@@ -118,7 +132,7 @@ void RemoteControlClient::sendInitialDataResponse(){
     std::any onOffCollection = DataContainer::getSignalValue(SIG_COLLECTION_ONOFF);
 
     NodeInitialData initialData = {
-        .nodeId = nodeId,
+        .nodeId = localNodeId,
         .numberOfOnOffDevices = 0,
         .numberOfLedStrips = 0
 
@@ -149,7 +163,7 @@ void RemoteControlClient::sendDetailedDataResponse() {
      // try to read onOff collection if signal exist in data container
       std::vector<OnOffDeviceDescription> onOffDescriptionVector  = std::any_cast<std::vector<OnOffDeviceDescription>>(onOffCollection);
       for(OnOffDeviceDescription& deviceDescription: onOffDescriptionVector) {
-        deviceDescription.nodeId = nodeId;
+        deviceDescription.nodeId = localNodeId;
         MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
         
         detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
@@ -166,13 +180,13 @@ void RemoteControlClient::sendDetailedDataResponse() {
 
 void RemoteControlClient::sendKeepAlive() {
     KeepAliveData keepAlive;
-    keepAlive.nodeId = nodeId;
+    keepAlive.nodeId = localNodeId;
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));
     NetworkDriver::sendBroadcast(keepAliveResponse);
 }
 
-bool RemoteControlClient::registerRequestReceiver(RequestType request, std::function<bool(RcRequest&)> receiverCallback) {
+bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std::function<bool(SystemRequest&)> receiverCallback) {
     if(request >= REQ_FIRST && request < UNKNOWN_REQ) {
         if(requestReceivers.at(request)) { 
             //receiver allready registered

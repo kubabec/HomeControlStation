@@ -1,5 +1,4 @@
 #include <os/app/DeviceProvider.hpp>
-#include <os/datacontainer/DataContainer.hpp>
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
 
@@ -21,16 +20,25 @@ void DeviceProvider::init()
     DataContainer::setSignalValue(CBK_DEVICE_ENABLE,"DeviceProvider", static_cast<std::function<bool(uint8_t, bool)> > (DeviceProvider::deviceEnable));
     DataContainer::setSignalValue(CBK_DEVICE_BRIGHTNESS_CHANGE,"DeviceProvider", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceProvider::deviceBrightnessChange));
 
-   
-
     std::any rcServerCoding = DataContainer::getSignalValue(SIG_IS_RC_SERVER);
     isRCServer = std::any_cast<bool> (rcServerCoding);
+
+
 
 
     initLocalDevicesSetup();
 
     if(isRCServer)  {
         initRemoteDevicesSetup();
+    }else {
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (ENABLE_SYSREQ, DeviceProvider::receiveSystemRequest);
+
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (DISABLE_SYSREQ, DeviceProvider::receiveSystemRequest);
+
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (BRIGHTNESS_CHANGE_SYSREQ, DeviceProvider::receiveSystemRequest);
     }
     
     updateDeviceDescriptionSignal();
@@ -191,6 +199,13 @@ void DeviceProvider::printIdMap() {
 void DeviceProvider::deviceReset() {
 
     Serial.println(" -> DeviceProvider.deviceReset");
+}
+
+
+bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
+    request.print();
+    return true;
+    //
 }
 
 // uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {

@@ -1,6 +1,7 @@
 #ifndef DEVICE_PROVIDER_H
 #define DEVICE_PROVIDER_H
 #include <Arduino.h>
+#include <os/datacontainer/DataContainer.hpp>
 #include <map>
 #include <any>
 #include <functional>
@@ -45,6 +46,9 @@ public:
     static void updateDeviceDescriptionSignal_onChange(std::any signal);
 
     static void printIdMap();
+
+    static bool receiveSystemRequest(SystemRequest& request);
+
         
 };
 

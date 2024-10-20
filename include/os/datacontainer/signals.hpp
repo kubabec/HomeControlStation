@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 27
+#define NUMBER_OF_SIGNALS 28
 enum Signal
 {
     /* Type: bool , somme description */
@@ -76,7 +76,10 @@ enum Signal
     SIG_SYSTEM_ERROR_LIST,
 
     /* Type: std:function<void(void)> - callback to erase NVM data */
-    CBK_MASS_ERASE
+    CBK_MASS_ERASE,
+
+    /* Type: std:function<bool(RequestType, bool)> - callback to signal receivers */
+    CBK_REGISTER_REQUEST_RECEIVER
 };
 
 // const std::string signalNames[NUMBER_OF_SIGNALS] = {

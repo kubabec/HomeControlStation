@@ -153,4 +153,34 @@ typedef struct
     uint64_t lastOccurrenceTime = 0;
 }SystemErrorType;
 
+typedef enum {
+    SYSREQ_FIRST,
+    ENABLE_SYSREQ = SYSREQ_FIRST,
+    DISABLE_SYSREQ,
+    BRIGHTNESS_CHANGE_SYSREQ,
+    COLOR_CHANGE_SYSREQ,
+    RESET_SYSREQ,
+    UNKNOWN_SYSREQ,
+    SYSREQ_COUNT = UNKNOWN_SYSREQ
+}SystemRequestType;
+
+
+typedef struct {
+    uint8_t requestId = 255;
+    uint8_t type = UNKNOWN_SYSREQ;
+    uint8_t data[30] = {0xFF};
+
+    void print() {
+        Serial.println("$$$ System Request $$$");
+        Serial.println("requestId :" + String((int)requestId));
+        Serial.println("type :" + String((int)type));
+        for(uint8_t i=0; i<30; i++) {
+            Serial.print((int)data[i]);
+        }
+        Serial.println("");
+        Serial.println("$$$$$$$$$$$$$$$$$$$$");
+    }
+
+}SystemRequest;
+
 #endif 

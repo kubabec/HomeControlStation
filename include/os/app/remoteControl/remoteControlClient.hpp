@@ -14,8 +14,11 @@
 class RemoteControlClient 
 {
     static std::queue<MessageUDP> receivedBuffer;
-    static std::array<std::function<bool(RcRequest&)>, REQ_COUNT> requestReceivers;
-
+    // deklaracja tablicy o nazwie requestReceivers
+    // kazdy element tablicy zawiera element typu funkcja typu bool z parametrem RcRequest
+    // i drugi element okreslajacy wielkosc tablicy
+    static std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> requestReceivers;
+    static uint8_t localNodeId;
     
     static void handleNodeInitialDataState();
     static void handleNodeDetailedDataState();
@@ -31,7 +34,7 @@ public:
     static void deinit();
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
-    static bool registerRequestReceiver(RequestType request, std::function<bool(RcRequest&)> receiverCallback);
+    static bool registerRequestReceiver(SystemRequestType request, std::function<bool(SystemRequest&)> receiverCallback);
     
 };
 
