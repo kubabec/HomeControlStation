@@ -367,9 +367,10 @@ bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     RcRequest newRequest;
     newRequest.requestId = 77;
     newRequest.targetNodeId = val.nodeId;
-    newRequest.targetDeviceId = val.onDeviceLocalId;
+    //newRequest.targetDeviceId = val.onDeviceLocalId;
     newRequest.type = DISABLE_REQ;
 
+    newRequest.data[0] = val.onDeviceLocalId;
     newRequest.data[15] = 123;
     
     newRequest.print();

@@ -145,13 +145,13 @@ bool DeviceManager::deviceEnable(uint8_t deviceId, bool state) {
             } else {
                 device.off();
                 updateDeviceDescriptionSignal();
-                return false;
+                return true;
             }
 
         }
     }
     
-    return state;
+    return false;
 }
 
 void DeviceManager::updateDeviceDescriptionSignal() {

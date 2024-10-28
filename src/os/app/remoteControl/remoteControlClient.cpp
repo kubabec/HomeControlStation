@@ -92,6 +92,7 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
                 if(requestReceivers.at(newRequest.type)) {
                     // jeżeli istnieje to ja wywoluje z parametrem newRequest
                     SystemRequest newSystemRequest = mapRcToSystemRequest(newRequest);
+                    //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
                     (requestReceivers.at(newRequest.type))(newSystemRequest);
 
                 }

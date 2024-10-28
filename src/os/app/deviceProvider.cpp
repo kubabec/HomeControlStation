@@ -137,7 +137,7 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     uniqueDeviceIdToNormalDeviceIdMap.clear();
     std::vector<OnOffDeviceDescription> vecOnOffDescription;
 
-    static uint8_t uniqueId = 0; //unikalne ID dla wszystkich urządzeń na lokalnym ESP i zdalnych ESP
+    static uint8_t uniqueId = 7; //unikalne ID dla wszystkich urządzeń na lokalnym ESP i zdalnych ESP
 
     try {
         // Pobieranie i przetwarzanie lokalnych urządzeń
@@ -150,12 +150,13 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                 .originalID = device.deviceId,
                 .isLocal = true            
             };
-            device.deviceId = uniqueId;
+
+            //device.deviceId = uniqueId;
             vecOnOffDescription.push_back(device);
             
             //Serial.println("-------------------- Dodaje local---------------");
-            uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{uniqueId,translationDetails});
-            uniqueId ++;
+            uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
+            //uniqueId ++;
         }        
            
     }catch (const std::bad_any_cast& e){ }
@@ -178,6 +179,9 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                 //Serial.println("-------------------- Dodaje remote---------------");            
                 uniqueDeviceIdToNormalDeviceIdMap.insert({uniqueId, translationDetails});
                 uniqueId++;
+                if(uniqueId == 0) {
+                    uniqueId = 7;
+                }
             }
             
         }catch (const std::bad_any_cast& e){ }   
@@ -204,6 +208,20 @@ void DeviceProvider::deviceReset() {
 
 bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
     request.print();
+    switch (request.type)
+    {
+    case ENABLE_SYSREQ:
+        deviceEnable(request.data[0],true);
+        break;
+    case DISABLE_SYSREQ:
+        deviceEnable(request.data[0],false);
+        break;   
+    case BRIGHTNESS_CHANGE_SYSREQ:
+        deviceBrightnessChange(request.data[0],request.data[2]);
+        break;  
+    default:
+        break;
+    }
     return true;
     //
 }
