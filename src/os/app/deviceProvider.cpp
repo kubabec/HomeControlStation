@@ -6,6 +6,8 @@ std::function<bool(uint8_t, bool)> DeviceProvider::deviceManager_DeviceEnable;
 std::function<bool(uint8_t, uint8_t)> DeviceProvider::deviceManager_BrightnessChange;
 std::function<bool(uint8_t, bool)> DeviceProvider::rcServer_DeviceEnable;
 std::function<bool(uint8_t, uint8_t)> DeviceProvider::rcServer_BrightnessChange;
+std::function<bool(SystemResponse&)> DeviceProvider::requestResponse;
+
 
 bool DeviceProvider::isRCServer = false;
 
@@ -23,8 +25,7 @@ void DeviceProvider::init()
     std::any rcServerCoding = DataContainer::getSignalValue(SIG_IS_RC_SERVER);
     isRCServer = std::any_cast<bool> (rcServerCoding);
 
-
-
+    
 
     initLocalDevicesSetup();
 
@@ -39,6 +40,9 @@ void DeviceProvider::init()
 
         std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
         (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (BRIGHTNESS_CHANGE_SYSREQ, DeviceProvider::receiveSystemRequest);
+        
+        std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
+        requestResponse = (std::any_cast<std::function<bool(SystemResponse&)>>(responseCBK));
     }
     
     updateDeviceDescriptionSignal();
@@ -51,6 +55,8 @@ void DeviceProvider::initLocalDevicesSetup() {
     deviceManager_DeviceEnable = (std::any_cast<std::function<bool(uint8_t, bool)>>(localDeviceEnableCBK));
     std::any localDeviceBrightnessCBK = DataContainer::getSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE);
     deviceManager_BrightnessChange = (std::any_cast<std::function<bool(uint8_t, uint8_t)>>(localDeviceBrightnessCBK));
+
+    
 }
 
 void DeviceProvider::initRemoteDevicesSetup() {
@@ -60,6 +66,8 @@ void DeviceProvider::initRemoteDevicesSetup() {
     rcServer_DeviceEnable = (std::any_cast<std::function<bool(uint8_t, bool)>>(RCDeviceEnableCBK));
     std::any RCDeviceBrightnessCBK = DataContainer::getSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE);
     rcServer_BrightnessChange = (std::any_cast<std::function<bool(uint8_t, uint8_t)>>(RCDeviceBrightnessCBK));
+
+    
     
 }
 
@@ -96,6 +104,7 @@ bool DeviceProvider::deviceEnable(uint8_t deviceId, bool state){
         if(devicedetails.isLocal) {
             //zawołaj deviceEnable() w device manager
             deviceManager_DeviceEnable(devicedetails.originalID, state);
+            
         }
         else {
             //zawołaj deviceEnable() w RC Server
@@ -208,16 +217,23 @@ void DeviceProvider::deviceReset() {
 
 bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
     request.print();
+    SystemResponse response;
+    response.responseId = request.requestId;
+    response.isPositive = 200; //200 is positive
+
     switch (request.type)
     {
     case ENABLE_SYSREQ:
         deviceEnable(request.data[0],true);
+        requestResponse(response);
         break;
     case DISABLE_SYSREQ:
         deviceEnable(request.data[0],false);
+        requestResponse(response);
         break;   
     case BRIGHTNESS_CHANGE_SYSREQ:
         deviceBrightnessChange(request.data[0],request.data[2]);
+        requestResponse(response);
         break;  
     default:
         break;

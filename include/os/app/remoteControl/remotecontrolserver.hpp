@@ -42,6 +42,10 @@ typedef struct {
 struct RCTranslation {
     uint16_t nodeId = 255;
     uint8_t onDeviceLocalId = 255;
+
+    void print() {
+        Serial.println(String(nodeId) + ", " + String((int) onDeviceLocalId));
+    }
 };
 
 class RemoteControlServer 
@@ -62,6 +66,7 @@ class RemoteControlServer
     static void requestNodeInitialData();
     static void requestNodeDetailedData();
     static void requestKeepAliveData();
+    
    
     static void processUDPMessage(MessageUDP& msg);
     static bool processPendingRequest(RcRequest& request);
@@ -78,6 +83,7 @@ class RemoteControlServer
     static void updateDeviceDescriptionSignal();
 
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
+    static void printTranslationMap();
 
 public:
     static void init();

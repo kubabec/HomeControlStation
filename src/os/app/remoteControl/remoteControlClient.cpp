@@ -2,8 +2,6 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/datacontainer/SigMessages.hpp>
 
-
-
 //static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
@@ -19,6 +17,7 @@ void RemoteControlClient::init()
 {       
     DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER,"RemoteControlClient", static_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
 
+    DataContainer::setSignalValue(CBK_RESPONSE, "RemoteControlClient",static_cast<std::function<bool(SystemResponse&)> > (RemoteControlClient::sendResponse));
 
     currentState = STATE_NODE_INITIAL_DATA;
     localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
@@ -135,9 +134,7 @@ void RemoteControlClient::sendInitialDataResponse(){
     NodeInitialData initialData = {
         .nodeId = localNodeId,
         .numberOfOnOffDevices = 0,
-        .numberOfLedStrips = 0
-
-        
+        .numberOfLedStrips = 0        
                
     };
 
@@ -200,4 +197,13 @@ bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std
         }
     }
     return false;
+}
+
+bool RemoteControlClient::sendResponse(SystemResponse& response) {
+    Serial.print("!!! RemoteControlClient - sendResponse - ");
+    Serial.println("ResponseId : " + String((int)response.responseId) + " State: " + String((int)response.isPositive));
+    
+   
+    return true;
+
 }

@@ -138,16 +138,30 @@ bool DeviceManager::deviceEnable(uint8_t deviceId, bool state) {
     
     for(OnOffDevice& device : vecOnOffDevices) {
         if(deviceId == device.getDeviceId()) {
-            if(device.getState() == false ) {
-                device.on();
-                updateDeviceDescriptionSignal();
-                return true;
-            } else {
-                device.off();
-                updateDeviceDescriptionSignal();
-                return true;
-            }
-
+            // if(device.getState() == false ) {
+            //     device.on();
+            //     updateDeviceDescriptionSignal();
+            //     return true;
+            // } else {
+            //     device.off();
+            //     updateDeviceDescriptionSignal();
+            //     return true;
+            // }
+            
+            // Jeśli żądany stan to "on" i urządzenie jest wyłączone, włączamy je
+            if (state && !device.getState()) {
+                    device.on();
+                    updateDeviceDescriptionSignal();
+                    return true;
+                }
+                // Jeśli żądany stan to "off" i urządzenie jest włączone, wyłączamy je
+            else if (!state && device.getState()) {
+                    device.off();
+                    updateDeviceDescriptionSignal();
+                    return true;
+                }
+            // W pozostałych przypadkach (stan urządzenia nie ulega zmianie) nic nie robimy
+            return false;            
         }
     }
     

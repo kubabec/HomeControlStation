@@ -339,6 +339,7 @@ void RemoteControlServer::updateDeviceDescriptionSignal() {
 
     DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF,"RemoteControlServer", vecRemoteOnOffDescription);
     Serial.println("->RemoteControlServer - Ustawienie sygnalu w Data Container");   
+    printTranslationMap();
 }
 
 RCTranslation RemoteControlServer::getTranslationFromUnique(uint8_t uniqueId) {
@@ -396,5 +397,12 @@ bool RemoteControlServer::processPendingRequest(RcRequest& request){
     //request.print();
     //return false;
     
+}
+
+void RemoteControlServer::printTranslationMap() {
+    for(auto& mapping: currentIdMapping){
+        Serial.println(String((int)mapping.first) + ": " );
+        mapping.second.print();
+    }
 }
 

@@ -35,6 +35,8 @@ public:
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
     static bool registerRequestReceiver(SystemRequestType request, std::function<bool(SystemRequest&)> receiverCallback);
+
+    static bool sendResponse(SystemResponse& response);
     
 };
 

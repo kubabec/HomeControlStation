@@ -66,6 +66,7 @@ typedef struct {
             buffer[4] = type;
             memcpy(&buffer[5], data, REQUEST_DATA_SIZE);
             buffer[36] = requestSendCount;
+            
             calculateCrc();
             memcpy(&buffer[37], &crc, 2);
 
@@ -76,7 +77,7 @@ typedef struct {
     }
 
     void calculateCrc(){
-        crc = requestId + targetNodeId + targetDeviceId + type + requestSendCount;
+        crc = requestId + targetNodeId + targetDeviceId + type + requestSendCount ;
         for(uint8_t i=0; i< REQUEST_DATA_SIZE; i++){
             crc += data[i];
         }
@@ -97,7 +98,7 @@ typedef struct {
             Serial.print((int)data[i]);
         }
         Serial.println("");
-        Serial.println("requestSendCount :" + String((int)requestSendCount));
+        Serial.println("requestSendCount :" + String((int)requestSendCount));      
         Serial.println("crc :" + String((int)crc));
         Serial.println("###############");
     }

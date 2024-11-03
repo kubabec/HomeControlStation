@@ -24,6 +24,7 @@ void OnOffDevice::off() {
 }
 
 bool OnOffDevice::getState() {
+    Serial.println("@@@@@@@@@@@@@@@@@@@@ onOffDevice - get state : " + String(isOn));
     return isOn;
        
 }
