@@ -138,16 +138,6 @@ bool DeviceManager::deviceEnable(uint8_t deviceId, bool state) {
     
     for(OnOffDevice& device : vecOnOffDevices) {
         if(deviceId == device.getDeviceId()) {
-            // if(device.getState() == false ) {
-            //     device.on();
-            //     updateDeviceDescriptionSignal();
-            //     return true;
-            // } else {
-            //     device.off();
-            //     updateDeviceDescriptionSignal();
-            //     return true;
-            // }
-            
             // Jeśli żądany stan to "on" i urządzenie jest wyłączone, włączamy je
             if (state && !device.getState()) {
                     device.on();

@@ -114,10 +114,15 @@ typedef enum {
 
 typedef struct {
     uint8_t responseId; 
-    ResponseType type = UNKNOWN_RESP;   
-    uint8_t data[RESPONSE_DATA_SIZE] = {0xFF};
-    uint8_t requestSendCount = 0;
+    uint8_t requestType = UNKNOWN_REQ;
+    uint8_t responseType = UNKNOWN_RESP;   
+    uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
     uint16_t crc ;
+
+    uint8_t getSize(){
+             
+        return 34;
+    }
 }RcResponse;
 
 #endif

@@ -197,7 +197,7 @@ typedef struct {
             Serial.print((int)data[i]);
         }
         Serial.println("");
-        Serial.println("$$$$$$$$$$$$$$$$$$$$");
+        Serial.println("$$$$$$$$Payload$$$$$$$$$$$$");
     }
 
 }SystemResponse;

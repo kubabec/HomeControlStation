@@ -6,6 +6,7 @@
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
+std::vector<SystemResponse> RemoteControlClient::vecResponseMessage;
 
 uint8_t RemoteControlClient::localNodeId =255;
 
@@ -45,6 +46,8 @@ void RemoteControlClient::cyclic()
         processUDPRequest(receivedBuffer.front());
         receivedBuffer.pop();
     }
+
+    processResponse();
 }
 
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
@@ -200,10 +203,39 @@ bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std
 }
 
 bool RemoteControlClient::sendResponse(SystemResponse& response) {
-    Serial.print("!!! RemoteControlClient - sendResponse - ");
-    Serial.println("ResponseId : " + String((int)response.responseId) + " State: " + String((int)response.isPositive));
+    Serial.print("!!! RemoteControlClient - sendResponse do vektora - ");
     
-   
-    return true;
+    vecResponseMessage.push_back(response);
 
+    return true;
+   
+
+}
+// checking if the vector containing the response to the request has an entry 
+bool RemoteControlClient::processResponse() {
+    if (!vecResponseMessage.empty()) {
+        RcResponse remoteControlResponse;
+        SystemResponse& currentResponse = vecResponseMessage.at(0);
+        remoteControlResponse.responseId = currentResponse.responseId;
+        remoteControlResponse.requestType = currentResponse.type;
+        if(currentResponse.isPositive){
+            remoteControlResponse.responseType = POSITIVE_RESP;        
+        }
+        else{
+            remoteControlResponse.responseType = NEGATIVE_RESP;
+        }
+        memcpy(remoteControlResponse.data, currentResponse.data, REQUEST_DATA_SIZE);
+
+
+        MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
+        msg.pushData((byte*)&remoteControlResponse, remoteControlResponse.getSize());
+        
+        NetworkDriver::sendBroadcast(msg);
+        Serial.print("!!! RemoteControlClient - processResponse ");
+        return true;
+    } else {        
+
+        return false;
+    }
+    return true;
 }
