@@ -45,6 +45,16 @@ void DeviceProvider::init()
 
     if(isRCServer)  {
         initRemoteDevicesSetup();
+
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (ENABLE_SYSREQ, DeviceProvider::receiveSystemResponse);
+
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (DISABLE_SYSREQ, DeviceProvider::receiveSystemResponse);
+
+        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (BRIGHTNESS_CHANGE_SYSREQ, DeviceProvider::receiveSystemResponse);
+
     }else {
         std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
         (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (ENABLE_SYSREQ, DeviceProvider::receiveSystemRequest);
@@ -236,6 +246,7 @@ bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
     SystemResponse response;
     response.responseId = request.requestId;
     response.isPositive = 200; //200 is positive
+    response.type = request.type;
 
     switch (request.type)
     {
@@ -256,6 +267,12 @@ bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
     }
     return true;
     //
+}
+
+bool DeviceProvider::receiveSystemResponse(SystemResponse& response) {
+    Serial.println(" Received respond Id: " + String((int)response.responseId));
+    return true;
+
 }
 
 // uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {

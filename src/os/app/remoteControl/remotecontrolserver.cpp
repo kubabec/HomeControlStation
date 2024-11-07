@@ -9,6 +9,8 @@ long long initialDataExitTimer = 0;
 
 std::map<uint16_t, RemoteNodeInformation> RemoteControlServer::remoteNodes;
 std::map<uint8_t, RCTranslation> RemoteControlServer::currentIdMapping;
+std::array<std::function<bool(SystemResponse&)>, REQ_COUNT> RemoteControlServer::responseReceivers;
+
 
 ServerState RemoteControlServer::currentState = STATE_REQUEST_NODE_INITIAL_DATA;
 std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
@@ -28,6 +30,8 @@ void RemoteControlServer::init(){
     //to robi ze funkcje sa widoczne w datacontainer
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, bool)> > (RemoteControlServer::deviceEnable));
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, uint8_t)> > (RemoteControlServer::deviceBrightnessChange));
+
+    DataContainer::setSignalValue(CBK_REGISTER_RESPONSE_RECEIVER,"RemoteControlServer", static_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)> >(RemoteControlServer::registerResponseReceiver));
     
     /*NEW*/
     DeviceControlFunctionSet controlSet = {
@@ -440,11 +444,44 @@ void RemoteControlServer::printTranslationMap() {
 void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 {
     /* TODO : Unpack payload MessageUdp -> RcResponse */
-    /* TODO : Compare received response as it matches currently processed request 
-              which can be found on the beginning of pendingRequestsQueue queue */
+    RcResponse response;
+    if(msg.getPayload().size() == response.getSize()){
+        memcpy(&response, &msg.getPayload().at(0), response.getSize());
+        
+
+        if(pendingRequestsQueue.front().requestId == response.responseId &&
+           pendingRequestsQueue.front().type == response.requestType){
+            pendingRequestsQueue.pop();
+
+            SystemResponse receivedResponse;
+            receivedResponse.responseId = response.responseId;
+            receivedResponse.isPositive = response.responseType == POSITIVE_RESP ? 1 : 0;
+            receivedResponse.type = response.requestType;
+            memcpy(receivedResponse.data, response.data, REQUEST_DATA_SIZE);
+
+            response.print();
+            if(responseReceivers.at(receivedResponse.type)){
+                responseReceivers.at(receivedResponse.type)(receivedResponse);
+            }
+        }
+    }
+      
     /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
-    /* TODO : Process matched response : Remove request from the beginning of pendingRequestsQueue to
-              do not retrigger further processing */
     /* TODO : Call the request source application (e.g. DeviceProvider) to provide the response but remember to
               map the type into RcResponse -> SystemResponse */
+}
+
+bool RemoteControlServer::registerResponseReceiver(SystemRequestType request, std::function<bool(SystemResponse&)> receiverCallback) {
+    if(request >= REQ_FIRST && request < UNKNOWN_REQ) {
+        if(responseReceivers.at(request)) { 
+            //receiver allready registered
+            return false;
+            
+
+        } else {
+            responseReceivers.at(request) = receiverCallback;
+            return true;
+        }
+    }
+    return false;
 }

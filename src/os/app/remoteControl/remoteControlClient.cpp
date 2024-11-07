@@ -6,7 +6,7 @@
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
-std::vector<SystemResponse> RemoteControlClient::vecResponseMessage;
+std::queue<SystemResponse> RemoteControlClient::vecResponseMessage;
 
 uint8_t RemoteControlClient::localNodeId =255;
 
@@ -208,7 +208,7 @@ bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std
 bool RemoteControlClient::sendResponse(SystemResponse& response) {
     Serial.print("!!! RemoteControlClient - sendResponse do vektora - ");
     
-    vecResponseMessage.push_back(response);
+    vecResponseMessage.push(response);
 
     return true;
    
@@ -218,7 +218,7 @@ bool RemoteControlClient::sendResponse(SystemResponse& response) {
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         RcResponse remoteControlResponse;
-        SystemResponse& currentResponse = vecResponseMessage.at(0);
+        SystemResponse& currentResponse = vecResponseMessage.front();
         remoteControlResponse.responseId = currentResponse.responseId;
         remoteControlResponse.requestType = currentResponse.type;
         if(currentResponse.isPositive){
@@ -228,6 +228,7 @@ bool RemoteControlClient::processResponse() {
             remoteControlResponse.responseType = NEGATIVE_RESP;
         }
         memcpy(remoteControlResponse.data, currentResponse.data, REQUEST_DATA_SIZE);
+        vecResponseMessage.pop();
 
 
         MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);

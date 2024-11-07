@@ -56,6 +56,7 @@ class RemoteControlServer
     static std::queue<RcRequest> pendingRequestsQueue;
 
     static std::vector<OnOffDevice> vecRemoteOnOffDevices;
+    static std::array<std::function<bool(SystemResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;
 
@@ -94,6 +95,8 @@ public:
 
     static bool deviceEnable(uint8_t deviceId, bool state);
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
+
+    static bool registerResponseReceiver(SystemRequestType request, std::function<bool(SystemResponse&)> receiverCallback);
     
 };
 

@@ -19,7 +19,7 @@ class RemoteControlClient
     // i drugi element okreslajacy wielkosc tablicy
     static std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> requestReceivers;
     static uint8_t localNodeId;
-    static std::vector<SystemResponse> vecResponseMessage; //vector containing the responses to the requests
+    static std::queue<SystemResponse> vecResponseMessage; //vector containing the responses to the requests
     
     static void handleNodeInitialDataState();
     static void handleNodeDetailedDataState();

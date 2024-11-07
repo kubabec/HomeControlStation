@@ -50,7 +50,7 @@ public:
     static void printIdMap();
 
     static bool receiveSystemRequest(SystemRequest& request);
-
+    static bool receiveSystemResponse(SystemResponse& request);
         
 };
 

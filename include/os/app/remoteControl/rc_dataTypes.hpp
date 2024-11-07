@@ -123,6 +123,22 @@ typedef struct {
              
         return 34;
     }
+
+    void print() {
+        Serial.println("   Response ");
+        Serial.println("responseId :" + String((int)responseId));
+        Serial.println("requestType :" + String((int)requestType));
+        Serial.println("responseType :" + String((int)responseType));
+        
+        for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
+            Serial.print((int)data[i]);
+        }
+        Serial.println("");
+             
+        Serial.println("crc :" + String((int)crc));
+        Serial.println("###############");
+    }
+
 }RcResponse;
 
 #endif

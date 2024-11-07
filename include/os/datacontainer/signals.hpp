@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 32
+#define NUMBER_OF_SIGNALS 33
 enum Signal
 {
     /* Type: bool , somme description */
@@ -72,8 +72,13 @@ enum Signal
     CBK_MASS_ERASE,
     /* Type: std:function<bool(RequestType, bool)> - callback to signal receivers */
     CBK_REGISTER_REQUEST_RECEIVER,
+    /* Type: std:function<bool(ResponseType, bool)> - callback to signal receivers */
+    CBK_REGISTER_RESPONSE_RECEIVER,
+
+
     /* Type: std:function<void(uin8_t, bool)> - callback to response RcRequest uint8_t - response ID, bool - on/off */
     CBK_RESPONSE
+
 };
 
 // const std::string signalNames[NUMBER_OF_SIGNALS] = {
