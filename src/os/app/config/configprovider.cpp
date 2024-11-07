@@ -13,6 +13,7 @@ bool ConfigProvider::nvmDataAvailable = false;
 
 void ConfigProvider::init()
 {
+    Serial.println("ConfigProvider init ...");
     totalNvmSize = configRamMirror.getSize() + NUMBER_OF_PERSISTENT_DATABLOCKS * PersistentDataBlock::getSize();
 
     PersistentMemoryAccess::init(totalNvmSize);
@@ -89,6 +90,9 @@ void ConfigProvider::init()
         CBK_MASS_ERASE,
         "ConfigProvider",
         static_cast<std::function<void(void)>>(ConfigProvider::massErase));
+
+
+    Serial.println("... done");
 }
 
 void ConfigProvider::updateNodeConfigurationSignal()

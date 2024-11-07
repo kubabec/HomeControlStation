@@ -84,6 +84,8 @@ void HomeLightHttpServer::deinit() {
 
 void HomeLightHttpServer::init()
 {
+  Serial.println("HomeLightHttpServer init ...");
+
   //std::any deviceEnable = DataContainer::getSignalValue(CBK_DEVICE_ENABLE);
   //deviceEnableCallback = (std::any_cast<std::function<bool(uint8_t, bool)>>(deviceEnable));
   // pod signal kryje sie adres na funkcje w device manager której aliasem jest deviceEnableCallback
@@ -145,6 +147,9 @@ void HomeLightHttpServer::init()
   server.begin();
   currentTime = millis();
   //DataContainer::subscribe(CBK_DEVICE_ENABLE, "DeviceManager", ...);
+
+
+  Serial.println("... done");
 }
 
 void HomeLightHttpServer::requestErrorList()

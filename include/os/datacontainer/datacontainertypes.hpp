@@ -1,6 +1,8 @@
 #ifndef DATA_CONTAINER_TYPES_H
 #define DATA_CONTAINER_TYPES_H
 
+#include "DeviceControlApi.hpp"
+
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
 

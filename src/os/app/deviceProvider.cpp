@@ -17,10 +17,24 @@ void DeviceProvider::deinit() {
 
 void DeviceProvider::init()
 {
+    Serial.println("DeviceProvider init ...");
     DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, "DeviceProvider", RequestProcessingState::eNO_REQUEST);
 
     DataContainer::setSignalValue(CBK_DEVICE_ENABLE,"DeviceProvider", static_cast<std::function<bool(uint8_t, bool)> > (DeviceProvider::deviceEnable));
     DataContainer::setSignalValue(CBK_DEVICE_BRIGHTNESS_CHANGE,"DeviceProvider", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceProvider::deviceBrightnessChange));
+
+    /*NEW*/
+    DeviceControlFunctionSet controlSet = {
+        .setDeviceState = DeviceProvider::deviceEnable,
+        .changeBrightness = DeviceProvider::deviceBrightnessChange
+    };
+    DataContainer::setSignalValue(
+        SIG_CONTROL_FUNCTIONS,
+        "DeviceManager",
+        static_cast<DeviceControlFunctionSet>(controlSet)
+    );
+    /*NEW*/
+
 
     std::any rcServerCoding = DataContainer::getSignalValue(SIG_IS_RC_SERVER);
     isRCServer = std::any_cast<bool> (rcServerCoding);
@@ -46,6 +60,8 @@ void DeviceProvider::init()
     }
     
     updateDeviceDescriptionSignal();
+
+    Serial.println("... done");
 }
 
 void DeviceProvider::initLocalDevicesSetup() {
