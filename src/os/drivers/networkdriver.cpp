@@ -18,6 +18,7 @@ void NetworkDriver::deinit() {
 
 void NetworkDriver::init()
 {
+    Serial.println("NetworkDriver init ...");
 /*******     WiFi connection section       ******/
     // Try to reach the network
     //WiFiAdapter::connectToNetwork( "GedUPC", "EmilaEryk2005");
@@ -81,6 +82,8 @@ void NetworkDriver::init()
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);
     packetReceivers.push_back(dummyTobeRemoved);
 
+
+    Serial.println("... done");
 }
 
 void NetworkDriver::cyclic()

@@ -24,25 +24,47 @@ void RemoteControlServer::deinit() {
 }
 
 void RemoteControlServer::init(){
+    Serial.println("RemoteControlServer init ...");
     //to robi ze funkcje sa widoczne w datacontainer
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, bool)> > (RemoteControlServer::deviceEnable));
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, uint8_t)> > (RemoteControlServer::deviceBrightnessChange));
-   
+    
+    /*NEW*/
+    DeviceControlFunctionSet controlSet = {
+        .setDeviceState = RemoteControlServer::deviceEnable,
+        .changeBrightness = RemoteControlServer::deviceBrightnessChange
+    };
+    DataContainer::setSignalValue(
+        SIG_REMOTE_CONTROL_FUNCTIONS,
+        "DeviceManager",
+        static_cast<DeviceControlFunctionSet>(controlSet)
+    );
+    /*NEW*/
+
+
     requestInitialDataTimer = millis();
     requestDetailedDataTimer = millis();
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
+
+
+    Serial.println("... done");
 }
 
 void RemoteControlServer::cyclic(){   
-    
-     if(!receivedBuffer.empty()){
+    /* did we receive any UDP ? */
+    if(!receivedBuffer.empty()){
         processUDPMessage(receivedBuffer.front());
         receivedBuffer.pop();
     }
 
-     if(!pendingRequestsQueue.empty()){
+
+    /* is there anything we can send ? */
+    if(!pendingRequestsQueue.empty()){
+        /* This call will return true as long as message is being processed, otherwise it will return false */
         if(processPendingRequest(pendingRequestsQueue.front()) == false){
+            /* In this case processing returned true due to timeouted request */
+            /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
         }
         
@@ -190,6 +212,7 @@ void RemoteControlServer::receiveUDP(MessageUDP& msg){
 }
 
 void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
+    /* validate handshake state before processing */
     ServerState stateValidForMsg = mapMsgIDToServerState(msg.getId());
     if(currentState == stateValidForMsg) {
         // is handshake message ?
@@ -199,6 +222,14 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
             handleSlaveAliveMonitoring(msg);
         }
+    }
+
+
+    /* Process response from the slave */
+    if(msg.getId() == RC_RESPONSE)
+    {
+        /* Process RcResponse */
+        processReceivedRcResponse(msg);
     }
 
 }
@@ -406,3 +437,14 @@ void RemoteControlServer::printTranslationMap() {
     }
 }
 
+void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
+{
+    /* TODO : Unpack payload MessageUdp -> RcResponse */
+    /* TODO : Compare received response as it matches currently processed request 
+              which can be found on the beginning of pendingRequestsQueue queue */
+    /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
+    /* TODO : Process matched response : Remove request from the beginning of pendingRequestsQueue to
+              do not retrigger further processing */
+    /* TODO : Call the request source application (e.g. DeviceProvider) to provide the response but remember to
+              map the type into RcResponse -> SystemResponse */
+}

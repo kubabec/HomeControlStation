@@ -8,6 +8,7 @@ void ErrorMonitor::deinit() {
 
 void ErrorMonitor::init()
 {
+    Serial.println("ErrorMonitor init ...");
     DataContainer::setSignalValue(CBK_ERROR_REPORT,
         "ErrorMonitor",
         static_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(ErrorMonitor::errorReport));
@@ -15,6 +16,8 @@ void ErrorMonitor::init()
     DataContainer::setSignalValue(CBK_ERROR_CLEAR,
         "ErrorMonitor",
         static_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(ErrorMonitor::errorClear));
+
+    Serial.println("... done");
 }
 
 void ErrorMonitor::cyclic()

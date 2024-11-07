@@ -70,6 +70,7 @@ class RemoteControlServer
    
     static void processUDPMessage(MessageUDP& msg);
     static bool processPendingRequest(RcRequest& request);
+    static void processReceivedRcResponse(MessageUDP& msg);
 
     static void handleRequestNodeInitialDataState();
     static void handleRequestNodeDetailedDataState();

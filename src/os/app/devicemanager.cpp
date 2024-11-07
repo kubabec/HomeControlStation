@@ -28,6 +28,7 @@ void DeviceManager::deinit() {
 
 void DeviceManager::init()
 {
+    Serial.println("DeviceManager init ...");
     /* TESTBLOCK TO BE REMOVED IN THE FUTURE */
     // DeviceConfigSlotType configData;
     // char* devicename = "TestDev";
@@ -113,6 +114,17 @@ void DeviceManager::init()
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_ENABLE,"DeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable));
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE,"DeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceManager::deviceBrightnessChange));
     
+    /*NEW*/
+    DeviceControlFunctionSet controlSet = {
+        .setDeviceState = DeviceManager::deviceEnable,
+        .changeBrightness = DeviceManager::deviceBrightnessChange
+    };
+    DataContainer::setSignalValue(
+        SIG_LOCAL_CONTROL_FUNCTIONS,
+        "DeviceManager",
+        static_cast<DeviceControlFunctionSet>(controlSet)
+    );
+    /*NEW*/
 
     DataContainer::setSignalValue(
         CBK_SET_DEVICES_CONFIG_VIA_STRING,
@@ -121,6 +133,9 @@ void DeviceManager::init()
    
 
     updateDeviceDescriptionSignal();
+
+
+    Serial.println("... done");
 }
 
 void DeviceManager::cyclic()
