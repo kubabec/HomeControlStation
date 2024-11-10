@@ -387,6 +387,31 @@ input[type=\"range\"]:focus {\
     display: none;\
     opacity: 0;\
 }\
+.isEnabledWidget {\
+    display: inline-block;\
+    position: relative;\
+}\
+\
+.status-light {\
+    width: 15px;\
+    height: 15px;\
+    border-radius: 50%;\
+    position: absolute;\
+    top: 10px;\
+    right: 10px;\
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);\
+    transition: all 0.3s ease;\
+}\
+\
+.status-light.on {\
+    background: radial-gradient(circle, #00ff00 20%, #006600 70%);\
+    box-shadow: 0 0 10px 4px rgba(0, 255, 0, 0.6), 0 0 20px 8px rgba(0, 255, 0, 0.4);\
+}\
+\
+.status-light.off {\
+    background: radial-gradient(circle, #666 20%, #333 70%);\
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);\
+}\
 </style>\
 ";
 

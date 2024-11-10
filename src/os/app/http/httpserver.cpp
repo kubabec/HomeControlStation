@@ -311,11 +311,15 @@ void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
 void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client) {
   client.println("<div class=\"container\">"); // container
-  /* Print device name */
-  client.println("<div class=\"header\">" + description.deviceName + "</div>"); // HEADER / HEADER
+  if(!description.isEnabled) {   
+    client.println("<div class=\"header\">" + description.deviceName + "</div><div class=\"status-light off\"></div>"); 
+  }
+  else {
+    client.println("<div class=\"header\">" + description.deviceName + "</div><div class=\"status-light on\"></div>"); 
+  }
 
   /* Draw ON/OFF button depending on the current state */
-  if(!description.isEnabled) {    
+  if(!description.isEnabled) {   
     client.println("<a class=\"button\" href=\"/dev" + String(description.deviceId) + "state" + "1&\">OFF</a>");
   }
   else {
