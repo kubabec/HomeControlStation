@@ -19,6 +19,8 @@ std::queue<RcRequest> RemoteControlServer::pendingRequestsQueue;
 
 RequestProcessor RemoteControlServer::requestProcessor;
 
+uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej statycznej poza klasą^^^^^^^^^^^^^^^^^^^^^^
+
 std::vector<OnOffDevice> vecOnOffDevices = {OnOffDevice(13,"RCDev1",0,8),OnOffDevice(10,"RCDevice2",1,9),OnOffDevice(11,"RCDev3",2,10)};
 
 void RemoteControlServer::deinit() {
@@ -38,14 +40,12 @@ void RemoteControlServer::init(){
         .setDeviceState = RemoteControlServer::deviceEnable,
         .changeBrightness = RemoteControlServer::deviceBrightnessChange
     };
-    DataContainer::setSignalValue(
-        SIG_REMOTE_CONTROL_FUNCTIONS,
-        "DeviceManager",
-        static_cast<DeviceControlFunctionSet>(controlSet)
+    DataContainer::setSignalValue(SIG_REMOTE_CONTROL_FUNCTIONS, "DeviceManager",static_cast<DeviceControlFunctionSet> (controlSet)
     );
     /*NEW*/
 
-
+    requestIdCounter = 0; //inicjalizacja zmiennej do trzymania countera requestów^^^^^^^^^^^^^^^^^^^
+    
     requestInitialDataTimer = millis();
     requestDetailedDataTimer = millis();
     requestKeepAliveTimer = millis();
@@ -401,10 +401,19 @@ bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     Serial.println("->Remote Control Server Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onDeviceLocalId));
 
     RcRequest newRequest;
-    newRequest.requestId = 77;
+
+    newRequest.requestId = generateRequestId(); // ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    //newRequest.requestId = 10;
     newRequest.targetNodeId = val.nodeId;
     //newRequest.targetDeviceId = val.onDeviceLocalId;
-    newRequest.type = DISABLE_REQ;
+    if(state == true){
+        newRequest.type = ENABLE_REQ;
+        Serial.print("blablabla Enable 66666666666666666666666666666");
+    }else{
+        newRequest.type = DISABLE_REQ;
+        Serial.print("blablabla DISable 88888888888888888888888888888888");
+    }
 
     newRequest.data[0] = val.onDeviceLocalId;
     newRequest.data[15] = 123;
@@ -447,7 +456,8 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
     RcResponse response;
     if(msg.getPayload().size() == response.getSize()){
         memcpy(&response, &msg.getPayload().at(0), response.getSize());
-        
+        Serial.println("Remote Control Server - received response UDP : ");
+        msg.serialPrintMessageUDP(msg);
 
         if(pendingRequestsQueue.front().requestId == response.responseId &&
            pendingRequestsQueue.front().type == response.requestType){
@@ -455,6 +465,7 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 
             SystemResponse receivedResponse;
             receivedResponse.responseId = response.responseId;
+            receivedResponse.responNodeId = response.responceNodeId;
             receivedResponse.isPositive = response.responseType == POSITIVE_RESP ? 1 : 0;
             receivedResponse.type = response.requestType;
             memcpy(receivedResponse.data, response.data, REQUEST_DATA_SIZE);
@@ -484,4 +495,8 @@ bool RemoteControlServer::registerResponseReceiver(SystemRequestType request, st
         }
     }
     return false;
+}
+
+uint8_t RemoteControlServer::generateRequestId() {
+    return requestIdCounter++;
 }

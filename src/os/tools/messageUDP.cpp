@@ -248,12 +248,12 @@ void MessageUDP::serialPrintMessageUDP(MessageUDP& msg)
     Serial.print("ID: " + String(msg.id));
     Serial.print(" TotalSize : " + String(msg.totalSize));
     Serial.print(" IP Address: " + String(msg.ipAddress.octet1) + "." + String(String(msg.ipAddress.octet2)) + "." + String(msg.ipAddress.octet3) + "." + String(msg.ipAddress.octet4));
-    Serial.print(" Port: " + String(msg.udpPort));
+    Serial.println(" Port: " + String(msg.udpPort));
 
     Serial.print(" Payload: ");
     for(int i = 0 ; i < msg.dataBuffer.size(); i ++)
     {
-        Serial.print("[" + String((uint8_t)msg.dataBuffer.at(i)) + "]");
+        Serial.print(String((uint8_t)msg.dataBuffer.at(i)));
         Serial.print(" ");
     }
 

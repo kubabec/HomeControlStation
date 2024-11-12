@@ -188,12 +188,14 @@ typedef struct {
 typedef struct {
     uint8_t isPositive = 0;
     uint8_t responseId = 255;
+    uint16_t responNodeId = 255;
     uint8_t type = UNKNOWN_SYSREQ;
     uint8_t data[30] = {0xFF};
 
     void print() {
         Serial.println("$$$ System Response $$$");
         Serial.println("responseId :" + String((int)responseId));
+        Serial.println("responNodeId :" + String((int)responNodeId));
         Serial.println("type :" + String((int)type));
         for(uint8_t i=0; i<30; i++) {
             Serial.print((int)data[i]);

@@ -16,6 +16,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     if(currentRequest.requestId != newReqest.requestId) {
         /* Set newRequest as currently processed one for further function entries */
         memcpy(&currentRequest, &newReqest, REQEST_SIZE);
+
         
         /* Prepare UDP message with RC_REQUEST identifier */
         MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);

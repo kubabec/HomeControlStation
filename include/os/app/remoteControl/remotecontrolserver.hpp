@@ -48,9 +48,11 @@ struct RCTranslation {
     }
 };
 
+
 class RemoteControlServer 
-{
-   
+{  
+    static uint8_t requestIdCounter; //zmienna dla trzymania requestId pakietu UDP ^^^^^^^^^^^^^^
+
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
     static std::queue<RcRequest> pendingRequestsQueue;
@@ -59,7 +61,7 @@ class RemoteControlServer
     static std::array<std::function<bool(SystemResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;
-
+    
     /* Kontener na informacje o zdalnych Nodach*/
     static std::map<uint16_t, RemoteNodeInformation> remoteNodes;
     static std::map<uint8_t, RCTranslation> currentIdMapping;
@@ -67,8 +69,7 @@ class RemoteControlServer
     static void requestNodeInitialData();
     static void requestNodeDetailedData();
     static void requestKeepAliveData();
-    
-   
+
     static void processUDPMessage(MessageUDP& msg);
     static bool processPendingRequest(RcRequest& request);
     static void processReceivedRcResponse(MessageUDP& msg);
@@ -87,11 +88,16 @@ class RemoteControlServer
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
     static void printTranslationMap();
 
+
+
 public:
+
     static void init();
     static void deinit();
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
+
+    static uint8_t generateRequestId(); // funkcja do generowania Request Id
 
     static bool deviceEnable(uint8_t deviceId, bool state);
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
