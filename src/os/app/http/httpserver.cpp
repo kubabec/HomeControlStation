@@ -320,10 +320,10 @@ void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, W
 
   /* Draw ON/OFF button depending on the current state */
   if(!description.isEnabled) {   
-    client.println("<a class=\"button\" href=\"/dev" + String(description.deviceId) + "state" + "1&\">OFF</a>");
+    client.println("<a class=\"button\" href=\"/dev" + String(description.deviceId) + "state" + "1&\">ON</a>");
   }
   else {
-    client.println("<a class=\"button\"  href=\"/dev" + String(description.deviceId) +  "state" + "0&\" + &>ON</a>");
+    client.println("<a class=\"button\"  href=\"/dev" + String(description.deviceId) +  "state" + "0&\" + &>OFF</a>");
   }
 
   /* Draw Brightness range bar if device allows brightness change */

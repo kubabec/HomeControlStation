@@ -79,6 +79,7 @@ class RemoteControlServer
     static void handleKeepAliveState();
     static void handleHandShakeCommunication(MessageUDP& msg);
     static void handleSlaveAliveMonitoring(MessageUDP& msg);
+    static void handleDetailedDataUpdate(MessageUDP& msg);
 
     static ServerState mapMsgIDToServerState(int msgID); // zwraca server state w którym powinniśmy obsłużyć message o zadanym msgID
     static NodeInitialData getInitialDataFromPayload(MessageUDP& msg);
@@ -103,6 +104,7 @@ public:
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
 
     static bool registerResponseReceiver(SystemRequestType request, std::function<bool(SystemResponse&)> receiverCallback);
+    static void refreshRemoteNodeInfo(uint8_t nodeId);
     
 };
 

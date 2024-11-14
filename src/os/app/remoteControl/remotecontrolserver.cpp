@@ -226,6 +226,9 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
             handleSlaveAliveMonitoring(msg);
         }
+        if(msg.getId() == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE) {
+            handleDetailedDataUpdate(msg);
+        }
     }
 
 
@@ -246,6 +249,9 @@ ServerState RemoteControlServer::mapMsgIDToServerState(int msgID) {
         return ServerState::STATE_REQUEST_NODE_DETAILED_DATA;
     }
     if(msgID == RESPONSE_KEEP_ALIVE){
+        return ServerState::STATE_KEEP_ALIVE;
+    }
+    if(msgID == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE){
         return ServerState::STATE_KEEP_ALIVE;
     }
 
@@ -317,6 +323,39 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
             }   
         }
     }
+}
+
+void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
+
+    OnOffDeviceDescription receivedDescription;
+        memcpy(&receivedDescription, &(msg.getPayload().at(0)), msg.getPayload().size()); //gdzie, skąd (getpayload to jest wektor databuffer), wielkosc
+        
+        /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
+        if (remoteNodes.find(receivedDescription.nodeId) == remoteNodes.end()) {
+            // not found
+            Serial.println("Received Node ID Not Found");
+        } else {
+            // found
+            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) onOff-ow dla otrzymanego nodeID */
+            std::vector<OnOffDeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollectionOnOff;
+            bool isDeviceAlreadyInCollection = false;
+            /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
+            for(auto& device: collectionVecRef) {
+                if(device.deviceId == receivedDescription.deviceId){
+                    isDeviceAlreadyInCollection = true;
+                    //Serial.println("Mam go w kolekcji");
+                    break;
+                }
+            }
+            /* dodaj do kolekcji jesli nie istnieje*/
+            if(!isDeviceAlreadyInCollection) {
+                collectionVecRef.push_back(receivedDescription);
+                //Serial.println("Dodaje do kolekcji");
+            }
+            else{
+                Serial.println("Device allready PRESENT");
+            }   
+        }
 }
 
 NodeInitialData RemoteControlServer::getInitialDataFromPayload(MessageUDP& msg) {
@@ -499,4 +538,12 @@ bool RemoteControlServer::registerResponseReceiver(SystemRequestType request, st
 
 uint8_t RemoteControlServer::generateRequestId() {
     return requestIdCounter++;
+}
+
+void RemoteControlServer::refreshRemoteNodeInfo(uint8_t nodeId){
+    remoteNodes.find(nodeId)->second.devicesCollectionOnOff.clear();
+    MessageUDP msg(REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE,NETWORK_BROADCAST, 9001);
+    msg.pushData(nodeId);
+    NetworkDriver::sendBroadcast(msg);
+    
 }
