@@ -246,7 +246,7 @@ void MessageUDP::serialPrintMessageUDP(MessageUDP& msg)
     Serial.println("- - ** UDP Message ** - -");
 
     Serial.print("ID: " + String(msg.id));
-    Serial.print(" TotalSize : " + String(msg.totalSize));
+    Serial.print(" TotalSize: " + String(msg.totalSize));
     Serial.print(" IP Address: " + String(msg.ipAddress.octet1) + "." + String(String(msg.ipAddress.octet2)) + "." + String(msg.ipAddress.octet3) + "." + String(msg.ipAddress.octet4));
     Serial.println(" Port: " + String(msg.udpPort));
 

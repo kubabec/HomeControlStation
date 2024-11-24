@@ -56,6 +56,7 @@ public:
     static void constantHandler_configPage(WiFiClient& client);
     static void constantHandler_devicesSetup(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
+    static void constantHandler_pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);
     static void parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client);

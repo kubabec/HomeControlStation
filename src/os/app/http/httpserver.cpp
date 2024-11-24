@@ -46,7 +46,8 @@ std::vector<String> constantRequests = {
   "config",
   "errclrbtn",
   "localDevices",
-  "masseraseviahttp"
+  "masseraseviahttp",
+  "pending"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -61,7 +62,9 @@ std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
   HomeLightHttpServer::constantHandler_configPage,
   HomeLightHttpServer::constantHandler_clearErrors,
   HomeLightHttpServer::constantHandler_devicesSetup,
-  HomeLightHttpServer::constantHandler_massErase
+  HomeLightHttpServer::constantHandler_massErase,
+  HomeLightHttpServer::constantHandler_pending
+
 };
 
 std::vector<std::function<void(String&, WiFiClient&)>> parameterizedRequestHandlers = {
@@ -682,5 +685,9 @@ void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& re
 
   deviceBrightnessChangeCallback(idString,newbrightness);
   // TODO : Przekieruj zawsze na pending a nie na stronę główną
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+}
+
+void HomeLightHttpServer::constantHandler_pending(WiFiClient& client){
   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }

@@ -27,6 +27,8 @@ class RemoteControlClient
     static void processUDPRequest(MessageUDP& msg);
     static void sendInitialDataResponse();
     static void sendDetailedDataResponse();
+    static void sendDetailedDataResponseFromNode();
+    
     static void sendKeepAlive();
     static void processGenericRequest(MessageUDP& msg);
     static bool processResponse();

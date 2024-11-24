@@ -211,7 +211,7 @@ void RemoteControlServer::handleKeepAliveState() {
 }
 
 void RemoteControlServer::receiveUDP(MessageUDP& msg){
-    //Serial.println(" Message Id" + String(msg.getId()));
+    Serial.println(" ->RCS Push to buffer receive UDP Message Id: " + String(msg.getId()));
     receivedBuffer.push(msg);
 }
 
@@ -222,12 +222,15 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
         // is handshake message ?
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA || msg.getId() == RESPONSE_NODE_INITIAL_DATA) {
             handleHandShakeCommunication(msg);
+            Serial.println("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
         }
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
             handleSlaveAliveMonitoring(msg);
+            //Serial.println("RESPONSE_KEEP_ALIVE");
         }
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE) {
             handleDetailedDataUpdate(msg);
+            Serial.println("<-RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
         }
     }
 
@@ -237,7 +240,9 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
     {
         /* Process RcResponse */
         processReceivedRcResponse(msg);
+        Serial.println("<-RC_RESPONSE");
     }
+
 
 }
 
@@ -252,7 +257,7 @@ ServerState RemoteControlServer::mapMsgIDToServerState(int msgID) {
         return ServerState::STATE_KEEP_ALIVE;
     }
     if(msgID == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE){
-        return ServerState::STATE_KEEP_ALIVE;
+        return ServerState::STATE_KEEP_ALIVE; 
     }
 
 
@@ -350,6 +355,9 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
             /* dodaj do kolekcji jesli nie istnieje*/
             if(!isDeviceAlreadyInCollection) {
                 collectionVecRef.push_back(receivedDescription);
+                if(remoteNodes.find(receivedDescription.nodeId)->second.numberOfOnOffDevices == collectionVecRef.size()) {
+                    updateDeviceDescriptionSignal();
+                }
                 //Serial.println("Dodaje do kolekcji");
             }
             else{
@@ -412,7 +420,7 @@ void RemoteControlServer::updateDeviceDescriptionSignal() {
     }
 
     DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF,"RemoteControlServer", vecRemoteOnOffDescription);
-    Serial.println("->RemoteControlServer - Ustawienie sygnalu w Data Container");   
+    Serial.println("->RCS - Ustawienie sygnalu w Data Container");   
     printTranslationMap();
 }
 
@@ -421,7 +429,7 @@ RCTranslation RemoteControlServer::getTranslationFromUnique(uint8_t uniqueId) {
     
      if (currentIdMapping.find(uniqueId) == currentIdMapping.end()) {
             // not found 
-            Serial.println("Remote Control Server-Translation for invalid ID received: " + String(uniqueId));
+            Serial.println("RCS-Translation for invalid ID received: " + String(uniqueId));
             Serial.println("---------------------------------------");
         } else {
             // found            
@@ -434,29 +442,30 @@ RCTranslation RemoteControlServer::getTranslationFromUnique(uint8_t uniqueId) {
 
 bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
     //magia z odpaleniem zdalnego urzadzenia  
-    Serial.println("->Remote Control Server-Enabling RC Device ID : " + String(deviceId) + " State : " + String(state));
+    Serial.println("->RCS - Enabling RC Device ID : " + String(deviceId) + " State : " + String(state));
     
     RCTranslation val = getTranslationFromUnique(deviceId);
-    Serial.println("->Remote Control Server Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onDeviceLocalId));
+    Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onDeviceLocalId));
 
     RcRequest newRequest;
 
-    newRequest.requestId = generateRequestId(); // ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    newRequest.requestId = generateRequestId();
 
     //newRequest.requestId = 10;
     newRequest.targetNodeId = val.nodeId;
     //newRequest.targetDeviceId = val.onDeviceLocalId;
     if(state == true){
         newRequest.type = ENABLE_REQ;
-        Serial.print("blablabla Enable 66666666666666666666666666666");
+        //Serial.println("RCS Device Enable ");
     }else{
         newRequest.type = DISABLE_REQ;
-        Serial.print("blablabla DISable 88888888888888888888888888888888");
+        //Serial.println("RCS Device Disable ");
     }
 
     newRequest.data[0] = val.onDeviceLocalId;
     newRequest.data[15] = 123;
     
+    Serial.println("->RCS - Device enable - new request do kolejki pendingRequestsQueue:");
     newRequest.print();
 
     pendingRequestsQueue.push(newRequest);
@@ -495,7 +504,7 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
     RcResponse response;
     if(msg.getPayload().size() == response.getSize()){
         memcpy(&response, &msg.getPayload().at(0), response.getSize());
-        Serial.println("Remote Control Server - received response UDP : ");
+        Serial.println("<-RCS - received response UDP : ");
         msg.serialPrintMessageUDP(msg);
 
         if(pendingRequestsQueue.front().requestId == response.responseId &&
@@ -509,11 +518,14 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
             receivedResponse.type = response.requestType;
             memcpy(receivedResponse.data, response.data, REQUEST_DATA_SIZE);
 
+            Serial.println("## RCS - processReceivedRcResponse");
             response.print();
             if(responseReceivers.at(receivedResponse.type)){
                 responseReceivers.at(receivedResponse.type)(receivedResponse);
             }
         }
+
+        refreshRemoteNodeInfo(response.responceNodeId);
     }
       
     /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
@@ -539,11 +551,12 @@ bool RemoteControlServer::registerResponseReceiver(SystemRequestType request, st
 uint8_t RemoteControlServer::generateRequestId() {
     return requestIdCounter++;
 }
-
+/* funkcja służy do update urzadzen i stanow na danym node (np po otrzymaniu pakietu response) */
 void RemoteControlServer::refreshRemoteNodeInfo(uint8_t nodeId){
-    remoteNodes.find(nodeId)->second.devicesCollectionOnOff.clear();
+    remoteNodes.find(nodeId)->second.devicesCollectionOnOff.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE,NETWORK_BROADCAST, 9001);
     msg.pushData(nodeId);
     NetworkDriver::sendBroadcast(msg);
-    
+    Serial.println("->RCS - wysylam o detailed data dla node Id : " + String(nodeId));
+    msg.serialPrintMessageUDP(msg);
 }

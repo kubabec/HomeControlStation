@@ -29,21 +29,6 @@ void RemoteControlClient::init()
 
 void RemoteControlClient::cyclic()
 {
-    // switch (currentState) {
-
-    //     case STATE_NODE_INITIAL_DATA:
-    //         handleNodeInitialDataState();
-    //         break;
-
-    //     case STATE_NODE_DETAILED_DATA:
-    //         handleNodeDetailedDataState();            
-    //         break;
-
-    //     case STATE_KEEP_ALIVE:
-    //          handleKeepAliveState();
-    //         break;
-    // }
-
     // Sprawdzenie czy jest coś w receivedBuffer
     if(!receivedBuffer.empty()){
         processUDPRequest(receivedBuffer.front());
@@ -56,19 +41,30 @@ void RemoteControlClient::cyclic()
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     switch(msg.getId()) {
         case RC_REQUEST:
+            Serial.println("-> Dostałem UDP type RC_REQUEST");
             processGenericRequest(msg);
+            
             break;
 
         case REQUEST_NODE_INITIAL_DATA:
+            Serial.println("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
             sendInitialDataResponse();
+
 
             break;
         case REQUEST_NODE_DETAILED_DATA:
+            Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
             sendDetailedDataResponse();
             break;
         
         case REQUEST_KEEP_ALIVE:
+            Serial.println("-> Dostałem UDP REQUEST_KEEP_ALIVE");
             sendKeepAlive();
+            break;
+        
+        case REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE:
+            Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
+            sendDetailedDataResponseFromNode();
             break;
 
 
@@ -248,4 +244,26 @@ bool RemoteControlClient::processResponse() {
         return false;
     }
     return true;
+}
+
+void RemoteControlClient::sendDetailedDataResponseFromNode(){
+    std::any onOffCollection = DataContainer::getSignalValue(SIG_COLLECTION_ONOFF);
+
+    try
+    {
+     // try to read onOff collection if signal exist in data container
+      std::vector<OnOffDeviceDescription> onOffDescriptionVector  = std::any_cast<std::vector<OnOffDeviceDescription>>(onOffCollection);
+      for(OnOffDeviceDescription& deviceDescription: onOffDescriptionVector) {
+        deviceDescription.nodeId = localNodeId;
+        MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
+        
+        detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
+        NetworkDriver::sendBroadcast(detailedDataResponse);
+
+        Serial.println("->Remote Control Client - Wysyłam Detailed data z Node Id : " + String(localNodeId));
+        delay(10);
+
+      }
+      
+    }catch (const std::bad_any_cast& e){ }
 }
