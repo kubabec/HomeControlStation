@@ -15,6 +15,7 @@ const long HomeLightHttpServer::timeoutTime = 2000;
 int HomeLightHttpServer::pos1= 100;
 int HomeLightHttpServer::pos2 = 150;
 int HomeLightHttpServer::pos3 = 150;
+bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 
 std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
 std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
@@ -46,8 +47,7 @@ std::vector<String> constantRequests = {
   "config",
   "errclrbtn",
   "localDevices",
-  "masseraseviahttp",
-  "pending"
+  "masseraseviahttp"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -63,8 +63,6 @@ std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
   HomeLightHttpServer::constantHandler_clearErrors,
   HomeLightHttpServer::constantHandler_devicesSetup,
   HomeLightHttpServer::constantHandler_massErase,
-  HomeLightHttpServer::constantHandler_pending
-
 };
 
 std::vector<std::function<void(String&, WiFiClient&)>> parameterizedRequestHandlers = {
@@ -136,10 +134,9 @@ void HomeLightHttpServer::init()
   }
 
 
-
   DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
   DataContainer::subscribe(SIG_CONFIG_SLOTS, "HTTPServer", HomeLightHttpServer::onSlotConfigChange);
-
+  // DataContainer::subscribe(SIG_IS_UI_BLOCKED, "HTTPServer,", HomeLightHttpServer::onUiBlockedSignalChange);
 
   /* Get IP address from DataContainer to have it for further client redirections */
   ipAddressString = std::any_cast<String>(
@@ -268,14 +265,15 @@ void HomeLightHttpServer::handleClientRequest()
             client.println("<body><div class=\"wrapper\">");
             client.println(popupContent);
 
-            processLinkRequestData(client);
-
-            if(header.indexOf("GET /?pending") >= 0) //Ta linia sprawdza, czy w nagłówku żądania HTTP występuje fraza "GET /?bri"
-            { 
-                /* TODO :
-                  jezeli sygnał SIG_CURRENT_REQUEST_PROCESSING_STATE nie jest pending to przekieruj na strone główną,
-                  w każdym innym razie przekieruj ponownie na pending (/?pending) */
+            if(!isUserInterfaceBlocked){
+              /* Process request only when user interface is NOT blocked */
+              processLinkRequestData(client);
+            }else 
+            {
+              /* Wait in a loop until UI will be unlocked */
+              pending(client);
             }
+
 
             client.println("</div></body></html>");            
             client.println();
@@ -308,6 +306,16 @@ void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
   pinConfigSlotsCopy_HttpServer = (std::any_cast<ConfigSlotsDataType>(newSlotConfig));
   for(auto& slot : pinConfigSlotsCopy_HttpServer.slots) {
     slot.print();
+  }
+}
+
+void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
+{
+  try {
+    isUserInterfaceBlocked = (std::any_cast<bool>(isBlockedValue));
+  }catch (std::bad_any_cast ex)
+  {
+    /* do nothing */
   }
 }
 
@@ -688,6 +696,7 @@ void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& re
   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
 
-void HomeLightHttpServer::constantHandler_pending(WiFiClient& client){
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+void HomeLightHttpServer::pending(WiFiClient& client){
+  client.println("Loading, please wait . . . ");
+  client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"'>");
 }

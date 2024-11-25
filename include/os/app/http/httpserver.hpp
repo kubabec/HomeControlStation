@@ -23,6 +23,8 @@ class HomeLightHttpServer
     static uint8_t activeErrorsCount;
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
 
+    static bool isUserInterfaceBlocked;
+
     static String ipAddressString;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
@@ -46,6 +48,7 @@ public:
     static void deinit();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
     static void onSlotConfigChange(std::any newSlotConfig);
+    static void onUiBlockedSignalChange(std::any isBlockedValue);
 
     static void generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
@@ -56,7 +59,7 @@ public:
     static void constantHandler_configPage(WiFiClient& client);
     static void constantHandler_devicesSetup(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
-    static void constantHandler_pending(WiFiClient& client);
+    static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);
     static void parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client);
