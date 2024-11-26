@@ -8,9 +8,7 @@ long long initialDataExitTimer = 0;
 
 
 std::map<uint16_t, RemoteNodeInformation> RemoteControlServer::remoteNodes;
-std::map<uint8_t, RCTranslation> RemoteControlServer::currentIdMapping;
-std::array<std::function<bool(SystemResponse&)>, REQ_COUNT> RemoteControlServer::responseReceivers;
-
+std::array<std::function<bool(RcResponse&)>, REQ_COUNT> RemoteControlServer::responseReceivers;
 
 ServerState RemoteControlServer::currentState = STATE_REQUEST_NODE_INITIAL_DATA;
 std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
@@ -29,28 +27,25 @@ void RemoteControlServer::deinit() {
 
 void RemoteControlServer::init(){
     Serial.println("RemoteControlServer init ...");
-    //to robi ze funkcje sa widoczne w datacontainer
-    DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, bool)> > (RemoteControlServer::deviceEnable));
-    DataContainer::setSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE,"RemoteControlServer", static_cast<std::function<bool(uint8_t, uint8_t)> > (RemoteControlServer::deviceBrightnessChange));
-
-    DataContainer::setSignalValue(CBK_REGISTER_RESPONSE_RECEIVER,"RemoteControlServer", static_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)> >(RemoteControlServer::registerResponseReceiver));
+    DataContainer::setSignalValue(
+        CBK_REGISTER_RESPONSE_RECEIVER,
+        "RemoteControlServer", 
+            static_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)> >(RemoteControlServer::registerResponseReceiver)
+        );
     
-    /*NEW*/
-    DeviceControlFunctionSet controlSet = {
-        .setDeviceState = RemoteControlServer::deviceEnable,
-        .changeBrightness = RemoteControlServer::deviceBrightnessChange
-    };
-    DataContainer::setSignalValue(SIG_REMOTE_CONTROL_FUNCTIONS, "DeviceManager",static_cast<DeviceControlFunctionSet> (controlSet)
-    );
-    /*NEW*/
-
+    DataContainer::setSignalValue(
+        CBK_CREATE_RC_REQUEST,
+        "RemoteControlServer", 
+            static_cast<std::function<void(RcRequest&)>>(RemoteControlServer::createRcRequest)
+        );
+    
+    
     requestIdCounter = 0; //inicjalizacja zmiennej do trzymania countera requestów^^^^^^^^^^^^^^^^^^^
     
     requestInitialDataTimer = millis();
     requestDetailedDataTimer = millis();
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
-
 
     Serial.println("... done");
 }
@@ -96,7 +91,7 @@ void RemoteControlServer::requestNodeInitialData(){
     MessageUDP msg(REQUEST_NODE_INITIAL_DATA, NETWORK_BROADCAST, 9001);
     msg.pushData(msgCount);
     NetworkDriver::sendBroadcast(msg);
-    Serial.println("---> Wysylam REQUEST_NODE_INITIAL_DATA ---> ");
+    //Serial.println("---> Wysylam REQUEST_NODE_INITIAL_DATA ---> ");
     msgCount++;
 }
 void RemoteControlServer::requestNodeDetailedData(){
@@ -211,7 +206,7 @@ void RemoteControlServer::handleKeepAliveState() {
 }
 
 void RemoteControlServer::receiveUDP(MessageUDP& msg){
-    Serial.println(" ->RCS Push to buffer receive UDP Message Id: " + String(msg.getId()));
+    //Serial.println(" ->RCS Push to buffer receive UDP Message Id: " + String(msg.getId()));
     receivedBuffer.push(msg);
 }
 
@@ -222,7 +217,7 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
         // is handshake message ?
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA || msg.getId() == RESPONSE_NODE_INITIAL_DATA) {
             handleHandShakeCommunication(msg);
-            Serial.println("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
+            //Serial.println("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
         }
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
             handleSlaveAliveMonitoring(msg);
@@ -273,11 +268,11 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
             //Serial.println("Sprawdzamy czy node jest w mapie.......................");
             //czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
             if (remoteNodes.find(receivedInitialData.nodeId) == remoteNodes.end()) {
+                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
             // not found - brak info o node, dodajemy info do mapy
                 //Serial.println("Nie jestesmy w mapie i dodajemy do mapy...");
                 RemoteNodeInformation nodeInfo {
                     .nodeId = receivedInitialData.nodeId,
-                    .roomId = receivedInitialData.roomId,
                     .numberOfOnOffDevices = receivedInitialData.numberOfOnOffDevices,
                     .numberOfLedStrips = receivedInitialData.numberOfLedStrips
                 };
@@ -396,93 +391,19 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
 }
 
 void RemoteControlServer::updateDeviceDescriptionSignal() {
-
-    currentIdMapping.clear();
-
-    static uint8_t uniqueRcId = 0;
-
-    std::vector<OnOffDeviceDescription> vecRemoteOnOffDescription;
-    
-    
+    std::vector<OnOffDeviceDescription> mergedTunneledDevices;
     for(auto& remoteNode : remoteNodes) {
         for(auto device : remoteNode.second.devicesCollectionOnOff) {
-            RCTranslation translation = {
-                .nodeId = remoteNode.first,
-                .onDeviceLocalId = device.deviceId
-            };
-
-            device.deviceId = uniqueRcId;
-            vecRemoteOnOffDescription.push_back(device);
-            currentIdMapping.insert({uniqueRcId,translation});
-            uniqueRcId ++;
+            mergedTunneledDevices.push_back(device);
         }
-
     }
+    DataContainer::setSignalValue(
+        SIG_RC_DEVICES_INTERNAL_TUNNEL, 
+        "RcServer", 
+        mergedTunneledDevices
+    );
 
-    DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF,"RemoteControlServer", vecRemoteOnOffDescription);
-    Serial.println("->RCS - Ustawienie sygnalu w Data Container");   
-    printTranslationMap();
 }
-
-RCTranslation RemoteControlServer::getTranslationFromUnique(uint8_t uniqueId) {
-    RCTranslation retVal; //oryginalId ma default-owo 255
-    
-     if (currentIdMapping.find(uniqueId) == currentIdMapping.end()) {
-            // not found 
-            Serial.println("RCS-Translation for invalid ID received: " + String(uniqueId));
-            Serial.println("---------------------------------------");
-        } else {
-            // found            
-            retVal = currentIdMapping.find(uniqueId)->second;
-        }
-        
-    return retVal;
-}
-
-
-bool RemoteControlServer::deviceEnable(uint8_t deviceId, bool state) {
-    //magia z odpaleniem zdalnego urzadzenia  
-    Serial.println("->RCS - Enabling RC Device ID : " + String(deviceId) + " State : " + String(state));
-    
-    RCTranslation val = getTranslationFromUnique(deviceId);
-    Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onDeviceLocalId));
-
-    RcRequest newRequest;
-
-    newRequest.requestId = generateRequestId();
-
-    //newRequest.requestId = 10;
-    newRequest.targetNodeId = val.nodeId;
-    //newRequest.targetDeviceId = val.onDeviceLocalId;
-    if(state == true){
-        newRequest.type = ENABLE_REQ;
-        //Serial.println("RCS Device Enable ");
-    }else{
-        newRequest.type = DISABLE_REQ;
-        //Serial.println("RCS Device Disable ");
-    }
-
-    newRequest.data[0] = val.onDeviceLocalId;
-    newRequest.data[15] = 123;
-    
-    Serial.println("->RCS - Device enable - new request do kolejki pendingRequestsQueue:");
-    newRequest.print();
-
-    pendingRequestsQueue.push(newRequest);
-    
-
-    return true;
-}
-
-bool RemoteControlServer::deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel)
-{       
-    //magia z jasnoscia zdalnego urzadzenia 
-
-    //Serial.println(" Changing Brightness RC Device ID : " + String(deviceId) + " Level : " + String(brightnessLevel));
-
-    return true;
-}
-
 
 bool RemoteControlServer::processPendingRequest(RcRequest& request){
     return requestProcessor.processReqest(request);
@@ -491,41 +412,30 @@ bool RemoteControlServer::processPendingRequest(RcRequest& request){
     
 }
 
-void RemoteControlServer::printTranslationMap() {
-    for(auto& mapping: currentIdMapping){
-        Serial.println(String((int)mapping.first) + ": " );
-        mapping.second.print();
-    }
-}
-
 void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 {
     /* TODO : Unpack payload MessageUdp -> RcResponse */
     RcResponse response;
+    /* Is received response in valid length ? */
     if(msg.getPayload().size() == response.getSize()){
         memcpy(&response, &msg.getPayload().at(0), response.getSize());
-        Serial.println("<-RCS - received response UDP : ");
-        msg.serialPrintMessageUDP(msg);
-
+        
+        /*PRINT*/
+        //msg.serialPrintMessageUDP(msg);
+        /* Does received response match currently processed request? */
         if(pendingRequestsQueue.front().requestId == response.responseId &&
            pendingRequestsQueue.front().type == response.requestType){
+            /* remove processed request as we received the response */
             pendingRequestsQueue.pop();
-
-            SystemResponse receivedResponse;
-            receivedResponse.responseId = response.responseId;
-            receivedResponse.responNodeId = response.responceNodeId;
-            receivedResponse.isPositive = response.responseType == POSITIVE_RESP ? 1 : 0;
-            receivedResponse.type = response.requestType;
-            memcpy(receivedResponse.data, response.data, REQUEST_DATA_SIZE);
-
-            Serial.println("## RCS - processReceivedRcResponse");
-            response.print();
-            if(responseReceivers.at(receivedResponse.type)){
-                responseReceivers.at(receivedResponse.type)(receivedResponse);
+  
+            /* Do we have receiver registered for this type of the request ? */
+            if(responseReceivers.at(response.requestType)){
+                /* forward response in a callback to the request sender */
+                responseReceivers.at(response.requestType)(response);
             }
-        }
 
-        refreshRemoteNodeInfo(response.responceNodeId);
+            refreshRemoteNodeInfo(response.responceNodeId);
+        }
     }
       
     /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
@@ -533,7 +443,7 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
               map the type into RcResponse -> SystemResponse */
 }
 
-bool RemoteControlServer::registerResponseReceiver(SystemRequestType request, std::function<bool(SystemResponse&)> receiverCallback) {
+bool RemoteControlServer::registerResponseReceiver(RequestType request, std::function<bool(RcResponse&)> receiverCallback) {
     if(request >= REQ_FIRST && request < UNKNOWN_REQ) {
         if(responseReceivers.at(request)) { 
             //receiver allready registered
@@ -559,4 +469,14 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint8_t nodeId){
     NetworkDriver::sendBroadcast(msg);
     Serial.println("->RCS - wysylam o detailed data dla node Id : " + String(nodeId));
     msg.serialPrintMessageUDP(msg);
+}
+
+
+void RemoteControlServer::createRcRequest(RcRequest& newRequest)
+{
+    newRequest.requestId = generateRequestId();
+
+    /* Creating new request */
+    Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.requestId));
+    pendingRequestsQueue.push(newRequest);
 }

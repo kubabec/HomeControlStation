@@ -6,6 +6,7 @@
 #include <os/drivers/NetworkDriver.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/app/remoteControl/RemoteControlServer.hpp>
+#include <os/app/RemoteDevicesManager.hpp>
 #include <os/app/config/ConfigProvider.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DeviceProvider.hpp>
@@ -17,11 +18,14 @@ class   OperatingSystem
 private:
     static bool isHttpServerRunning;
     static bool isRCServerRunning;
+    static uint16_t runtimeNodeHash;
+    static uint16_t uniqueLifecycleId;
 
     static bool resetPending;
     static uint8_t resetCountdown;
 
     static void performReset();
+    static uint16_t calculateRuntimeNodeHash();
 public:
     static void init();
     static void reset();
@@ -30,6 +34,7 @@ public:
     static void task10ms();
     static void task20ms();
     static void task50ms();
+    static void task1s();
 
 };
 

@@ -18,7 +18,6 @@
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct {
     uint16_t nodeId = 255;
-    uint8_t roomId = 255;
     uint8_t numberOfOnOffDevices = 255;
     uint8_t numberOfLedStrips = 255;
     std::vector<OnOffDeviceDescription> devicesCollectionOnOff;
@@ -28,7 +27,6 @@ typedef struct {
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
         Serial.println("Node Id : " + String(nodeId));
-        Serial.println("Room Id : " + String(roomId));
         Serial.println("numberOfOnOffDevices : " + String(numberOfOnOffDevices));
         Serial.println("numberOfLedStrips : " + String(numberOfLedStrips));
         for(auto& device: devicesCollectionOnOff) {
@@ -38,15 +36,6 @@ typedef struct {
         Serial.println("------- ----------------------- --------------");                
     }
 } RemoteNodeInformation;
-
-struct RCTranslation {
-    uint16_t nodeId = 255;
-    uint8_t onDeviceLocalId = 255;
-
-    void print() {
-        Serial.println(String(nodeId) + ", " + String((int) onDeviceLocalId));
-    }
-};
 
 
 class RemoteControlServer 
@@ -58,13 +47,12 @@ class RemoteControlServer
     static std::queue<RcRequest> pendingRequestsQueue;
 
     static std::vector<OnOffDevice> vecRemoteOnOffDevices;
-    static std::array<std::function<bool(SystemResponse&)>, REQ_COUNT> responseReceivers;
+    static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;
     
     /* Kontener na informacje o zdalnych Nodach*/
     static std::map<uint16_t, RemoteNodeInformation> remoteNodes;
-    static std::map<uint8_t, RCTranslation> currentIdMapping;
 
     static void requestNodeInitialData();
     static void requestNodeDetailedData();
@@ -86,10 +74,7 @@ class RemoteControlServer
 
     static void updateDeviceDescriptionSignal();
 
-    static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
-    static void printTranslationMap();
-
-
+    static uint8_t generateRequestId(); // funkcja do generowania Request Id
 
 public:
 
@@ -98,12 +83,9 @@ public:
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
 
-    static uint8_t generateRequestId(); // funkcja do generowania Request Id
+    static void createRcRequest(RcRequest& newRequest);
 
-    static bool deviceEnable(uint8_t deviceId, bool state);
-    static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
-
-    static bool registerResponseReceiver(SystemRequestType request, std::function<bool(SystemResponse&)> receiverCallback);
+    static bool registerResponseReceiver(RequestType request, std::function<bool(RcResponse&)> receiverCallback);
     static void refreshRemoteNodeInfo(uint8_t nodeId);
     
 };

@@ -5,10 +5,15 @@ bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
 bool OperatingSystem::resetPending = false;
 uint8_t OperatingSystem::resetCountdown = 10;
+uint16_t OperatingSystem::runtimeNodeHash = 0;
+uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
 void OperatingSystem::init()
 {
+    uniqueLifecycleId = (uint16_t)random(10, 10000);
+
     DataContainer::setSignalValue(CBK_RESET_DEVICE, "OperatingSystem", static_cast<std::function<void()>>(OperatingSystem::reset));
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, "OS", static_cast<uint16_t>(runtimeNodeHash));
 
     DataContainer::subscribe(SIG_IS_HTTP_SERVER, "OperatingSystem", [](std::any signal) {
         isHttpServerRunning = (std::any_cast<bool>(signal));
@@ -38,6 +43,7 @@ void OperatingSystem::init()
 
     if(isRCServerRunning){
         RemoteControlServer::init();
+        RemoteDevicesManager::init();
     }else{
         RemoteControlClient::init();
     }
@@ -61,6 +67,7 @@ void OperatingSystem::task10ms()
 
     if(isRCServerRunning){
         RemoteControlServer::cyclic();
+        RemoteDevicesManager::cyclic();
     }else{
         RemoteControlClient::cyclic();
     }
@@ -85,6 +92,12 @@ void OperatingSystem::task50ms()
     }
 }
 
+void OperatingSystem::task1s()
+{
+    runtimeNodeHash = calculateRuntimeNodeHash();
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, "OS", static_cast<uint16_t>(runtimeNodeHash));
+}
+
 void OperatingSystem::reset() {
     resetPending = true;
 }
@@ -95,6 +108,7 @@ void OperatingSystem::performReset()
     DeviceProvider::deinit();
 
     if(isRCServerRunning){
+        RemoteDevicesManager::deinit();
         RemoteControlServer::deinit();
     }else{
         RemoteControlClient::deinit();
@@ -112,4 +126,57 @@ void OperatingSystem::performReset()
     ConfigProvider::deinit();
 
     ESP.restart();
+}
+
+uint16_t OperatingSystem::calculateRuntimeNodeHash()
+{
+    uint16_t hash = 0;
+
+    hash += uniqueLifecycleId;
+
+    /* Get configuration */
+    try{
+        NodeConfiguration configuration = 
+            std::any_cast<NodeConfiguration>(
+                DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)
+            );
+        hash += (uint8_t) configuration.isHttpServer;
+        hash += (uint8_t) configuration.isRcServer;
+        hash += (uint8_t) configuration.networkCredentialsAvailable;
+        hash += (uint8_t) configuration.nodeId;
+        hash += (uint8_t) configuration.nodeType;
+        for(uint8_t idx = 0 ; idx < configuration.networkSSID.length(); idx ++)
+        {
+            hash += (uint8_t) configuration.networkSSID.charAt(idx);
+        }
+        for(uint8_t idx = 0 ; idx < configuration.networkPassword.length(); idx ++)
+        {
+            hash += (uint8_t) configuration.networkPassword.charAt(idx);
+        }
+    }catch (std::bad_any_cast ex){}
+
+
+    /* Get devices data */
+    try{
+        std::vector<OnOffDeviceDescription> devicesVector = 
+            std::any_cast<std::vector<OnOffDeviceDescription>>(
+                DataContainer::getSignalValue(SIG_COLLECTION_ONOFF)
+            );
+        for(auto& device : devicesVector)
+        {
+            hash += (uint8_t) device.deviceId;
+            hash += (uint8_t) device.nodeId;
+            hash += (uint8_t) device.isEnabled;
+            hash += (uint8_t) device.currentBrightness;
+            hash += (uint8_t) device.brightnessIsAdjustable;
+            for(uint8_t idx = 0 ; idx < device.deviceName.length(); idx ++)
+            {
+                hash += (uint8_t) device.deviceName.charAt(idx);
+            }
+        }
+    }catch (std::bad_any_cast ex){}
+
+    Serial.println("Hash : " + String((int)hash));
+
+    return hash;
 }

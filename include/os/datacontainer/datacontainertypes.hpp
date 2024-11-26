@@ -2,6 +2,7 @@
 #define DATA_CONTAINER_TYPES_H
 
 #include "DeviceControlApi.hpp"
+#include "os/app/remoteControl/RC_publicDataTypes.hpp"
 
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
@@ -11,6 +12,7 @@ typedef struct
 {
     uint8_t nodeId = 255;
     uint8_t deviceId = -1;
+    uint8_t roomId = 255;
     bool isEnabled;
     bool brightnessIsAdjustable = false;
     uint8_t currentBrightness;
@@ -155,55 +157,5 @@ typedef struct
     uint64_t lastOccurrenceTime = 0;
 }SystemErrorType;
 
-typedef enum {
-    SYSREQ_FIRST,
-    ENABLE_SYSREQ = SYSREQ_FIRST,
-    DISABLE_SYSREQ,
-    BRIGHTNESS_CHANGE_SYSREQ,
-    COLOR_CHANGE_SYSREQ,
-    RESET_SYSREQ,
-    UNKNOWN_SYSREQ,
-    SYSREQ_COUNT = UNKNOWN_SYSREQ
-}SystemRequestType;
-
-
-typedef struct {
-    uint8_t requestId = 255;
-    uint8_t type = UNKNOWN_SYSREQ;
-    uint8_t data[30] = {0xFF};
-
-    void print() {
-        Serial.println("$$$ System Request $$$");
-        Serial.println("requestId :" + String((int)requestId));
-        Serial.println("type :" + String((int)type));
-        for(uint8_t i=0; i<30; i++) {
-            Serial.print((int)data[i]);
-        }
-        Serial.println("");
-        Serial.println("$$$$$$$$$$$$$$$$$$$$");
-    }
-
-}SystemRequest;
-
-typedef struct {
-    uint8_t isPositive = 0;
-    uint8_t responseId = 255;
-    uint16_t responNodeId = 255;
-    uint8_t type = UNKNOWN_SYSREQ;
-    uint8_t data[30] = {0xFF};
-
-    void print() {
-        Serial.println("$$$ System Response $$$");
-        Serial.println("responseId :" + String((int)responseId));
-        Serial.println("responNodeId :" + String((int)responNodeId));
-        Serial.println("type :" + String((int)type));
-        for(uint8_t i=0; i<30; i++) {
-            Serial.print((int)data[i]);
-        }
-        Serial.println("");
-        Serial.println("$$$$$$$$Payload$$$$$$$$$$$$");
-    }
-
-}SystemResponse;
 
 #endif 

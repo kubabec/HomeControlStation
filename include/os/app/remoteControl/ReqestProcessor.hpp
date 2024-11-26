@@ -2,6 +2,7 @@
 #define REQUEST_PROCESSOR_H
 
 #include <os/app/remoteControl/rc_dataTypes.hpp>
+#include <os/app/remoteControl/RC_publicDataTypes.hpp>
 
 
 class RequestProcessor

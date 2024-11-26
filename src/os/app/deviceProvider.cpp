@@ -6,7 +6,7 @@ std::function<bool(uint8_t, bool)> DeviceProvider::deviceManager_DeviceEnable;
 std::function<bool(uint8_t, uint8_t)> DeviceProvider::deviceManager_BrightnessChange;
 std::function<bool(uint8_t, bool)> DeviceProvider::rcServer_DeviceEnable;
 std::function<bool(uint8_t, uint8_t)> DeviceProvider::rcServer_BrightnessChange;
-std::function<bool(SystemResponse&)> DeviceProvider::requestResponse;
+std::function<bool(RcResponse&)> DeviceProvider::requestResponse;
 
 
 bool DeviceProvider::isRCServer = false;
@@ -45,28 +45,18 @@ void DeviceProvider::init()
 
     if(isRCServer)  {
         initRemoteDevicesSetup();
-
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (ENABLE_SYSREQ, DeviceProvider::receiveSystemResponse);
-
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (DISABLE_SYSREQ, DeviceProvider::receiveSystemResponse);
-
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemResponse&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (BRIGHTNESS_CHANGE_SYSREQ, DeviceProvider::receiveSystemResponse);
-
     }else {
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (ENABLE_SYSREQ, DeviceProvider::receiveSystemRequest);
+        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (ENABLE_REQ, DeviceProvider::receiveRequest);
 
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (DISABLE_SYSREQ, DeviceProvider::receiveSystemRequest);
+        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (DISABLE_REQ, DeviceProvider::receiveRequest);
 
-        std::any_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (BRIGHTNESS_CHANGE_SYSREQ, DeviceProvider::receiveSystemRequest);
+        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (BRIGHTNESS_CHANGE_REQ, DeviceProvider::receiveRequest);
         
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
-        requestResponse = (std::any_cast<std::function<bool(SystemResponse&)>>(responseCBK));
+        requestResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
     }
     
     updateDeviceDescriptionSignal();
@@ -241,24 +231,24 @@ void DeviceProvider::deviceReset() {
 }
 
 
-bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
+bool DeviceProvider::receiveRequest(RcRequest& request) {
     request.print();
-    SystemResponse response;
+    RcResponse response;
     response.responseId = request.requestId;
-    response.isPositive = 200; //200 is positive
-    response.type = request.type;
+    response.responseType = POSITIVE_RESP; //200 is positive
+    response.requestType = request.type;
 
     switch (request.type)
     {
-    case ENABLE_SYSREQ:
+    case ENABLE_REQ:
         deviceEnable(request.data[0],true);
         requestResponse(response);
         break;
-    case DISABLE_SYSREQ:
+    case DISABLE_REQ:
         deviceEnable(request.data[0],false);
         requestResponse(response);
         break;   
-    case BRIGHTNESS_CHANGE_SYSREQ:
+    case BRIGHTNESS_CHANGE_REQ:
         deviceBrightnessChange(request.data[0],request.data[2]);
         requestResponse(response);
         break;  
@@ -267,13 +257,6 @@ bool DeviceProvider::receiveSystemRequest(SystemRequest& request) {
     }
     return true;
     //
-}
-
-bool DeviceProvider::receiveSystemResponse(SystemResponse& response) {
-    Serial.println("->Device Provider received respond Id: " + String((int)response.responseId));
-    Serial.println("->Device Provider received respon Node Id: " + String((int)response.responNodeId));
-    return true;
-
 }
 
 // uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {

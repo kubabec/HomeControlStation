@@ -136,7 +136,7 @@ void HomeLightHttpServer::init()
 
   DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
   DataContainer::subscribe(SIG_CONFIG_SLOTS, "HTTPServer", HomeLightHttpServer::onSlotConfigChange);
-  // DataContainer::subscribe(SIG_IS_UI_BLOCKED, "HTTPServer,", HomeLightHttpServer::onUiBlockedSignalChange);
+  DataContainer::subscribe(SIG_IS_UI_BLOCKED, "HTTPServer,", HomeLightHttpServer::onUiBlockedSignalChange);
 
   /* Get IP address from DataContainer to have it for further client redirections */
   ipAddressString = std::any_cast<String>(
@@ -297,7 +297,7 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
   //Wlasny Http Servra wektor urzadzen On Off 
   onOffDescriptionVector = (std::any_cast<std::vector<OnOffDeviceDescription>>(newDescriptionVector));
   for(auto& onOff : onOffDescriptionVector) {
-    onOff.print();
+    //onOff.print();
   }
 }
 

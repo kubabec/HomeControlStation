@@ -3,7 +3,7 @@
 
 void setup() {
   Serial.begin(115200);
-
+  randomSeed(analogRead(0));
   OperatingSystem::init();
 
 }
@@ -12,6 +12,7 @@ void loop() {
   static long long task10msCounter = 0;
   static long long task20msCounter = 0;
   static long long task50msCounter = 0;
+  static long long task1sCounter = 0;
 
   if(abs(millis() - task10msCounter) > 10)
   {
@@ -29,6 +30,12 @@ void loop() {
   {
     OperatingSystem::task50ms();
     task50msCounter = millis();
+  }  
+
+  if(abs(millis() - task1sCounter) > 1000)
+  {
+    OperatingSystem::task1s();
+    task1sCounter = millis();
   }  
   delay(1);
 }

@@ -5,8 +5,8 @@
 //static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
-std::array<std::function<bool(SystemRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
-std::queue<SystemResponse> RemoteControlClient::vecResponseMessage;
+std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
+std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
 
 uint8_t RemoteControlClient::localNodeId =255;
 
@@ -17,9 +17,9 @@ void RemoteControlClient::deinit() {
 void RemoteControlClient::init()
 {       
     Serial.println("RemoteControlClient init ...");
-    DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER,"RemoteControlClient", static_cast<std::function<bool(SystemRequestType, std::function<bool(SystemRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
+    DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER,"RemoteControlClient", static_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
 
-    DataContainer::setSignalValue(CBK_RESPONSE, "RemoteControlClient",static_cast<std::function<bool(SystemResponse&)> > (RemoteControlClient::sendResponse));
+    DataContainer::setSignalValue(CBK_RESPONSE, "RemoteControlClient",static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
 
     currentState = STATE_NODE_INITIAL_DATA;
     localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
@@ -74,13 +74,6 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     
 }
 
-SystemRequest mapRcToSystemRequest(RcRequest& request){
-    SystemRequest retVal;
-    retVal.requestId = request.requestId;
-    retVal.type = request.type;
-    memcpy(retVal.data, request.data,request.getSize());
-    return retVal;
-}
 
 void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
     if(msg.getPayload().size() == REQEST_SIZE) {
@@ -91,10 +84,8 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
             if(newRequest.type >= REQ_FIRST && newRequest.type < UNKNOWN_REQ) {
                 //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
                 if(requestReceivers.at(newRequest.type)) {
-                    // jeżeli istnieje to ja wywoluje z parametrem newRequest
-                    SystemRequest newSystemRequest = mapRcToSystemRequest(newRequest);
                     //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
-                    (requestReceivers.at(newRequest.type))(newSystemRequest);
+                    (requestReceivers.at(newRequest.type))(newRequest);
 
                 }
             }
@@ -186,7 +177,7 @@ void RemoteControlClient::sendKeepAlive() {
     NetworkDriver::sendBroadcast(keepAliveResponse);
 }
 
-bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std::function<bool(SystemRequest&)> receiverCallback) {
+bool RemoteControlClient::registerRequestReceiver(RequestType request, std::function<bool(RcRequest&)> receiverCallback) {
     if(request >= REQ_FIRST && request < UNKNOWN_REQ) {
         if(requestReceivers.at(request)) { 
             //receiver allready registered
@@ -201,7 +192,7 @@ bool RemoteControlClient::registerRequestReceiver(SystemRequestType request, std
     return false;
 }
 
-bool RemoteControlClient::sendResponse(SystemResponse& response) {
+bool RemoteControlClient::sendResponse(RcResponse& response) {
     //Serial.println("!!! RemoteControlClient - sendResponse do vektora - ");
     
     vecResponseMessage.push(response);
@@ -213,18 +204,8 @@ bool RemoteControlClient::sendResponse(SystemResponse& response) {
 // checking if the vector containing the response to the request has an entry 
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
-        RcResponse remoteControlResponse;
-        SystemResponse& currentResponse = vecResponseMessage.front();
-        remoteControlResponse.responseId = currentResponse.responseId;
-        remoteControlResponse.requestType = currentResponse.type;
+        RcResponse remoteControlResponse = vecResponseMessage.front();
         remoteControlResponse.responceNodeId = localNodeId;
-        if(currentResponse.isPositive){
-            remoteControlResponse.responseType = POSITIVE_RESP;        
-        }
-        else{
-            remoteControlResponse.responseType = NEGATIVE_RESP;
-        }
-        memcpy(remoteControlResponse.data, currentResponse.data, REQUEST_DATA_SIZE);
         vecResponseMessage.pop();
 
         Serial.println("!!! Remote Control Client Response - processResponse : ");

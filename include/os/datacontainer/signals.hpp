@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 33
+#define NUMBER_OF_SIGNALS 37
 enum Signal
 {
     /* Type: bool , somme description */
@@ -77,7 +77,15 @@ enum Signal
 
 
     /* Type: std:function<void(uin8_t, bool)> - callback to response RcRequest uint8_t - response ID, bool - on/off */
-    CBK_RESPONSE
+    CBK_RESPONSE,
+    /* TYpe: uint16_t - hash representing current runtime state including configuration and devices states */
+    SIG_RUNTIME_NODE_HASH,
+    /* Type: std::vector<OnOffDeviceDescription> - Internal tunel!! only to be used between RCServer <-> RCDevicesManager*/
+    SIG_RC_DEVICES_INTERNAL_TUNNEL,
+    /* Type: std:function<void(RcRequest&)> - callback add new generic RcRequest to RcServer for processing */
+    CBK_CREATE_RC_REQUEST,
+    /* TYpe: bool - represents information if UI can be displayed to the user or not */
+    SIG_IS_UI_BLOCKED
 
 };
 

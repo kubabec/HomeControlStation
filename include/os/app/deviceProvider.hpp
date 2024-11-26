@@ -18,7 +18,7 @@ class DeviceProvider
     static std::function<bool(uint8_t, uint8_t)> deviceManager_BrightnessChange;
     static std::function<bool(uint8_t, bool)> rcServer_DeviceEnable;
     static std::function<bool(uint8_t, uint8_t)> rcServer_BrightnessChange;
-    static std::function<bool(SystemResponse&)> requestResponse;
+    static std::function<bool(RcResponse&)> requestResponse;
 
 
     static bool isRCServer;
@@ -49,8 +49,7 @@ public:
 
     static void printIdMap();
 
-    static bool receiveSystemRequest(SystemRequest& request);
-    static bool receiveSystemResponse(SystemResponse& request);
+    static bool receiveRequest(RcRequest& request);
         
 };
 

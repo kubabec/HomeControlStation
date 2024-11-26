@@ -44,7 +44,7 @@ void OnOffDevice::brightnessChangeHandler() {
     
     if(brightnessLevel != brightnessLevelTarget) {        
         if ((millis() - timePrevious1) >= brightnessStepDurationMS) {
-            Serial.print("Zmiana jasności : ");
+            //Serial.print("Zmiana jasności : ");
             if(brightnessLevel < brightnessLevelTarget) {
                 brightnessLevel ++;
                 
@@ -53,7 +53,7 @@ void OnOffDevice::brightnessChangeHandler() {
             if(brightnessLevel > brightnessLevelTarget) {
                 brightnessLevel --;
             } 
-            Serial.println(brightnessLevel);
+            //Serial.println(brightnessLevel);
             timePrevious1 = millis(); 
         }        
     }  
