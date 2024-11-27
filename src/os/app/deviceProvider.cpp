@@ -23,17 +23,33 @@ void DeviceProvider::init()
     DataContainer::setSignalValue(CBK_DEVICE_ENABLE,"DeviceProvider", static_cast<std::function<bool(uint8_t, bool)> > (DeviceProvider::deviceEnable));
     DataContainer::setSignalValue(CBK_DEVICE_BRIGHTNESS_CHANGE,"DeviceProvider", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceProvider::deviceBrightnessChange));
 
-    /*NEW*/
-    DeviceControlFunctionSet controlSet = {
-        .setDeviceState = DeviceProvider::deviceEnable,
-        .changeBrightness = DeviceProvider::deviceBrightnessChange
+    /*TESTCODE*/
+    /* Link service API functions to DeviceProvider function calls */
+    DeviceServicesAPI servicesFunctionSet = {
+        .serviceCall_NoParams = 
+            [](uint8_t deviceId, DeviceServicesType request){ 
+                return DeviceProvider::service(deviceId, request);
+            },
+        .serviceCall_set1 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set1 params){
+                return DeviceProvider::service(deviceId, request, params);
+            },
+        .serviceCall_set2 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set2 params){
+                return DeviceProvider::service(deviceId, request, params);
+            },
+        .serviceCall_set3 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set3 params){
+                return DeviceProvider::service(deviceId, request, params);
+            }
     };
+
+    /* Push prepared service API to DataContainer */
     DataContainer::setSignalValue(
-        SIG_CONTROL_FUNCTIONS,
-        "DeviceManager",
-        static_cast<DeviceControlFunctionSet>(controlSet)
-    );
-    /*NEW*/
+        SIG_DEVICE_SERVICES,
+        "DeviceProvider", 
+        static_cast<DeviceServicesAPI>(servicesFunctionSet));
+    /*TESTCODE*/
 
 
     std::any rcServerCoding = DataContainer::getSignalValue(SIG_IS_RC_SERVER);
@@ -270,3 +286,42 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
 //     Serial.println("Nie znaleziono unikalnego ID dla podanego oryginalnego ID");
 //     return 0;
 // }
+
+
+/* TESTCODE */
+ServiceRequestErrorCode DeviceProvider::service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+){
+  
+    return SERV_GENERAL_FAILURE;  
+}
+
+ServiceRequestErrorCode DeviceProvider::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set1 param
+){
+  
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode DeviceProvider::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set2 param
+){
+  
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode DeviceProvider::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set3 param
+){
+    
+    return SERV_GENERAL_FAILURE;
+}
+
+/* TESTCODE */

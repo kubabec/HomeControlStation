@@ -3,6 +3,7 @@
 
 #include "DeviceControlApi.hpp"
 #include "os/app/remoteControl/RC_publicDataTypes.hpp"
+#include "devices/Device.hpp"
 
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
@@ -145,6 +146,7 @@ typedef enum{
     ERR_MON_INVALID_LOCAL_CONFIG,
     ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
     ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
+    ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
     ERR_MON_INVALID_ERROR_REPORTED,
     ERR_MON_LAST_ERROR = ERR_MON_INVALID_ERROR_REPORTED,
     ERR_MONT_ERROR_COUNT = ERR_MON_LAST_ERROR
@@ -157,5 +159,13 @@ typedef struct
     uint64_t lastOccurrenceTime = 0;
 }SystemErrorType;
 
+
+typedef struct
+{
+    std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType)> serviceCall_NoParams;
+    std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set1 param)> serviceCall_set1;
+    std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set2 param)> serviceCall_set2;
+    std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set3 param)> serviceCall_set3;
+}DeviceServicesAPI;
 
 #endif 

@@ -39,6 +39,7 @@ String errorCodeDescription[ERR_MONT_ERROR_COUNT] =
   "Invalid local devices config",
   "Wrong config string received",
   "Wrong local devices config string received",
+  "Wrong device ID for local service request",
   "Invalid error reported"
 };
 
@@ -700,3 +701,66 @@ void HomeLightHttpServer::pending(WiFiClient& client){
   client.println("Loading, please wait . . . ");
   client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"'>");
 }
+
+
+
+/*TESTCODE*/
+/*Device control services implementation*/
+ServiceRequestErrorCode HomeLightHttpServer::service(
+    uint8_t deviceId, 
+    DeviceServicesType serviceType
+){
+  try {
+    /* Call service from DeviceProvider with no parameters */
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_NoParams(
+      deviceId,
+      serviceType
+    );
+  }catch (std::bad_any_cast ex){}
+}
+
+ServiceRequestErrorCode HomeLightHttpServer::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set1 param
+){
+  try {
+    /* Call service from DeviceProvider with parameters set 1 */
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(
+      deviceId,
+      serviceType,
+      param
+    );
+  }catch (std::bad_any_cast ex){}
+}
+
+ServiceRequestErrorCode HomeLightHttpServer::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set2 param
+){
+    try {
+    /* Call service from DeviceProvider with parameters set 2 */
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set2(
+      deviceId,
+      serviceType,
+      param
+    );
+  }catch (std::bad_any_cast ex){}
+}
+
+ServiceRequestErrorCode HomeLightHttpServer::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set3 param
+){
+    try {
+    /* Call service from DeviceProvider with parameters set 3 */
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set3(
+      deviceId,
+      serviceType,
+      param
+    );
+  }catch (std::bad_any_cast ex){}
+}
+/*TESTCODE*/

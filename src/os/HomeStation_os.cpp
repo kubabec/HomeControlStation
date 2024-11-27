@@ -177,7 +177,7 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
         }
     }catch (std::bad_any_cast ex){}
 
-    Serial.println("Hash : " + String((int)hash));
+    //Serial.println("Hash : " + String((int)hash));
 
     return hash;
 }

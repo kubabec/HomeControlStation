@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 
 
-class OnOffDevice : public Device 
+class OnOffDevice
 {
 private:
     bool isOn = false; //stan urzadzenia
@@ -34,8 +34,8 @@ public:
     void off();
     bool getState(); //getter na stan urzadzenia
   
-    void init() override; //override mowi ze to funkcja odziedziczona
-    void cyclic() override;
+    void init(); 
+    void cyclic();
     void setBrightnessLevelSupport(bool p_brightnessLevelSupport); //ustawienie czy obslugiwana jest zmiana jasnosci
     void brightnessChangeHandler();
     int getBrightnessLevel();

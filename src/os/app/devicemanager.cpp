@@ -5,9 +5,11 @@
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
-    // OnOffDevice(13,"Garaz",0,8),
-    // OnOffDevice(10,"WC",1,9),
-    // OnOffDevice(11,"Dev",3,10)};
+
+/*TESTCODE*/
+std::vector<Device*> DeviceManager::devices;
+TestDeviceType DeviceManager::testDev;
+/*TESTCODE*/
 
 void DeviceManager::deinit() {
     for(uint8_t i = e_BLOCK_DEVICE_1; i <= e_BLOCK_DEVICE_6; i++)
@@ -29,27 +31,6 @@ void DeviceManager::deinit() {
 void DeviceManager::init()
 {
     Serial.println("DeviceManager init ...");
-    /* TESTBLOCK TO BE REMOVED IN THE FUTURE */
-    // DeviceConfigSlotType configData;
-    // char* devicename = "TestDev";
-    // configData.deviceId = 15;
-    // memcpy(configData.deviceName, devicename, 7);
-    // configData.brightnessSupport = true;
-    // configData.deviceType = e_ON_OFF_DEVICE;
-    // configData.lastBrightness = 30;
-    // configData.pinNumber = 7;
-    // configData.roomId = 5;
-
-    // std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
-    //                 DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK)
-    // )(
-    //     e_BLOCK_DEVICE_1, // Datablock ID
-    //     (uint8_t*)&configData // local memory buffer for datablock data
-    //  );
-    /* TESTBLOCK TO BE REMOVED IN THE FUTURE */
-
-
-
 
     /* Protection against PersistentDataBlock size modification without DeviceConfigSlotType update */
     if(PersistentDataBlock::getSize() == DeviceConfigSlotType::getSize() )
@@ -100,10 +81,6 @@ void DeviceManager::init()
     }
 
 
-
-
-    // Serial.println("Local devices configuration start...");
-
     for(OnOffDevice& device : vecOnOffDevices) 
     {
         device.init();
@@ -113,18 +90,34 @@ void DeviceManager::init()
     // <std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable) - adres funkcji deviceEnable
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_ENABLE,"DeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable));
     DataContainer::setSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE,"DeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceManager::deviceBrightnessChange));
-    
-    /*NEW*/
-    DeviceControlFunctionSet controlSet = {
-        .setDeviceState = DeviceManager::deviceEnable,
-        .changeBrightness = DeviceManager::deviceBrightnessChange
+
+    /*TESTCODE*/
+    /* Link service API functions to DeviceManager function calls */
+    DeviceServicesAPI servicesFunctionSet = {
+        .serviceCall_NoParams = 
+            [](uint8_t deviceId, DeviceServicesType request){ 
+                return DeviceManager::service(deviceId, request);
+            },
+        .serviceCall_set1 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set1 params){
+                return DeviceManager::service(deviceId, request, params);
+            },
+        .serviceCall_set2 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set2 params){
+                return DeviceManager::service(deviceId, request, params);
+            },
+        .serviceCall_set3 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set3 params){
+                return DeviceManager::service(deviceId, request, params);
+            }
     };
+
+    /* Push prepared service API to DataContainer */
     DataContainer::setSignalValue(
-        SIG_LOCAL_CONTROL_FUNCTIONS,
-        "DeviceManager",
-        static_cast<DeviceControlFunctionSet>(controlSet)
-    );
-    /*NEW*/
+        SIG_LOCAL_DEVICE_SERVICES,
+        "DeviceManager", 
+        static_cast<DeviceServicesAPI>(servicesFunctionSet));
+    /*TESTCODE*/
 
     DataContainer::setSignalValue(
         CBK_SET_DEVICES_CONFIG_VIA_STRING,
@@ -134,6 +127,11 @@ void DeviceManager::init()
 
     updateDeviceDescriptionSignal();
 
+
+    /*TESTCODE*/
+    /* Add pointer to all existing devices to the device list */
+    devices.push_back(&testDev);
+    /*TESTCODE*/
 
     Serial.println("... done");
 }
@@ -546,3 +544,106 @@ bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
 
     return validationSuccess;
 }
+
+
+/* TESTCODE */
+ServiceRequestErrorCode DeviceManager::service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+){
+    /* Go through the devices list */
+    for(auto& device : devices)
+    {
+        /* Device with requested identifier found */
+        if(device->getDeviceIdentifier() == deviceId)
+        {
+            /* run the service and return execution code */
+            return device->service(serviceType);
+        }
+    }
+
+    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+            deviceId
+        );
+    /* Device with requested ID not found, return general failure */
+    return SERV_GENERAL_FAILURE;  
+}
+
+ServiceRequestErrorCode DeviceManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set1 param
+){
+    /* Go through the devices list */
+    for(auto& device : devices)
+    {
+        /* Device with requested identifier found */
+        if(device->getDeviceIdentifier() == deviceId)
+        {
+            /* run the service and return execution code */
+            return device->service(serviceType, param);
+        }
+    }
+
+    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+            deviceId
+        );
+    /* Device with requested ID not found, return general failure */
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode DeviceManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set2 param
+){
+    /* Go through the devices list */
+    for(auto& device : devices)
+    {
+        /* Device with requested identifier found */
+        if(device->getDeviceIdentifier() == deviceId)
+        {
+            /* run the service and return execution code */
+            return device->service(serviceType, param);
+        }
+    }
+
+    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+            deviceId
+        );
+    /* Device with requested ID not found, return general failure */
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode DeviceManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set3 param
+){
+    /* Go through the devices list */
+    for(auto& device : devices)
+    {
+        /* Device with requested identifier found */
+        if(device->getDeviceIdentifier() == deviceId)
+        {
+            /* run the service and return execution code */
+            return device->service(serviceType, param);
+        }
+    }
+
+    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+            deviceId
+        );
+    /* Device with requested ID not found, return general failure */
+    return SERV_GENERAL_FAILURE;
+}
+
+/* TESTCODE */

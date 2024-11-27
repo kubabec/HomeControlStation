@@ -2,6 +2,7 @@
 #define DEVICE_MANAGER_H
 #include <Arduino.h>
 #include <devices/OnOffDevice.hpp>
+#include <devices/TestDeviceType.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 
 
@@ -15,7 +16,10 @@ typedef enum
 
 class DeviceManager 
 {
-
+    /*TESTCODE*/
+    static std::vector<Device*> devices;
+    static TestDeviceType testDev;
+    /*TESTCODE*/
     static std::vector<OnOffDevice> vecOnOffDevices;
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
     static void updateDeviceDescriptionSignal();
@@ -35,6 +39,29 @@ public:
     static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
 
     static void setLocalConfigViaString(String& config);
+
+
+    /* TESTCODE */
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set1 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set2 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set3 param
+    );
+    /* TESTCODE */
     
 
 };

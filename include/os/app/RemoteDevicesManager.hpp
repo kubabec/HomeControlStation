@@ -35,6 +35,29 @@ public:
 
     static bool receiveResponse(RcResponse& response);
 
+
+    /* TESTCODE */
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set1 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set2 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set3 param
+    );
+    /* TESTCODE */
+
 };
 
 #endif

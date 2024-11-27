@@ -42,6 +42,29 @@ class HomeLightHttpServer
     static bool processConstantRequests(const String& request, WiFiClient& client);
     static bool processParameterizedRequests(String& request, WiFiClient& client);
 
+    /*TESTCODE*/
+    /* Devices control services */
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set1 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set2 param
+    );
+    static ServiceRequestErrorCode service(
+        uint8_t deviceId,
+        DeviceServicesType serviceType,
+        ServiceParameters_set3 param
+    );
+    /*TESTCODE*/
+
 public:
     static void cyclic();
     static void init();

@@ -12,16 +12,6 @@ void RemoteDevicesManager::init()
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RCDeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (RemoteDevicesManager::deviceEnable));
     DataContainer::setSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE,"RCDeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (RemoteDevicesManager::deviceBrightnessChange));
 
-    /*NEW*/
-    DeviceControlFunctionSet controlSet = {
-        .setDeviceState = RemoteDevicesManager::deviceEnable,
-        .changeBrightness = RemoteDevicesManager::deviceBrightnessChange
-    };
-    DataContainer::setSignalValue(SIG_REMOTE_CONTROL_FUNCTIONS, "RCDeviceManager",static_cast<DeviceControlFunctionSet> (controlSet)
-    );
-    /*NEW*/
-
-
 
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
     (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (ENABLE_REQ, RemoteDevicesManager::receiveResponse);
@@ -31,6 +21,36 @@ void RemoteDevicesManager::init()
 
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
     (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (BRIGHTNESS_CHANGE_REQ, RemoteDevicesManager::receiveResponse);
+
+
+    /*TESTCODE*/
+    /* Link service API functions to RemoteDevicesManager function calls */
+    DeviceServicesAPI servicesFunctionSet = {
+        .serviceCall_NoParams = 
+            [](uint8_t deviceId, DeviceServicesType request){ 
+                return RemoteDevicesManager::service(deviceId, request);
+            },
+        .serviceCall_set1 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set1 params){
+                return RemoteDevicesManager::service(deviceId, request, params);
+            },
+        .serviceCall_set2 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set2 params){
+                return RemoteDevicesManager::service(deviceId, request, params);
+            },
+        .serviceCall_set3 = 
+            [](uint8_t deviceId, DeviceServicesType request, ServiceParameters_set3 params){
+                return RemoteDevicesManager::service(deviceId, request, params);
+            }
+    };
+
+    /* Push prepared service API to DataContainer */
+    DataContainer::setSignalValue(
+        SIG_REMOTE_DEVICE_SERVICES,
+        "RemoteDeviceManager", 
+        static_cast<DeviceServicesAPI>(servicesFunctionSet));
+    /*TESTCODE*/
+
 
     Serial.println("... done");
 }
@@ -159,3 +179,42 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
     
     return true;
 }
+
+
+/* TESTCODE */
+ServiceRequestErrorCode RemoteDevicesManager::service(
+        uint8_t deviceId, 
+        DeviceServicesType serviceType
+){
+  
+    return SERV_GENERAL_FAILURE;  
+}
+
+ServiceRequestErrorCode RemoteDevicesManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set1 param
+){
+  
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode RemoteDevicesManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set2 param
+){
+  
+    return SERV_GENERAL_FAILURE;
+}
+
+ServiceRequestErrorCode RemoteDevicesManager::service(
+    uint8_t deviceId,
+    DeviceServicesType serviceType,
+    ServiceParameters_set3 param
+){
+    
+    return SERV_GENERAL_FAILURE;
+}
+
+/* TESTCODE */
