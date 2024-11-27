@@ -128,6 +128,7 @@ void OperatingSystem::performReset()
     ESP.restart();
 }
 
+/* Funkcja do obliczenia unikalnego identyfikatora (hasha) dla bieżącego stanu systemu.*/
 uint16_t OperatingSystem::calculateRuntimeNodeHash()
 {
     uint16_t hash = 0;

@@ -374,6 +374,7 @@ NodeInitialData RemoteControlServer::getInitialDataFromPayload(MessageUDP& msg) 
 
 void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
     KeepAliveData receivedKeepAlive;
+
     std::vector<uint8_t>& payload = msg.getPayload();
     if(payload.size() ==  sizeof(receivedKeepAlive))  {
         memcpy(&receivedKeepAlive, &(payload.at(0)),sizeof(receivedKeepAlive)); //gdzie, skad, wielkosc
@@ -385,6 +386,8 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
         } else {
             // found
             remoteNodes.find(receivedKeepAlive.nodeId)->second.lastKeepAliveReceivedTime = millis();
+            Serial.println("<-Received Node ID :" + String(receivedKeepAlive.nodeId) + " Received Hash :" + String(receivedKeepAlive.nodeHash));
+            
         }
     }
 

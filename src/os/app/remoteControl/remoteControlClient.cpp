@@ -169,9 +169,15 @@ void RemoteControlClient::sendDetailedDataResponse() {
 
 }
 
-void RemoteControlClient::sendKeepAlive() {
+void RemoteControlClient:: sendKeepAlive() {
     KeepAliveData keepAlive;
     keepAlive.nodeId = localNodeId;
+
+    /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
+    keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
+    Serial.print("Node sending Keep Alive response local ID :" + String(keepAlive.nodeId));
+    Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
+
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));
     NetworkDriver::sendBroadcast(keepAliveResponse);

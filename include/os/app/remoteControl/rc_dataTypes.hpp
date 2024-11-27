@@ -29,6 +29,7 @@ typedef struct {
 
 typedef struct {
     uint16_t nodeId = 255;
+    uint16_t nodeHash = 0;
 
 } KeepAliveData;
 
