@@ -412,6 +412,32 @@ input[type=\"range\"]:focus {\
     background: radial-gradient(circle, #666 20%, #333 70%);\
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);\
 }\
+.room-container {\
+width: 340px;\
+margin-bottom: 10px;\
+background: linear-gradient(135deg, #ddeff7, #c3dcec);\
+border: 1px solid #b0c8d8;\
+border-radius: 10px;\
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\
+padding: 15px;\
+transition: transform 0.2s ease;\
+}\
+\
+.room-container:hover {\
+transform: translateY(-2px);\
+box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);\
+}\
+\
+.room-header {\
+font-size: 18px;\
+font-weight: bold;\
+color: #2b3a47;\
+margin-bottom: 10px;\
+text-transform: uppercase;\
+letter-spacing: 1px;\
+border-bottom: 2px solid #7aaedb;\
+padding-bottom: 5px;\
+}\
 </style>\
 ";
 

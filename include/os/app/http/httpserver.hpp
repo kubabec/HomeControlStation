@@ -2,6 +2,7 @@
 #define HTTP_SERVER_H
 #include <WiFi.h>
 #include <any>
+#include <map>
 #include <os/datacontainer/DataContainer.hpp>
 
 
@@ -19,6 +20,8 @@ class HomeLightHttpServer
     static int pos3;
     
     static std::vector<OnOffDeviceDescription> onOffDescriptionVector;
+    static std::map<uint8_t, std::vector<OnOffDeviceDescription*>> deviceToRoomMappingList;
+
     static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
     static uint8_t activeErrorsCount;
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;

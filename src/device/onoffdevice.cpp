@@ -1,7 +1,7 @@
 #include <devices/OnOffDevice.hpp>
 
 
-Adafruit_NeoPixel testMemoryConsumption;
+//Adafruit_NeoPixel testMemoryConsumption;
 
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId) {
     pinNumber = pin;

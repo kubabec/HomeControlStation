@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include "Device.hpp"
 
-#include <Adafruit_NeoPixel.h>
+//#include <Adafruit_NeoPixel.h>
 
 
 class OnOffDevice

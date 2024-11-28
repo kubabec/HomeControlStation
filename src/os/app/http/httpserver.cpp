@@ -20,6 +20,7 @@ bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
 std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
+std::map<uint8_t, std::vector<OnOffDeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
 uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
@@ -297,9 +298,26 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
 {
   //Wlasny Http Servra wektor urzadzen On Off 
   onOffDescriptionVector = (std::any_cast<std::vector<OnOffDeviceDescription>>(newDescriptionVector));
-  for(auto& onOff : onOffDescriptionVector) {
-    //onOff.print();
+
+  deviceToRoomMappingList.clear();
+
+  for(auto& device : onOffDescriptionVector){
+    if(deviceToRoomMappingList.find(device.roomId) == deviceToRoomMappingList.end())
+    {
+      /* First device in this room */
+      std::vector<OnOffDeviceDescription*> roomDevicesVector = {&device};
+      deviceToRoomMappingList.insert({device.roomId, roomDevicesVector});
+    }else 
+    {
+      /* Add to already existing record, as there already are other devices in this room */
+      deviceToRoomMappingList.find(device.roomId)->second.push_back(&device);
+
+    }
   }
+
+  // for(auto& onOff : onOffDescriptionVector) {
+  //   //onOff.print();
+  // }
 }
 
 void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
@@ -582,12 +600,20 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
-  /* Generate UI for every available device */
-  for(OnOffDeviceDescription& description : onOffDescriptionVector) 
-  {
-    generateOnOffUi(description, client);       
-  }
 
+  for(auto& room : deviceToRoomMappingList){
+    client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
+    /* Generate UI for every available device in this room */
+    for(auto& device : room.second)
+    {
+      generateOnOffUi(*device, client);
+    }
+    // for(OnOffDeviceDescription& description : onOffDescriptionVector) 
+    // {
+    //   generateOnOffUi(description, client);       
+    // }
+    client.println("</div>");
+  }
 
   /* Display configuration button */
   const char* configButtonLink = "\

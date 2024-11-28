@@ -187,6 +187,7 @@ void DeviceManager::updateDeviceDescriptionSignal() {
         devDescription.brightnessIsAdjustable = device.getBrightnessIsAdjustable();
         //Serial.print(", BrightnessIsAdjustable: " + String(device.getBrightnessIsAdjustable()));
         devDescription.isEnabled = device.getState();
+        devDescription.roomId = device.getRoomId();
         //Serial.println(", State: " + String(device.getState()));        
         
         vecOnOffDescription.push_back(devDescription);              
