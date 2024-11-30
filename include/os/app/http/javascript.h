@@ -18,6 +18,10 @@ const char* javascript = "\
         var url = `/localDevices`;\
         window.location.href = url;\
     }\
+    function goToRoomSettings() {\
+        var url = `/roomAssignment`;\
+        window.location.href = url;\
+    }\
     function massErase(){\
         var url = `/masseraseviahttp`;\
         window.location.href = url;\
@@ -111,6 +115,25 @@ const char* javascript = "\
         url = '/localSetup' + url;\
 \
         url = url + crc.toString().length + crc;\
+        window.location.href = url;\
+    };\
+    function roomMappingCreateString(count)\
+    {\
+        var mappingStr = '';\
+        var lengthCount = 0;\
+        for (let i = 1; i <= count; i++) {\
+            var dataId = document.getElementById(\"roomMappingID\" + i).value;\
+            var idLength = dataId.length;\
+            var dataName = document.getElementById(\"roomMappingName\" + i).value;\
+            var nameLength = dataName.length;\
+            \
+            var idLengthLength = 1;\
+            \
+            mappingStr = mappingStr + idLength + dataId + nameLength.toString().length + nameLength + dataName;\
+            lengthCount = lengthCount + 1  + dataId.length + 1 + nameLength.toString().length + dataName.length;\
+        }\
+        mappingStr = lengthCount.toString().length.toString() + lengthCount + mappingStr;\
+        url = '/roomMappingApply' + mappingStr;\
         window.location.href = url;\
     };\
     window.onload = function() {\

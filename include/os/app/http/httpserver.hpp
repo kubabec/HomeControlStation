@@ -21,6 +21,7 @@ class HomeLightHttpServer
     
     static std::vector<OnOffDeviceDescription> onOffDescriptionVector;
     static std::map<uint8_t, std::vector<OnOffDeviceDescription*>> deviceToRoomMappingList;
+    static std::map<uint8_t, String> roomNamesMapping;
 
     static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
     static uint8_t activeErrorsCount;
@@ -84,6 +85,7 @@ public:
     static void constantHandler_clearErrors(WiFiClient& client);
     static void constantHandler_configPage(WiFiClient& client);
     static void constantHandler_devicesSetup(WiFiClient& client);
+    static void constantHandler_roomAssignment(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
     static void pending(WiFiClient& client);
 
@@ -91,6 +93,7 @@ public:
     static void parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client);
     static void parameterizedHandler_deviceSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client);
+    static void parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client);
     
 };
 

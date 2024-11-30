@@ -21,12 +21,15 @@ std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
 std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
 std::map<uint8_t, std::vector<OnOffDeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
+std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
 std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
 uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
 
 
+const char* labelStart = "<label>";
+const char* labelEnd = "</label>";
 // ERR_MON_UNEXPECTED_RESET = 1,
 // ERR_MON_INVALID_NVM_DATA,
 // ERR_MON_INVALID_LOCAL_CONFIG,
@@ -49,6 +52,7 @@ std::vector<String> constantRequests = {
   "config",
   "errclrbtn",
   "localDevices",
+  "roomAssignment",
   "masseraseviahttp"
 };
 
@@ -56,7 +60,8 @@ std::vector<String> parameterizedRequests = {
   "apply",
   "localSetup",
   "dev",
-  "?bri"
+  "?bri",
+  "roomMappingApply"
 };
 
 std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
@@ -64,6 +69,7 @@ std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
   HomeLightHttpServer::constantHandler_configPage,
   HomeLightHttpServer::constantHandler_clearErrors,
   HomeLightHttpServer::constantHandler_devicesSetup,
+  HomeLightHttpServer::constantHandler_roomAssignment,
   HomeLightHttpServer::constantHandler_massErase,
 };
 
@@ -71,7 +77,8 @@ std::vector<std::function<void(String&, WiFiClient&)>> parameterizedRequestHandl
   HomeLightHttpServer::parameterizedHandler_newConfigApply,
   HomeLightHttpServer::parameterizedHandler_newDevicesSetup,
   HomeLightHttpServer::parameterizedHandler_deviceSwitch,
-  HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange
+  HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange,
+  HomeLightHttpServer::parameterizedHandler_roomNameMappingApply
 };
 
 
@@ -369,8 +376,6 @@ void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, W
 
 void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
-  const char* labelStart = "<label>";
-  const char* labelEnd = "</label>";
 
   client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
   
@@ -602,7 +607,12 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
 
   for(auto& room : deviceToRoomMappingList){
-    client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
+    if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
+      client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
+    }else
+    {
+      client.println("<div class=\"room-container\"><div class=\"room-header\">"+ roomNamesMapping.find(room.first)->second + "</div>");
+    }
     /* Generate UI for every available device in this room */
     for(auto& device : room.second)
     {
@@ -643,6 +653,43 @@ void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient& client)
 {
   printSlotsConfigPage(client);
 }
+
+void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
+{
+  client.println("<div class=\"wrapper\">\
+        <div class=\"header\">Room name mapping</div>");
+  
+  uint8_t slotIndex = 1;
+  for(auto& room : deviceToRoomMappingList){
+    client.println("<div class=\"container\">");
+    client.println(labelStart);
+    client.println("Room ID:<input disabled type=\"text\" maxlength=\"2\" id=\"roomMappingID"+String((int)slotIndex)+"\"\
+    value=\""+ String((int)room.first) +"\">");
+    client.println(labelEnd);
+
+    String nameValue = "";
+    /* name existing */
+    if(roomNamesMapping.find(room.first) != roomNamesMapping.end())
+    {
+      nameValue = roomNamesMapping.find(room.first)->second;
+    }
+
+    client.println(labelStart);
+    client.println("Name:<input type=\"text\" maxlength=\"24\" placeholder=\"Your custom name here\" id=\"roomMappingName"+String((int)slotIndex)+"\"\
+    value=\""+ nameValue +"\">");
+    client.println(labelEnd);
+
+    client.println("</div>");
+    slotIndex++;
+  }
+
+  client.println("<button class=\"button\" id=\"roomMappingApplyBtn\" onclick=\"roomMappingCreateString(" +String((int)deviceToRoomMappingList.size()) + ");\">Save</button>");
+  client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
+
+
+  client.println("</div>");
+}
+
 
 void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
 {
@@ -727,6 +774,53 @@ void HomeLightHttpServer::pending(WiFiClient& client){
   client.println("Loading, please wait . . . ");
   client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"'>");
 }
+
+void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client)
+{
+  /* remove header from the payload : roomMappingApply */
+  request = request.substring(String("roomMappingApply").length());
+
+  uint8_t amountOfDigitsForTotalLength = (uint8_t) request.substring(0, 1).toInt();
+  uint16_t totalRequestLength = (uint8_t) request.substring(1, 1+amountOfDigitsForTotalLength).toInt();
+
+  // Serial.println(request.substring(1, 1+amountOfDigitsForTotalLength));
+  // Serial.println("Digits : " + String((int)amountOfDigitsForTotalLength));
+  // Serial.println("Length : " + String((int)totalRequestLength));
+
+  String configData = request.substring(1+amountOfDigitsForTotalLength);
+  /*totalRequestLength evaluated correctly and request length matches input payload*/
+  if(totalRequestLength > 0 && (totalRequestLength == configData.length()))
+  {
+    uint16_t curerntProcessingIndex = 0;
+    while(curerntProcessingIndex < totalRequestLength)
+    {
+      uint8_t idDigits = configData.substring(0, 1).toInt();
+      uint8_t roomId = configData.substring(1, 1 + idDigits).toInt();
+      uint8_t nameLengthDigits = configData.substring(1 + idDigits, (1 + idDigits) + 1).toInt();
+      uint8_t nameLength = configData.substring(2 + idDigits, nameLengthDigits + (2 + idDigits)).toInt();
+      String name = configData.substring(nameLengthDigits + (2 + idDigits), (nameLengthDigits + (2 + idDigits)) + nameLength);
+
+      // Serial.println("room ID: " + String((int)roomId));
+      // Serial.println("room name: " + name);
+
+      uint8_t processedBytes = 1 + idDigits + 1 + nameLengthDigits + nameLength;
+      curerntProcessingIndex += processedBytes;
+
+      if(nameLength > 0){
+        roomNamesMapping.insert({roomId, name});
+      }
+
+      configData = configData.substring(processedBytes);
+    }
+
+    client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"/roomAssignment'>");
+
+  }
+
+}
+
+
+
 
 
 
