@@ -679,6 +679,15 @@ void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
     value=\""+ nameValue +"\">");
     client.println(labelEnd);
 
+    if(nameValue != ""){
+      client.println(labelStart);
+      client.println("ON link:<input type=\"text\" disabled value=\"roomON/"+ nameValue +"\">");
+      client.println(labelEnd);
+      client.println(labelStart);
+      client.println("OFF link:<input type=\"text\" disabled value=\"roomOFF/"+ nameValue +"\">");
+      client.println(labelEnd);
+    }
+
     client.println("</div>");
     slotIndex++;
   }
