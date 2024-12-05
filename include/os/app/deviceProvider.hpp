@@ -14,10 +14,7 @@ struct DeviceTranslationDetails{
 
 class DeviceProvider 
 {
-    static std::function<bool(uint8_t, bool)> deviceManager_DeviceEnable;
-    static std::function<bool(uint8_t, uint8_t)> deviceManager_BrightnessChange;
-    static std::function<bool(uint8_t, bool)> rcServer_DeviceEnable;
-    static std::function<bool(uint8_t, uint8_t)> rcServer_BrightnessChange;
+    
     static std::function<bool(RcResponse&)> requestResponse;
 
 
@@ -39,9 +36,6 @@ public:
     static void init();
     static void deinit();
     static void cyclic();
-
-    static bool deviceEnable(uint8_t deviceId, bool state);
-    static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
 
     static void deviceReset();
 

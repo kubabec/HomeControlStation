@@ -130,3 +130,47 @@ uint8_t OnOffDevice::getRoomId() {
 bool OnOffDevice::getBrightnessIsAdjustable() {
     return brightnessLevelSupport;
 }
+
+uint8_t OnOffDevice::getDeviceIdentifier(){
+
+    return deviceId;
+}
+uint8_t OnOffDevice::getDeviceType(){
+    return 5;
+}
+
+ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType){
+    switch(serviceType){
+        
+
+        default: 
+            return SERV_NOT_SUPPORTED;
+    };
+}
+ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
+    switch(serviceType){
+        case DEVSERVICE_STATE_SWITCH:
+            if(param.a ==1) {
+                on();
+            }
+            else {
+                off();
+            }
+            return SERV_SUCCESS;
+        
+        default: 
+            return SERV_NOT_SUPPORTED;
+    };
+}
+ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
+    switch(serviceType){
+        default: 
+            return SERV_NOT_SUPPORTED;
+    };
+}
+ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
+    switch(serviceType){
+        default: 
+            return SERV_NOT_SUPPORTED;
+    };
+}

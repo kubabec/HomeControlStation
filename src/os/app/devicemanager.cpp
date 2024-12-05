@@ -83,14 +83,15 @@ void DeviceManager::init()
 
     for(OnOffDevice& device : vecOnOffDevices) 
     {
-        device.init();
-        
+        devices.push_back(&device);
+                
     }
 
-    // <std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable) - adres funkcji deviceEnable
-    DataContainer::setSignalValue(CBK_LOCAL_DEVICE_ENABLE,"DeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (DeviceManager::deviceEnable));
-    DataContainer::setSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE,"DeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceManager::deviceBrightnessChange));
+    for(auto device : devices){
+        device->init();
+    }
 
+    
     /*TESTCODE*/
     /* Link service API functions to DeviceManager function calls */
     DeviceServicesAPI servicesFunctionSet = {
@@ -138,38 +139,14 @@ void DeviceManager::init()
 
 void DeviceManager::cyclic()
 {
-    for(OnOffDevice& device : vecOnOffDevices) 
+    for(auto device : devices) 
     {
-        device.cyclic();
+        device->cyclic();
         
     }
 }
 
-bool DeviceManager::deviceEnable(uint8_t deviceId, bool state) {
-     Serial.println("->Device Manager-deviceEnable Device ID: " +  String(deviceId) + " State: " + String(state));
-     Serial.println("");
-    
-    for(OnOffDevice& device : vecOnOffDevices) {
-        if(deviceId == device.getDeviceId()) {
-            // Jeśli żądany stan to "on" i urządzenie jest wyłączone, włączamy je
-            if (state && !device.getState()) {
-                    device.on();
-                    updateDeviceDescriptionSignal();
-                    return true;
-                }
-                // Jeśli żądany stan to "off" i urządzenie jest włączone, wyłączamy je
-            else if (!state && device.getState()) {
-                    device.off();
-                    updateDeviceDescriptionSignal();
-                    return true;
-                }
-            // W pozostałych przypadkach (stan urządzenia nie ulega zmianie) nic nie robimy
-            return false;            
-        }
-    }
-    
-    return false;
-}
+
 
 void DeviceManager::updateDeviceDescriptionSignal() {
     std::vector<OnOffDeviceDescription> vecOnOffDescription;
@@ -195,20 +172,6 @@ void DeviceManager::updateDeviceDescriptionSignal() {
         
     DataContainer::setSignalValue(SIG_LOCAL_COLLECTION_ONOFF,"DeviceManager", vecOnOffDescription);
     //Serial.println("===DeviceManager - Ustawienie sygnału w Data Container======");   
-}
-
-bool DeviceManager::deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel)
-{
-    //Serial.println("DeviceManager deviceId: " + String(deviceId) + "brightnessLevel: " + String(brightnessLevel));
-    for(OnOffDevice& device : vecOnOffDevices) {
-        if(deviceId == device.getDeviceId()) {
-            device.changeBrightness(brightnessLevel);
-            updateDeviceDescriptionSignal();
-            return true;
-        }
-    }
-    
-    return false;
 }
 
 
@@ -552,6 +515,7 @@ ServiceRequestErrorCode DeviceManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
+    ServiceRequestErrorCode retVal = SERV_GENERAL_FAILURE;
     /* Go through the devices list */
     for(auto& device : devices)
     {
@@ -559,17 +523,22 @@ ServiceRequestErrorCode DeviceManager::service(
         if(device->getDeviceIdentifier() == deviceId)
         {
             /* run the service and return execution code */
-            return device->service(serviceType);
+            
+            retVal = device->service(serviceType);
+            if(retVal == SERV_SUCCESS) {
+                updateDeviceDescriptionSignal();
+            };
         }
     }
 
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-            deviceId
-        );
+
+    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+    //         deviceId
+    //     );
     /* Device with requested ID not found, return general failure */
-    return SERV_GENERAL_FAILURE;  
+    return retVal;  
 }
 
 ServiceRequestErrorCode DeviceManager::service(
@@ -577,6 +546,7 @@ ServiceRequestErrorCode DeviceManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
+    ServiceRequestErrorCode retVal = SERV_GENERAL_FAILURE;
     /* Go through the devices list */
     for(auto& device : devices)
     {
@@ -584,17 +554,22 @@ ServiceRequestErrorCode DeviceManager::service(
         if(device->getDeviceIdentifier() == deviceId)
         {
             /* run the service and return execution code */
-            return device->service(serviceType, param);
+            
+            retVal = device->service(serviceType, param);
+            if(retVal == SERV_SUCCESS) {
+                updateDeviceDescriptionSignal();
+            };
         }
     }
 
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-            deviceId
-        );
+
+    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+    //         deviceId
+    //     );
     /* Device with requested ID not found, return general failure */
-    return SERV_GENERAL_FAILURE;
+    return retVal;  
 }
 
 ServiceRequestErrorCode DeviceManager::service(
@@ -602,6 +577,7 @@ ServiceRequestErrorCode DeviceManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set2 param
 ){
+    ServiceRequestErrorCode retVal = SERV_GENERAL_FAILURE;
     /* Go through the devices list */
     for(auto& device : devices)
     {
@@ -609,17 +585,22 @@ ServiceRequestErrorCode DeviceManager::service(
         if(device->getDeviceIdentifier() == deviceId)
         {
             /* run the service and return execution code */
-            return device->service(serviceType, param);
+            
+            retVal = device->service(serviceType, param);
+            if(retVal == SERV_SUCCESS) {
+                updateDeviceDescriptionSignal();
+            };
         }
     }
 
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-            deviceId
-        );
+
+    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+    //         deviceId
+    //     );
     /* Device with requested ID not found, return general failure */
-    return SERV_GENERAL_FAILURE;
+    return retVal;  
 }
 
 ServiceRequestErrorCode DeviceManager::service(
@@ -627,6 +608,7 @@ ServiceRequestErrorCode DeviceManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set3 param
 ){
+    ServiceRequestErrorCode retVal = SERV_GENERAL_FAILURE;
     /* Go through the devices list */
     for(auto& device : devices)
     {
@@ -634,17 +616,22 @@ ServiceRequestErrorCode DeviceManager::service(
         if(device->getDeviceIdentifier() == deviceId)
         {
             /* run the service and return execution code */
-            return device->service(serviceType, param);
+            
+            retVal = device->service(serviceType, param);
+            if(retVal == SERV_SUCCESS) {
+                updateDeviceDescriptionSignal();
+            };
         }
     }
 
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-        DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-            ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-            deviceId
-        );
+
+    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
+    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+    //         deviceId
+    //     );
     /* Device with requested ID not found, return general failure */
-    return SERV_GENERAL_FAILURE;
+    return retVal;  
 }
 
 /* TESTCODE */

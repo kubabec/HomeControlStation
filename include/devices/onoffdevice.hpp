@@ -5,7 +5,7 @@
 #include "Device.hpp"
 
 
-class OnOffDevice
+class OnOffDevice : public Device
 {
 private:
     bool isOn = false; //stan urzadzenia
@@ -30,10 +30,8 @@ public:
 
     void on();
     void off();
-    bool getState(); //getter na stan urzadzenia
-  
-    void init(); 
-    void cyclic();
+    bool getState(); //getter na stan urzadzenia  
+    
     void setBrightnessLevelSupport(bool p_brightnessLevelSupport); //ustawienie czy obslugiwana jest zmiana jasnosci
     void brightnessChangeHandler();
     int getBrightnessLevel();
@@ -48,6 +46,16 @@ public:
     uint8_t getDeviceId();
     uint8_t getRoomId();
     bool getBrightnessIsAdjustable();
+
+    virtual void init();//funkcje ktore nazucaja potomka koniecznosc ich implementacji
+    virtual void cyclic();
+    virtual uint8_t getDeviceIdentifier();
+    virtual uint8_t getDeviceType();
+
+    virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
+    virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
+    virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);
+    virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set3 param);
 };
 
 

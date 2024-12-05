@@ -17,8 +17,7 @@ int HomeLightHttpServer::pos2 = 150;
 int HomeLightHttpServer::pos3 = 150;
 bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 
-std::function<bool(uint8_t, bool)> HomeLightHttpServer::deviceEnableCallback;
-std::function<bool(uint8_t, uint8_t)> HomeLightHttpServer::deviceBrightnessChangeCallback;
+
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
 std::map<uint8_t, std::vector<OnOffDeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
@@ -96,19 +95,7 @@ void HomeLightHttpServer::init()
 {
   Serial.println("HomeLightHttpServer init ...");
 
-  //std::any deviceEnable = DataContainer::getSignalValue(CBK_DEVICE_ENABLE);
-  //deviceEnableCallback = (std::any_cast<std::function<bool(uint8_t, bool)>>(deviceEnable));
-  // pod signal kryje sie adres na funkcje w device manager której aliasem jest deviceEnableCallback
-  DataContainer::subscribe(CBK_DEVICE_ENABLE, "HTTPServer", [](std::any signal) {
-    deviceEnableCallback = (std::any_cast<std::function<bool(uint8_t, bool)>>(signal));
-  }
-  );
-
-  DataContainer::subscribe(CBK_DEVICE_BRIGHTNESS_CHANGE, "HTTPServer", [](std::any signal) {
-    deviceBrightnessChangeCallback = (std::any_cast<std::function<bool(uint8_t, uint8_t)>>(signal));
-  }
-  );
-
+  
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, "HTTPServer", [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
     activeErrorsCount = 0;
@@ -758,7 +745,12 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiF
   uint8_t deviceId = devId.toInt();
   uint8_t deviceState = state.toInt();
   
-  deviceEnableCallback(deviceId, deviceState);
+  (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+    deviceId,
+    DEVSERVICE_STATE_SWITCH,
+    {deviceState,0,0,0}
+  );
+  
   Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
   client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
 }
@@ -774,8 +766,12 @@ void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& re
   uint8_t newbrightness = brightnessString.toInt(); 
   uint8_t idString = idDeviceString.toInt();
 
-  deviceBrightnessChangeCallback(idString,newbrightness);
-  // TODO : Przekieruj zawsze na pending a nie na stronę główną
+  (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+    idString,
+    DEVSERVICE_BRIGHTNESS_CHANGE,
+    {newbrightness,0,0,0}
+  );
+  
   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
 

@@ -2,10 +2,7 @@
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
 
-std::function<bool(uint8_t, bool)> DeviceProvider::deviceManager_DeviceEnable;
-std::function<bool(uint8_t, uint8_t)> DeviceProvider::deviceManager_BrightnessChange;
-std::function<bool(uint8_t, bool)> DeviceProvider::rcServer_DeviceEnable;
-std::function<bool(uint8_t, uint8_t)> DeviceProvider::rcServer_BrightnessChange;
+
 std::function<bool(RcResponse&)> DeviceProvider::requestResponse;
 
 
@@ -20,9 +17,7 @@ void DeviceProvider::init()
     Serial.println("DeviceProvider init ...");
     DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, "DeviceProvider", RequestProcessingState::eNO_REQUEST);
 
-    DataContainer::setSignalValue(CBK_DEVICE_ENABLE,"DeviceProvider", static_cast<std::function<bool(uint8_t, bool)> > (DeviceProvider::deviceEnable));
-    DataContainer::setSignalValue(CBK_DEVICE_BRIGHTNESS_CHANGE,"DeviceProvider", static_cast<std::function<bool(uint8_t, uint8_t)> > (DeviceProvider::deviceBrightnessChange));
-
+    
     /*TESTCODE*/
     /* Link service API functions to DeviceProvider function calls */
     DeviceServicesAPI servicesFunctionSet = {
@@ -83,24 +78,12 @@ void DeviceProvider::init()
 void DeviceProvider::initLocalDevicesSetup() {
     DataContainer::subscribe(SIG_LOCAL_COLLECTION_ONOFF, "DeviceProvider", DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
-    std::any localDeviceEnableCBK = DataContainer::getSignalValue(CBK_LOCAL_DEVICE_ENABLE);
-    deviceManager_DeviceEnable = (std::any_cast<std::function<bool(uint8_t, bool)>>(localDeviceEnableCBK));
-    std::any localDeviceBrightnessCBK = DataContainer::getSignalValue(CBK_LOCAL_DEVICE_BRIGHTNESS_CHANGE);
-    deviceManager_BrightnessChange = (std::any_cast<std::function<bool(uint8_t, uint8_t)>>(localDeviceBrightnessCBK));
-
     
 }
 
 void DeviceProvider::initRemoteDevicesSetup() {
     DataContainer::subscribe(SIG_REMOTE_COLLECTION_ONOFF, "DeviceProvider", DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
-    std::any RCDeviceEnableCBK = DataContainer::getSignalValue(CBK_REMOTE_DEVICE_ENABLE);
-    rcServer_DeviceEnable = (std::any_cast<std::function<bool(uint8_t, bool)>>(RCDeviceEnableCBK));
-    std::any RCDeviceBrightnessCBK = DataContainer::getSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE);
-    rcServer_BrightnessChange = (std::any_cast<std::function<bool(uint8_t, uint8_t)>>(RCDeviceBrightnessCBK));
-
-    
-    
 }
 
 void DeviceProvider::cyclic()
@@ -123,51 +106,6 @@ DeviceTranslationDetails DeviceProvider::getOriginalIdFromUnique(uint8_t uniqueI
     return retVal;
 }
 
-
-
-
-bool DeviceProvider::deviceEnable(uint8_t deviceId, bool state){
-
-    Serial.println("");
-    Serial.println("->Device Provider-Device enable request: DeviceId " + String(deviceId) + " State: " + String(state));
-    
-    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
-    if(devicedetails.originalID != 255) {
-        if(devicedetails.isLocal) {
-            //zawołaj deviceEnable() w device manager
-            deviceManager_DeviceEnable(devicedetails.originalID, state);
-            
-        }
-        else {
-            //zawołaj deviceEnable() w RC Server
-            if(isRCServer) {
-                rcServer_DeviceEnable(devicedetails.originalID, state);
-            }
-        }
-    }
-    
-    printIdMap();
-    return true;
-}
-
-bool DeviceProvider::deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel){
-
-    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
-    if(devicedetails.originalID != 255) {
-        if(devicedetails.isLocal) {
-            //zawołaj deviceBrightnesChange() w device manager
-            deviceManager_BrightnessChange(devicedetails.originalID, brightnessLevel);
-        }
-        else {
-            //zawołaj deviceBrightnesChange() w RC Server
-            if(isRCServer) {
-                rcServer_BrightnessChange(devicedetails.originalID, brightnessLevel);
-            }
-        }
-
-    }
-    return true;
-}
 
 void DeviceProvider::updateDeviceDescriptionSignal_onChange(std::any signal) {
     updateDeviceDescriptionSignal();
@@ -257,15 +195,29 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     switch (request.type)
     {
     case ENABLE_REQ:
-        deviceEnable(request.data[0],true);
+        //deviceEnable(request.data[0],true);
+        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+            request.data[0],
+            DEVSERVICE_STATE_SWITCH,
+            {true,0,0,0}
+        );
         requestResponse(response);
         break;
     case DISABLE_REQ:
-        deviceEnable(request.data[0],false);
+        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+            request.data[0],
+            DEVSERVICE_STATE_SWITCH,
+            {false,0,0,0}
+        );
         requestResponse(response);
         break;   
     case BRIGHTNESS_CHANGE_REQ:
-        deviceBrightnessChange(request.data[0],request.data[2]);
+        //deviceBrightnessChange(request.data[0],request.data[2]);
+        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+            request.data[0],
+            DEVSERVICE_BRIGHTNESS_CHANGE,
+            {request.data[2],0,0,0}
+        );
         requestResponse(response);
         break;  
     default:
@@ -293,6 +245,29 @@ ServiceRequestErrorCode DeviceProvider::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
+    if(devicedetails.originalID != 255) {
+        if(devicedetails.isLocal) {
+            //zawołaj deviceEnable() w device manager
+            //deviceManager_DeviceEnable(devicedetails.originalID, state);
+            /* TODO */
+            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
+                devicedetails.originalID,
+                serviceType
+            );
+        }
+        else {
+            //zawołaj deviceEnable() w RC Server
+            if(isRCServer) {
+                //rcServer_DeviceEnable(devicedetails.originalID, state);
+                /* TODO */
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_NoParams(
+                    devicedetails.originalID,
+                    serviceType
+                );
+            }
+        }
+    }
   
     return SERV_GENERAL_FAILURE;  
 }
@@ -302,6 +277,31 @@ ServiceRequestErrorCode DeviceProvider::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
+    if(devicedetails.originalID != 255) {
+        if(devicedetails.isLocal) {
+            //zawołaj deviceEnable() w device manager
+            //deviceManager_DeviceEnable(devicedetails.originalID, state);
+            /* TODO */
+            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+                devicedetails.originalID,
+                serviceType,
+                param
+            );
+        }
+        else {
+            //zawołaj deviceEnable() w RC Server
+            if(isRCServer) {
+                //rcServer_DeviceEnable(devicedetails.originalID, state);
+                /* TODO */
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set1(
+                    devicedetails.originalID,
+                    serviceType,
+                    param
+                );
+            }
+        }
+    }
   
     return SERV_GENERAL_FAILURE;
 }
@@ -311,6 +311,31 @@ ServiceRequestErrorCode DeviceProvider::service(
     DeviceServicesType serviceType,
     ServiceParameters_set2 param
 ){
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
+    if(devicedetails.originalID != 255) {
+        if(devicedetails.isLocal) {
+            //zawołaj deviceEnable() w device manager
+            //deviceManager_DeviceEnable(devicedetails.originalID, state);
+            /* TODO */
+            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set2(
+                devicedetails.originalID,
+                serviceType,
+                param
+            );
+        }
+        else {
+            //zawołaj deviceEnable() w RC Server
+            if(isRCServer) {
+                //rcServer_DeviceEnable(devicedetails.originalID, state);
+                /* TODO */
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set2(
+                    devicedetails.originalID,
+                    serviceType,
+                    param
+                );
+            }
+        }
+    }
   
     return SERV_GENERAL_FAILURE;
 }
@@ -320,7 +345,31 @@ ServiceRequestErrorCode DeviceProvider::service(
     DeviceServicesType serviceType,
     ServiceParameters_set3 param
 ){
-    
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
+    if(devicedetails.originalID != 255) {
+        if(devicedetails.isLocal) {
+            //zawołaj deviceEnable() w device manager
+            //deviceManager_DeviceEnable(devicedetails.originalID, state);
+            /* TODO */
+            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set3(
+                devicedetails.originalID,
+                serviceType,
+                param
+            );
+        }
+        else {
+            //zawołaj deviceEnable() w RC Server
+            if(isRCServer) {
+                //rcServer_DeviceEnable(devicedetails.originalID, state);
+                /* TODO */
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set3(
+                    devicedetails.originalID,
+                    serviceType,
+                    param
+                );
+            }
+        }
+    }
     return SERV_GENERAL_FAILURE;
 }
 

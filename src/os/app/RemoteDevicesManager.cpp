@@ -9,10 +9,7 @@ void RemoteDevicesManager::init()
 
     DataContainer::subscribe(SIG_RC_DEVICES_INTERNAL_TUNNEL, "RcDeviceManager", RemoteDevicesManager::tunnelDataUpdate);
 
-    DataContainer::setSignalValue(CBK_REMOTE_DEVICE_ENABLE,"RCDeviceManager", static_cast<std::function<bool(uint8_t, bool)> > (RemoteDevicesManager::deviceEnable));
-    DataContainer::setSignalValue(CBK_REMOTE_DEVICE_BRIGHTNESS_CHANGE,"RCDeviceManager", static_cast<std::function<bool(uint8_t, uint8_t)> > (RemoteDevicesManager::deviceBrightnessChange));
-
-
+    
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
     (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (ENABLE_REQ, RemoteDevicesManager::receiveResponse);
 
@@ -120,48 +117,7 @@ void RemoteDevicesManager::cyclic()
 }
 
 
-bool RemoteDevicesManager::deviceEnable(uint8_t deviceId, bool state) {
-    //magia z odpaleniem zdalnego urzadzenia  
-    // Serial.println("->RCS - Enabling RC Device ID : " + String(deviceId) + " State : " + String(state));
-    
-    RCTranslation val = getTranslationFromUnique(deviceId);
-    Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
 
-    RcRequest request;
-
-
-    request.targetNodeId = val.nodeId;
-    request.targetDeviceId = val.onSourceNodeLocalId;
-    if(state == true){
-        request.type = ENABLE_REQ;
-        //Serial.println("RCS Device Enable ");
-    }else{
-        request.type = DISABLE_REQ;
-        //Serial.println("RCS Device Disable ");
-    }
-
-    request.data[0] = val.onSourceNodeLocalId;
-    request.data[15] = 123;
-
-    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
-
-    try{
-        /* Pass request for processing to RCServer */
-        std::any_cast<std::function<void(RcRequest&)>>(
-            DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
-    }catch(std::bad_any_cast ex){}
-
-    return true;
-}
-
-bool RemoteDevicesManager::deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel)
-{       
-    //magia z jasnoscia zdalnego urzadzenia 
-
-    //Serial.println(" Changing Brightness RC Device ID : " + String(deviceId) + " Level : " + String(brightnessLevel));
-
-    return true;
-}
 
 void RemoteDevicesManager::printTranslationMap() {
     for(auto& mapping: currentIdMapping){
@@ -186,6 +142,33 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
+    // RCTranslation val = getTranslationFromUnique(deviceId);
+    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
+
+    // RcRequest request;
+
+
+    // request.targetNodeId = val.nodeId;
+    // request.targetDeviceId = val.onSourceNodeLocalId;
+    // if(state == true){
+    //     request.type = ENABLE_REQ;
+    //     //Serial.println("RCS Device Enable ");
+    // }else{
+    //     request.type = DISABLE_REQ;
+    //     //Serial.println("RCS Device Disable ");
+    // }
+
+    // request.data[0] = val.onSourceNodeLocalId;
+    // request.data[15] = 123;
+
+    // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+
+    // try{
+    //     /* Pass request for processing to RCServer */
+    //     std::any_cast<std::function<void(RcRequest&)>>(
+    //         DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+    // }catch(std::bad_any_cast ex){}
+
   
     return SERV_GENERAL_FAILURE;  
 }

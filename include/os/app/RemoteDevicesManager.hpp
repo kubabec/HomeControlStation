@@ -27,9 +27,7 @@ public:
     static void cyclic();
     static void printTranslationMap();
 
-    static bool deviceEnable(uint8_t deviceId, bool state);
-    static bool deviceBrightnessChange(uint8_t deviceId, uint8_t brightnessLevel);
-
+    
     static void tunnelDataUpdate(std::any remoteDevices);
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
 
