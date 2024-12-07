@@ -58,14 +58,8 @@ void DeviceProvider::init()
         initRemoteDevicesSetup();
     }else {
         std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (ENABLE_REQ, DeviceProvider::receiveRequest);
-
-        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (DISABLE_REQ, DeviceProvider::receiveRequest);
-
-        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
-        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (BRIGHTNESS_CHANGE_REQ, DeviceProvider::receiveRequest);
-        
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (SERVICE_CALL_REQ, DeviceProvider::receiveRequest);
+                
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
         requestResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
     }
@@ -187,42 +181,35 @@ void DeviceProvider::deviceReset() {
 
 bool DeviceProvider::receiveRequest(RcRequest& request) {
     request.print();
+
     RcResponse response;
     response.responseId = request.requestId;
     response.responseType = POSITIVE_RESP; //200 is positive
     response.requestType = request.type;
 
-    switch (request.type)
-    {
-    case ENABLE_REQ:
-        //deviceEnable(request.data[0],true);
-        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
-            request.data[0],
-            DEVSERVICE_STATE_SWITCH,
-            {true,0,0,0}
-        );
-        requestResponse(response);
-        break;
-    case DISABLE_REQ:
-        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
-            request.data[0],
-            DEVSERVICE_STATE_SWITCH,
-            {false,0,0,0}
-        );
-        requestResponse(response);
-        break;   
-    case BRIGHTNESS_CHANGE_REQ:
-        //deviceBrightnessChange(request.data[0],request.data[2]);
-        (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
-            request.data[0],
-            DEVSERVICE_BRIGHTNESS_CHANGE,
-            {request.data[2],0,0,0}
-        );
-        requestResponse(response);
-        break;  
-    default:
-        break;
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.targetDeviceId);
+    if(devicedetails.originalID != 255) {
+        if(devicedetails.isLocal) {
+          
+            switch (request.data[1])
+            {
+            case 0:
+                //deviceEnable(request.data[0],true);
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
+                    devicedetails.originalID,
+                    (DeviceServicesType)request.data[0] /* TODO negative response*/
+                );
+                requestResponse(response);
+                break;
+            
+            default:
+                break;
+            }
+        }
     }
+
+
+    
     return true;
     //
 }

@@ -80,15 +80,16 @@ void DeviceManager::init()
         Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
 
-
+    /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
     for(OnOffDevice& device : vecOnOffDevices) 
     {
-        devices.push_back(&device);
+        
+        devices.push_back(&device); //wrzucam pointer na device onOffDevice
                 
     }
 
     for(auto device : devices){
-        device->init();
+        device->init(); // to jest init() danego typu device np. onoffDevice
     }
 
     
@@ -524,7 +525,7 @@ ServiceRequestErrorCode DeviceManager::service(
         {
             /* run the service and return execution code */
             
-            retVal = device->service(serviceType);
+            retVal = device->service(serviceType); // na device uruchamiamy service type który nam przyszedł
             if(retVal == SERV_SUCCESS) {
                 updateDeviceDescriptionSignal();
             };

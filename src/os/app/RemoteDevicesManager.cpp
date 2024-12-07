@@ -11,18 +11,15 @@ void RemoteDevicesManager::init()
 
     
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
-    (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (ENABLE_REQ, RemoteDevicesManager::receiveResponse);
+    (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (SERVICE_CALL_REQ, RemoteDevicesManager::receiveResponse);
 
-    std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
-    (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (DISABLE_REQ, RemoteDevicesManager::receiveResponse);
-
-    std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
-    (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (BRIGHTNESS_CHANGE_REQ, RemoteDevicesManager::receiveResponse);
+   
 
 
     /*TESTCODE*/
     /* Link service API functions to RemoteDevicesManager function calls */
     DeviceServicesAPI servicesFunctionSet = {
+        /* Funkcja lambda przekazuje wszystkie parametry do funkcji RemoteDevicesManager::service, która zajmuje się konkretną realizacją żądania.*/
         .serviceCall_NoParams = 
             [](uint8_t deviceId, DeviceServicesType request){ 
                 return RemoteDevicesManager::service(deviceId, request);
@@ -131,6 +128,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
     Serial.println("->Device Provider received response Node Id: " + String((int)response.responceNodeId));
+    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
     
     
     return true;
@@ -142,34 +140,31 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
-    // RCTranslation val = getTranslationFromUnique(deviceId);
+     RCTranslation val = getTranslationFromUnique(deviceId);
     // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
+    if(val.nodeId != 255){
+        RcRequest request;
 
-    // RcRequest request;
 
+        request.targetNodeId = val.nodeId;
+        request.targetDeviceId = val.onSourceNodeLocalId;
+        request.type = SERVICE_CALL_REQ;
 
-    // request.targetNodeId = val.nodeId;
-    // request.targetDeviceId = val.onSourceNodeLocalId;
-    // if(state == true){
-    //     request.type = ENABLE_REQ;
-    //     //Serial.println("RCS Device Enable ");
-    // }else{
-    //     request.type = DISABLE_REQ;
-    //     //Serial.println("RCS Device Disable ");
-    // }
+        request.data[0] = serviceType;
+        /* TODO */
+        request.data[1] = 0; //0 - no params, 1 - set1 ...
+        
+        /* TODO */
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
 
-    // request.data[0] = val.onSourceNodeLocalId;
-    // request.data[15] = 123;
-
-    // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
-
-    // try{
-    //     /* Pass request for processing to RCServer */
-    //     std::any_cast<std::function<void(RcRequest&)>>(
-    //         DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
-    // }catch(std::bad_any_cast ex){}
-
-  
+        try{
+            /* Pass request for processing to RCServer */
+            std::any_cast<std::function<void(RcRequest&)>>(
+                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            return SERV_SUCCESS;
+        }catch(std::bad_any_cast ex){}
+    }
+    
     return SERV_GENERAL_FAILURE;  
 }
 
@@ -178,8 +173,32 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
-  
-    return SERV_GENERAL_FAILURE;
+  RCTranslation val = getTranslationFromUnique(deviceId);
+    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
+    if(val.nodeId != 255){
+        RcRequest request;
+
+
+        request.targetNodeId = val.nodeId;
+        request.targetDeviceId = val.onSourceNodeLocalId;
+        request.type = SERVICE_CALL_REQ;
+
+        request.data[0] = serviceType;
+        /* TODO */
+        request.data[1] = 1; //0 - no params, 1 - set1 ...
+        memcpy(&(request.data[2]), &param, sizeof(param));
+        /* TODO */
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+
+        try{
+            /* Pass request for processing to RCServer */
+            std::any_cast<std::function<void(RcRequest&)>>(
+                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            return SERV_SUCCESS;
+        }catch(std::bad_any_cast ex){}
+    }
+    
+    return SERV_GENERAL_FAILURE;  
 }
 
 ServiceRequestErrorCode RemoteDevicesManager::service(
@@ -187,8 +206,32 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set2 param
 ){
-  
-    return SERV_GENERAL_FAILURE;
+  RCTranslation val = getTranslationFromUnique(deviceId);
+    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
+    if(val.nodeId != 255){
+        RcRequest request;
+
+
+        request.targetNodeId = val.nodeId;
+        request.targetDeviceId = val.onSourceNodeLocalId;
+        request.type = SERVICE_CALL_REQ;
+
+        request.data[0] = serviceType;
+        /* TODO */
+        request.data[1] = 2; //0 - no params, 1 - set1 ...
+        memcpy(&(request.data[2]), &param, sizeof(param));
+        /* TODO */
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+
+        try{
+            /* Pass request for processing to RCServer */
+            std::any_cast<std::function<void(RcRequest&)>>(
+                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            return SERV_SUCCESS;
+        }catch(std::bad_any_cast ex){}
+    }
+    
+    return SERV_GENERAL_FAILURE;  
 }
 
 ServiceRequestErrorCode RemoteDevicesManager::service(
