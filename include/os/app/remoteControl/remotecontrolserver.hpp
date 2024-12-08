@@ -34,6 +34,7 @@ typedef struct {
         for(auto& device: devicesCollectionOnOff) {
             device.print();
         }
+        Serial.println("Device Hash : " + String((int)lastKeepAliveReceivedTime));
         Serial.println("isOnOffCollectionCompleted : " + String(isOnOffCollectionCompleted));
         Serial.println("------- ----------------------- --------------");                
     }
@@ -47,6 +48,7 @@ class RemoteControlServer
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
     static std::queue<RcRequest> pendingRequestsQueue;
+    static std::queue<uint8_t> pendingDDRefreshNodeIdentifiers;
 
     static std::vector<OnOffDevice> vecRemoteOnOffDevices;
     static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
@@ -77,6 +79,7 @@ class RemoteControlServer
     static NodeInitialData getInitialDataFromPayload(MessageUDP& msg);
 
     static void updateDeviceDescriptionSignal();
+    static void triggerDDRefresh(uint8_t nodeID); /* Trigger detailed data refresh */
     static void handleDetailedDataRefreshMech(std::vector <uint16_t>& nodesToBeRemoved);
 
     static uint8_t generateRequestId(); // funkcja do generowania Request Id

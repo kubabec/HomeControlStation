@@ -160,6 +160,9 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
         }catch (const std::bad_any_cast& e){ }   
     }
     
+    Serial.println("DeviceProvider//: Content updated :");
+    printIdMap();
+    Serial.println("///");
     DataContainer::setSignalValue(SIG_COLLECTION_ONOFF,"DeviceProvider", vecOnOffDescription);     
 }
 

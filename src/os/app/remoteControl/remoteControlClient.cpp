@@ -147,9 +147,9 @@ void RemoteControlClient::sendInitialDataResponse(){
 
     NodeInitialData initialData = {
         .nodeId = localNodeId,
+        .nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH)),
         .numberOfOnOffDevices = 0,
-        .numberOfLedStrips = 0        
-               
+        .numberOfLedStrips = 0                 
     };
 
 

@@ -19,6 +19,7 @@ typedef enum {
 typedef struct {
     uint16_t nodeId = 255;
     uint8_t roomId = 255;
+    uint16_t nodeHash = 0;
     uint8_t numberOfOnOffDevices = 255;
     uint8_t numberOfLedStrips = 255;
     bool isValid() {

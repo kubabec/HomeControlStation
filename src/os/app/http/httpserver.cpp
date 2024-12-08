@@ -751,7 +751,7 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiF
     {deviceState,0,0,0}
   );
   
-  Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
+  //Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
   client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
 }
 
