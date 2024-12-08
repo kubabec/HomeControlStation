@@ -184,13 +184,15 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
 
     RcResponse response;
     response.responseId = request.requestId;
-    response.responseType = POSITIVE_RESP; //200 is positive
+    response.responseType = NEGATIVE_RESP; //200 is positive
     response.requestType = request.type;
+    ServiceParameters_set1 params;
 
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.targetDeviceId);
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
           
+            /* Which service overloading is received? */
             switch (request.data[1])
             {
             case 0:
@@ -199,14 +201,38 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     devicedetails.originalID,
                     (DeviceServicesType)request.data[0] /* TODO negative response*/
                 );
-                requestResponse(response);
+                response.responseType = POSITIVE_RESP;
+                break;
+
+            case 1:
+                /* Copy function parameter values from the request */
+                
+                memcpy(&params, &request.data[2], sizeof(ServiceParameters_set1));
+
+                /* call the service */
+                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+                    devicedetails.originalID,
+                    (DeviceServicesType)request.data[0], /* TODO negative response*/
+                    params
+                );
+                response.responseType = POSITIVE_RESP;
                 break;
             
             default:
                 break;
             }
+
+            Serial.println("Response sent.");
+        }else 
+        {
+            Serial.println("Device id corruption within received request " + String((int) request.requestId));
         }
+    }else 
+    {
+       Serial.println("No mapping found for received DeviceID (" + String((int)request.targetDeviceId)+ ") in request " + String((int) request.requestId));
     }
+
+    requestResponse(response);
 
 
     

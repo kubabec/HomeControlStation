@@ -16,6 +16,7 @@ std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
 std::queue<RcRequest> RemoteControlServer::pendingRequestsQueue;
 
 RequestProcessor RemoteControlServer::requestProcessor;
+uint8_t RemoteControlServer::detailedDataPendingNodeID = 255;
 
 uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej statycznej poza klasą^^^^^^^^^^^^^^^^^^^^^^
 
@@ -65,6 +66,7 @@ void RemoteControlServer::cyclic(){
             /* In this case processing returned true due to timeouted request */
             /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
         }
         
     }
@@ -195,6 +197,9 @@ void RemoteControlServer::handleKeepAliveState() {
         
     }
 
+    /* Handle refresh of specific node detailed data update if ongoing */
+    handleDetailedDataRefreshMech(nodesToBeRemoved);
+
     if(nodesToBeRemoved.size() > 0) { 
         for(auto& nodeID : nodesToBeRemoved) {
             remoteNodes.erase (nodeID);
@@ -202,7 +207,35 @@ void RemoteControlServer::handleKeepAliveState() {
         }
 
         updateDeviceDescriptionSignal();
-    }    
+    }  
+
+}
+
+void RemoteControlServer::handleDetailedDataRefreshMech(std::vector <uint16_t>& nodesToBeRemoved)
+{
+    /* Detailed data from specific slave must be collected ?*/  
+    static long lastDetailedDataRequestTime = 0;
+    static uint8_t detailedDataRefresh_retryCount = 0;
+    if(detailedDataPendingNodeID != 255){
+        /* Enough time passed since last request try? */
+        if(millis() - lastDetailedDataRequestTime > 3000){
+            if(detailedDataRefresh_retryCount > 5){
+                /* Maximum number of times to ask for detailed data exceeded */
+                /* Node to be removed from the list */
+                nodesToBeRemoved.push_back(detailedDataPendingNodeID);
+                detailedDataPendingNodeID = 255;
+                Serial.println("Removing slave due to detailed data refresh failure");
+            }else {
+                refreshRemoteNodeInfo(detailedDataPendingNodeID);
+                lastDetailedDataRequestTime = millis();
+                
+                detailedDataRefresh_retryCount ++;
+            }
+        }
+    }else {
+        detailedDataRefresh_retryCount = 0;
+        lastDetailedDataRequestTime = 0;
+    }
 }
 
 void RemoteControlServer::receiveUDP(MessageUDP& msg){
@@ -351,6 +384,7 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
             if(!isDeviceAlreadyInCollection) {
                 collectionVecRef.push_back(receivedDescription);
                 if(remoteNodes.find(receivedDescription.nodeId)->second.numberOfOnOffDevices == collectionVecRef.size()) {
+                    detailedDataPendingNodeID = 255; /* reset ID to do not repeat the requests anymore */
                     updateDeviceDescriptionSignal();
                 }
                 //Serial.println("Dodaje do kolekcji");
@@ -387,7 +421,14 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
             // found
             remoteNodes.find(receivedKeepAlive.nodeId)->second.lastKeepAliveReceivedTime = millis();
             Serial.println("<-Received Node ID :" + String(receivedKeepAlive.nodeId) + " Received Hash :" + String(receivedKeepAlive.nodeHash));
-            
+
+            /* Node hash validation */
+            if(remoteNodes.find(receivedKeepAlive.nodeId)->second.lastKnownNodeHash != receivedKeepAlive.nodeHash)
+            {
+                /* Detailed data collection refresh needed */
+                // detailedDataPendingNodeID = receivedKeepAlive.nodeId;
+                // remoteNodes.find(detailedDataPendingNodeID)->second.devicesCollectionOnOff.clear();
+            }   
         }
     }
 
@@ -437,7 +478,20 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
                 responseReceivers.at(response.requestType)(response);
             }
 
-            refreshRemoteNodeInfo(response.responceNodeId);
+            //refreshRemoteNodeInfo(response.responseNodeId);
+            if(response.responseType == POSITIVE_RESP){
+                if(response.responseNodeId != 255){
+                    detailedDataPendingNodeID = response.responseNodeId;
+                    remoteNodes.find(detailedDataPendingNodeID)->second.devicesCollectionOnOff.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
+                }else{
+                    Serial.println("Response from invalid slave with ID 255 received");
+                    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+                }
+            }else 
+            {
+                /* Unlock UI immediately as there is no detailed data refresh for NegativeResponse */
+                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+            }
         }
     }
       
@@ -466,7 +520,7 @@ uint8_t RemoteControlServer::generateRequestId() {
 }
 /* funkcja służy do update urzadzen i stanow na danym node (np po otrzymaniu pakietu response) */
 void RemoteControlServer::refreshRemoteNodeInfo(uint8_t nodeId){
-    remoteNodes.find(nodeId)->second.devicesCollectionOnOff.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
+    
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE,NETWORK_BROADCAST, 9001);
     msg.pushData(nodeId);
     NetworkDriver::sendBroadcast(msg);

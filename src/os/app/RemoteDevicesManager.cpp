@@ -127,8 +127,8 @@ void RemoteDevicesManager::printTranslationMap() {
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
-    Serial.println("->Device Provider received response Node Id: " + String((int)response.responceNodeId));
-    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+    Serial.println("->Device Provider received response Node Id: " + String((int)response.responseNodeId));
+    //DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
     
     
     return true;

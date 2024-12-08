@@ -78,7 +78,7 @@ typedef enum {
 
 typedef struct {
     uint8_t responseId;
-    uint16_t responceNodeId = 255;
+    uint16_t responseNodeId = 255;
     uint8_t requestType = UNKNOWN_REQ;
     uint8_t responseType = UNKNOWN_RESP;   
     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
@@ -92,7 +92,7 @@ typedef struct {
     void print() {
         Serial.println("   Response ");
         Serial.println("responseId :" + String((int)responseId));
-        Serial.println("responceNodeId :" + String((int)responceNodeId));
+        Serial.println("responceNodeId :" + String((int)responseNodeId));
         Serial.println("requestType :" + String((int)requestType));
         Serial.println("responseType :" + String((int)responseType));
         Serial.print(" Payload : ");

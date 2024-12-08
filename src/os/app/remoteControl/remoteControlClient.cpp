@@ -7,6 +7,7 @@ static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
 std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
+std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
 
 uint8_t RemoteControlClient::localNodeId =255;
 
@@ -36,6 +37,26 @@ void RemoteControlClient::cyclic()
     }
 
     processResponse();
+    processPendingTxData();
+}
+
+void RemoteControlClient::processPendingTxData()
+{
+    static long lastTxSendTime = 0;
+    const uint8_t frameTransmissionDelay = 20; /* ms */
+
+    if(!pendingTxQueue.empty())
+    {
+        /* Tx data waiting to be sent */
+        if(millis() - lastTxSendTime > frameTransmissionDelay)
+        {
+            NetworkDriver::sendBroadcast(pendingTxQueue.front());
+            // Serial.println("Sending broadcast with message id " + String((int)pendingTxQueue.front().getId()));
+            pendingTxQueue.pop();
+            
+            lastTxSendTime = millis();
+        }
+    }    
 }
 
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
@@ -142,7 +163,9 @@ void RemoteControlClient::sendInitialDataResponse(){
     }catch (const std::bad_any_cast& e){ }
     
     initialDataResponse.pushData((byte*)&initialData, sizeof(NodeInitialData)); //wkleja do payload
-    NetworkDriver::sendBroadcast(initialDataResponse);
+
+    /* TX transmission will be handled in the available time from cyclic() context */
+    pendingTxQueue.push(initialDataResponse);
 }
 
 void RemoteControlClient::sendDetailedDataResponse() {
@@ -158,10 +181,12 @@ void RemoteControlClient::sendDetailedDataResponse() {
         MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
         
         detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
-        NetworkDriver::sendBroadcast(detailedDataResponse);
+
+        /* TX transmission will be handled in the available time from cyclic() context */
+        pendingTxQueue.push(detailedDataResponse);
 
         Serial.println("->Remote Control Client - ! Wysyłam Detaile Data!");
-        delay(10);
+        //delay(10);
 
       }
       
@@ -175,12 +200,14 @@ void RemoteControlClient:: sendKeepAlive() {
 
     /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
     keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
-    Serial.print("Node sending Keep Alive response local ID :" + String(keepAlive.nodeId));
-    Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
+    // Serial.print("Node sending Keep Alive response local ID :" + String(keepAlive.nodeId));
+    // Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
 
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));
-    NetworkDriver::sendBroadcast(keepAliveResponse);
+    
+    /* TX transmission will be handled in the available time from cyclic() context */
+    pendingTxQueue.push(keepAliveResponse);
 }
 
 bool RemoteControlClient::registerRequestReceiver(RequestType request, std::function<bool(RcRequest&)> receiverCallback) {
@@ -211,19 +238,15 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         RcResponse remoteControlResponse = vecResponseMessage.front();
-        remoteControlResponse.responceNodeId = localNodeId;
+        remoteControlResponse.responseNodeId = localNodeId;
         vecResponseMessage.pop();
-
-        Serial.println("!!! Remote Control Client Response - processResponse : ");
-        remoteControlResponse.print();
 
         MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
         msg.pushData((byte*)&remoteControlResponse, remoteControlResponse.getSize());
         
-        NetworkDriver::sendBroadcast(msg);
 
-        Serial.println("!!! RemoteControlClient - UDP Packet Response Send : ");
-        MessageUDP::serialPrintMessageUDP(msg);
+        /* TX transmission will be handled in the available time from cyclic() context */
+        pendingTxQueue.push(msg);
 
         return true;
     } else {        
@@ -245,11 +268,12 @@ void RemoteControlClient::sendDetailedDataResponseFromNode(){
         MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
         
         detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
-        NetworkDriver::sendBroadcast(detailedDataResponse);
+        
+        /* TX transmission will be handled in the available time from cyclic() context */
+        pendingTxQueue.push(detailedDataResponse);
 
         Serial.println("->Remote Control Client - Wysyłam Detailed data z Node Id : " + String(localNodeId));
         delay(10);
-
       }
       
     }catch (const std::bad_any_cast& e){ }

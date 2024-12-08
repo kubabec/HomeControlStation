@@ -44,6 +44,9 @@ typedef struct
     uint8_t size = 0xff;
 }ServiceParameters_set3;
 
+
+
+
 class Device
 {
 private:

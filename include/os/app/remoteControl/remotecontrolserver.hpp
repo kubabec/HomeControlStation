@@ -23,6 +23,8 @@ typedef struct {
     std::vector<OnOffDeviceDescription> devicesCollectionOnOff;
     bool isOnOffCollectionCompleted = false;
     uint64_t lastKeepAliveReceivedTime =0;
+    uint16_t lastKnownNodeHash = 0;
+
 
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
@@ -50,6 +52,8 @@ class RemoteControlServer
     static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;
+
+    static uint8_t detailedDataPendingNodeID;
     
     /* Kontener na informacje o zdalnych Nodach*/
     static std::map<uint16_t, RemoteNodeInformation> remoteNodes;
@@ -73,6 +77,7 @@ class RemoteControlServer
     static NodeInitialData getInitialDataFromPayload(MessageUDP& msg);
 
     static void updateDeviceDescriptionSignal();
+    static void handleDetailedDataRefreshMech(std::vector <uint16_t>& nodesToBeRemoved);
 
     static uint8_t generateRequestId(); // funkcja do generowania Request Id
 

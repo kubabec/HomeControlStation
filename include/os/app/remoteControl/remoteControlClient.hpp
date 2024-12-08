@@ -20,6 +20,7 @@ class RemoteControlClient
     static std::array<std::function<bool(RcRequest&)>, REQ_COUNT> requestReceivers;
     static uint8_t localNodeId;
     static std::queue<RcResponse> vecResponseMessage; //vector containing the responses to the requests
+    static std::queue<MessageUDP> pendingTxQueue;
     
     static void handleNodeInitialDataState();
     static void handleNodeDetailedDataState();
@@ -32,6 +33,7 @@ class RemoteControlClient
     static void sendKeepAlive();
     static void processGenericRequest(MessageUDP& msg);
     static bool processResponse();
+    static void processPendingTxData();
     
 public:
     static void init();
