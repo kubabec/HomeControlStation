@@ -8,6 +8,7 @@
 #include "os/app/http/JavaScript.h"
 
 WiFiServer HomeLightHttpServer::server(80);
+HomeLightHttpServer::HttpServerNvmMetadata HomeLightHttpServer::nvmMetadata;
 String HomeLightHttpServer::header = "";
 unsigned long HomeLightHttpServer::currentTime = 0;
 unsigned long HomeLightHttpServer::previousTime = 0;
@@ -88,7 +89,63 @@ void HomeLightHttpServer::cyclic()
 }
 
 void HomeLightHttpServer::deinit() {
+
+  /* Write NVM data for HttpServer application */
+  uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
+  /* Allocate memory for NVM data */
+  uint8_t* nvmData = (uint8_t*)malloc(sizeOfNvm);
+  uint8_t offset = 0;
+
+  if(packNvmData(nvmData, sizeOfNvm)){
+    for(uint8_t blockID = e_BLOCK_HTTP_FIRST; blockID <= e_BLOCK_HTTP_LAST; blockID ++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK)
+        )(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t*)&nvmData[offset] // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+  }
+  /* release heap buffer */
+  free(nvmData);
     
+}
+
+bool HomeLightHttpServer::packNvmData(uint8_t* nvmData, uint16_t length)
+{
+  bool retVal = false;
+  if(nvmData != nullptr){
+    nvmData[0] = 0xAB;
+    nvmData[1] = (uint8_t)roomNamesMapping.size();
+    for(uint8_t i = 2; i < 25; i++)
+    {
+      nvmData[i] = 0;
+    }
+
+    uint16_t offset = 25;
+    for(auto& mapping: roomNamesMapping){
+      /* safe mech */
+      if(offset + 25 > length){
+        break;
+      }
+
+      nvmData[offset] = mapping.first; /* room ID */
+      uint8_t strArr[24] = {'\0'};
+      mapping.second.toCharArray((char*)strArr, 24);
+      memcpy(&nvmData[offset+1], strArr, 24);
+
+      offset += 25;
+    }
+
+    retVal = true;
+  }
+
+  return retVal;
 }
 
 void HomeLightHttpServer::init()
@@ -110,6 +167,31 @@ void HomeLightHttpServer::init()
     }
   }
   );
+
+  /* Read NVM data for HttpServer application */
+  uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
+  /* Allocate memory for NVM data */
+  uint8_t* nvmData = (uint8_t*)malloc(sizeOfNvm);
+  uint8_t offset = 0;
+  for(uint8_t blockID = e_BLOCK_HTTP_FIRST; blockID <= e_BLOCK_HTTP_LAST; blockID ++)
+  {
+      /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+      std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
+          DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK)
+      )(
+          (PersistentDatablockID)blockID, // Datablock ID
+          (uint8_t*)&nvmData[offset] // local memory buffer for datablock data
+      );
+
+      /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+      offset += PERSISTENT_DATABLOCK_SIZE;
+  }
+
+  restoreNvmData(nvmData, sizeOfNvm);
+
+  /* release heap buffer */
+  free(nvmData);
+
 
   /* Explicit read of system error needed due to init order ->  ErrorMon -> ConfigProvider -> HttpServer */
   std::any errorsAsAny = DataContainer::getSignalValue(SIG_SYSTEM_ERROR_LIST);
@@ -146,6 +228,54 @@ void HomeLightHttpServer::init()
 
 
   Serial.println("... done");
+}
+
+void HomeLightHttpServer::restoreNvmData(uint8_t* nvmData, uint16_t length)
+{
+
+  /* NVM expected pattern */
+  /* 0xAB X 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 */
+  /* ROOM_ID NAME_FIRST_BYTE ...22 ... NAME_LAST_BYTE   0 */
+  /* ROOM_ID ....... 
+  X times repeated */
+  if(nvmData != nullptr){
+    /* validate data correctness */
+    if(nvmData[0] == 0xAB){ /* Magic number written during successfull nvmWrite() */
+      nvmMetadata.restoredSuccessfully = 1;
+    }
+
+    if(nvmMetadata.restoredSuccessfully){
+      nvmMetadata.numberOfTranslations = nvmData[1];
+
+      /* 25 bytes offset is needed to have right padding */
+      uint16_t offset = 25;
+      if(nvmMetadata.numberOfTranslations <= MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
+        for(uint8_t translationIndex = 0; translationIndex < nvmMetadata.numberOfTranslations; translationIndex++){
+          /* safe mech */
+          if((offset + 25) > length){
+            break;
+          }
+
+          uint8_t roomId = nvmData[offset]; /* First byte */
+          uint8_t strArr[24] = {'\0'};
+          memcpy(strArr, &nvmData[offset+1], 23); /* max length to ensure '\0' at the end */
+          /* Construct room name string */
+          String roomName = String((char*)strArr);
+
+          
+          roomNamesMapping.insert({roomId,roomName});
+          
+
+          offset += 25;
+        }
+      }else { 
+        nvmMetadata.numberOfTranslations  = 0; 
+      }
+
+    }else{
+      Serial.println("HttpServer://Failure during NVM data restore try");
+    }
+  }
 }
 
 void HomeLightHttpServer::requestErrorList()
@@ -647,6 +777,7 @@ void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
         <div class=\"header\">Room name mapping</div>");
   
   uint8_t slotIndex = 1;
+  std::vector<uint8_t> alreadyPrintedMappings;
   for(auto& room : deviceToRoomMappingList){
     client.println("<div class=\"container\">");
     client.println(labelStart);
@@ -659,6 +790,7 @@ void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
     if(roomNamesMapping.find(room.first) != roomNamesMapping.end())
     {
       nameValue = roomNamesMapping.find(room.first)->second;
+      alreadyPrintedMappings.push_back(room.first);
     }
 
     client.println(labelStart);
@@ -674,6 +806,37 @@ void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
       client.println("OFF link:<input type=\"text\" disabled value=\"roomOFF/"+ nameValue +"\">");
       client.println(labelEnd);
     }
+
+    client.println("</div>");
+    slotIndex++;
+  }
+
+  /* There also can be room mappings of the roomIDs which are no longer present in deviceToRoomMappingList - device room was changed 
+      or device was removed */
+      /* This is why we must print also the rest of mappings which were not printed above */
+  for(auto& mapping : roomNamesMapping){
+    bool mappingAlreadyPrinted = false;
+    for(auto& alreadyPrinted : alreadyPrintedMappings){
+      if(mapping.first == alreadyPrinted){
+        mappingAlreadyPrinted = true;
+        break;
+      }
+    }
+    if(mappingAlreadyPrinted){
+      continue;
+    }
+
+    client.println("<div class=\"container\"><div class=\"header\">Empty (no devices)</div>");
+    client.println(labelStart);
+    client.println("Room ID:<input disabled type=\"text\" maxlength=\"2\" id=\"roomMappingID"+String((int)slotIndex)+"\"\
+    value=\""+ String((int)mapping.first) +"\">");
+    client.println(labelEnd);
+
+
+    client.println(labelStart);
+    client.println("Name:<input type=\"text\" maxlength=\"24\" placeholder=\"Your custom name here\" id=\"roomMappingName"+String((int)slotIndex)+"\"\
+    value=\""+ mapping.second +"\">");
+    client.println(labelEnd);
 
     client.println("</div>");
     slotIndex++;
@@ -811,7 +974,7 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
       uint8_t processedBytes = 1 + idDigits + 1 + nameLengthDigits + nameLength;
       curerntProcessingIndex += processedBytes;
 
-      if(nameLength > 0){
+      if(nameLength > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
         roomNamesMapping.insert({roomId, name});
       }
 

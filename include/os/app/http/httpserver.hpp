@@ -5,9 +5,18 @@
 #include <map>
 #include <os/datacontainer/DataContainer.hpp>
 
+#define MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS 15
 
 class HomeLightHttpServer
 {
+    typedef struct {
+        uint8_t restoredSuccessfully = 0;
+        uint8_t numberOfTranslations = 0;
+
+        //uint8_t reserved[PERSISTENT_DATABLOCK_SIZE - 2];
+    }HttpServerNvmMetadata;
+
+    static HttpServerNvmMetadata nvmMetadata;
     static WiFiServer server;
     static String header;
     static unsigned long currentTime;
@@ -45,6 +54,9 @@ class HomeLightHttpServer
     static void processLinkRequestData(WiFiClient& client);
     static bool processConstantRequests(const String& request, WiFiClient& client);
     static bool processParameterizedRequests(String& request, WiFiClient& client);
+
+    static void restoreNvmData(uint8_t* nvmData, uint16_t length);
+    static bool packNvmData(uint8_t* nvmData, uint16_t length);
 
     /*TESTCODE*/
     /* Devices control services */

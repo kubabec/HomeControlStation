@@ -59,7 +59,17 @@ typedef enum
     e_BLOCK_DEVICE_4,
     e_BLOCK_DEVICE_5,
     e_BLOCK_DEVICE_6,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DEVICE_6
+    e_BLOCK_HTTP_FIRST,
+    e_BLOCK_HTTP_1 = e_BLOCK_HTTP_FIRST,
+    e_BLOCK_HTTP_2,
+    e_BLOCK_HTTP_3,
+    e_BLOCK_HTTP_4,
+    e_BLOCK_HTTP_5,
+    e_BLOCK_HTTP_6,
+    e_BLOCK_HTTP_7,
+    e_BLOCK_HTTP_8,
+    e_BLOCK_HTTP_LAST = e_BLOCK_HTTP_8,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_HTTP_8
 }PersistentDatablockID;
 
 /* Description of single configuration NVM slot */
