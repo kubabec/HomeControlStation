@@ -4,9 +4,7 @@
 
 std::array<std::any, NUMBER_OF_SIGNALS>  DataContainer::dataTable;
 
-std::array<
-    std::vector<std::pair<std::string, std::function<void(std::any)>>
-            >, NUMBER_OF_SIGNALS> DataContainer::subscribers;
+std::array<std::vector<std::function<void(std::any)>>, NUMBER_OF_SIGNALS> DataContainer::subscribers;
 
 // std::string getCurrentTime() {
 //     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -22,10 +20,10 @@ DataContainer::DataContainer()
 
 }
 
-void DataContainer::subscribe(Signal sigName, std::string subscriberName, std::function<void (std::any)> dupa)
+void DataContainer::subscribe(Signal sigName, std::function<void (std::any)> callback)
 {
     //Serial.println(String(subscriberName.c_str()) + " has been subscribed to signal " + String(signalNames[sigName].c_str()));
-    subscribers.at(sigName).push_back({subscriberName, dupa});
+    subscribers.at(sigName).push_back(callback);
 }
 
 std::any DataContainer::getSignalValue(Signal sigName)

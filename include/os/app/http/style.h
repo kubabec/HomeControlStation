@@ -377,6 +377,14 @@ input[type=\"range\"]:focus {\
 .popup-close:hover {\
     background: #ff4d4d;\
 }\
+.popup-password-input {\
+    width: 80%;\
+    padding: 10px;\
+    margin-bottom: 20px;\
+    border: 1px solid #ddd;\
+    border-radius: 5px;\
+    font-size: 16px;\
+}\
 \
 .visible-popup {\
     display: flex;\

@@ -12,14 +12,18 @@ void OperatingSystem::init()
 {
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
-    DataContainer::setSignalValue(CBK_RESET_DEVICE, "OperatingSystem", static_cast<std::function<void()>>(OperatingSystem::reset));
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, "OS", static_cast<uint16_t>(runtimeNodeHash));
+    DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
+    DataContainer::setSignalValue(
+        CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
+        static_cast<std::function<void(String)>>(OperatingSystem::requestSecurityAccessLevelChangeViaString)
+    );
 
-    DataContainer::subscribe(SIG_IS_HTTP_SERVER, "OperatingSystem", [](std::any signal) {
+    DataContainer::subscribe(SIG_IS_HTTP_SERVER, [](std::any signal) {
         isHttpServerRunning = (std::any_cast<bool>(signal));
     });
 
-    DataContainer::subscribe(SIG_IS_RC_SERVER, "OperatingSystem", [](std::any signal) {
+    DataContainer::subscribe(SIG_IS_RC_SERVER, [](std::any signal) {
         isRCServerRunning = (std::any_cast<bool>(signal));
     });
 
@@ -95,7 +99,7 @@ void OperatingSystem::task50ms()
 void OperatingSystem::task1s()
 {
     runtimeNodeHash = calculateRuntimeNodeHash();
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, "OS", static_cast<uint16_t>(runtimeNodeHash));
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
 }
 
 void OperatingSystem::reset() {
@@ -180,4 +184,12 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
     //Serial.println("Hash : " + String((int)hash));
 
     return hash;
+}
+
+void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
+{
+    if(password == "admin"){
+        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE);
+        Serial.println("Access level granted: e_ACCESS_LEVEL_SERVICE_MODE");
+    }
 }

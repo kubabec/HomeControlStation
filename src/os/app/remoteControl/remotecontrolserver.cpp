@@ -31,13 +31,11 @@ void RemoteControlServer::init(){
     Serial.println("RemoteControlServer init ...");
     DataContainer::setSignalValue(
         CBK_REGISTER_RESPONSE_RECEIVER,
-        "RemoteControlServer", 
             static_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)> >(RemoteControlServer::registerResponseReceiver)
         );
     
     DataContainer::setSignalValue(
         CBK_CREATE_RC_REQUEST,
-        "RemoteControlServer", 
             static_cast<std::function<void(RcRequest&)>>(RemoteControlServer::createRcRequest)
         );
     
@@ -67,7 +65,7 @@ void RemoteControlServer::cyclic(){
             /* In this case processing returned true due to timeouted request */
             /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         
     }
@@ -314,7 +312,7 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
             //Serial.println("Sprawdzamy czy node jest w mapie.......................");
             //czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
             if (remoteNodes.find(receivedInitialData.nodeId) == remoteNodes.end()) {
-                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
             // not found - brak info o node, dodajemy info do mapy
                 //Serial.println("Nie jestesmy w mapie i dodajemy do mapy...");
                 RemoteNodeInformation nodeInfo {
@@ -460,7 +458,6 @@ void RemoteControlServer::updateDeviceDescriptionSignal() {
     }
     DataContainer::setSignalValue(
         SIG_RC_DEVICES_INTERNAL_TUNNEL, 
-        "RcServer", 
         mergedTunneledDevices
     );
 
@@ -511,12 +508,12 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
                     no explicit trigger needed here anymore ! */
                 }else{
                     Serial.println("Response from invalid slave with ID 255 received");
-                    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+                    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
                 }
             }else 
             {
                 /* Unlock UI immediately as there is no detailed data refresh for NegativeResponse */
-                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
             }
         }
     }

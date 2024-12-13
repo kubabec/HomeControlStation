@@ -30,6 +30,8 @@ public:
     static void init();
     static void reset();
 
+    static void requestSecurityAccessLevelChangeViaString(String password);
+
 
     static void task10ms();
     static void task20ms();

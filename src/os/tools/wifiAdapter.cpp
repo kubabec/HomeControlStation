@@ -68,7 +68,6 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password)
     Serial.println(WiFi.localIP());
     DataContainer::setSignalValue(
         SIG_IP_ADDRESS_STRING,
-        "WiFiAdapter",
         static_cast<String>(WiFi.localIP().toString())
     );
 
@@ -78,7 +77,7 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password)
     memcpy((uint8_t*)&ip+2, &WiFi.localIP()[2], 1);
     memcpy((uint8_t*)&ip+3, &WiFi.localIP()[3], 1);
 
-    DataContainer::setSignalValue(SIG_IP_ADDRESS, "WiFiAdapter", static_cast<uint32_t>(ip));
+    DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
 
     Serial.println("======== IP Adres =========");
 }
@@ -146,7 +145,6 @@ void WiFiAdapter::createAccessPoint()
     Serial.println(WiFi.softAPIP());
     DataContainer::setSignalValue(
         SIG_IP_ADDRESS_STRING,
-        "WiFiAdapter",
         static_cast<String>(WiFi.softAPIP().toString())
     );
 
@@ -156,7 +154,7 @@ void WiFiAdapter::createAccessPoint()
     memcpy((uint8_t*)&ip+2, &WiFi.softAPIP()[2], 1);
     memcpy((uint8_t*)&ip+3, &WiFi.softAPIP()[3], 1);
 
-    DataContainer::setSignalValue(SIG_IP_ADDRESS, "WiFiAdapter", static_cast<uint32_t>(ip));
+    DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
     
     // isConnectedFlag = true;
     // lastConnectedSSID = String("ESP32_HomeStation");

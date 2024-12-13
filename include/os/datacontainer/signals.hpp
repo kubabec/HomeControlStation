@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 31
+#define NUMBER_OF_SIGNALS 33
 enum Signal
 {
     /* Type: bool , somme description */
@@ -70,7 +70,11 @@ enum Signal
     /* Type: DeviceServicesAPI - set of services functions provided by RemooteDevicesManager to Device Provider */
     SIG_REMOTE_DEVICE_SERVICES,
     /* Type: DeviceServicesAPI - set of services functions provided by DeviceProvider to users */
-    SIG_DEVICE_SERVICES
+    SIG_DEVICE_SERVICES,
+    /* Type: SecurityAccessLevelType - security access to prevent unauthorized changes */
+    SIG_SECURITY_ACCESS_LEVEL,
+    /* Type: std:function<void(String)> - callback to try access level change in OS */
+    CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING
 
 };
 #endif

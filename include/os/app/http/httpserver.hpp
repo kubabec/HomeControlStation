@@ -39,6 +39,7 @@ class HomeLightHttpServer
     static bool isUserInterfaceBlocked;
 
     static String ipAddressString;
+    static SecurityAccessLevelType secAccessLevel;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
@@ -106,6 +107,7 @@ public:
     static void parameterizedHandler_deviceSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client);
     static void parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client);
+    static void parameterizedHandler_passwordApply(String& request, WiFiClient& client);
     
 };
 

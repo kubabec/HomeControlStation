@@ -178,4 +178,10 @@ typedef struct
     std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set3 param)> serviceCall_set3;
 }DeviceServicesAPI;
 
+typedef enum
+{
+    e_ACCESS_LEVEL_NONE = 10,
+    e_ACCESS_LEVEL_AUTH_USER,
+    e_ACCESS_LEVEL_SERVICE_MODE
+}SecurityAccessLevelType;
 #endif 

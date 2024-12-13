@@ -7,7 +7,7 @@ void RemoteDevicesManager::init()
 {
     Serial.println("RemoteDevicesManager init ...");
 
-    DataContainer::subscribe(SIG_RC_DEVICES_INTERNAL_TUNNEL, "RcDeviceManager", RemoteDevicesManager::tunnelDataUpdate);
+    DataContainer::subscribe(SIG_RC_DEVICES_INTERNAL_TUNNEL, RemoteDevicesManager::tunnelDataUpdate);
 
     
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
@@ -41,7 +41,6 @@ void RemoteDevicesManager::init()
     /* Push prepared service API to DataContainer */
     DataContainer::setSignalValue(
         SIG_REMOTE_DEVICE_SERVICES,
-        "RemoteDeviceManager", 
         static_cast<DeviceServicesAPI>(servicesFunctionSet));
     /*TESTCODE*/
 
@@ -80,9 +79,9 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
         }
 
 
-        DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF,"RCManager", vecRemoteOnOffDescription);
+        DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF, vecRemoteOnOffDescription);
 
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         //Serial.println("->RCS - Ustawienie sygnalu w Data Container");   
         //printTranslationMap();
     }catch (std::bad_any_cast ex){}
@@ -155,7 +154,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 0; //0 - no params, 1 - set1 ...
         
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -188,7 +187,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 1; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -221,7 +220,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 2; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(true));
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */

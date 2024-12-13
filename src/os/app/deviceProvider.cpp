@@ -15,7 +15,7 @@ void DeviceProvider::deinit() {
 void DeviceProvider::init()
 {
     Serial.println("DeviceProvider init ...");
-    DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, "DeviceProvider", RequestProcessingState::eNO_REQUEST);
+    DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, RequestProcessingState::eNO_REQUEST);
 
     
     /*TESTCODE*/
@@ -42,7 +42,6 @@ void DeviceProvider::init()
     /* Push prepared service API to DataContainer */
     DataContainer::setSignalValue(
         SIG_DEVICE_SERVICES,
-        "DeviceProvider", 
         static_cast<DeviceServicesAPI>(servicesFunctionSet));
     /*TESTCODE*/
 
@@ -70,13 +69,13 @@ void DeviceProvider::init()
 }
 
 void DeviceProvider::initLocalDevicesSetup() {
-    DataContainer::subscribe(SIG_LOCAL_COLLECTION_ONOFF, "DeviceProvider", DeviceProvider::updateDeviceDescriptionSignal_onChange);
+    DataContainer::subscribe(SIG_LOCAL_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
     
 }
 
 void DeviceProvider::initRemoteDevicesSetup() {
-    DataContainer::subscribe(SIG_REMOTE_COLLECTION_ONOFF, "DeviceProvider", DeviceProvider::updateDeviceDescriptionSignal_onChange);
+    DataContainer::subscribe(SIG_REMOTE_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
 }
 
@@ -163,7 +162,7 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     Serial.println("DeviceProvider//: Content updated :");
     printIdMap();
     Serial.println("///");
-    DataContainer::setSignalValue(SIG_COLLECTION_ONOFF,"DeviceProvider", vecOnOffDescription);     
+    DataContainer::setSignalValue(SIG_COLLECTION_ONOFF, vecOnOffDescription);     
 }
 
 void DeviceProvider::printIdMap() {

@@ -189,6 +189,35 @@ const char* javascript = "\
             popupOverlay.classList.add('hidden-popup');\
             popupContent.classList.remove('show');\
         };\
+        function showPasswordPopup() {\
+            const passwordPopupOverlay = document.getElementById('password-popup-overlay');\
+            const passwordPopupContent = document.getElementById('password-popup-content');\
+\
+            passwordPopupOverlay.classList.remove('hidden-popup');\
+            passwordPopupOverlay.classList.add('visible-popup');\
+            passwordPopupContent.classList.add('show');\
+\
+            document.getElementById('password-popup-close').onclick = function () {\
+                hidePopup(passwordPopupOverlay, passwordPopupContent);\
+            };\
+        }\
+        function hidePopup(popupOverlay, popupContent) {\
+            popupOverlay.classList.remove('visible-popup');\
+            popupOverlay.classList.add('hidden-popup');\
+            popupContent.classList.remove('show');\
+        }\
+\
+        function submitPassword() {\
+            const passwordValue = document.getElementById('password-input').value;\
+            alert(`Password entered: ${passwordValue}`);\
+            hidePopup(document.getElementById('password-popup-overlay'), document.getElementById('password-popup-content'));\
+        }\
+        function submitPassword() {\
+            const passwordValue = document.getElementById('password-input').value;\
+            hidePopup(document.getElementById('password-popup-overlay'), document.getElementById('password-popup-content'));\
+            url = '/passwordApply' + passwordValue;\
+            window.location.href = url;\
+        }\
 </script>";
 
 #endif

@@ -18,9 +18,9 @@ void RemoteControlClient::deinit() {
 void RemoteControlClient::init()
 {       
     Serial.println("RemoteControlClient init ...");
-    DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER,"RemoteControlClient", static_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
+    DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER, static_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
 
-    DataContainer::setSignalValue(CBK_RESPONSE, "RemoteControlClient",static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
+    DataContainer::setSignalValue(CBK_RESPONSE, static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
 
     currentState = STATE_NODE_INITIAL_DATA;
     localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;

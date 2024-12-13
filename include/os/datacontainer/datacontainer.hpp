@@ -19,15 +19,15 @@ class DataContainer
     static std::array<std::any, NUMBER_OF_SIGNALS> dataTable;
 
     // Signals subscribers container
-    static std::array<std::vector<std::pair<std::string, std::function<void(std::any)>>>, NUMBER_OF_SIGNALS> subscribers;
+    static std::array<std::vector<std::function<void(std::any)>>, NUMBER_OF_SIGNALS> subscribers;
 public:
     DataContainer();
     // Register new subscriber (listener) waiting on signal change notification
-    static void subscribe(Signal sigName, std::string subscriberName, std::function<void(std::any)> callback);
+    static void subscribe(Signal sigName, std::function<void(std::any)> callback);
 
     // Set signal value to newValue and notify all the signals listeners (subscribers)
     template <typename Type>
-    static void setSignalValue(Signal sigName, std::string senderName, Type newValue)
+    static void setSignalValue(Signal sigName, Type newValue)
     {
         dataTable.at(sigName) = newValue; //Aktualizuje wartość powiązaną z określonym sigName w tabeli danych (dataTable)
         
@@ -38,7 +38,7 @@ public:
         for(const auto& subscriber: subscribers.at(sigName)) // Iteruje po subskrybentach powiązanych z danym sigName.
         {
            // Serial.println("Notifying subscriber: " + String(subscriber.first.c_str()) );
-            subscriber.second(newValue);   //Wywołuje funkcję zwrotną powiązaną z subskrybentem, przekazując nową wartość (newValue) jako argument.
+            subscriber(newValue);   //Wywołuje funkcję zwrotną powiązaną z subskrybentem, przekazując nową wartość (newValue) jako argument.
             
         }
     }

@@ -63,32 +63,28 @@ void ConfigProvider::init()
         
         /* Write DEFAULT configuration to DataContainer */
         // Obsolete signal to be removed
-        DataContainer::setSignalValue(SIG_IS_HTTP_SERVER,"ConfigProvider", static_cast<bool> (true));
+        DataContainer::setSignalValue(SIG_IS_HTTP_SERVER, static_cast<bool> (true));
         // Obsolete signal to be removed
-        DataContainer::setSignalValue(SIG_IS_RC_SERVER,"ConfigProvider", static_cast<bool> (true));
+        DataContainer::setSignalValue(SIG_IS_RC_SERVER, static_cast<bool> (true));
         // New signal to be used in the future implementation
-        DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, "ConfigProvider", emptyConfiguration);
+        DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, emptyConfiguration);
     }
 
     
     DataContainer::setSignalValue(
         CBK_SET_CONFIG_VIA_STRING,
-        "ConfigProvider", 
         static_cast<std::function<void(String&)>>(ConfigProvider::setConfigViaString));
 
     DataContainer::setSignalValue(
         CBK_SET_NVM_DATABLOCK,
-        "ConfigProvider", 
         static_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(ConfigProvider::setDatablock));
 
     DataContainer::setSignalValue(
         CBK_GET_NVM_DATABLOCK,
-        "ConfigProvider", 
         static_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(ConfigProvider::getDatablock));
 
     DataContainer::setSignalValue(
         CBK_MASS_ERASE,
-        "ConfigProvider",
         static_cast<std::function<void(void)>>(ConfigProvider::massErase));
 
 
@@ -112,12 +108,12 @@ void ConfigProvider::updateNodeConfigurationSignal()
 
     /* Write valid  configuration to DataContainer */
     // Obsolete signal to be removed
-    DataContainer::setSignalValue(SIG_IS_HTTP_SERVER,"ConfigProvider", static_cast<bool> (validConfiguration.isHttpServer));
+    DataContainer::setSignalValue(SIG_IS_HTTP_SERVER, static_cast<bool> (validConfiguration.isHttpServer));
     // Obsolete signal to be removed
-    DataContainer::setSignalValue(SIG_IS_RC_SERVER,"ConfigProvider", static_cast<bool> (validConfiguration.isRcServer));
+    DataContainer::setSignalValue(SIG_IS_RC_SERVER, static_cast<bool> (validConfiguration.isRcServer));
     
     // New signal to be used in the future implementation
-    DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, "ConfigProvider", validConfiguration);
+    DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, validConfiguration);
 
     Serial.println("NVM configuration restored successfully.");
 }

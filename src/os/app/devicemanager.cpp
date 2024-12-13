@@ -73,7 +73,7 @@ void DeviceManager::init()
             free(configBlock);
 
             /* Publish retrieved DeviceConfigSlots signal to the system */
-            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
+            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
         }
     }else
     {
@@ -117,13 +117,11 @@ void DeviceManager::init()
     /* Push prepared service API to DataContainer */
     DataContainer::setSignalValue(
         SIG_LOCAL_DEVICE_SERVICES,
-        "DeviceManager", 
         static_cast<DeviceServicesAPI>(servicesFunctionSet));
     /*TESTCODE*/
 
     DataContainer::setSignalValue(
         CBK_SET_DEVICES_CONFIG_VIA_STRING,
-        "DeviceManager", 
         static_cast<std::function<void(String&)>>(DeviceManager::setLocalConfigViaString));
    
 
@@ -171,7 +169,7 @@ void DeviceManager::updateDeviceDescriptionSignal() {
         vecOnOffDescription.push_back(devDescription);              
     }
         
-    DataContainer::setSignalValue(SIG_LOCAL_COLLECTION_ONOFF,"DeviceManager", vecOnOffDescription);
+    DataContainer::setSignalValue(SIG_LOCAL_COLLECTION_ONOFF, vecOnOffDescription);
     //Serial.println("===DeviceManager - Ustawienie sygnału w Data Container======");   
 }
 
@@ -337,7 +335,7 @@ void DeviceManager::setLocalConfigViaString(String& config)
                 isValidConfigReceived = true;
 
                 /* Publish retrieved DeviceConfigSlots signal to the system */
-                DataContainer::setSignalValue(SIG_CONFIG_SLOTS, "DeviceManager", pinConfigSlotsRamMirror);
+                DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
 
 
                 Serial.println("New config found, reboot ...");

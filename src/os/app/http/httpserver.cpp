@@ -17,6 +17,7 @@ int HomeLightHttpServer::pos1= 100;
 int HomeLightHttpServer::pos2 = 150;
 int HomeLightHttpServer::pos3 = 150;
 bool HomeLightHttpServer::isUserInterfaceBlocked = false;
+SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NONE;
 
 
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
@@ -61,24 +62,26 @@ std::vector<String> parameterizedRequests = {
   "localSetup",
   "dev",
   "?bri",
-  "roomMappingApply"
+  "roomMappingApply",
+  "passwordApply"
 };
 
-std::vector<std::function<void(WiFiClient&)>> constantRequestHandlers = {
-  HomeLightHttpServer::constantHandler_mainPage,
-  HomeLightHttpServer::constantHandler_configPage,
-  HomeLightHttpServer::constantHandler_clearErrors,
-  HomeLightHttpServer::constantHandler_devicesSetup,
-  HomeLightHttpServer::constantHandler_roomAssignment,
-  HomeLightHttpServer::constantHandler_massErase,
+std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>> constantRequestHandlers = {
+  {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::constantHandler_clearErrors, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
-std::vector<std::function<void(String&, WiFiClient&)>> parameterizedRequestHandlers = {
-  HomeLightHttpServer::parameterizedHandler_newConfigApply,
-  HomeLightHttpServer::parameterizedHandler_newDevicesSetup,
-  HomeLightHttpServer::parameterizedHandler_deviceSwitch,
-  HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange,
-  HomeLightHttpServer::parameterizedHandler_roomNameMappingApply
+std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
+  {HomeLightHttpServer::parameterizedHandler_newConfigApply, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::parameterizedHandler_newDevicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_roomNameMappingApply, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -153,7 +156,7 @@ void HomeLightHttpServer::init()
   Serial.println("HomeLightHttpServer init ...");
 
   
-  DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, "HTTPServer", [](std::any signal) {
+  DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
     activeErrorsCount = 0;
 
@@ -212,9 +215,15 @@ void HomeLightHttpServer::init()
   }
 
 
-  DataContainer::subscribe(SIG_COLLECTION_ONOFF, "HTTPServer", HomeLightHttpServer::onDeviceDescriptionChange);
-  DataContainer::subscribe(SIG_CONFIG_SLOTS, "HTTPServer", HomeLightHttpServer::onSlotConfigChange);
-  DataContainer::subscribe(SIG_IS_UI_BLOCKED, "HTTPServer,", HomeLightHttpServer::onUiBlockedSignalChange);
+  DataContainer::subscribe(SIG_COLLECTION_ONOFF, HomeLightHttpServer::onDeviceDescriptionChange);
+  DataContainer::subscribe(SIG_CONFIG_SLOTS, HomeLightHttpServer::onSlotConfigChange);
+  DataContainer::subscribe(SIG_IS_UI_BLOCKED, HomeLightHttpServer::onUiBlockedSignalChange);
+
+  DataContainer::subscribe(SIG_SECURITY_ACCESS_LEVEL, [](std::any signal){
+    try{
+      secAccessLevel = std::any_cast<SecurityAccessLevelType>(signal);
+    }catch (std::bad_any_cast ex){ }
+  });
 
   /* Get IP address from DataContainer to have it for further client redirections */
   ipAddressString = std::any_cast<String>(
@@ -313,9 +322,16 @@ bool HomeLightHttpServer::processConstantRequests(const String& request, WiFiCli
       /* Check if there is known handler function for matched request */
       if(knownRequest < constantRequestHandlers.size())
       {
-        /* Run function assigned to received command */
-        constantRequestHandlers.at(knownRequest)(client);
-        retVal = true;
+        /* Check if access level allows to enter the request */
+        if(secAccessLevel >= constantRequestHandlers.at(knownRequest).second){
+          /* Run function assigned to received command */
+          constantRequestHandlers.at(knownRequest).first(client);
+          retVal = true;
+        }else 
+        {
+          /* Redirect client to main page as security access is too low */
+          client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+        }
         break;
       }
     }
@@ -345,8 +361,15 @@ bool HomeLightHttpServer::processParameterizedRequests(String& request, WiFiClie
       /* Handler for received request is not missing */
       if(knownRequest < parameterizedRequestHandlers.size())
       {
-        parameterizedRequestHandlers.at(knownRequest)(request, client);
-        retVal = true;
+        /* Check if access level allows to enter the request */
+        if(secAccessLevel >= parameterizedRequestHandlers.at(knownRequest).second){
+          parameterizedRequestHandlers.at(knownRequest).first(request, client);
+          retVal = true;
+        }else 
+        {
+          /* Redirect client to main page as security access is too low */
+          client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+        }
         break;
       }
     }
@@ -742,10 +765,27 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
     client.println("</div>");
   }
 
+
+  /* Password popup code */
+  client.println("<div class=\"popup-overlay hidden-popup\" id=\"password-popup-overlay\">\
+        <div class=\"popup-content\" id=\"password-popup-content\">\
+            <div class=\"popup-header\">Enter Password</div>\
+            <div class=\"popup-message\">Please provide your password to continue:</div>\
+            <input type=\"password\" id=\"password-input\" class=\"popup-password-input\" placeholder=\"Password\" />\
+            <button class=\"popup-button\" onclick=\"submitPassword()\">Submit</button>\
+            <div class=\"popup-close\" id=\"password-popup-close\">&times;</div>\
+        </div>\
+  </div>");
+
   /* Display configuration button */
-  const char* configButtonLink = "\
-  <br><a href=\"/config\" class=\"button\">Settings</a><br>";
-  client.println(configButtonLink);
+  if(secAccessLevel == e_ACCESS_LEVEL_NONE){
+    const char* configButtonLink = "\
+    <br><button class=\"button\" onclick=\"showPasswordPopup()\">Settings</button><br>";
+    client.println(configButtonLink);
+  }else 
+  {
+    client.println("<br><a href=\"/config\" class=\"button\">Settings</a><br>");
+  }
 }
 
 void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
@@ -985,6 +1025,20 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
 
   }
 
+}
+
+void HomeLightHttpServer::parameterizedHandler_passwordApply(String& request, WiFiClient& client)
+{
+  request = request.substring(String("passwordApply").length());
+  try{
+    /* Request Security access level change in OS via received password */
+    std::any_cast<std::function<void(String)>>(
+      DataContainer::getSignalValue(CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING))(request);
+  }catch (std::bad_any_cast ex){
+
+  }
+
+  client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"/config'>");
 }
 
 
