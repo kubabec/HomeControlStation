@@ -146,7 +146,7 @@ void ConfigProvider::setConfigViaString(String& configString)
         const String part4 = "&Password=";
         const String part5 = "&nodeId=";
         const String part6 = "&nodeType=";
-        const String part7 = "";
+        const String part7 = "&end";
 
         char searchResult = matcher.Match(part2.c_str());
         uint16_t readStartIndex = 0;
@@ -214,7 +214,7 @@ void ConfigProvider::setConfigViaString(String& configString)
             {
                 // Read RC server config
                 str_nodeType = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("str_Passwd : " + str_Passwd);
+                //Serial.println("////////str_nodeType : " + str_nodeType);
             }
 
             /* Prepare configuration data */
@@ -224,6 +224,14 @@ void ConfigProvider::setConfigViaString(String& configString)
                 configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
                 configRamMirror.nodeId = str_nodeId.toInt() < 254 ? str_nodeId.toInt() : 255;
                 configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
+
+                Serial.println("String values:");
+                Serial.println("str_isHttpServer " + str_isHttpServer) ;
+                Serial.println("str_isRcServer " + str_isRcServer) ;
+                Serial.println("str_Ssid " + str_Ssid) ;
+                Serial.println("str_Passwd " + str_Passwd) ;
+                Serial.println("str_nodeId " + str_nodeId) ;
+                Serial.println("str_nodeType " + str_nodeType) ;
             }
 
             configRamMirror.setSSID(str_Ssid);
