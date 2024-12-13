@@ -230,6 +230,8 @@ void HomeLightHttpServer::init()
     DataContainer::getSignalValue(SIG_IP_ADDRESS_STRING)
   );
 
+  secAccessLevel = std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
+
   server.setNoDelay(true);
   server.begin();
   currentTime = millis();
@@ -634,37 +636,86 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
   client.println("<div class=\"header\">General configuration</div>");
+  client.println("\
+    <div class=\"container\">\
+    <form onsubmit=\"return false;\">");
+  
+  /* exclusion for ServiceMode Access level only */
+  if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
+    client.println("<div class=\"access-level-hidder\" >");
+  }
+  /* intended TAB */
+    /* Is Http Server configuration */
+    client.println("<label>HTTP Server:<select name=\"isHTTPServer\">");
+    if(currentConfig.isHttpServer)
+    {
+      client.println(yesSelected);
+      client.println(noNotSelected);
+    }else
+    {
+      client.println(yesNotSelected);
+      client.println(noSelected);
+    }
+    client.println("</select></label>");
 
-  client.println(configPageContent1);
-  if(currentConfig.isHttpServer)
-  {
-    client.println(yesSelected);
-    client.println(noNotSelected);
-  }else
-  {
-    client.println(yesNotSelected);
-    client.println(noSelected);
+    /* Is RC Server configuration */
+    client.println("<label>RC Mode:<select name=\"isRCServer\">");
+    if(currentConfig.isRcServer)
+    {
+      client.println(yesSelected);
+      client.println(noNotSelected);
+    }else
+    {
+      client.println(yesNotSelected);
+      client.println(noSelected);
+    }
+    client.println("</select></label>");
+
+      /* Node ID */
+    client.println("<label>Node ID:<input value=\"");
+    client.println((int)currentConfig.nodeId);
+    client.println("\" type=\"text\" name=\"nodeid\"></label>");
+    
+    /* Device type  */
+    client.println("<label>Type:<input value=\"");
+    client.println((int)currentConfig.nodeType);
+    client.println("\" type=\"text\" name=\"nodetype\"></label>");
+
+  if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
+    client.println("</div>");
   }
-  client.println(configPageContent2);
-  if(currentConfig.isRcServer)
-  {
-    client.println(yesSelected);
-    client.println(noNotSelected);
-  }else
-  {
-    client.println(yesNotSelected);
-    client.println(noSelected);
-  }
-  client.println(configPageContent3);
+
+  /* Network SSID */
+  client.println("<label>SSID:<input value=\"");
   client.println(currentConfig.networkSSID);
-  client.println(configPageContent4);
-  client.println(currentConfig.networkPassword);
-  client.println(configPageContent5);
-  client.println((int)currentConfig.nodeId);
-  client.println(configPageContent6);
-  client.println((int)currentConfig.nodeType);
-  client.println(configPageContent7);
+  client.println("\" type=\"text\" name=\"SSID\"></label>");
 
+  /* Network Password */
+  client.println("<label>Password:<input value=\"");
+  client.println(currentConfig.networkPassword);
+  client.println("\" type=\"text\" name=\"Password\"></label>");
+
+  /* Network Password */
+  client.println("<label>Password (check):<input value=\"");
+  client.println(currentConfig.networkPassword);
+  client.println("\" type=\"text\" name=\"Password2\"></label>");
+
+  /* Apply button*/
+  client.println("<div class=\"error-button\" onclick=\"showPopup('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
+  
+  /* Room mapping button */
+  client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
+    
+  /* Devices setup button */
+  if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
+    client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
+  
+    /* Clear all settings */
+    client.println("<div class=\"error-button\" onclick=\"showPopup('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
+  }
+
+  /* Common HTML tags closure */
+  client.println("</form></div>");
 
   printErrorTable(client);
 
@@ -729,7 +780,15 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
     const char* errorClearBtn = "\
     <button class=\"error-button\" \
     onclick=\"showPopup('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
+
+    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
+      client.println("<div class=\"access-level-hidder\">");
+    }
+
     client.println(errorClearBtn);
+    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
+      client.println("</div>");
+    }
 
   }else 
   {

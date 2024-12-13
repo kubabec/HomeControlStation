@@ -11,8 +11,14 @@ const char* javascript = "\
         var nodeType = document.querySelector('input[name=\"nodetype\"]').value;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
+        var Password2 = document.querySelector('input[name=\"Password2\"]').value;\
         var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&nodeId=${encodeURIComponent(nodeId)}&nodeType=${encodeURIComponent(nodeType)}`;\
-        window.location.href = url;\
+        if(Password === Password2){\
+            window.location.href = url;\
+        }else {\
+            alert('Password must be the same!');\
+            window.location.href = '/';\
+        }\
     }\
     function goToDevicesManagement() {\
         var url = `/localDevices`;\
@@ -237,3 +243,10 @@ const char* javascript = "\
             //     crc = crc + dataName.charCodeAt(i);\
             // }\
             // crc = crc + Number(stringLength) + Number(stringLengthBytes);\
+
+            /*        if(Password === Password2){\
+            window.location.href = url;\
+        }else {\
+            alert('Password must be the same!');\
+            window.location.href = '/';\
+        }\*/

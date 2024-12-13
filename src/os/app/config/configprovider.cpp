@@ -45,6 +45,8 @@ void ConfigProvider::init()
         configRamMirror.safeShutdownFlag = 0;
         saveRamMirrorToNvm();
         configRamMirror.serialPrint();
+
+        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_NONE);
     }else 
     {
         std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
@@ -68,6 +70,9 @@ void ConfigProvider::init()
         DataContainer::setSignalValue(SIG_IS_RC_SERVER, static_cast<bool> (true));
         // New signal to be used in the future implementation
         DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, emptyConfiguration);
+
+        /* As device cannot restore correct configuration, Service Mode is granted by default */
+        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE);
     }
 
     

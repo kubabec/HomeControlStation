@@ -192,4 +192,9 @@ void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
         DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE);
         Serial.println("Access level granted: e_ACCESS_LEVEL_SERVICE_MODE");
     }
+
+    if(password == "user"){
+        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_AUTH_USER);
+        Serial.println("Access level granted: e_ACCESS_LEVEL_AUTH_USER");
+    }
 }

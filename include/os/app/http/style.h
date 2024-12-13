@@ -410,6 +410,10 @@ input[type=\"range\"]:focus {\
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);\
     transition: all 0.3s ease;\
 }\
+.access-level-hidder {\
+    visibility: hidden;\
+    display: none;\
+}\
 \
 .status-light.on {\
     background: radial-gradient(circle, #00ff00 20%, #006600 70%);\
