@@ -696,8 +696,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"Password\"></label>");
 
   /* Network Password */
-  client.println("<label>Panel Password:<input value=\"");
-  client.println(currentConfig.networkPassword);
+  client.println("<label>Panel Password:<input value=\"PWDHERE");
+  //client.println(currentConfig.networkPassword);
   client.println("\" type=\"text\" name=\"Password2\"></label>");
 
   /* Apply button*/

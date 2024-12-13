@@ -145,7 +145,7 @@ void OperatingSystem::performReset()
 
 void OperatingSystem::handleSecurityAccessLevelExpiration()
 {
-    const uint16_t timeToExpireAccessLevel = (1000 * 60) * 5; /* 5 minutes */
+    const unsigned timeToExpireAccessLevel = (1000 * 60) * 5; /* 5 minutes */
     /* access level is granted? */
     if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
         if(abs(millis() - accessLevelGrantedTimeSnapshot) > timeToExpireAccessLevel){
