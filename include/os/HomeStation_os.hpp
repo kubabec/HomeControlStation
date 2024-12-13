@@ -26,6 +26,11 @@ private:
 
     static void performReset();
     static uint16_t calculateRuntimeNodeHash();
+    static void handleSecurityAccessLevelExpiration();
+    static void changeSecurityAccessLevel(SecurityAccessLevelType newAccessLevel);
+    
+    static long long accessLevelGrantedTimeSnapshot;
+    static SecurityAccessLevelType currentAccessLevel;
 public:
     static void init();
     static void reset();

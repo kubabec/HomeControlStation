@@ -8,8 +8,13 @@ uint8_t OperatingSystem::resetCountdown = 10;
 uint16_t OperatingSystem::runtimeNodeHash = 0;
 uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
+long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
+SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
+
 void OperatingSystem::init()
 {
+    changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
+
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
@@ -29,8 +34,14 @@ void OperatingSystem::init()
 
     ErrorMonitor::init();
     ConfigProvider::init();
-    
 
+    /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
+    NodeConfiguration currentConfig = 
+        std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+    if(currentConfig.nodeId == 255 && currentConfig.nodeType == 255){
+        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
+    }
+    
     // Initialize network settings such as 
     // WiFi network connection etc.
     NetworkDriver::init();
@@ -38,8 +49,6 @@ void OperatingSystem::init()
     if(isHttpServerRunning){
         HomeLightHttpServer::init();
     }
-
-
 
 
     // Inicialize device manager, devices settings etc.
@@ -94,12 +103,14 @@ void OperatingSystem::task50ms()
             performReset();
         }
     }
+
+    runtimeNodeHash = calculateRuntimeNodeHash();
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
 }
 
 void OperatingSystem::task1s()
 {
-    runtimeNodeHash = calculateRuntimeNodeHash();
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
+    handleSecurityAccessLevelExpiration();
 }
 
 void OperatingSystem::reset() {
@@ -130,6 +141,20 @@ void OperatingSystem::performReset()
     ConfigProvider::deinit();
 
     ESP.restart();
+}
+
+void OperatingSystem::handleSecurityAccessLevelExpiration()
+{
+    const uint16_t timeToExpireAccessLevel = (1000 * 60) * 5; /* 5 minutes */
+    /* access level is granted? */
+    if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
+        if(abs(millis() - accessLevelGrantedTimeSnapshot) > timeToExpireAccessLevel){
+            accessLevelGrantedTimeSnapshot = 0;
+            currentAccessLevel = e_ACCESS_LEVEL_NONE;
+            DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
+            Serial.println("Access level unlock expired.");
+        }
+    }
 }
 
 /* Funkcja do obliczenia unikalnego identyfikatora (hasha) dla bieżącego stanu systemu.*/
@@ -189,12 +214,36 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 {
     if(password == "admin"){
-        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE);
-        Serial.println("Access level granted: e_ACCESS_LEVEL_SERVICE_MODE");
+        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
     }
 
     if(password == "user"){
-        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_AUTH_USER);
-        Serial.println("Access level granted: e_ACCESS_LEVEL_AUTH_USER");
+        changeSecurityAccessLevel(e_ACCESS_LEVEL_AUTH_USER);
+    }
+}
+
+void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAccessLevel)
+{
+    currentAccessLevel = newAccessLevel;
+    accessLevelGrantedTimeSnapshot = millis();
+    DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
+
+    Serial.print("Access level granted: ");
+    switch (currentAccessLevel)
+    {
+    case e_ACCESS_LEVEL_NONE:
+        Serial.println("e_ACCESS_LEVEL_NONE");
+        break;
+    
+    case e_ACCESS_LEVEL_AUTH_USER:
+        Serial.println("e_ACCESS_LEVEL_AUTH_USER");
+        break;
+
+    case e_ACCESS_LEVEL_SERVICE_MODE:
+        Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
+        break;
+    default:
+        Serial.println("INVALID");
+        break;
     }
 }

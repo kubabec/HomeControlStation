@@ -691,12 +691,12 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"SSID\"></label>");
 
   /* Network Password */
-  client.println("<label>Password:<input value=\"");
+  client.println("<label>WiFi Password:<input value=\"");
   client.println(currentConfig.networkPassword);
   client.println("\" type=\"text\" name=\"Password\"></label>");
 
   /* Network Password */
-  client.println("<label>Password (check):<input value=\"");
+  client.println("<label>Panel Password:<input value=\"");
   client.println(currentConfig.networkPassword);
   client.println("\" type=\"text\" name=\"Password2\"></label>");
 

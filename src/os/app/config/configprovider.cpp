@@ -46,7 +46,6 @@ void ConfigProvider::init()
         saveRamMirrorToNvm();
         configRamMirror.serialPrint();
 
-        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_NONE);
     }else 
     {
         std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
@@ -71,8 +70,8 @@ void ConfigProvider::init()
         // New signal to be used in the future implementation
         DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, emptyConfiguration);
 
-        /* As device cannot restore correct configuration, Service Mode is granted by default */
-        DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE);
+        // /* As device cannot restore correct configuration, Service Mode is granted by default */
+        // DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE); /* moved to OS logic */
     }
 
     
@@ -131,112 +130,126 @@ void ConfigProvider::cyclic()
 
 void ConfigProvider::setConfigViaString(String& configString)
 {
-    String str_isHttpServer, str_isRcServer, str_Ssid, str_Passwd, str_nodeId, str_nodeType;
-    MatchState matcher;
-    matcher.Target(const_cast<char*>(configString.c_str()));
-    /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
-    Serial.println("New config received :");
-    const String part1 = "apply?isHTTPServer=";
-    const String part2 = "&isRCServer=";
-    const String part3 = "&SSID=";
-    const String part4 = "&Password=";
-    const String part5 = "&nodeId=";
-    const String part6 = "&nodeType=";
-    const String part7 = "";
+    SecurityAccessLevelType currentAccessLevel = 
+        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
 
-    char searchResult = matcher.Match(part2.c_str());
-    uint16_t readStartIndex = 0;
-    Serial.println((uint16_t)searchResult);
-    if(searchResult > 0)
+    /* Check if device is unlocked that config can be modified */
+    if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
+        String str_isHttpServer, str_isRcServer, str_Ssid, str_Passwd, str_nodeId, str_nodeType;
+        MatchState matcher;
+        matcher.Target(const_cast<char*>(configString.c_str()));
+        /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
+        Serial.println("New config received :");
+        const String part1 = "apply?isHTTPServer=";
+        const String part2 = "&isRCServer=";
+        const String part3 = "&SSID=";
+        const String part4 = "&Password=";
+        const String part5 = "&nodeId=";
+        const String part6 = "&nodeType=";
+        const String part7 = "";
+
+        char searchResult = matcher.Match(part2.c_str());
+        uint16_t readStartIndex = 0;
+        Serial.println((uint16_t)searchResult);
+        if(searchResult > 0)
+        {
+            readStartIndex = part1.length();
+            // Read HTTP server config
+            str_isHttpServer = configString.substring(readStartIndex, matcher.MatchStart);
+            //Serial.println("isHttpServer : " + str_isHttpServer);
+
+            // Move start read index by part2 length
+            readStartIndex = matcher.MatchStart + part2.length();
+            
+            // Search for next value
+            searchResult = matcher.Match(part3.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_isRcServer = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("str_isRcServer : " + str_isRcServer);
+            }
+
+            // Move start read index by part3 length
+            readStartIndex = matcher.MatchStart + part3.length();
+            // Search for next value
+            searchResult = matcher.Match(part4.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_Ssid = configString.substring(readStartIndex, matcher.MatchStart);
+                str_Ssid.replace("%20", " ");
+                //Serial.println("str_Ssid : " + str_Ssid);
+            }
+
+            // Move start read index by part4 length
+            readStartIndex = matcher.MatchStart + part4.length();
+            // Search for next value
+            searchResult = matcher.Match(part5.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_Passwd = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("str_Passwd : " + str_Passwd);
+            }
+
+
+            // Move start read index by part4 length
+            readStartIndex = matcher.MatchStart + part5.length();
+            // Search for next value
+            searchResult = matcher.Match(part6.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_nodeId = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("str_Passwd : " + str_Passwd);
+            }
+
+
+            // Move start read index by part4 length
+            readStartIndex = matcher.MatchStart + part6.length();
+            // Search for next value
+            searchResult = matcher.Match(part7.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_nodeType = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("str_Passwd : " + str_Passwd);
+            }
+
+            /* Prepare configuration data */
+            /* Some of configs are only allowed to be changed in Service mode */
+            if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
+                configRamMirror.isHttpServer = str_isHttpServer == "yes" ? 1 : 0;
+                configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
+                configRamMirror.nodeId = str_nodeId.toInt() < 254 ? str_nodeId.toInt() : 255;
+                configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
+            }
+
+            configRamMirror.setSSID(str_Ssid);
+            configRamMirror.setPassword(str_Passwd);
+
+            Serial.println("Applying following configuration :");
+            configRamMirror.serialPrint();
+
+            /* Save changed configuration + all the rest of RAM mirrors to NVM */
+            //saveRamMirrorToNvm();
+
+        }else
+        {
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT)
+                )(ERR_MON_WRONG_CONFIG_STRING_RECEIVED, 0);
+
+            Serial.println("Invalid config passed! Rejecting...");
+        }
+
+        Serial.println(configString);
+
+    } else 
     {
-        readStartIndex = part1.length();
-        // Read HTTP server config
-        str_isHttpServer = configString.substring(readStartIndex, matcher.MatchStart);
-        //Serial.println("isHttpServer : " + str_isHttpServer);
-
-        // Move start read index by part2 length
-        readStartIndex = matcher.MatchStart + part2.length();
-        
-        // Search for next value
-        searchResult = matcher.Match(part3.c_str());
-        if(searchResult > 0)
-        {
-            // Read RC server config
-            str_isRcServer = configString.substring(readStartIndex, matcher.MatchStart);
-            //Serial.println("str_isRcServer : " + str_isRcServer);
-        }
-
-        // Move start read index by part3 length
-        readStartIndex = matcher.MatchStart + part3.length();
-        // Search for next value
-        searchResult = matcher.Match(part4.c_str());
-        if(searchResult > 0)
-        {
-            // Read RC server config
-            str_Ssid = configString.substring(readStartIndex, matcher.MatchStart);
-            str_Ssid.replace("%20", " ");
-            //Serial.println("str_Ssid : " + str_Ssid);
-        }
-
-        // Move start read index by part4 length
-        readStartIndex = matcher.MatchStart + part4.length();
-        // Search for next value
-        searchResult = matcher.Match(part5.c_str());
-        if(searchResult > 0)
-        {
-            // Read RC server config
-            str_Passwd = configString.substring(readStartIndex, matcher.MatchStart);
-            //Serial.println("str_Passwd : " + str_Passwd);
-        }
-
-
-        // Move start read index by part4 length
-        readStartIndex = matcher.MatchStart + part5.length();
-        // Search for next value
-        searchResult = matcher.Match(part6.c_str());
-        if(searchResult > 0)
-        {
-            // Read RC server config
-            str_nodeId = configString.substring(readStartIndex, matcher.MatchStart);
-            //Serial.println("str_Passwd : " + str_Passwd);
-        }
-
-
-        // Move start read index by part4 length
-        readStartIndex = matcher.MatchStart + part6.length();
-        // Search for next value
-        searchResult = matcher.Match(part7.c_str());
-        if(searchResult > 0)
-        {
-            // Read RC server config
-            str_nodeType = configString.substring(readStartIndex, matcher.MatchStart);
-            //Serial.println("str_Passwd : " + str_Passwd);
-        }
-
-        /* Prepare configuration data */
-        configRamMirror.isHttpServer = str_isHttpServer == "yes" ? 1 : 0;
-        configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
-        configRamMirror.setSSID(str_Ssid);
-        configRamMirror.setPassword(str_Passwd);
-        configRamMirror.nodeId = str_nodeId.toInt() < 254 ? str_nodeId.toInt() : 255;
-        configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
-
-        Serial.println("Applying following configuration :");
-        configRamMirror.serialPrint();
-
-        /* Save changed configuration + all the rest of RAM mirrors to NVM */
-        //saveRamMirrorToNvm();
-
-    }else
-    {
-        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-            DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(ERR_MON_WRONG_CONFIG_STRING_RECEIVED, 0);
-
-        Serial.println("Invalid config passed! Rejecting...");
+        /* No access level to apply */
     }
-
-    Serial.println(configString);
 }
 
 

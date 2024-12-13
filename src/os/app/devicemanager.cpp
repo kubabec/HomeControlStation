@@ -251,122 +251,131 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
 
 void DeviceManager::setLocalConfigViaString(String& config)
 {
-    const String part1 = "localSetup";
-    const String part5 = "";
-    const uint8_t numberOfDevicesExpected = 6;
-    bool isValidConfigReceived = false;
-    String devicesConfigStrings[numberOfDevicesExpected];
+    SecurityAccessLevelType currentAccessLevel = 
+        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
 
-    uint16_t charIndex = 0;
-    String configExtracted =  config.substring(part1.length());
-    uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
-    uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
+    /* feature only available in SERVICE MODE */
+    if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
+        const String part1 = "localSetup";
+        const String part5 = "";
+        const uint8_t numberOfDevicesExpected = 6;
+        bool isValidConfigReceived = false;
+        String devicesConfigStrings[numberOfDevicesExpected];
 
-    //Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
-    String deviceConfigOnlyStr = "";
+        uint16_t charIndex = 0;
+        String configExtracted =  config.substring(part1.length());
+        uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
+        uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
 
-    deviceConfigOnlyStr = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
+        //Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
+        String deviceConfigOnlyStr = "";
 
-    //Serial.println("Device only:" + deviceConfigOnlyStr);
-    //Serial.println("Extracted : " + configExtracted);
+        deviceConfigOnlyStr = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
 
-    charIndex = 0;
-    for(int i = 0; i < numberOfDevicesExpected; i ++)
-    {
-        uint8_t numberOfBytesForSingleConfigLength = String(deviceConfigOnlyStr.charAt(charIndex)).toInt();
-        uint8_t singleConfigLength = String(deviceConfigOnlyStr.substring(charIndex+1, (charIndex+1 + numberOfBytesForSingleConfigLength))).toInt();
-        /* Copy single device config string to string array */
-        devicesConfigStrings[i] = String(deviceConfigOnlyStr.substring(
-            (charIndex + 1 + numberOfBytesForSingleConfigLength), // [CONFLENGTH] [LENGTH ...] [CONFIG ...]
-            (charIndex + 1 + numberOfBytesForSingleConfigLength + singleConfigLength))
-            );
+        //Serial.println("Device only:" + deviceConfigOnlyStr);
+        //Serial.println("Extracted : " + configExtracted);
 
-        // Serial.println("Single Length : " + String((int)numberOfBytesForSingleConfigLength) + " , lenght: " + String((int)singleConfigLength));
-    
-        /*Move char index by this particular length + 1 (length count byte)*/
-        charIndex += singleConfigLength + 1 + numberOfBytesForSingleConfigLength;
-    }
-
-    uint8_t crcLength = String(configExtracted.charAt(charIndex + 1 + numberOfBytesForDataLength)).toInt();
-
-    // Serial.println("CRC length: " + String((int)crcLength));
-    charIndex++;
-    uint16_t crc = String(
-        configExtracted.substring(
-            charIndex + 1 + numberOfBytesForDataLength,
-            (charIndex + 1 + numberOfBytesForDataLength + crcLength))
-            ).toInt();
-    // Serial.println("CRC : " + String((int)crc));
-
-    uint16_t localCrc = configCrcCalculation(
-        (uint8_t*)configExtracted.c_str(), 
-        dataLength + 1 + numberOfBytesForDataLength);
-    // Serial.println("Local Crc : " + String((int)localCrc));
-
-    /* Proceed with data analysis STARTs here */
-    /* Based on known algorithm, check if received CRC is equal to locally calculated */
-    if(crc == localCrc) {
-        /* further data extraction possible */
-
-        /* This temp config set needs to be used in order to validate dependencies
-        between separate slots and to apply or reject the whole configuration*/
-        ConfigSlotsDataType temporaryConfigurationSet;
-
-        Serial.println(deviceConfigOnlyStr);
-        bool atLeastOneValid = false;
-        for(int i = 0 ; i < 6 ; i++)
+        charIndex = 0;
+        for(int i = 0; i < numberOfDevicesExpected; i ++)
         {
-            //Serial.println(devicesConfigStrings[i]);
-            DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
-            if(slotData.isValid())
-            {
-                atLeastOneValid = true;
-                //pinConfigSlotsRamMirror.slots[i] = slotData;
-                temporaryConfigurationSet.slots[i] = slotData;
-            }
+            uint8_t numberOfBytesForSingleConfigLength = String(deviceConfigOnlyStr.charAt(charIndex)).toInt();
+            uint8_t singleConfigLength = String(deviceConfigOnlyStr.substring(charIndex+1, (charIndex+1 + numberOfBytesForSingleConfigLength))).toInt();
+            /* Copy single device config string to string array */
+            devicesConfigStrings[i] = String(deviceConfigOnlyStr.substring(
+                (charIndex + 1 + numberOfBytesForSingleConfigLength), // [CONFLENGTH] [LENGTH ...] [CONFIG ...]
+                (charIndex + 1 + numberOfBytesForSingleConfigLength + singleConfigLength))
+                );
+
+            // Serial.println("Single Length : " + String((int)numberOfBytesForSingleConfigLength) + " , lenght: " + String((int)singleConfigLength));
+        
+            /*Move char index by this particular length + 1 (length count byte)*/
+            charIndex += singleConfigLength + 1 + numberOfBytesForSingleConfigLength;
         }
 
-        if(atLeastOneValid){
-            if(validateConfigurationData(temporaryConfigurationSet))
+        uint8_t crcLength = String(configExtracted.charAt(charIndex + 1 + numberOfBytesForDataLength)).toInt();
+
+        // Serial.println("CRC length: " + String((int)crcLength));
+        charIndex++;
+        uint16_t crc = String(
+            configExtracted.substring(
+                charIndex + 1 + numberOfBytesForDataLength,
+                (charIndex + 1 + numberOfBytesForDataLength + crcLength))
+                ).toInt();
+        // Serial.println("CRC : " + String((int)crc));
+
+        uint16_t localCrc = configCrcCalculation(
+            (uint8_t*)configExtracted.c_str(), 
+            dataLength + 1 + numberOfBytesForDataLength);
+        // Serial.println("Local Crc : " + String((int)localCrc));
+
+        /* Proceed with data analysis STARTs here */
+        /* Based on known algorithm, check if received CRC is equal to locally calculated */
+        if(crc == localCrc) {
+            /* further data extraction possible */
+
+            /* This temp config set needs to be used in order to validate dependencies
+            between separate slots and to apply or reject the whole configuration*/
+            ConfigSlotsDataType temporaryConfigurationSet;
+
+            Serial.println(deviceConfigOnlyStr);
+            bool atLeastOneValid = false;
+            for(int i = 0 ; i < 6 ; i++)
             {
-                /* Temporary config validated correctly, settings can be applied */
-
-                pinConfigSlotsRamMirror = temporaryConfigurationSet;
-                isValidConfigReceived = true;
-
-                /* Publish retrieved DeviceConfigSlots signal to the system */
-                DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
-
-
-                Serial.println("New config found, reboot ...");
-
-
-                Serial.println("Applying new config !!!!");
-                for(auto& element : pinConfigSlotsRamMirror.slots)
+                //Serial.println(devicesConfigStrings[i]);
+                DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
+                if(slotData.isValid())
                 {
-                    element.print();
+                    atLeastOneValid = true;
+                    //pinConfigSlotsRamMirror.slots[i] = slotData;
+                    temporaryConfigurationSet.slots[i] = slotData;
                 }
-
-                std::any_cast<std::function<void()>>
-                    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-            }else 
-            {
-                Serial.println("Invalid configuration set detected, ignoring.");
             }
+
+            if(atLeastOneValid){
+                if(validateConfigurationData(temporaryConfigurationSet))
+                {
+                    /* Temporary config validated correctly, settings can be applied */
+
+                    pinConfigSlotsRamMirror = temporaryConfigurationSet;
+                    isValidConfigReceived = true;
+
+                    /* Publish retrieved DeviceConfigSlots signal to the system */
+                    DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
+
+
+                    Serial.println("New config found, reboot ...");
+
+
+                    Serial.println("Applying new config !!!!");
+                    for(auto& element : pinConfigSlotsRamMirror.slots)
+                    {
+                        element.print();
+                    }
+
+                    std::any_cast<std::function<void()>>
+                        (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+                }else 
+                {
+                    Serial.println("Invalid configuration set detected, ignoring.");
+                }
+            }
+
+        }else 
+        {
+            /* invalid CRC, reject the request */
+            Serial.println("Invalid CRC received for local config: " + String((int)crc) + " != " + String((int)localCrc));
         }
 
+
+        if(!isValidConfigReceived)
+        {
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT)
+                )(ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED, localCrc);
+        }
     }else 
     {
-        /* invalid CRC, reject the request */
-        Serial.println("Invalid CRC received for local config: " + String((int)crc) + " != " + String((int)localCrc));
-    }
-
-
-    if(!isValidConfigReceived)
-    {
-        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-            DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED, localCrc);
+        /* no access level to apply */
     }
 }
 
