@@ -37,6 +37,8 @@ class HomeLightHttpServer
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
 
     static bool isUserInterfaceBlocked;
+    static unsigned long blockUIStartTime;
+    
 
     static String ipAddressString;
     static SecurityAccessLevelType secAccessLevel;
@@ -46,7 +48,7 @@ class HomeLightHttpServer
     static void requestErrorList();
 
     
-
+    static void checkUIBlockTime();
 
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);

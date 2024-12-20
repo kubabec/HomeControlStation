@@ -89,6 +89,7 @@ void HomeLightHttpServer::cyclic()
 {
     // Do cyclic task here
     handleClientRequest();
+    //checkUIBlockTime();
 }
 
 void HomeLightHttpServer::deinit() {
@@ -481,9 +482,21 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 {
   try {
     isUserInterfaceBlocked = (std::any_cast<bool>(isBlockedValue));
+    blockUIStartTime = millis();
   }catch (std::bad_any_cast ex)
   {
     /* do nothing */
+  }
+  
+}
+
+void HomeLightHttpServer::checkUIBlockTime() {
+  if (isUserInterfaceBlocked) {
+    
+    if (millis() - blockUIStartTime > 2000) {
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
+        Serial.println("^^^^^^^^^^^^^^^^^^^^ UI Odblokowane ^^^^^^^^^^^^^^^^^^^^^^^");
+        }
   }
 }
 

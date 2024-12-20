@@ -195,7 +195,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
         if(devicedetails.isLocal) {
           
             /* Which service overloading is received? */
-            switch (request.data[1])
+            switch (request.data[1]) /* zrobic define na 1 o nazwie " " zrobić enum na 1*/
             {
             case 0:
                 //deviceEnable(request.data[0],true);
