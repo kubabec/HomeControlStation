@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 33
+#define NUMBER_OF_SIGNALS 34
 enum Signal
 {
     /* Type: bool , somme description */
@@ -11,6 +11,9 @@ enum Signal
     
     /* Type: std::vector<OnOffDeviceDescription> - zbiór lokalnych OnOffDevices information*/
     SIG_LOCAL_COLLECTION_ONOFF,
+
+    /* Type: std::vector<DeviceDescription> - zbiór lokalnych Devices information*/
+    SIG_LOCAL_COLLECTION,
     
     /* Type: std::vector<OnOffDeviceDescription> - zbior urządzeń na innych nodach OnOffDevices information*/
     SIG_REMOTE_COLLECTION_ONOFF,

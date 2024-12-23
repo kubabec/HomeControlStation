@@ -2,6 +2,8 @@
 #define DEVICE_H
 #include "Arduino.h"
 
+#define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
+
 typedef enum
 {
     SERV_SUCCESS,
@@ -19,6 +21,12 @@ typedef enum
     DEVSERVICE_STATE_SWITCH,
     DEVSERVICE_BRIGHTNESS_CHANGE
 }DeviceServicesType;
+
+typedef enum {
+    type_ONOFFDEVICE = 100,
+    type_TESTDEVICETYPE,
+    type_LEDSTRIP
+}DevType;
 
 typedef struct
 {
@@ -44,7 +52,26 @@ typedef struct
     uint8_t size = 0xff;
 }ServiceParameters_set3;
 
-
+typedef struct
+{
+    uint8_t deviceType = 255;
+    uint8_t nodeId = 255;
+    uint8_t deviceId = -1;
+    uint8_t roomId = 255;
+    bool isEnabled;
+    uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION];
+    
+    String deviceName;
+    void print() {
+        //Serial.println(" ======DEVICE DESCRIPTION=============");
+        Serial.print("deviceType: " + String(deviceType) + " - ");
+        Serial.print("nodeId: " + String(nodeId) + " - ");
+        Serial.print("deviceId: " + String(deviceId) + " - ");
+        Serial.print("isEnabled: " + String(isEnabled) + " - ");
+        Serial.print("deviceName: " + deviceName);
+        Serial.println();
+        }
+}DeviceDescription;
 
 
 class Device
@@ -56,6 +83,7 @@ public:
 
     virtual void init() = 0; //funkcje ktore nazucaja potomka koniecznosc ich implementacji
     virtual void cyclic() = 0;
+    virtual DeviceDescription getDeviceDescription() = 0;
     virtual uint8_t getDeviceIdentifier() = 0;
     virtual uint8_t getDeviceType() = 0;
 

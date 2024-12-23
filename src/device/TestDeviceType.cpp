@@ -49,3 +49,14 @@ ServiceRequestErrorCode TestDeviceType::service(DeviceServicesType serviceType, 
             return SERV_NOT_SUPPORTED;
     };
 }
+
+DeviceDescription TestDeviceType::getDeviceDescription(){
+    DeviceDescription desc;
+    desc.deviceType = 5;
+    desc.nodeId = 1;
+    desc.deviceId = 11;
+    desc.roomId = 1;
+    desc.isEnabled = true;
+    desc.deviceName = "TestDeviceType";
+    return desc;
+}

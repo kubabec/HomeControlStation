@@ -174,3 +174,17 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             return SERV_NOT_SUPPORTED;
     };
 }
+
+DeviceDescription OnOffDevice::getDeviceDescription(){
+    DeviceDescription desc;
+    desc.deviceType = type_ONOFFDEVICE;
+    desc.nodeId = 200;
+    desc.deviceId = deviceId;
+    desc.roomId = roomId;
+    desc.isEnabled = isOn;
+    desc.deviceName = deviceName;
+    desc.customBytes[0] = brightnessLevelSupport;
+    desc.customBytes[1] = brightnessLevel;
+
+    return desc;
+}

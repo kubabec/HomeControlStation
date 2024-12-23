@@ -171,6 +171,19 @@ void DeviceManager::updateDeviceDescriptionSignal() {
         
     DataContainer::setSignalValue(SIG_LOCAL_COLLECTION_ONOFF, vecOnOffDescription);
     //Serial.println("===DeviceManager - Ustawienie sygnału w Data Container======");   
+
+
+    std::vector<DeviceDescription> Descriptions;
+
+    for(Device* device : devices) {
+        
+        Descriptions.push_back(device->getDeviceDescription());
+
+    }
+
+    DataContainer::setSignalValue(SIG_LOCAL_COLLECTION, Descriptions);
+
+
 }
 
 
