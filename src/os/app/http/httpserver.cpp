@@ -14,10 +14,12 @@ unsigned long HomeLightHttpServer::currentTime = 0;
 unsigned long HomeLightHttpServer::previousTime = 0;
 const long HomeLightHttpServer::timeoutTime = 2000;
 int HomeLightHttpServer::pos1= 100;
-int HomeLightHttpServer::pos2 = 150;
+int HomeLightHttpServer::pos2 = 150; 
 int HomeLightHttpServer::pos3 = 150;
 bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NONE;
+
+unsigned long HomeLightHttpServer::blockUIStartTime = 0; 
 
 
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
@@ -89,7 +91,7 @@ void HomeLightHttpServer::cyclic()
 {
     // Do cyclic task here
     handleClientRequest();
-    //checkUIBlockTime();
+    checkUIBlockTime();
 }
 
 void HomeLightHttpServer::deinit() {
@@ -159,7 +161,7 @@ void HomeLightHttpServer::init()
   
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
-    activeErrorsCount = 0;
+    activeErrorsCount = 0;    
 
     /* Count errors with occurrence > 0 */
     for(auto& error : systemErrorList)
@@ -482,6 +484,7 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 {
   try {
     isUserInterfaceBlocked = (std::any_cast<bool>(isBlockedValue));
+    //Serial.println("!!!!!!!!!!!!!!!!!!!!!UI blocked: " + String(isUserInterfaceBlocked));
     blockUIStartTime = millis();
   }catch (std::bad_any_cast ex)
   {
@@ -492,10 +495,10 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 
 void HomeLightHttpServer::checkUIBlockTime() {
   if (isUserInterfaceBlocked) {
-    
-    if (millis() - blockUIStartTime > 2000) {
+    //Serial.println("***Checking UI Block Time***");
+    if (millis() - blockUIStartTime > 5000) {
         DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
-        Serial.println("^^^^^^^^^^^^^^^^^^^^ UI Odblokowane ^^^^^^^^^^^^^^^^^^^^^^^");
+        //Serial.println("*** UI Unblocked ***");
         }
   }
 }

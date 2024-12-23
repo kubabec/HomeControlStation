@@ -6,6 +6,16 @@
 #include <any>
 #include <functional>
 
+#define SERVICE_OVERLOADING_FUNCTION_INDEX 1
+#define SERVICE_NAME 0
+
+enum {
+    serviceCall_NoParams,
+    serviceCall_1,
+    serviceCall_2,
+    serviceCall_3
+} ServiceOverloadingFunction;
+
 /* typ opisujacy czy dane urzadzenie jest local czy remote i jakie ma oryginalne ID */
 struct DeviceTranslationDetails{
     uint8_t originalID = 255;

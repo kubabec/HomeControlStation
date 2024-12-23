@@ -194,19 +194,18 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
           
-            /* Which service overloading is received? */
-            switch (request.data[1]) /* zrobic define na 1 o nazwie " " zrobić enum na 1*/
+            /* Which function service overloading is received? */
+            switch (request.data[SERVICE_OVERLOADING_FUNCTION_INDEX])
             {
-            case 0:
-                //deviceEnable(request.data[0],true);
+            case serviceCall_NoParams:
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[0] /* TODO negative response*/
+                    (DeviceServicesType)request.data[SERVICE_NAME] /* TODO negative response*/
                 );
                 response.responseType = POSITIVE_RESP;
                 break;
 
-            case 1:
+            case serviceCall_1:
                 /* Copy function parameter values from the request */
                 
                 memcpy(&params, &request.data[2], sizeof(ServiceParameters_set1));
@@ -214,7 +213,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                 /* call the service */
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[0], /* TODO negative response*/
+                    (DeviceServicesType)request.data[SERVICE_NAME], /* TODO negative response*/
                     params
                 );
                 response.responseType = POSITIVE_RESP;
