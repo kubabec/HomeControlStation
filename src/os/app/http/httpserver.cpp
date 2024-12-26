@@ -39,16 +39,6 @@ const char* labelEnd = "</label>";
 // ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
 // ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
 // ERR_MON_INVALID_ERROR_REPORTED,
-String errorCodeDescription[ERR_MONT_ERROR_COUNT] = 
-{
-  "Unexpected reset",
-  "Invalid NVM data",
-  "Invalid local devices config",
-  "Wrong config string received",
-  "Wrong local devices config string received",
-  "Wrong device ID for local service request",
-  "Invalid error reported"
-};
 
 std::vector<String> constantRequests = {
   "", /* Main page with no parameter */
@@ -769,9 +759,8 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
     client.println("<thead>\
                       <tr>\
                           <th>Code</th>\
-                          <th>Description</th>\
                           <th>Count</th>\
-                          <th>Extra Data</th>\
+                          <th>Comment</th>\
                           <th>Time</th>\
                       </tr>\
                   </thead><tbody>");
@@ -782,9 +771,8 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
       if(systemErrorList.at(i).occurrenceCount > 0) {
         client.println("<tr>\
                           <td>ERR-"+ String(i+1) +"</td>\
-                          <td>" + errorCodeDescription[i] + "</td>\
                           <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
-                          <td>"+ String((int)systemErrorList.at(i).extendedData) +"</td>\
+                          <td>"+ systemErrorList.at(i).comment +"</td>\
                           <td>"+ String((int)systemErrorList.at(i).lastOccurrenceTime) +"</td>\
                       </tr>");
 

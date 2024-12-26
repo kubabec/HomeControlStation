@@ -9,7 +9,7 @@ class ErrorMonitor
     static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> errorList;
 
     
-    static void errorReport(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData);
+    static void errorReport(ERR_MON_ERROR_TYPE errorCode, String comment);
     static void errorClear(ERR_MON_ERROR_TYPE errorCode);
 
     static void updateSystemErrorSignal();

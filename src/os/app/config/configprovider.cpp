@@ -38,8 +38,11 @@ void ConfigProvider::init()
         if(configRamMirror.safeShutdownFlag != 37)
         {
             /* Unexpected reset detected! */
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT))(ERR_MON_UNEXPECTED_RESET, 0);
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT))(
+                    ERR_MON_UNEXPECTED_RESET, 
+                    "Unexpected reset occured"
+                );
         }
 
         configRamMirror.safeShutdownFlag = 0;
@@ -48,9 +51,12 @@ void ConfigProvider::init()
 
     }else 
     {
-        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
             DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(ERR_MON_INVALID_NVM_DATA, 0);
+            )(
+                ERR_MON_INVALID_NVM_DATA,
+                "Unable to restore NVM data"
+            );
 
     
         Serial.println("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
@@ -245,9 +251,12 @@ void ConfigProvider::setConfigViaString(String& configString)
 
         }else
         {
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
                 DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(ERR_MON_WRONG_CONFIG_STRING_RECEIVED, 0);
+                )(
+                    ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
+                    "Invalid configuration string received"
+                );
 
             Serial.println("Invalid config passed! Rejecting...");
         }
