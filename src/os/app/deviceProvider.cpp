@@ -71,6 +71,7 @@ void DeviceProvider::init()
 void DeviceProvider::initLocalDevicesSetup() {
     DataContainer::subscribe(SIG_LOCAL_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
+    DataContainer::subscribe(SIG_LOCAL_COLLECTION, DeviceProvider::updateDeviceDescriptionSignal_onChange);
     
 }
 
@@ -78,6 +79,7 @@ void DeviceProvider::initRemoteDevicesSetup() {
     DataContainer::subscribe(SIG_REMOTE_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
 
 }
+
 
 void DeviceProvider::cyclic()
 {
@@ -109,6 +111,8 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     uniqueDeviceIdToNormalDeviceIdMap.clear();
     std::vector<OnOffDeviceDescription> vecOnOffDescription;
 
+    std::vector<DeviceDescription> deviceDescription;
+
     static uint8_t uniqueId = 7; //unikalne ID dla wszystkich urządzeń na lokalnym ESP i zdalnych ESP
 
     try {
@@ -116,10 +120,14 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
         std::any newLocalDescriptionVector = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION_ONOFF);
         std::vector<OnOffDeviceDescription> localOnOffDescriptionVector = (std::any_cast<std::vector<OnOffDeviceDescription>>(newLocalDescriptionVector));
 
+        std::any newLocalDeviceDescriptionVector = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION);
+        std::vector<DeviceDescription> localDeviceDescriptionVector = (std::any_cast<std::vector<DeviceDescription>>(newLocalDeviceDescriptionVector));
+
+
         for(auto device: localOnOffDescriptionVector) {
             
             DeviceTranslationDetails translationDetails = {                
-                .originalID = device.deviceId,
+                .originalID = device.deviceId, 
                 .isLocal = true            
             };
 
@@ -129,7 +137,19 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
             //Serial.println("-------------------- Dodaje local---------------");
             uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
             //uniqueId ++;
-        }        
+        }      
+
+        for(auto device: localDeviceDescriptionVector) {
+            DeviceTranslationDetails translationDetails = {                
+                .originalID = device.deviceId, 
+                .isLocal = true            
+            };
+
+            deviceDescription.push_back(device);
+            
+            uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
+            
+        }   
            
     }catch (const std::bad_any_cast& e){ }
 
@@ -162,7 +182,9 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     Serial.println("DeviceProvider//: Content updated :");
     printIdMap();
     Serial.println("///");
-    DataContainer::setSignalValue(SIG_COLLECTION_ONOFF, vecOnOffDescription);     
+    DataContainer::setSignalValue(SIG_COLLECTION_ONOFF, vecOnOffDescription);
+    
+    DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescription);     
 }
 
 void DeviceProvider::printIdMap() {
@@ -200,7 +222,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
             case serviceCall_NoParams:
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[SERVICE_NAME] /* TODO negative response*/
+                    (DeviceServicesType)request.data[SERVICE_NAME_INDEX] /* TODO negative response*/
                 );
                 response.responseType = POSITIVE_RESP;
                 break;
@@ -213,7 +235,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                 /* call the service */
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[SERVICE_NAME], /* TODO negative response*/
+                    (DeviceServicesType)request.data[SERVICE_NAME_INDEX], /* TODO negative response*/
                     params
                 );
                 response.responseType = POSITIVE_RESP;

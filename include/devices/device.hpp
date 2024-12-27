@@ -4,6 +4,16 @@
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 
+#define SERVICE_OVERLOADING_FUNCTION_INDEX 1
+#define SERVICE_NAME_INDEX 0
+
+enum {
+    serviceCall_NoParams,
+    serviceCall_1,
+    serviceCall_2,
+    serviceCall_3
+} ServiceOverloadingFunction;
+
 typedef enum
 {
     SERV_SUCCESS,
@@ -69,6 +79,11 @@ typedef struct
         Serial.print("deviceId: " + String(deviceId) + " - ");
         Serial.print("isEnabled: " + String(isEnabled) + " - ");
         Serial.print("deviceName: " + deviceName);
+        Serial.println("customBytes: ");
+        Serial.println(" dla OnOff [0] = brightnessLevelSupport, [1] = brightnessLevel");
+        for(int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++) {
+            Serial.print(String(customBytes[i]) + " ");
+        }
         Serial.println();
         }
 }DeviceDescription;
