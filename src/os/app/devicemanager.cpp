@@ -236,16 +236,19 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             }else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
                 Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
-                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String )>>(
                 DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
+                )(ERR_MON_INVALID_LOCAL_CONFIG, String("Invalid config slot ID: " + String((int)configSlotID)));
             }
         }
         else {
             Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
             DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
+            )(
+                ERR_MON_INVALID_LOCAL_CONFIG, 
+                String("Invalid Device type ("+ String((int)nvmData.deviceType)+") on slot " + String((int)configSlotID))
+            );
         }
     }
     // else 
@@ -382,9 +385,12 @@ void DeviceManager::setLocalConfigViaString(String& config)
 
         if(!isValidConfigReceived)
         {
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
+            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
                 DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED, localCrc);
+                )(
+                    ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
+                    "Invalid configuration data loaded"
+                );
         }
     }else 
     {

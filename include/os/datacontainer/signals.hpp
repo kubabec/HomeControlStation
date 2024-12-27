@@ -47,7 +47,7 @@ enum Signal
     SIG_CONFIG_SLOTS,
     /* Type: std:function<void()> - callback to reboot */
     CBK_RESET_DEVICE,
-    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)> - callback to reboot */
+    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode, String)> - callback to reboot */
     CBK_ERROR_REPORT,
     /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode)> - callback to reboot */
     CBK_ERROR_CLEAR,
