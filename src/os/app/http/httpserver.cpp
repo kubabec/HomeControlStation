@@ -806,6 +806,45 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 
 /*** CONSTANT HANDLERS */
 
+void printTestLedStrip(WiFiClient& client)
+{
+  const String brightnessSlider1  = "<br><div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
+  const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
+  
+
+  client.println("<div class=\"container\">"); 
+  client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
+  client.println("\
+                <div class=\"color-picker\"> \
+                    <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
+                    <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
+                </div>\
+                <button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
+  client.println("<a class=\"button\" href=\"/test\">OFF</a>\
+                ");
+  client.println(brightnessSlider1 + 40 + brightnessSlider2);
+
+  client.println("</div>");
+
+
+
+
+
+  client.println("<div class=\"container\">"); 
+  client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
+  client.println("\
+                <div class=\"color-picker\"> \
+                    <div class=\"color-display off\" id=\"colorDisplay2\" style=\"background-color:#e11cf3;\"></div> \
+                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#e11cf3\"> \
+                </div>\
+                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>");
+  client.println("<a class=\"button\" href=\"/test\">ON</a>\
+                ");
+  client.println(brightnessSlider1 + 70 + brightnessSlider2);
+
+  client.println("</div>");
+}
+
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
 
@@ -839,6 +878,9 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
             <div class=\"popup-close\" id=\"password-popup-close\">&times;</div>\
         </div>\
   </div>");
+
+
+  printTestLedStrip(client);
 
   /* Display configuration button */
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){

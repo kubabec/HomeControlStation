@@ -218,6 +218,26 @@ const char* javascript = "\
             url = '/passwordApply' + passwordValue;\
             window.location.href = url;\
         }\
+        function hexToRgb(hex) {\
+            const match = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);\
+            if (match) {\
+                return {\
+                    r: parseInt(match[1], 16),\
+                    g: parseInt(match[2], 16),\
+                    b: parseInt(match[3], 16)\
+                };\
+            }\
+            return null;\
+        }\
+        function sendColor(stripId) {\
+            const colorInput = document.getElementById(`colorInput${stripId}`);\
+            const color = colorInput.value;\
+            const rgbColor = hexToRgb(color);\
+            if (rgbColor) {\
+                const url = `/setColor?id=${stripId}&red=${rgbColor.r}&green=${rgbColor.g}&blue=${rgbColor.b}`;\
+                window.location.href = url;\
+            }\
+        }\
 </script>";
 
 #endif
@@ -244,3 +264,8 @@ const char* javascript = "\
             alert('Password must be the same!');\
             window.location.href = '/';\
         }\*/
+
+
+        
+
+        

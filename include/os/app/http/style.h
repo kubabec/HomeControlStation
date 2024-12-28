@@ -450,6 +450,60 @@ letter-spacing: 1px;\
 border-bottom: 2px solid #7aaedb;\
 padding-bottom: 5px;\
 }\
+.color-picker {\
+    display: flex;\
+    flex-direction: column;\
+    align-items: center;\
+}\
+\
+.color-input {\
+    width: 70px;\
+    height:40px;\
+    padding: 0px 0px;\
+    border: none;\
+    background-color: 0xffffff\
+    border-radius: 4px;\
+    color: white;\
+    text-align: center;\
+    text-decoration: none;\
+    font-size: 16px;\
+    cursor: pointer;\
+    font-family: inherit;\
+}\
+\
+.color-display {\
+    width: 250px;\
+    height: 8px;\
+    border-radius: 8px;\
+    background-color:0xffffff;\
+    margin-bottom: 10px;\
+    border: 1px solid #ccc;\
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);\
+    transition: all 0.3s ease;\
+    overflow: auto;\
+}\
+.color-display.on {\
+    box-shadow: 0 0 10px 4px rgba(0, 255, 0, 0.6), 0 0 20px 8px rgba(0, 255, 0, 0.5);\
+}\
+\
+.color-display.off {\
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3);\
+}\
+\
+.send-color-button {\
+    padding: 10px 20px;\
+    font-size: 16px;\
+    color: #fff;\
+    background-color: #007bff;\
+    border: none;\
+    border-radius: 5px;\
+    cursor: pointer;\
+    transition: background-color 0.3s ease;\
+}\
+\
+.send-color-button:hover {\
+    background-color: #0056b3;\
+}\
 </style>\
 ";
 
