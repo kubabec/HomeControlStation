@@ -36,8 +36,8 @@ const uint8_t ledsCount = 50;
 typedef struct{
   uint8_t status = 0;
   uint8_t red[ledsCount] = {0};
-  uint8_t green[ledsCount] = {0xA5};
-  uint8_t blue[ledsCount] = {0xAB};
+  uint8_t green[ledsCount] = {0};
+  uint8_t blue[ledsCount] = {0};
 }LedStripTestType;
 
 LedStripTestType leds;
@@ -835,6 +835,27 @@ void printTestLedStrip(WiFiClient& client)
         </div>\
     </div>");
 
+  
+  client.println("<div class=\"popup-backdrop\"></div>\
+    <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
+        <div class=\"header2\">Select composition</div>\
+          <button class=\"button\" id=\"compos1\">Composition 1</button>\
+          <button class=\"button\" id=\"compos2\">Composition 2</button>\
+          <button class=\"button\" id=\"compos3\">Composition 3</button>\
+          <br>\
+          <button class=\"button\" id=\"composClose\">Close</button>\
+    </div>");
+
+  client.println("<div class=\"popup-backdrop\"></div>\
+    <div class=\"color-picker-popup\" id=\"SaveFavouritesPopup\">\
+        <div class=\"header2\">Save composition</div>\
+          <button class=\"button\" id=\"compos1\">Slot 1</button>\
+          <button class=\"button\" id=\"compos2\">Slot 2</button>\
+          <button class=\"button\" id=\"compos3\">Slot 3</button>\
+          <br>\
+          <button class=\"button\" id=\"composSaveClose\">Close</button>\
+    </div>");
+
 
   const String brightnessSlider1  = "<br><div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
   const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
@@ -882,7 +903,9 @@ void printTestLedStrip(WiFiClient& client)
 "+firstLedGreen+"\
 "+firstLedBlue+"\"> \
                 </div>\
-                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>");
+                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
+                <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
+                <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
   client.println("<a class=\"button\" href=\"/test\">ON</a>\
                 ");
   client.println(brightnessSlider1 + 70 + brightnessSlider2);

@@ -251,6 +251,38 @@ const char* javascript = "\
             colorPickerPopup.style.display = \"none\";\
             backdrop.style.display = \"none\";\
         }\
+        function openCompositions() {\
+            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
+            const composClose = document.getElementById(\"composClose\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            composClose.addEventListener(\"click\", closeCompositions);\
+            colorInput.value = 0xFF00FA;\
+            FavouritesPopup.style.display = \"flex\";\
+            backdrop.style.display = \"block\";\
+        }\
+\
+        function closeCompositions() {\
+            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            FavouritesPopup.style.display = \"none\";\
+            backdrop.style.display = \"none\";\
+        }\
+        function openSaveCompositions() {\
+            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
+            const composClose = document.getElementById(\"composSaveClose\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            composClose.addEventListener(\"click\", closeSaveCompositions);\
+            colorInput.value = 0xFF00FA;\
+            FavouritesPopup.style.display = \"flex\";\
+            backdrop.style.display = \"block\";\
+        }\
+\
+        function closeSaveCompositions() {\
+            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            FavouritesPopup.style.display = \"none\";\
+            backdrop.style.display = \"none\";\
+        }\
         function rgbToHex(rgb) {\
             return rgb;\
         }\
