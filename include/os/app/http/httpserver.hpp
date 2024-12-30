@@ -110,6 +110,8 @@ public:
     static void parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client);
     static void parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client);
     static void parameterizedHandler_passwordApply(String& request, WiFiClient& client);
+    static void parameterizedHandler_ledStripColor(String& request, WiFiClient& client);
+    static void parameterizedHandler_ledColor(String& request, WiFiClient& client);
     
 };
 
