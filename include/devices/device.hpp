@@ -78,12 +78,14 @@ typedef struct
         Serial.print("nodeId: " + String(nodeId) + " - ");
         Serial.print("deviceId: " + String(deviceId) + " - ");
         Serial.print("isEnabled: " + String(isEnabled) + " - ");
-        Serial.print("deviceName: " + deviceName);
-        Serial.println("customBytes: ");        
+        Serial.println("deviceName: " + deviceName);
+        Serial.println();
+        Serial.print(" customBytes: ");
+        Serial.println(" dla OnOff [0] = brightnessLevelSupport, [1] = brightnessLevel");
+        Serial.println();        
         for(int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++) {
             Serial.print(String(customBytes[i]) + " ");
-        }
-        Serial.println(" dla OnOff [0] = brightnessLevelSupport, [1] = brightnessLevel");
+        }        
         Serial.println();
         }
 }DeviceDescription;

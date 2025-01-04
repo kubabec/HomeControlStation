@@ -11,6 +11,8 @@ uint16_t OperatingSystem::uniqueLifecycleId = 0;
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
+long long uiBlockTime = 0;
+
 void OperatingSystem::init()
 {
     changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
@@ -31,6 +33,13 @@ void OperatingSystem::init()
     DataContainer::subscribe(SIG_IS_RC_SERVER, [](std::any signal) {
         isRCServerRunning = (std::any_cast<bool>(signal));
     });
+
+    DataContainer::subscribe(SIG_IS_UI_BLOCKED, [](std::any signal) {
+        if (std::any_cast<bool>(signal)) {
+            uiBlockTime = millis();
+        }
+    });
+
 
     ErrorMonitor::init();
     ConfigProvider::init();
@@ -245,5 +254,17 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     default:
         Serial.println("INVALID");
         break;
+    }
+}
+
+void OperatingSystem::handleUiBlockTimeExpiration()
+{
+    bool isUIBlocked = std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_UI_BLOCKED));
+
+    if(isUIBlocked){
+        if(abs(millis() - uIBlockTime) > 1000){
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, false);
+            uIBlockTime = 0;
+        }
     }
 }

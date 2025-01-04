@@ -18,10 +18,13 @@
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct {
     uint16_t nodeId = 255;
-    uint8_t numberOfOnOffDevices = 255;
-    uint8_t numberOfLedStrips = 255;
-    std::vector<OnOffDeviceDescription> devicesCollectionOnOff;
-    bool isOnOffCollectionCompleted = false;
+    // uint8_t numberOfOnOffDevices = 255;
+    // uint8_t numberOfLedStrips = 255;
+    uint8_t numberOfDevices = 255;
+    //std::vector<OnOffDeviceDescription> devicesCollectionOnOff;
+    std::vector<DeviceDescription> devicesCollection;
+    //bool isOnOffCollectionCompleted = false;
+    bool isDeviceCollectionCompleted = false;
     uint64_t lastKeepAliveReceivedTime =0;
     uint16_t lastKnownNodeHash = 0;
 
@@ -29,13 +32,18 @@ typedef struct {
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
         Serial.println("Node Id : " + String(nodeId));
-        Serial.println("numberOfOnOffDevices : " + String(numberOfOnOffDevices));
-        Serial.println("numberOfLedStrips : " + String(numberOfLedStrips));
-        for(auto& device: devicesCollectionOnOff) {
+        // Serial.println("numberOfOnOffDevices : " + String(numberOfOnOffDevices));
+        // Serial.println("numberOfLedStrips : " + String(numberOfLedStrips));
+        Serial.println("numberOfDevices : " + String(numberOfDevices));
+        // for(auto& device: devicesCollectionOnOff) {
+        //     device.print();
+        // }
+        for(auto& device: devicesCollection) {
             device.print();
         }
         Serial.println("Device Hash : " + String((int)lastKeepAliveReceivedTime));
-        Serial.println("isOnOffCollectionCompleted : " + String(isOnOffCollectionCompleted));
+        //Serial.println("isOnOffCollectionCompleted : " + String(isOnOffCollectionCompleted));
+        Serial.println("isDeviceCollectionCompleted : " + String(isDeviceCollectionCompleted));
         Serial.println("------- ----------------------- --------------");                
     }
 } RemoteNodeInformation;

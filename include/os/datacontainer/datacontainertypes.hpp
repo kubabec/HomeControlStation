@@ -30,6 +30,34 @@ typedef struct
         }
 }OnOffDeviceDescription;
 
+
+// typedef struct
+// {
+//     uint8_t deviceType = 255;
+//     uint8_t nodeId = 255;
+//     uint8_t deviceId = -1;
+//     uint8_t roomId = 255;
+//     bool isEnabled;
+//     uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION];
+    
+//     String deviceName;
+//     void print() {
+//         //Serial.println(" ======DEVICE DESCRIPTION=============");
+//         Serial.print("deviceType: " + String(deviceType) + " - ");
+//         Serial.print("nodeId: " + String(nodeId) + " - ");
+//         Serial.print("deviceId: " + String(deviceId) + " - ");
+//         Serial.print("isEnabled: " + String(isEnabled) + " - ");
+//         Serial.print("deviceName: " + deviceName);
+//         Serial.println("customBytes: ");        
+//         for(int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++) {
+//             Serial.print(String(customBytes[i]) + " ");
+//         }
+//         Serial.println(" dla OnOff [0] = brightnessLevelSupport, [1] = brightnessLevel");
+//         Serial.println();
+//         }
+// }DeviceDescription;
+
+
 // aktualny stan przerabianego requesta
 /* State of request processing */
 enum RequestProcessingState {

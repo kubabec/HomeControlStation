@@ -19,9 +19,6 @@ int HomeLightHttpServer::pos3 = 150;
 bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NONE;
 
-unsigned long HomeLightHttpServer::blockUIStartTime = 0; 
-
-
 std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
 std::map<uint8_t, std::vector<OnOffDeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
@@ -81,7 +78,7 @@ void HomeLightHttpServer::cyclic()
 {
     // Do cyclic task here
     handleClientRequest();
-    checkUIBlockTime();
+    //checkUIBlockTime();
 }
 
 void HomeLightHttpServer::deinit() {
@@ -457,9 +454,6 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
     }
   }
 
-  // for(auto& onOff : onOffDescriptionVector) {
-  //   //onOff.print();
-  // }
 }
 
 void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
@@ -475,22 +469,11 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
   try {
     isUserInterfaceBlocked = (std::any_cast<bool>(isBlockedValue));
     //Serial.println("!!!!!!!!!!!!!!!!!!!!!UI blocked: " + String(isUserInterfaceBlocked));
-    blockUIStartTime = millis();
-  }catch (std::bad_any_cast ex)
+    }catch (std::bad_any_cast ex)
   {
     /* do nothing */
   }
   
-}
-
-void HomeLightHttpServer::checkUIBlockTime() {
-  if (isUserInterfaceBlocked) {
-    //Serial.println("***Checking UI Block Time***");
-    if (millis() - blockUIStartTime > 5000) {
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
-        //Serial.println("*** UI Unblocked ***");
-        }
-  }
 }
 
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff

@@ -107,9 +107,7 @@ void RemoteControlServer::requestKeepAliveData(){
 }
 // Funkcja obsługująca stan zadznia danych poczatkowych
 void RemoteControlServer::handleRequestNodeInitialDataState() {
-    // Sprawdzenie, czy minęło 2 sekundy od ostatniego żądania danych początkowych
-
-    
+    // Sprawdzenie, czy minęło 2 sekundy od ostatniego żądania danych początkowych  
     
 
     if(abs(millis() - requestInitialDataTimer) > TIME_TO_REPEAT_INITIAL_DATA_REQEST) 
@@ -143,17 +141,28 @@ void RemoteControlServer::handleRequestNodeDetailedDataState() {
             /* sprawdzamy cyklicznie czy zebralismy wszystkie dane dla kazdego node */
             for(auto& node: remoteNodes){
                 /* kolekcja zawiera tyle urzadzen ile zadeklarowano w initial data */
-                if(!node.second.isOnOffCollectionCompleted && node.second.numberOfOnOffDevices == node.second.devicesCollectionOnOff.size()){
-                    node.second.isOnOffCollectionCompleted = true;
+                // if(!node.second.isOnOffCollectionCompleted && node.second.numberOfOnOffDevices == node.second.devicesCollectionOnOff.size()){
+                //     node.second.isOnOffCollectionCompleted = true;
+                //     node.second.printLn();
+                // }
+
+                if(!node.second.isDeviceCollectionCompleted && node.second.numberOfDevices == node.second.devicesCollection.size()){
+                    node.second.isDeviceCollectionCompleted = true;
                     node.second.printLn();
                 }
+                
                 
             }
 
             /* sprawdzamy czy wszystkie nody sa zebrane*/
             bool isHandshakeCompleted = true;
             for(auto& node: remoteNodes) {
-                if(!node.second.isOnOffCollectionCompleted) {
+                // if(!node.second.isOnOffCollectionCompleted) {
+                //     isHandshakeCompleted = false;
+                //     break;
+                // }
+
+                if(!node.second.isDeviceCollectionCompleted) {
                     isHandshakeCompleted = false;
                     break;
                 }
@@ -217,7 +226,8 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector <uint16_t>& 
     {
         detailedDataPendingNodeID = pendingDDRefreshNodeIdentifiers.front(); /* Start refresh for first in the queue */
         pendingDDRefreshNodeIdentifiers.pop(); /* Remove already processed */
-        remoteNodes.find(detailedDataPendingNodeID)->second.devicesCollectionOnOff.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
+        //remoteNodes.find(detailedDataPendingNodeID)->second.devicesCollectionOnOff.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
+        remoteNodes.find(detailedDataPendingNodeID)->second.devicesCollection.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
     }
 
     
@@ -317,8 +327,9 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
                 //Serial.println("Nie jestesmy w mapie i dodajemy do mapy...");
                 RemoteNodeInformation nodeInfo {
                     .nodeId = receivedInitialData.nodeId,
-                    .numberOfOnOffDevices = receivedInitialData.numberOfOnOffDevices,
-                    .numberOfLedStrips = receivedInitialData.numberOfLedStrips,
+                    // .numberOfOnOffDevices = receivedInitialData.numberOfOnOffDevices,
+                    // .numberOfLedStrips = receivedInitialData.numberOfLedStrips,
+                    .numberOfDevices = receivedInitialData.numberOfDevices,
                     .lastKnownNodeHash = receivedInitialData.nodeHash
                 };
 
@@ -338,7 +349,8 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
         
     }
     else if(msg.getId() == RESPONSE_NODE_DETAILED_DATA) {
-        OnOffDeviceDescription receivedDescription;
+        //OnOffDeviceDescription receivedDescription;
+        DeviceDescription receivedDescription;
         memcpy(&receivedDescription, &(msg.getPayload().at(0)), msg.getPayload().size()); //gdzie, skąd (getpayload to jest wektor databuffer), wielkosc
         
         /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
@@ -348,7 +360,8 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
         } else {
             // found
             /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) onOff-ow dla otrzymanego nodeID */
-            std::vector<OnOffDeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollectionOnOff;
+            //std::vector<OnOffDeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollectionOnOff;
+            std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollection;
             bool isDeviceAlreadyInCollection = false;
             /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
             for(auto& device: collectionVecRef) {
@@ -372,7 +385,8 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
 
 void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
 
-    OnOffDeviceDescription receivedDescription;
+    //OnOffDeviceDescription receivedDescription;
+    DeviceDescription receivedDescription;
         memcpy(&receivedDescription, &(msg.getPayload().at(0)), msg.getPayload().size()); //gdzie, skąd (getpayload to jest wektor databuffer), wielkosc
         
         /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
@@ -382,7 +396,8 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
         } else {
             // found
             /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) onOff-ow dla otrzymanego nodeID */
-            std::vector<OnOffDeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollectionOnOff;
+           // std::vector<OnOffDeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollectionOnOff;
+            std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.nodeId)->second.devicesCollection;
             bool isDeviceAlreadyInCollection = false;
             /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
             for(auto& device: collectionVecRef) {
@@ -393,9 +408,18 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
                 }
             }
             /* dodaj do kolekcji jesli nie istnieje*/
-            if(!isDeviceAlreadyInCollection) {
+            // if(!isDeviceAlreadyInCollection) {
+            //     collectionVecRef.push_back(receivedDescription);
+            //     if(remoteNodes.find(receivedDescription.nodeId)->second.numberOfOnOffDevices == collectionVecRef.size()) {
+            //         detailedDataPendingNodeID = 255; /* reset ID to do not repeat the requests anymore */
+            //         updateDeviceDescriptionSignal();
+            //     }
+            //     //Serial.println("Dodaje do kolekcji");
+            // }
+
+            if(!isDeviceAlreadyInCollection){
                 collectionVecRef.push_back(receivedDescription);
-                if(remoteNodes.find(receivedDescription.nodeId)->second.numberOfOnOffDevices == collectionVecRef.size()) {
+                if(remoteNodes.find(receivedDescription.nodeId)->second.numberOfDevices == collectionVecRef.size()) {
                     detailedDataPendingNodeID = 255; /* reset ID to do not repeat the requests anymore */
                     updateDeviceDescriptionSignal();
                 }
@@ -450,11 +474,18 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
 }
 
 void RemoteControlServer::updateDeviceDescriptionSignal() {
-    std::vector<OnOffDeviceDescription> mergedTunneledDevices;
+    //std::vector<OnOffDeviceDescription> mergedTunneledDevices;
+    std::vector<DeviceDescription> mergedTunneledDevices;
     for(auto& remoteNode : remoteNodes) {
-        for(auto device : remoteNode.second.devicesCollectionOnOff) {
-            mergedTunneledDevices.push_back(device);
-        }
+        // for(auto device : remoteNode.second.devicesCollectionOnOff) {
+        //     mergedTunneledDevices.push_back(device);
+        // }
+
+        for(auto remoteNode : remoteNodes) {
+            for(auto device : remoteNode.second.devicesCollection) {
+                mergedTunneledDevices.push_back(device);
+            }
+        }   
     }
     DataContainer::setSignalValue(
         SIG_RC_DEVICES_INTERNAL_TUNNEL, 

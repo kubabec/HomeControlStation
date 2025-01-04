@@ -37,18 +37,13 @@ class HomeLightHttpServer
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
 
     static bool isUserInterfaceBlocked;
-    static unsigned long blockUIStartTime;
     
-
     static String ipAddressString;
     static SecurityAccessLevelType secAccessLevel;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
     static void requestErrorList();
-
-    
-    static void checkUIBlockTime();
 
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);

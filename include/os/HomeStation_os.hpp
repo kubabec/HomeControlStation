@@ -21,6 +21,8 @@ private:
     static uint16_t runtimeNodeHash;
     static uint16_t uniqueLifecycleId;
 
+    static long long uIBlockTime;
+
     static bool resetPending;
     static uint8_t resetCountdown;
 
@@ -31,6 +33,9 @@ private:
     
     static long long accessLevelGrantedTimeSnapshot;
     static SecurityAccessLevelType currentAccessLevel;
+
+    static void handleUiBlockTimeExpiration();
+
 public:
     static void init();
     static void reset();
