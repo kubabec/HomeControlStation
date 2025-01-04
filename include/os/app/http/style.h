@@ -504,6 +504,68 @@ padding-bottom: 5px;\
 .send-color-button:hover {\
     background-color: #0056b3;\
 }\
+.led-strip {\
+    display: flex;\
+    padding: 10px 0px;\
+    justify-content: space-between;\
+    align-items: center;\
+    overflow: hidden;\
+}\
+\
+.led {\
+    height: 12px;\
+    border-radius: 0px; \
+    margin: 0;\
+}\
+.led.on {\
+    box-shadow: 0 0 1px 1px rgba(217, 255, 27, 0.4), 0 0 2px 1px rgba(251, 255, 0, 0.5);\
+}\
+\
+.led.off {\
+    background-color: rgba(0, 0, 0, 0.1);\
+}\
+.color-picker-popup {\
+    position: fixed;\
+    top: 10%;\
+    left: 50%;\
+    transform: translate(-50%, -10%);\
+    background: #ffffff;\
+    border: 1px solid #b0c8d8;\
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);\
+    padding: 20px;\
+    border-radius: 8px;\
+    display: none;\
+    flex-direction: column;\
+    align-items: center;\
+    z-index: 10;\
+}\
+.popup-backdrop {\
+    position: fixed;\
+    top: 0;\
+    left: 0;\
+    font-size: 16px;\
+    width: 100%;\
+    height: 100%;\
+    background-color: rgba(0, 0, 0, 0.5);\
+    z-index: 9;\
+    display: none;\
+}\
+.popup-buttons {\
+    display: flex;\
+    gap: 10px;\
+}\
+.popup-buttons button {\
+    padding: 5px 10px;\
+    border: none;\
+    font-size: 16px;\
+    border-radius: 4px;\
+    background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
+    color: #ffffff;\
+    cursor: pointer;\
+}\
+.popup-buttons button:hover {\
+    background: linear-gradient(135deg, #5aa9d4, #337bbf);\
+}\
 </style>\
 ";
 

@@ -234,9 +234,75 @@ const char* javascript = "\
             const color = colorInput.value;\
             const rgbColor = hexToRgb(color);\
             if (rgbColor) {\
-                const url = `/setColor?id=${stripId}&red=${rgbColor.r}&green=${rgbColor.g}&blue=${rgbColor.b}`;\
+                const url = `/ledStripColor?id=${stripId}&r=${rgbColor.r}&g=${rgbColor.g}&b=${rgbColor.b}`;\
                 window.location.href = url;\
             }\
+        }\
+        function openColorPicker(index) {\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            selectedLedIndex = index;\
+            colorInput.value = 0xFF00FA;\
+            colorPickerPopup.style.display = \"flex\";\
+            backdrop.style.display = \"block\";\
+        }\
+\
+        function closePopup() {\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            colorPickerPopup.style.display = \"none\";\
+            backdrop.style.display = \"none\";\
+        }\
+        function openCompositions() {\
+            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
+            const composClose = document.getElementById(\"composClose\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            composClose.addEventListener(\"click\", closeCompositions);\
+            colorInput.value = 0xFF00FA;\
+            FavouritesPopup.style.display = \"flex\";\
+            backdrop.style.display = \"block\";\
+        }\
+\
+        function closeCompositions() {\
+            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            FavouritesPopup.style.display = \"none\";\
+            backdrop.style.display = \"none\";\
+        }\
+        function openSaveCompositions() {\
+            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
+            const composClose = document.getElementById(\"composSaveClose\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            composClose.addEventListener(\"click\", closeSaveCompositions);\
+            colorInput.value = 0xFF00FA;\
+            FavouritesPopup.style.display = \"flex\";\
+            backdrop.style.display = \"block\";\
+        }\
+\
+        function closeSaveCompositions() {\
+            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
+            const backdrop = document.querySelector(\".popup-backdrop\");\
+            FavouritesPopup.style.display = \"none\";\
+            backdrop.style.display = \"none\";\
+        }\
+        function rgbToHex(rgb) {\
+            return rgb;\
+        }\
+        function colorClickedAction(index) {\
+            const ledStrip = document.getElementById(\"ledStrip\");\
+            const colorPickerPopup = document.getElementById(\"colorPickerPopup\");\
+            const colorInput = document.getElementById(\"colorInput\");\
+            const confirmButton = document.getElementById(\"confirmColorButton\");\
+            const cancelButton = document.getElementById(\"cancelColorButton\");\
+\
+            openColorPicker(index);\
+\
+            confirmButton.addEventListener(\"click\", () => {\
+            const rgbColor = hexToRgb(colorInput.value);\
+            closePopup();\
+\
+            const url = `/ledColor?id=2&led=${selectedLedIndex}&r=${rgbColor.r}&g=${rgbColor.g}&b=${rgbColor.b}`;\
+                window.location.href = url;\
+            });\
+            cancelButton.addEventListener(\"click\", closePopup);\
         }\
 </script>";
 

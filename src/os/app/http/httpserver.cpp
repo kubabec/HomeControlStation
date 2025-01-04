@@ -28,6 +28,19 @@ ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
 
 
+/*TESTBLOCK */
+const uint8_t ledsCount = 50;
+typedef struct{
+  uint8_t status = 0;
+  uint8_t red[ledsCount] = {0};
+  uint8_t green[ledsCount] = {0};
+  uint8_t blue[ledsCount] = {0};
+}LedStripTestType;
+
+LedStripTestType leds;
+
+/*TESTBLOCK */
+
 const char* labelStart = "<label>";
 const char* labelEnd = "</label>";
 // ERR_MON_UNEXPECTED_RESET = 1,
@@ -52,7 +65,9 @@ std::vector<String> parameterizedRequests = {
   "dev",
   "?bri",
   "roomMappingApply",
-  "passwordApply"
+  "passwordApply",
+  "ledStripColor",
+  "ledColor"
 };
 
 std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>> constantRequestHandlers = {
@@ -70,7 +85,9 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomNameMappingApply, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_ledStripColor, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -791,36 +808,87 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 
 void printTestLedStrip(WiFiClient& client)
 {
+  client.println("<div class=\"popup-backdrop\"></div>\
+    <div class=\"color-picker-popup\" id=\"colorPickerPopup\">\
+        <div class=\"header2\">Set Diode Color</div>\
+        <input type=\"color\" id=\"colorInput\" class=\"color-input\" />\
+        <div class=\"popup-buttons\">\
+            <button id=\"confirmColorButton\">Confirm</button>\
+            <button id=\"cancelColorButton\">Cancel</button>\
+        </div>\
+    </div>");
+
+  
+  client.println("<div class=\"popup-backdrop\"></div>\
+    <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
+        <div class=\"header2\">Select composition</div>\
+          <button class=\"button\" id=\"compos1\">Composition 1</button>\
+          <button class=\"button\" id=\"compos2\">Composition 2</button>\
+          <button class=\"button\" id=\"compos3\">Composition 3</button>\
+          <br>\
+          <button class=\"button\" id=\"composClose\">Close</button>\
+    </div>");
+
+  client.println("<div class=\"popup-backdrop\"></div>\
+    <div class=\"color-picker-popup\" id=\"SaveFavouritesPopup\">\
+        <div class=\"header2\">Save composition</div>\
+          <button class=\"button\" id=\"compos1\">Slot 1</button>\
+          <button class=\"button\" id=\"compos2\">Slot 2</button>\
+          <button class=\"button\" id=\"compos3\">Slot 3</button>\
+          <br>\
+          <button class=\"button\" id=\"composSaveClose\">Close</button>\
+    </div>");
+
+
   const String brightnessSlider1  = "<br><div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
   const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
   
 
-  client.println("<div class=\"container\">"); 
-  client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
-  client.println("\
-                <div class=\"color-picker\"> \
-                    <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-                    <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
-                </div>\
-                <button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
-  client.println("<a class=\"button\" href=\"/test\">OFF</a>\
-                ");
-  client.println(brightnessSlider1 + 40 + brightnessSlider2);
+  // client.println("<div class=\"container\">"); 
+  // client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
+  // client.println("\
+  //               <div class=\"color-picker\"> \
+  //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
+  //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
+  //               </div>\
+  //               <button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
+  // client.println("<a class=\"button\" href=\"/test\">OFF</a>\
+  //               ");
+  // client.println(brightnessSlider1 + 40 + brightnessSlider2);
 
-  client.println("</div>");
+  // client.println("</div>");
 
-
-
+  String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
+  String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
+  String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
 
 
   client.println("<div class=\"container\">"); 
   client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
+  client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
+  for(uint8_t i = 0; i < ledsCount; i++){
+    String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
+
+    client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
+    if(enableStatus == "on"){
+      client.println("background-color: rgb(\
+      "+String((int)leds.red[i])+", \
+      "+String((int)leds.green[i])+", \
+      "+String((int)leds.blue[i])+");");
+    }
+    client.println("\"> </div>");
+  }
+  client.println("</div>");
   client.println("\
                 <div class=\"color-picker\"> \
-                    <div class=\"color-display off\" id=\"colorDisplay2\" style=\"background-color:#e11cf3;\"></div> \
-                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#e11cf3\"> \
+                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
+"+firstLedRed+"\
+"+firstLedGreen+"\
+"+firstLedBlue+"\"> \
                 </div>\
-                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>");
+                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
+                <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
+                <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
   client.println("<a class=\"button\" href=\"/test\">ON</a>\
                 ");
   client.println(brightnessSlider1 + 70 + brightnessSlider2);
@@ -1127,6 +1195,53 @@ void HomeLightHttpServer::parameterizedHandler_passwordApply(String& request, Wi
   }
 
   client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"/config'>");
+}
+
+void HomeLightHttpServer::parameterizedHandler_ledStripColor(String& request, WiFiClient& client){
+  int pos1 = request.indexOf("ledStripColor?id="); 
+  int pos2 = request.indexOf("&r="); 
+  int pos3 = request.indexOf("&g=");
+  int pos4 = request.indexOf("&b=");       
+  String devId = request.substring(pos1+17 , pos2);
+  String red = request.substring(pos2+3 , pos3);
+  String green = request.substring(pos3+3 , pos4);
+  String blue = request.substring(pos4+3);
+
+  for(uint8_t i = 0 ; i < ledsCount; i++)
+  {
+    leds.red[i] = red.toInt();
+    leds.green[i] = green.toInt();
+    leds.blue[i] = blue.toInt();
+  }
+
+  Serial.println(devId);
+  Serial.println(red + ", " + green + " , " + blue);
+
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+
+}
+void HomeLightHttpServer::parameterizedHandler_ledColor(String& request, WiFiClient& client){
+  int pos1 = request.indexOf("ledColor?id="); 
+  int pos2 = request.indexOf("&led="); 
+  int pos3 = request.indexOf("&r="); 
+  int pos4 = request.indexOf("&g=");
+  int pos5 = request.indexOf("&b=");       
+  String devId = request.substring(pos1+12 , pos2);
+  String ledIndex = request.substring(pos2+5 , pos3);
+  String red = request.substring(pos3+3 , pos4);
+  String green = request.substring(pos4+3 , pos5);
+  String blue = request.substring(pos5+3);
+
+  leds.red[ledIndex.toInt()] = red.toInt();
+  leds.green[ledIndex.toInt()] = green.toInt();
+  leds.blue[ledIndex.toInt()] = blue.toInt();
+  
+
+  Serial.println(devId);
+  Serial.println(red + ", " + green + " , " + blue);
+
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+
 }
 
 
