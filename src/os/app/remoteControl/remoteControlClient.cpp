@@ -278,13 +278,29 @@ bool RemoteControlClient::processResponse() {
 }
 
 void RemoteControlClient::sendDetailedDataResponseFromNode(){
-    std::any onOffCollection = DataContainer::getSignalValue(SIG_COLLECTION_ONOFF);
+    //std::any onOffCollection = DataContainer::getSignalValue(SIG_COLLECTION_ONOFF);
+    std::any deviceCollection = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION);
 
     try
     {
      // try to read onOff collection if signal exist in data container
-      std::vector<OnOffDeviceDescription> onOffDescriptionVector  = std::any_cast<std::vector<OnOffDeviceDescription>>(onOffCollection);
-      for(OnOffDeviceDescription& deviceDescription: onOffDescriptionVector) {
+      //std::vector<OnOffDeviceDescription> onOffDescriptionVector  = std::any_cast<std::vector<OnOffDeviceDescription>>(onOffCollection);
+      std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
+
+    //   for(OnOffDeviceDescription& deviceDescription: onOffDescriptionVector) {
+    //     deviceDescription.nodeId = localNodeId;
+    //     MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
+        
+    //     detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
+        
+    //     /* TX transmission will be handled in the available time from cyclic() context */
+    //     pendingTxQueue.push(detailedDataResponse);
+
+    //     Serial.println("->Remote Control Client - Wysyłam Detailed data z Node Id : " + String(localNodeId));
+    //     delay(10);
+    //   }
+
+      for(DeviceDescription& deviceDescription: deviceDescriptionVector) {
         deviceDescription.nodeId = localNodeId;
         MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
         
