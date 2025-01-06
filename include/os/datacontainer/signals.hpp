@@ -1,28 +1,19 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 35
+#define NUMBER_OF_SIGNALS 33
 enum Signal
 {
     /* Type: bool , somme description */
     SIG_KEEP_ALIVE_RECEIVED = 0,
     /* Type: int , not used yet */
     SIG_CONNECTION_STATUS,    
-    
-    /* Type: std::vector<OnOffDeviceDescription> - zbiór lokalnych OnOffDevices information*/
-    SIG_LOCAL_COLLECTION_ONOFF,
-
     /* Type: std::vector<DeviceDescription> - zbiór lokalnych Devices information*/
     SIG_LOCAL_COLLECTION,
-
     /* Type: std::vector<DeviceDescription> - Devices information*/
     SIG_DEVICE_COLLECTION,
-    
-    /* Type: std::vector<OnOffDeviceDescription> - zbior urządzeń na innych nodach OnOffDevices information*/
-    SIG_REMOTE_COLLECTION_ONOFF,
-    
-    /* Type: std::vector<OnOffDeviceDescription> - OnOffDevices information*/
-    SIG_COLLECTION_ONOFF,
+    /* Type: std::vector<DeviceDescription> - zbior urządzeń na innych nodach */
+    SIG_REMOTE_COLLECTION,
     /* Type: bool - is http server running*/
     SIG_IS_HTTP_SERVER,
     /* Type: bool - is controll remote server or client, TRUE-server, FALSE-client */
@@ -65,7 +56,7 @@ enum Signal
     CBK_RESPONSE,
     /* TYpe: uint16_t - hash representing current runtime state including configuration and devices states */
     SIG_RUNTIME_NODE_HASH,
-    /* Type: std::vector<OnOffDeviceDescription> - Internal tunel!! only to be used between RCServer <-> RCDevicesManager*/
+    /* Type: std::vector<DeviceDescription> - Internal tunel!! only to be used between RCServer <-> RCDevicesManager*/
     SIG_RC_DEVICES_INTERNAL_TUNNEL,
     /* Type: std:function<void(RcRequest&)> - callback add new generic RcRequest to RcServer for processing */
     CBK_CREATE_RC_REQUEST,

@@ -19,8 +19,8 @@ int HomeLightHttpServer::pos3 = 150;
 bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NONE;
 
-std::vector<OnOffDeviceDescription> HomeLightHttpServer::onOffDescriptionVector;
-std::map<uint8_t, std::vector<OnOffDeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
+std::vector<DeviceDescription> HomeLightHttpServer::descriptionVector;
+std::map<uint8_t, std::vector<DeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
 std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
 uint8_t HomeLightHttpServer::activeErrorsCount = 0;
@@ -222,7 +222,7 @@ void HomeLightHttpServer::init()
   }
 
 
-  DataContainer::subscribe(SIG_COLLECTION_ONOFF, HomeLightHttpServer::onDeviceDescriptionChange);
+  DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
   DataContainer::subscribe(SIG_CONFIG_SLOTS, HomeLightHttpServer::onSlotConfigChange);
   DataContainer::subscribe(SIG_IS_UI_BLOCKED, HomeLightHttpServer::onUiBlockedSignalChange);
 
@@ -453,15 +453,15 @@ void HomeLightHttpServer::handleClientRequest()
 void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVector) 
 {
   //Wlasny Http Servra wektor urzadzen On Off 
-  onOffDescriptionVector = (std::any_cast<std::vector<OnOffDeviceDescription>>(newDescriptionVector));
+  descriptionVector = (std::any_cast<std::vector<DeviceDescription>>(newDescriptionVector));
 
   deviceToRoomMappingList.clear();
 
-  for(auto& device : onOffDescriptionVector){
+  for(auto& device : descriptionVector){
     if(deviceToRoomMappingList.find(device.roomId) == deviceToRoomMappingList.end())
     {
       /* First device in this room */
-      std::vector<OnOffDeviceDescription*> roomDevicesVector = {&device};
+      std::vector<DeviceDescription*> roomDevicesVector = {&device};
       deviceToRoomMappingList.insert({device.roomId, roomDevicesVector});
     }else 
     {
@@ -494,7 +494,7 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 }
 
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
-void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client) {
+void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiClient& client) {
   client.println("<div class=\"container\">"); // container
   if(!description.isEnabled) {   
     client.println("<div class=\"header\">" + description.deviceName + "</div><div class=\"status-light off\"></div>"); 
@@ -512,11 +512,12 @@ void HomeLightHttpServer::generateOnOffUi(OnOffDeviceDescription& description, W
   }
 
   /* Draw Brightness range bar if device allows brightness change */
-  if(description.brightnessIsAdjustable) {
+  /* is brigthness adjustable ? */
+  if(description.customBytes[0]) {
     client.println("<br>");
     const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
     const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, " + String(description.deviceId) + ")\">";
-    client.println(brightnessSlider1 + String(description.currentBrightness) + brightnessSlider2);
+    client.println(brightnessSlider1 + String(description.customBytes[1]) + brightnessSlider2);
   }
   client.println("</div>"); // container 
 }
@@ -898,7 +899,6 @@ void printTestLedStrip(WiFiClient& client)
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
-
   for(auto& room : deviceToRoomMappingList){
     if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
       client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
@@ -909,12 +909,11 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
     /* Generate UI for every available device in this room */
     for(auto& device : room.second)
     {
-      generateOnOffUi(*device, client);
+
+      if(device->deviceType == type_ONOFFDEVICE){
+        generateOnOffUi(*device, client);
+      }
     }
-    // for(OnOffDeviceDescription& description : onOffDescriptionVector) 
-    // {
-    //   generateOnOffUi(description, client);       
-    // }
     client.println("</div>");
   }
 
@@ -931,7 +930,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   </div>");
 
 
-  printTestLedStrip(client);
+  //printTestLedStrip(client);
 
   /* Display configuration button */
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){

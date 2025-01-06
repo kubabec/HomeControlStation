@@ -8,7 +8,7 @@ ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 
 /*TESTCODE*/
 std::vector<Device*> DeviceManager::devices;
-TestDeviceType DeviceManager::testDev;
+// TestDeviceType DeviceManager::testDev;
 /*TESTCODE*/
 
 void DeviceManager::deinit() {
@@ -130,7 +130,7 @@ void DeviceManager::init()
 
     /*TESTCODE*/
     /* Add pointer to all existing devices to the device list */
-    devices.push_back(&testDev);
+    // devices.push_back(&testDev);
     /*TESTCODE*/
 
     Serial.println("... done");
@@ -148,31 +148,6 @@ void DeviceManager::cyclic()
 
 
 void DeviceManager::updateDeviceDescriptionSignal() {
-    std::vector<OnOffDeviceDescription> vecOnOffDescription;
-    //Serial.println("=Stwozenie lokalnego wektora devDescription i wyslanie do vecOnOffDevices w Data Container=");
-
-    for(OnOffDevice& device : vecOnOffDevices) {
-        OnOffDeviceDescription devDescription;        
-        devDescription.deviceId = device.getDeviceId();
-        //Serial.print("Device ID: " + String(device.getDeviceId()));
-        devDescription.deviceName = device.getName();
-        //Serial.print(", Name: " + device.getName());
-        
-        devDescription.currentBrightness = device.getBrightnessLevelTarget();
-        //Serial.print(", Brightnes Level: " + String(device.getBrightnessLevel()));
-        devDescription.brightnessIsAdjustable = device.getBrightnessIsAdjustable();
-        //Serial.print(", BrightnessIsAdjustable: " + String(device.getBrightnessIsAdjustable()));
-        devDescription.isEnabled = device.getState();
-        devDescription.roomId = device.getRoomId();
-        //Serial.println(", State: " + String(device.getState()));        
-        
-        vecOnOffDescription.push_back(devDescription);              
-    }
-        
-    DataContainer::setSignalValue(SIG_LOCAL_COLLECTION_ONOFF, vecOnOffDescription);
-    //Serial.println("===DeviceManager - Ustawienie sygnału w Data Container======");   
-
-
     std::vector<DeviceDescription> Descriptions;
 
     for(Device* device : devices) {
@@ -182,8 +157,6 @@ void DeviceManager::updateDeviceDescriptionSignal() {
     }
 
     DataContainer::setSignalValue(SIG_LOCAL_COLLECTION, Descriptions);
-
-
 }
 
 

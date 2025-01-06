@@ -197,17 +197,19 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 
     /* Get devices data */
     try{
-        std::vector<OnOffDeviceDescription> devicesVector = 
-            std::any_cast<std::vector<OnOffDeviceDescription>>(
-                DataContainer::getSignalValue(SIG_COLLECTION_ONOFF)
+        std::vector<DeviceDescription> devicesVector = 
+            std::any_cast<std::vector<DeviceDescription>>(
+                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION)
             );
         for(auto& device : devicesVector)
         {
             hash += (uint8_t) device.deviceId;
             hash += (uint8_t) device.nodeId;
             hash += (uint8_t) device.isEnabled;
-            hash += (uint8_t) device.currentBrightness;
-            hash += (uint8_t) device.brightnessIsAdjustable;
+            for(uint8_t idx = 0 ; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION ; idx ++)
+            {
+                hash += device.customBytes[idx];
+            }
             for(uint8_t idx = 0 ; idx < device.deviceName.length(); idx ++)
             {
                 hash += (uint8_t) device.deviceName.charAt(idx);

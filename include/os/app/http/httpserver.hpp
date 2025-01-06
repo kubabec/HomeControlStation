@@ -28,8 +28,8 @@ class HomeLightHttpServer
     static int pos2;
     static int pos3;
     
-    static std::vector<OnOffDeviceDescription> onOffDescriptionVector;
-    static std::map<uint8_t, std::vector<OnOffDeviceDescription*>> deviceToRoomMappingList;
+    static std::vector<DeviceDescription> descriptionVector;
+    static std::map<uint8_t, std::vector<DeviceDescription*>> deviceToRoomMappingList;
     static std::map<uint8_t, String> roomNamesMapping;
 
     static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
@@ -87,7 +87,7 @@ public:
     static void onSlotConfigChange(std::any newSlotConfig);
     static void onUiBlockedSignalChange(std::any isBlockedValue);
 
-    static void generateOnOffUi(OnOffDeviceDescription& description, WiFiClient& client);
+    static void generateOnOffUi(DeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
 
 

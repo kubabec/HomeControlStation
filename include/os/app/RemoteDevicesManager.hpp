@@ -19,7 +19,7 @@ struct RCTranslation {
 class RemoteDevicesManager 
 {   
     /* This vector is tunneled from RCServer when handshake is over via SIG_RC_DEVICES_INTERNAL_TUNEL signal */
-    static std::vector<OnOffDeviceDescription> remoteDevicesCollection;
+    static std::vector<DeviceDescription> remoteDevicesCollection;
     static std::map<uint8_t, RCTranslation> currentIdMapping;
 public:
     static void init();

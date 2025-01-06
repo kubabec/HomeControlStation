@@ -1,6 +1,6 @@
 #include <os/app/RemoteDevicesManager.hpp>
 
-std::vector<OnOffDeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
+std::vector<DeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
 std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
 
 void RemoteDevicesManager::init()
@@ -51,14 +51,14 @@ void RemoteDevicesManager::init()
 void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 {
     try{
-        remoteDevicesCollection = std::any_cast<std::vector<OnOffDeviceDescription>>(remoteDevices);
+        remoteDevicesCollection = std::any_cast<std::vector<DeviceDescription>>(remoteDevices);
     
         currentIdMapping.clear();
         /* This ID will be present in the public Remote_devices signal to have all devices 
         from all the nodes merged together to one vector with unique identifiers */
         static uint8_t uniqueRcId = 0;
 
-        std::vector<OnOffDeviceDescription> vecRemoteOnOffDescription;
+        std::vector<DeviceDescription> vecRemoteDevicesDescription;
         
         for(auto device : remoteDevicesCollection) {
             // Create new translation {node, device}
@@ -70,8 +70,8 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
             /* Replace original ID with our new Unique */
             device.deviceId = uniqueRcId;
             device.nodeId = 0xFF; /* Obfuscate nodeID that it can't be used in upper layers */
-            /* Add modified record to public signal SIG_REMOTE_COLLECTION_ONOFF */
-            vecRemoteOnOffDescription.push_back(device);
+            /* Add modified record to public signal SIG_REMOTE_COLLECTION */
+            vecRemoteDevicesDescription.push_back(device);
             
             /* Save translation {uniqueID, {node, device}} to internal map*/
             currentIdMapping.insert({uniqueRcId,translation});
@@ -79,7 +79,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
         }
 
 
-        DataContainer::setSignalValue(SIG_REMOTE_COLLECTION_ONOFF, vecRemoteOnOffDescription);
+        DataContainer::setSignalValue(SIG_REMOTE_COLLECTION, vecRemoteDevicesDescription);
 
         DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         //Serial.println("->RCS - Ustawienie sygnalu w Data Container");   

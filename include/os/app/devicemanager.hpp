@@ -18,7 +18,7 @@ class DeviceManager
 {
     /*TESTCODE*/
     static std::vector<Device*> devices;
-    static TestDeviceType testDev;
+    // static TestDeviceType testDev;
     /*TESTCODE*/
     static std::vector<OnOffDevice> vecOnOffDevices;
     static ConfigSlotsDataType pinConfigSlotsRamMirror;

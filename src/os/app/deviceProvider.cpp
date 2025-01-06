@@ -69,15 +69,12 @@ void DeviceProvider::init()
 }
 
 void DeviceProvider::initLocalDevicesSetup() {
-    DataContainer::subscribe(SIG_LOCAL_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
-
     DataContainer::subscribe(SIG_LOCAL_COLLECTION, DeviceProvider::updateDeviceDescriptionSignal_onChange);
     
 }
 
 void DeviceProvider::initRemoteDevicesSetup() {
-    DataContainer::subscribe(SIG_REMOTE_COLLECTION_ONOFF, DeviceProvider::updateDeviceDescriptionSignal_onChange);
-
+    DataContainer::subscribe(SIG_REMOTE_COLLECTION, DeviceProvider::updateDeviceDescriptionSignal_onChange);
 }
 
 
@@ -109,46 +106,26 @@ void DeviceProvider::updateDeviceDescriptionSignal_onChange(std::any signal) {
 void DeviceProvider::updateDeviceDescriptionSignal() {
 
     uniqueDeviceIdToNormalDeviceIdMap.clear();
-    std::vector<OnOffDeviceDescription> vecOnOffDescription;
 
-    std::vector<DeviceDescription> deviceDescription;
+    std::vector<DeviceDescription> deviceDescriptionsTotal;
 
     static uint8_t uniqueId = 7; //unikalne ID dla wszystkich urządzeń na lokalnym ESP i zdalnych ESP
 
     try {
         // Pobieranie i przetwarzanie lokalnych urządzeń
-        std::any newLocalDescriptionVector = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION_ONOFF);
-        std::vector<OnOffDeviceDescription> localOnOffDescriptionVector = (std::any_cast<std::vector<OnOffDeviceDescription>>(newLocalDescriptionVector));
 
         std::any newLocalDeviceDescriptionVector = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION);
         std::vector<DeviceDescription> localDeviceDescriptionVector = (std::any_cast<std::vector<DeviceDescription>>(newLocalDeviceDescriptionVector));
 
-
-        for(auto device: localOnOffDescriptionVector) {
-            
-            DeviceTranslationDetails translationDetails = {                
-                .originalID = device.deviceId, 
-                .isLocal = true            
-            };
-
-            //device.deviceId = uniqueId;
-            vecOnOffDescription.push_back(device);
-            
-            //Serial.println("-------------------- Dodaje local---------------");
-            uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
-            //uniqueId ++;
-        }      
-
+        /* No need to change unique id for local devices as it is remembered based on pins configuration */
         for(auto device: localDeviceDescriptionVector) {
             DeviceTranslationDetails translationDetails = {                
                 .originalID = device.deviceId, 
                 .isLocal = true            
             };
 
-            deviceDescription.push_back(device);
-            
+            deviceDescriptionsTotal.push_back(device);
             uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
-            
         }   
            
     }catch (const std::bad_any_cast& e){ }
@@ -156,10 +133,11 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     if(isRCServer) {
         try {            
             // Pobieranie i przetwarzanie zdalnych urządzeń
-            std::any newRemoteDescriptionVector = DataContainer::getSignalValue(SIG_REMOTE_COLLECTION_ONOFF);
-            std::vector<OnOffDeviceDescription> remoteOnOffDescriptionVector = std::any_cast<std::vector<OnOffDeviceDescription>>(newRemoteDescriptionVector);
 
-            for (auto device : remoteOnOffDescriptionVector) {
+            std::any newRemoteDescriptionVector = DataContainer::getSignalValue(SIG_REMOTE_COLLECTION);
+            std::vector<DeviceDescription> remoteDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(newRemoteDescriptionVector);
+
+            for (auto device : remoteDescriptionVector) {
                 
                 DeviceTranslationDetails translationDetails = {                
                     .originalID = device.deviceId,
@@ -167,11 +145,11 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                 };
 
                 device.deviceId = uniqueId;
-                vecOnOffDescription.push_back(device);                
+                deviceDescriptionsTotal.push_back(device);                
                 //Serial.println("-------------------- Dodaje remote---------------");            
                 uniqueDeviceIdToNormalDeviceIdMap.insert({uniqueId, translationDetails});
                 uniqueId++;
-                if(uniqueId == 0) {
+                if(uniqueId == 255) {
                     uniqueId = 7;
                 }
             }
@@ -181,10 +159,8 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     
     Serial.println("DeviceProvider//: Content updated :");
     printIdMap();
-    Serial.println("///");
-    DataContainer::setSignalValue(SIG_COLLECTION_ONOFF, vecOnOffDescription);
-    
-    DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescription);     
+    Serial.println("///");    
+    DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);     
 }
 
 void DeviceProvider::printIdMap() {

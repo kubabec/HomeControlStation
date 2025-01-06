@@ -6,7 +6,6 @@
 #include <map>
 #include <os/datacontainer/SigMessages.hpp>
 #include <os/app/remoteControl/rc_DataTypes.hpp>
-#include <devices/OnOffDevice.hpp>
 #include <os/app/remoteControl/ReqestProcessor.hpp>
 
 #define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
@@ -17,13 +16,9 @@
 
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct {
-    uint16_t nodeId = 255;
-    // uint8_t numberOfOnOffDevices = 255;
-    // uint8_t numberOfLedStrips = 255;
-    uint8_t numberOfDevices = 255;
-    //std::vector<OnOffDeviceDescription> devicesCollectionOnOff;
+    uint16_t nodeId = 255;                  /* Remote node identifier */
+    uint8_t numberOfDevices = 255;          /* Count of on-Node devices */
     std::vector<DeviceDescription> devicesCollection;
-    //bool isOnOffCollectionCompleted = false;
     bool isDeviceCollectionCompleted = false;
     uint64_t lastKeepAliveReceivedTime =0;
     uint16_t lastKnownNodeHash = 0;
@@ -32,17 +27,11 @@ typedef struct {
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
         Serial.println("Node Id : " + String(nodeId));
-        // Serial.println("numberOfOnOffDevices : " + String(numberOfOnOffDevices));
-        // Serial.println("numberOfLedStrips : " + String(numberOfLedStrips));
         Serial.println("numberOfDevices : " + String(numberOfDevices));
-        // for(auto& device: devicesCollectionOnOff) {
-        //     device.print();
-        // }
         for(auto& device: devicesCollection) {
             device.print();
         }
         Serial.println("Device Hash : " + String((int)lastKeepAliveReceivedTime));
-        //Serial.println("isOnOffCollectionCompleted : " + String(isOnOffCollectionCompleted));
         Serial.println("isDeviceCollectionCompleted : " + String(isDeviceCollectionCompleted));
         Serial.println("------- ----------------------- --------------");                
     }
@@ -58,7 +47,6 @@ class RemoteControlServer
     static std::queue<RcRequest> pendingRequestsQueue;
     static std::queue<uint8_t> pendingDDRefreshNodeIdentifiers;
 
-    static std::vector<OnOffDevice> vecRemoteOnOffDevices;
     static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;

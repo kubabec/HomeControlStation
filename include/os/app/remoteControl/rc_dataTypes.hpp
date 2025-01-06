@@ -18,14 +18,10 @@ typedef enum {
 
 typedef struct {
     uint16_t nodeId = 255;
-    uint8_t roomId = 255;
     uint16_t nodeHash = 0;
-    //uint8_t numberOfOnOffDevices = 255;
-    //uint8_t numberOfLedStrips = 255;
     uint8_t numberOfDevices = 255;
     bool isValid() {
-        // return (nodeId != 255 && /*roomId != 255 && */ numberOfOnOffDevices != 255 && numberOfLedStrips != 255);
-        return (nodeId != 255 && roomId != 255 && numberOfDevices != 255);
+        return (nodeId != 255 && numberOfDevices != 255);
         
     }
     
