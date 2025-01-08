@@ -304,6 +304,26 @@ const char* javascript = "\
             });\
             cancelButton.addEventListener(\"click\", closePopup);\
         }\
+\
+\
+    function sendAsyncRequest(){\
+      const xhr = new XMLHttpRequest();\
+      const url = \"/asyncRequestTest\";\
+      xhr.open(\"GET\", url, true);\
+      xhr.onreadystatechange = function() {\
+          if (xhr.readyState === 4) { \
+              const statusElement = document.getElementById(\"status\");\
+              if (xhr.status === 200) { \
+                  statusElement.style.backgroundColor = \"green\";\
+                  statusElement.textContent = xhr.responseText;\
+              } else { \
+                  statusElement.style.backgroundColor = \"red\";\
+                  statusElement.textContent = \"Error\";\
+              }\
+          }\
+      };\
+      xhr.send();\
+  }\
 </script>";
 
 #endif

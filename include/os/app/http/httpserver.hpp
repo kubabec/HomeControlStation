@@ -50,6 +50,7 @@ class HomeLightHttpServer
     static void printErrorTable(WiFiClient& client);
 
     static void processLinkRequestData(WiFiClient& client);
+    static bool processLinkAsyncRequest(WiFiClient& client);
     static bool processConstantRequests(const String& request, WiFiClient& client);
     static bool processParameterizedRequests(String& request, WiFiClient& client);
 
@@ -97,6 +98,7 @@ public:
     static void constantHandler_devicesSetup(WiFiClient& client);
     static void constantHandler_roomAssignment(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
+    static void constantHandler_asyncTest(WiFiClient& client);
     static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);

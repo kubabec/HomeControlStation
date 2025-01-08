@@ -56,7 +56,8 @@ std::vector<String> constantRequests = {
   "errclrbtn",
   "localDevices",
   "roomAssignment",
-  "masseraseviahttp"
+  "masseraseviahttp",
+  "asyncRequestTest"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -77,6 +78,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -301,6 +303,22 @@ void HomeLightHttpServer::requestErrorList()
   
 }
 
+bool HomeLightHttpServer::processLinkAsyncRequest(WiFiClient& client)
+{
+  /* Retrieve request from pattern : 'GET /request HTTP/1.1' */
+  String linkRequest = header.substring(
+    String("GET /").length(), 
+    (header.length() - (String(" HTTP/1.1").length()+2) )
+  );
+
+  if(linkRequest == "asyncRequestTest"){
+    client.println("dupa");
+    return true;
+  }
+
+  return false;
+}
+
 void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
 {
   /* Retrieve request from pattern : 'GET /request HTTP/1.1' */
@@ -411,31 +429,36 @@ void HomeLightHttpServer::handleClientRequest()
             client.println("Connection: close");
             client.println();
             client.println("<!DOCTYPE html>");
-            client.println("<head>");
-            client.println(pageHead);
-            client.println(style_css);
-            client.println(javascript);
-            client.println("</head>");
+            if(!processLinkAsyncRequest(client)){
+              client.println("<head>");
+              client.println(pageHead);
+              client.println(style_css);
+              client.println(javascript);
+              client.println("</head>");
 
 
 
-            // Web Page Heading
-            client.println("<body><div class=\"wrapper\">");
-            client.println(popupContent);
+              // Web Page Heading
+              client.println("<body><div class=\"wrapper\">");
+              client.println(popupContent);
 
-            if(!isUserInterfaceBlocked){
-              /* Process request only when user interface is NOT blocked */
-              processLinkRequestData(client);
-            }else 
-            {
-              /* Wait in a loop until UI will be unlocked */
-              pending(client);
+              if(!isUserInterfaceBlocked){
+                /* Process request only when user interface is NOT blocked */
+                processLinkRequestData(client);
+              }else 
+              {
+                /* Wait in a loop until UI will be unlocked */
+                pending(client);
+              }
+
+
+              client.println("</div></body></html>");            
+              client.println();
+              break;
+            }else {
+              client.println("</html>");
+              break;
             }
-
-
-            client.println("</div></body></html>");            
-            client.println();
-            break;
 
           } else { // if you got a newline, then clear currentLine
             currentLine = "";
@@ -930,7 +953,11 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   </div>");
 
 
-  //printTestLedStrip(client);
+  printTestLedStrip(client);
+
+
+  client.println("<button onclick=\"sendAsyncRequest()\" id=\"sendRequest\">Send Request</button> \
+    <div id=\"status\">Status</div>");
 
   /* Display configuration button */
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){
@@ -1063,6 +1090,11 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
   }
 }
 
+
+void HomeLightHttpServer::constantHandler_asyncTest(WiFiClient& client)
+{
+  Serial.println("Asysnc request received!");
+}
 
 
 /** parameterized requests */ 
