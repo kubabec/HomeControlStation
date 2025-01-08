@@ -4,6 +4,7 @@
 #include <devices/OnOffDevice.hpp>
 #include <devices/TestDeviceType.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
+#include <os/tools/ExtendedDataAllocator.hpp>
 
 
 typedef enum
@@ -22,6 +23,7 @@ class DeviceManager
     /*TESTCODE*/
     static std::vector<OnOffDevice> vecOnOffDevices;
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
+    static ExtendedDataAllocator extDataAllocator;
     static void updateDeviceDescriptionSignal();
 
     static bool extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nvmData, uint8_t configSlotID);

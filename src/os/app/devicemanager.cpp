@@ -5,6 +5,7 @@
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
+ExtendedDataAllocator DeviceManager::extDataAllocator;
 
 /*TESTCODE*/
 std::vector<Device*> DeviceManager::devices;
@@ -132,6 +133,13 @@ void DeviceManager::init()
     /* Add pointer to all existing devices to the device list */
     // devices.push_back(&testDev);
     /*TESTCODE*/
+
+
+
+    /* EXTENDED DATA ALLOCATOR TESTCODE */
+    ExtendedData newExtendedData = extDataAllocator.createNewExtendedData(200);
+    
+    /* */
 
     Serial.println("... done");
 }
