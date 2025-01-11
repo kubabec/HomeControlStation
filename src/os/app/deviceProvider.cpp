@@ -267,6 +267,8 @@ ServiceRequestErrorCode DeviceProvider::service(
                 devicedetails.originalID,
                 serviceType
             );
+
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
@@ -300,6 +302,8 @@ ServiceRequestErrorCode DeviceProvider::service(
                 serviceType,
                 param
             );
+
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
@@ -334,6 +338,8 @@ ServiceRequestErrorCode DeviceProvider::service(
                 serviceType,
                 param
             );
+
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
@@ -368,6 +374,8 @@ ServiceRequestErrorCode DeviceProvider::service(
                 serviceType,
                 param
             );
+
+            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server

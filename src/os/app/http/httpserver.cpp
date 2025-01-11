@@ -7,7 +7,12 @@
 #include "os/app/http/Style.h"
 #include "os/app/http/JavaScript.h"
 
+
+#define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 2
+
 WiFiServer HomeLightHttpServer::server(80);
+WiFiClient client;
+HomeLightHttpServer::InternalAsyncHttpRequest HomeLightHttpServer::asyncRequest;
 HomeLightHttpServer::HttpServerNvmMetadata HomeLightHttpServer::nvmMetadata;
 String HomeLightHttpServer::header = "";
 unsigned long HomeLightHttpServer::currentTime = 0;
@@ -63,13 +68,17 @@ std::vector<String> constantRequests = {
 std::vector<String> parameterizedRequests = {
   "apply",
   "localSetup",
-  "dev",
-  "?bri",
   "roomMappingApply",
   "passwordApply",
   "ledStripColor",
   "ledColor"
 };
+
+std::vector<String> parameterizedAsyncRequests = {
+  "dev",
+  "?bri"
+};
+
 
 std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>> constantRequestHandlers = {
   {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
@@ -84,20 +93,76 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
   {HomeLightHttpServer::parameterizedHandler_newConfigApply, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::parameterizedHandler_newDevicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomNameMappingApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE}
 };
 
+std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
+  {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
+};
+
 
 void HomeLightHttpServer::cyclic()
 {
-    // Do cyclic task here
-    handleClientRequest();
+    /* Synchronous processing is only allowed when async request is not under processing */
+    if(!processAsyncRequest()){
+      handleClientRequest();
+    }else 
+    {
+      header = "";
+      /* response to client when request processing is completed, otherwise wait */
+      if(asyncRequest.state == ASYNC_REQUEST_COMPLETED){
+        if(client){
+          client.println("HTTP/1.1 200 OK");
+          client.println("Content-Type:application/json");
+          //client.println("Connection: close");
+          // client.println();
+          // client.println("<!DOCTYPE html>");
+          // client.println("</html>");
+          client.println();
+          sendJsonResponse();
+          // Close the connection
+          client.stop();
+        }
+
+        asyncRequest.isResponsePositive = 0;
+        asyncRequest.state = ASYNC_NO_REQUEST;
+        asyncRequest.type = ASYNC_TYPE_INVALID;
+        asyncRequest.behavior = ASYNC_INTERNAL_INVALID;
+      }
+      
+    }
     //checkUIBlockTime();
+}
+
+void HomeLightHttpServer::sendJsonResponse(){
+  client.println("{");
+  client.println("\"status\": \"succ\",");
+  switch(asyncRequest.behavior){
+    case ASYNC_INTERNAL_STATE_SWITCH: /* Device state switching */
+      client.println("\"type\": \"switch\",");
+      client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
+      if(asyncRequest.requestData[3]){
+        client.println("\"state\": \"on\"");
+      }else
+      {
+        client.println("\"state\": \"off\"");
+      }
+    break;
+    /* other cases to be handled here */
+
+    case ASYNC_INTERNAL_BRIGHTNESS_CHANGE:
+    client.println("\"type\": \"brightnessChange\"");
+    break;
+
+    default: break;
+  }
+  
+  
+  client.println("}");
 }
 
 void HomeLightHttpServer::deinit() {
@@ -164,7 +229,8 @@ void HomeLightHttpServer::init()
 {
   Serial.println("HomeLightHttpServer init ...");
 
-  
+  server.setTimeout(10);
+
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
     activeErrorsCount = 0;    
@@ -311,8 +377,7 @@ bool HomeLightHttpServer::processLinkAsyncRequest(WiFiClient& client)
     (header.length() - (String(" HTTP/1.1").length()+2) )
   );
 
-  if(linkRequest == "asyncRequestTest"){
-    client.println("dupa");
+  if(processParameterizedAsyncRequests(linkRequest, client)){
     return true;
   }
 
@@ -326,6 +391,8 @@ void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
     String("GET /").length(), 
     (header.length() - (String(" HTTP/1.1").length()+2) )
   );
+
+  Serial.println("Request : " + linkRequest);
 
   /* If request is not known in list of constant commands */
   if(!processConstantRequests(linkRequest, client))
@@ -392,6 +459,8 @@ bool HomeLightHttpServer::processParameterizedRequests(String& request, WiFiClie
         if(secAccessLevel >= parameterizedRequestHandlers.at(knownRequest).second){
           parameterizedRequestHandlers.at(knownRequest).first(request, client);
           retVal = true;
+
+          Serial.println("Request handler found at : " + String((int)knownRequest));
         }else 
         {
           /* Redirect client to main page as security access is too low */
@@ -405,38 +474,80 @@ bool HomeLightHttpServer::processParameterizedRequests(String& request, WiFiClie
   return retVal;
 }
 
+bool HomeLightHttpServer::processParameterizedAsyncRequests(String& request, WiFiClient& client)
+{
+  MatchState matcher;
+  bool retVal = false;
+
+  /* Set received request as target for search engine */
+  matcher.Target(const_cast<char*>(request.c_str()));
+
+  /* Iterate through known requests (commands) array */
+  for(uint8_t knownRequest = 0; knownRequest < parameterizedAsyncRequests.size(); knownRequest ++)
+  {
+    /* Try to find currently inspected knownRequest in the request string */
+    char matchReqult = matcher.Match(parameterizedAsyncRequests[knownRequest].c_str());
+
+    /* Substring with known command found in received 'request' */
+    if(matchReqult > 0)
+    {
+      /* Handler for received request is not missing */
+      if(knownRequest < parameterizedAsyncRequestHandlers.size())
+      {
+        /* Check if access level allows to enter the request */
+        if(secAccessLevel >= parameterizedAsyncRequestHandlers.at(knownRequest).second){
+          parameterizedAsyncRequestHandlers.at(knownRequest).first(request, client);
+          retVal = true;
+        }
+        break;
+      }
+    }
+  }
+
+  return retVal;
+}
+
+
 void HomeLightHttpServer::handleClientRequest()
 {
-  WiFiClient client = server.available(); 
+  client = server.available(); 
   if (client) {                             // If a new client connects,
-    currentTime = millis();
-    previousTime = currentTime;
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
+    /* Synchronous request can only be accepted when there is no async */
+    if(asyncRequest.state == ASYNC_NO_REQUEST){
       currentTime = millis();
-      if (client.available()) {             
-        char requestLine = client.read();          
-        //Serial.write("request " + requestLine);                   
-        header += requestLine;
-        if (requestLine == '\n') {                    // if the byte is a newline character
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-            client.println("<!DOCTYPE html>");
-            if(!processLinkAsyncRequest(client)){
+      previousTime = currentTime;
+      String currentLine = "";                // make a String to hold incoming data from the client
+      while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
+        currentTime = millis();
+        if (client.available()) {             
+          char requestLine = client.read();          
+          //Serial.write("request " + requestLine);                   
+          header += requestLine;
+          if (requestLine == '\n') {                    // if the byte is a newline character
+            // if the current line is blank, you got two newline characters in a row.
+            // that's the end of the client HTTP request, so send a response:
+            if (currentLine.length() == 0) {
+              if(processLinkAsyncRequest(client)){
+                /* Received async request, further processing of this function must be dropped */
+                header = "";
+                client.setTimeout(10);
+                return;
+              }
+
+              // // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
+              // // and a content-type so the client knows what's coming, then a blank line:
+              client.println("HTTP/1.1 200 OK");
+              client.println("Content-type:text/html");
+              client.println("Connection: close");
+              client.println();
+              client.println("<!DOCTYPE html>");
               client.println("<head>");
               client.println(pageHead);
               client.println(style_css);
               client.println(javascript);
               client.println("</head>");
 
-
+              Serial.println("Processing regular request...");
 
               // Web Page Heading
               client.println("<body><div class=\"wrapper\">");
@@ -444,6 +555,7 @@ void HomeLightHttpServer::handleClientRequest()
 
               if(!isUserInterfaceBlocked){
                 /* Process request only when user interface is NOT blocked */
+                Serial.println("Processing link...");
                 processLinkRequestData(client);
               }else 
               {
@@ -455,21 +567,115 @@ void HomeLightHttpServer::handleClientRequest()
               client.println("</div></body></html>");            
               client.println();
               break;
-            }else {
-              client.println("</html>");
-              break;
-            }
 
-          } else { // if you got a newline, then clear currentLine
-            currentLine = "";
+
+            } else { // if you got a newline, then clear currentLine
+              currentLine = "";
+            }
           }
         }
       }
+      // Clear the header variable
+      header = "";
+
+      // Close the connection
+      client.stop();
     }
-    // Clear the header variable
-    header = "";
-    // Close the connection
-    client.stop();
+  }
+}
+
+bool HomeLightHttpServer::processAsyncRequest(){
+  bool isSynchronousClientProcessingBlocked = false;
+
+  /* is there anything to process? */
+  if(asyncRequest.state != ASYNC_NO_REQUEST){
+    switch(asyncRequest.state){
+      /* Request is just received and must be processed */
+      case ASYNC_REQUEST_RECEIVED:
+        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+        mapAsyncRequestToInternalAction();
+        isSynchronousClientProcessingBlocked = true;
+      break;
+
+      /* Request processing is ongoing */
+      case ASYNC_REQUEST_PROCESSING:
+        Serial.println("Request processing...");
+        /* UI block will be released as indication of completion */
+        if(!isUserInterfaceBlocked){
+          asyncRequest.state = ASYNC_REQUEST_COMPLETED;
+          Serial.println("Request completed...");
+        }
+
+        isSynchronousClientProcessingBlocked = true;
+      break;
+
+      /* Request is completed and async response can be sent back to the server */
+      case ASYNC_REQUEST_COMPLETED:
+        // asyncRequest.isResponsePositive = 0;
+        // asyncRequest.state = ASYNC_NO_REQUEST;
+        // asyncRequest.type = ASYNC_TYPE_INVALID;
+        // asyncRequest.behavior = ASYNC_INTERNAL_INVALID;
+      break;
+
+      default : break;
+    }
+  }else {
+
+  }
+
+  return isSynchronousClientProcessingBlocked;
+}
+
+void HomeLightHttpServer::mapAsyncRequestToInternalAction()
+{
+  if(asyncRequest.type <= ASYNC_TYPE_LAST && asyncRequest.type != ASYNC_TYPE_INVALID){
+    switch(asyncRequest.type){
+      case ASYNC_TYPE_DEVICE_SERVICE_CALL:
+        callServiceBasedOnAsyncRequest();
+        asyncRequest.state = ASYNC_REQUEST_PROCESSING;
+        Serial.println("Starting request processing");
+      break;
+
+      /* Other internal actions to be requested here ... */
+
+      default: break;
+    }
+  }else {
+    /* Invalid request type */
+    asyncRequest.state = ASYNC_REQUEST_COMPLETED;
+  }
+}
+
+void HomeLightHttpServer::callServiceBasedOnAsyncRequest()
+{
+  ServiceParameters_set1 params;
+
+  /* Which service overloading to be used? */
+  switch (asyncRequest.requestData[SERVICE_OVERLOADING_FUNCTION_INDEX])
+  {
+  case serviceCall_NoParams:
+      (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_NoParams(
+          asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
+          (DeviceServicesType)asyncRequest.requestData[SERVICE_NAME_INDEX] 
+      );
+      break;
+
+  case serviceCall_1:
+      /* Copy function parameter values from the request */
+      memcpy(&params, &asyncRequest.requestData[3], sizeof(ServiceParameters_set1));
+
+      /* call the service */
+      (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+          asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
+          (DeviceServicesType)asyncRequest.requestData[SERVICE_NAME_INDEX], 
+          params
+      );
+      break;
+
+    /*TODO further service overloadings ... */
+  
+  default:
+      break;
   }
 }
 
@@ -520,18 +726,18 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiClient& client) {
   client.println("<div class=\"container\">"); // container
   if(!description.isEnabled) {   
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div class=\"status-light off\"></div>"); 
+    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light off\"></div>"); 
   }
   else {
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div class=\"status-light on\"></div>"); 
+    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light on\"></div>"); 
   }
 
   /* Draw ON/OFF button depending on the current state */
   if(!description.isEnabled) {   
-    client.println("<a class=\"button\" href=\"/dev" + String(description.deviceId) + "state" + "1&\">ON</a>");
+    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 1)\">ON</a>");
   }
   else {
-    client.println("<a class=\"button\"  href=\"/dev" + String(description.deviceId) +  "state" + "0&\" + &>OFF</a>");
+    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 0)\">OFF</a>");
   }
 
   /* Draw Brightness range bar if device allows brightness change */
@@ -953,11 +1159,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   </div>");
 
 
-  printTestLedStrip(client);
-
-
-  client.println("<button onclick=\"sendAsyncRequest()\" id=\"sendRequest\">Send Request</button> \
-    <div id=\"status\">Status</div>");
+  //printTestLedStrip(client);
 
   /* Display configuration button */
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){
@@ -1135,14 +1337,37 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiF
   uint8_t deviceId = devId.toInt();
   uint8_t deviceState = state.toInt();
   
-  (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
-    deviceId,
-    DEVSERVICE_STATE_SWITCH,
-    {deviceState,0,0,0}
-  );
+  /* OLD */
+  // (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+  //   deviceId,
+  //   DEVSERVICE_STATE_SWITCH,
+  //   {deviceState,0,0,0}
+  // );
   
   //Serial.println("->HTTP server - dostalem ID : " + String(deviceId));
-  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+  // client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+
+  /* NEW */
+  asyncRequest.receivedTime = millis();
+  asyncRequest.state = ASYNC_REQUEST_RECEIVED;
+  asyncRequest.type = ASYNC_TYPE_DEVICE_SERVICE_CALL;
+  asyncRequest.behavior = ASYNC_INTERNAL_STATE_SWITCH;
+  asyncRequest.requestData[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;
+  asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId;
+  asyncRequest.requestData[SERVICE_NAME_INDEX] = DEVSERVICE_STATE_SWITCH;
+
+  /* Parameters */
+  asyncRequest.requestData[3] = deviceState;
+
+
+  asyncRequest.print();
+
+
+
+  Serial.println("Async request processing started ");
+  /* Request will be processed in next cycle of the HttpServer */
+
+
 }
 
 void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client)
@@ -1156,13 +1381,27 @@ void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& re
   uint8_t newbrightness = brightnessString.toInt(); 
   uint8_t idString = idDeviceString.toInt();
 
-  (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
-    idString,
-    DEVSERVICE_BRIGHTNESS_CHANGE,
-    {newbrightness,0,0,0}
-  );
+  /* OLD */
+  // (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+  //   idString,
+  //   DEVSERVICE_BRIGHTNESS_CHANGE,
+  //   {newbrightness,0,0,0}
+  // );
+
+
+  /* NEW */
+  asyncRequest.receivedTime = millis();
+  asyncRequest.state = ASYNC_REQUEST_RECEIVED;
+  asyncRequest.type = ASYNC_TYPE_DEVICE_SERVICE_CALL;
+  asyncRequest.behavior = ASYNC_INTERNAL_BRIGHTNESS_CHANGE;
+  asyncRequest.requestData[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;
+  asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = idString;
+  asyncRequest.requestData[SERVICE_NAME_INDEX] = DEVSERVICE_BRIGHTNESS_CHANGE;
+
+  /* Parameters */
+  asyncRequest.requestData[3] = newbrightness;
   
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+  //client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
 
 void HomeLightHttpServer::pending(WiFiClient& client){
@@ -1216,6 +1455,8 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
 
 void HomeLightHttpServer::parameterizedHandler_passwordApply(String& request, WiFiClient& client)
 {
+
+  Serial.println("Password apply processing");
   request = request.substring(String("passwordApply").length());
   try{
     /* Request Security access level change in OS via received password */
