@@ -305,24 +305,53 @@ const char* javascript = "\
             cancelButton.addEventListener(\"click\", closePopup);\
         }\
 \
-\
-    function sendAsyncRequest(){\
-      const xhr = new XMLHttpRequest();\
-      const url = \"/asyncRequestTest\";\
-      xhr.open(\"GET\", url, true);\
-      xhr.onreadystatechange = function() {\
-          if (xhr.readyState === 4) { \
-              const statusElement = document.getElementById(\"status\");\
-              if (xhr.status === 200) { \
-                  statusElement.style.backgroundColor = \"green\";\
-                  statusElement.textContent = xhr.responseText;\
-              } else { \
-                  statusElement.style.backgroundColor = \"red\";\
-                  statusElement.textContent = \"Error\";\
-              }\
-          }\
-      };\
-      xhr.send();\
+  function asyncDeviceStateSwitch(device, state){\
+    const xhr = new XMLHttpRequest();\
+    xhr.timeout = 10000;\
+    var url = '/dev' + device.toString() + 'state';\
+    const loadingOverlay = document.getElementById(\"loadingOverlay\");\
+    loadingOverlay.style.display = \"flex\";\
+    if(state === 1){\
+        url = url + '1&';\
+    }else {\
+        url = url + '0&';\
+    }\
+    xhr.open(\"GET\", url, true);\
+    xhr.onreadystatechange = function() {\
+        loadingOverlay.style.display = \"none\";\
+        if (xhr.readyState === 4) { \
+            const statusElement = document.getElementById(\"status\");\
+            if (xhr.status === 200) { \
+                handleJsonResponse(xhr.responseText);\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+    };\
+    xhr.send();\
+  }\
+  function handleJsonResponse(responseText = \"\"){\
+    const response = JSON.parse(responseText);\
+    if(response.status === \"succ\"){\
+        if(response.type === \"switch\"){\
+            var switchBtn = document.getElementById('switchBtn' + response.id);\
+            var statusLight = document.getElementById('statusLight' + response.id);\
+            if(response.state === \"on\"){\
+                switchBtn.innerHTML = \"OFF\";\
+                switchBtn.removeAttribute(\"onclick\");\
+                switchBtn.onclick = function() { asyncDeviceStateSwitch(response.id, 0); };\
+                statusLight.classList.remove('off');\
+                statusLight.classList.add('on');\
+            }else {\
+                switchBtn.innerHTML = \"ON\";\
+                switchBtn.removeAttribute(\"onclick\");\
+                switchBtn.onclick = function() { asyncDeviceStateSwitch(response.id, 1); };\
+                statusLight.classList.remove('on');\
+                statusLight.classList.add('off');\
+            }\
+            console.log(\"Success\")\
+        }\
+    }\
   }\
 </script>";
 

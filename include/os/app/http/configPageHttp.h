@@ -8,7 +8,14 @@ const char* popupContent = "<div class=\"popup-overlay hidden-popup\" id=\"popup
             <button class=\"popup-button\" id=\"popup-button\">Proceed</button>\
             <div class=\"popup-close\" id=\"popup-close\">&times;</div>\
         </div>\
-    </div>";
+    </div>\
+    <div id=\"loadingOverlay\">\
+        <div id=\"loadingContent\">\
+            <div id=\"loadingText\">Processing...</div>\
+            <div class=\"spinner\"></div>\
+        </div>\
+    </div>\
+    ";
 
 
 #endif

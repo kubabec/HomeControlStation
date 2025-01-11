@@ -127,8 +127,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
     Serial.println("->Device Provider received response Node Id: " + String((int)response.responseNodeId));
-    //DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, "RCDevManager", static_cast<bool>(false));
-    
+    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
     
     return true;
 }
@@ -154,7 +153,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 0; //0 - no params, 1 - set1 ...
         
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -187,7 +186,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 1; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -220,7 +219,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 2; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
