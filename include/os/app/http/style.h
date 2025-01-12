@@ -566,39 +566,37 @@ padding-bottom: 5px;\
 .popup-buttons button:hover {\
     background: linear-gradient(135deg, #5aa9d4, #337bbf);\
 }\
-#loadingOverlay {\
-    position: fixed;\
+.container.loading {\
+    background-color: rgba(255, 255, 255, 0.8);\
+}\
+.container .loading-overlay {\
+    position: absolute;\
     top: 0;\
     left: 0;\
     width: 100%;\
     height: 100%;\
-    background-color: rgba(21, 32, 50, 0.6);\
-    display: none;\
+    background-color: rgba(255, 255, 255, 0.8);\
+    display: flex;\
     align-items: center;\
     justify-content: center;\
-    z-index: 1000;\
+    z-index: 10;\
+    border-radius: inherit; \
+    pointer-events: none;\
 }\
-\
-#loadingContent {\
-    text-align: center;\
-    color: #82d0f9;\
-}\
-\
-#loadingText {\
-    font-size: 24px;\
-    margin-bottom: 20px;\
-    margin-left: -30px;\
-}\
-\
-.spinner {\
-    width: 50px;\
-    height: 50px;\
-    border: 5px solid transparent;\
-    border-top: 5px solid #79c2e9;\
+.loading-overlay .spinner {\
+    width: 40px;\
+    height: 40px;\
+    border: 4px solid transparent;\
+    border-top: 4px solid #007bff;\
     border-radius: 50%;\
     animation: spin 1s linear infinite;\
 }\
-\
+.loading-overlay .loading-text {\
+    font-size: 16px;\
+    color: #007bff;\
+    margin-left: 10px;\
+    font-weight: bold;\
+}\
 @keyframes spin {\
     from {\
         transform: rotate(0deg);\

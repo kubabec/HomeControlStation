@@ -309,8 +309,8 @@ const char* javascript = "\
     const xhr = new XMLHttpRequest();\
     xhr.timeout = 10000;\
     var url = '/dev' + device.toString() + 'state';\
-    const loadingOverlay = document.getElementById(\"loadingOverlay\");\
-    loadingOverlay.style.display = \"flex\";\
+    const container = document.getElementById('container' + device);\
+    showLoading(container);\
     if(state === 1){\
         url = url + '1&';\
     }else {\
@@ -318,7 +318,6 @@ const char* javascript = "\
     }\
     xhr.open(\"GET\", url, true);\
     xhr.onreadystatechange = function() {\
-        loadingOverlay.style.display = \"none\";\
         if (xhr.readyState === 4) { \
             const statusElement = document.getElementById(\"status\");\
             if (xhr.status === 200) { \
@@ -327,6 +326,7 @@ const char* javascript = "\
                 console.log('Error with AJAX request');\
             }\
         }\
+        hideLoading(container);\
     };\
     xhr.send();\
   }\
@@ -353,6 +353,21 @@ const char* javascript = "\
         }\
     }\
   }\
+  function showLoading(container) {\
+    container.classList.add(\"loading\");\
+    const overlay = container.querySelector(\".loading-overlay\");\
+    if (overlay) {\
+        overlay.style.display = \"flex\";\
+    }\
+}\
+\
+function hideLoading(container) {\
+    container.classList.remove(\"loading\");\
+    const overlay = container.querySelector(\".loading-overlay\");\
+    if (overlay) {\
+        overlay.style.display = \"none\";\
+    }\
+}\
 </script>";
 
 #endif
