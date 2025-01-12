@@ -86,6 +86,7 @@ class HomeLightHttpServer
     static SecurityAccessLevelType secAccessLevel;
     static void handleClientRequest();
     static bool processAsyncRequest();
+    static void updateAsyncResponseWithValidData();
     static void sendJsonResponse();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;

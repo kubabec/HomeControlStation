@@ -32,7 +32,24 @@ const char* javascript = "\
     }\
     function onRangeChanged(value, devId) {\
         value = parseInt(value);\
-        window.location.assign(\"/?bri\"+value+\"DEV\"+devId+\"&\");\
+        var url = \"/?bri\"+value+\"DEV\"+devId+\"&\";\
+        const xhr = new XMLHttpRequest();\
+        xhr.timeout = 10000;\
+        const container = document.getElementById('container' + devId);\
+        showLoading(container);\
+        xhr.open(\"GET\", url, true);\
+        xhr.onreadystatechange = function() {\
+            if (xhr.readyState === 4) { \
+                const statusElement = document.getElementById(\"status\");\
+                if (xhr.status === 200) { \
+                    handleJsonResponse(xhr.responseText);\
+                } else { \
+                    console.log('Error with AJAX request');\
+                }\
+            }\
+            hideLoading(container);\
+        };\
+        xhr.send();\
     }\
     function toggleDeviceConfig(checkbox) {\
         var container = checkbox.closest('.device-container');\
@@ -349,6 +366,10 @@ const char* javascript = "\
                 statusLight.classList.remove('on');\
                 statusLight.classList.add('off');\
             }\
+            console.log(\"Success\")\
+        }else if(response.type === \"brightnessChange\"){\
+            var slider = document.getElementById('brightnessSlider' + response.id);\
+            slider.value = response.level;\
             console.log(\"Success\")\
         }\
     }\

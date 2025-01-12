@@ -78,6 +78,7 @@ void OnOffDevice::timerHandler() {
     }  
 
 void OnOffDevice::changeBrightness(int requestedBrightness) {
+    Serial.println("Requested: " + String(requestedBrightness));
     brightnessLevelTarget = requestedBrightness;
     float brightnessDelta = abs(brightnessLevelTarget - brightnessLevel);
     brightnessStepDurationMS = brightnessChangeTime / brightnessDelta;    
@@ -157,6 +158,10 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
                 off();
             }
             return SERV_SUCCESS;
+
+        case DEVSERVICE_BRIGHTNESS_CHANGE:
+            changeBrightness(param.a);
+            return SERV_SUCCESS;
         
         default: 
             return SERV_NOT_SUPPORTED;
@@ -184,7 +189,8 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
     desc.isEnabled = isOn;
     desc.deviceName = deviceName;
     desc.customBytes[0] = brightnessLevelSupport;
-    desc.customBytes[1] = brightnessLevel;
+    desc.customBytes[1] = brightnessLevelTarget;
+    desc.customBytes[2] = brightnessLevel;
 
     return desc;
 }

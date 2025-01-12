@@ -8,7 +8,7 @@
 #include "os/app/http/JavaScript.h"
 
 
-#define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 2
+#define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 19
 
 WiFiServer HomeLightHttpServer::server(80);
 WiFiClient client;
@@ -115,13 +115,10 @@ void HomeLightHttpServer::cyclic()
       header = "";
       /* response to client when request processing is completed, otherwise wait */
       if(asyncRequest.state == ASYNC_REQUEST_COMPLETED){
+        updateAsyncResponseWithValidData();
         if(client){
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type:application/json");
-          //client.println("Connection: close");
-          // client.println();
-          // client.println("<!DOCTYPE html>");
-          // client.println("</html>");
           client.println();
           sendJsonResponse();
           // Close the connection
@@ -137,6 +134,40 @@ void HomeLightHttpServer::cyclic()
     }
     //checkUIBlockTime();
 }
+
+void HomeLightHttpServer::updateAsyncResponseWithValidData()
+{
+  bool deviceFound = false;
+  /* Find device corresponding to the request */
+  for(auto& room : deviceToRoomMappingList){
+    for(auto& device : room.second)
+    {
+      /* device found */
+      if(device->deviceId == asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL]){
+        switch(asyncRequest.behavior){
+          /* assign correct information to data which will be returned in JSON */
+          case ASYNC_INTERNAL_STATE_SWITCH:
+            asyncRequest.requestData[3] = device->isEnabled;
+          case ASYNC_INTERNAL_BRIGHTNESS_CHANGE:
+            asyncRequest.requestData[2] = device->customBytes[1];
+          default: break;
+        }
+
+        deviceFound = true;
+      }
+    }
+  }
+
+  /* There is no longer device for which request was received, drop the response data */
+  if(!deviceFound)
+  {
+    for(uint8_t i = 0 ; i < 20; i++){
+      asyncRequest.requestData[i] = 0xFF;
+    }
+  }
+
+}
+
 
 void HomeLightHttpServer::sendJsonResponse(){
   client.println("{");
@@ -155,7 +186,9 @@ void HomeLightHttpServer::sendJsonResponse(){
     /* other cases to be handled here */
 
     case ASYNC_INTERNAL_BRIGHTNESS_CHANGE:
-    client.println("\"type\": \"brightnessChange\"");
+      client.println("\"type\": \"brightnessChange\",");
+      client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
+      client.println("\"level\": \""+String(asyncRequest.requestData[2])+"\"");
     break;
 
     default: break;
@@ -750,7 +783,7 @@ void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiCl
   if(description.customBytes[0]) {
     client.println("<br>");
     const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-    const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, " + String(description.deviceId) + ")\">";
+    const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, " + String(description.deviceId) + ")\" id=\"brightnessSlider"+String(description.deviceId)+"\">";
     client.println(brightnessSlider1 + String(description.customBytes[1]) + brightnessSlider2);
   }
   client.println("</div>"); // container 
