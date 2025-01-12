@@ -724,7 +724,12 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
 void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiClient& client) {
-  client.println("<div class=\"container\">"); // container
+  client.println("<div class=\"container\" id=\"container"+String(description.deviceId)+"\">"); // container
+  client.println("<div class=\"loading-overlay\" style=\"display: none;\">\
+            <div class=\"spinner\"></div>\
+            <div class=\"loading-text\">Loading...</div>\
+        </div>");
+
   if(!description.isEnabled) {   
     client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light off\"></div>"); 
   }
