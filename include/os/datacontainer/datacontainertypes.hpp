@@ -162,4 +162,10 @@ typedef enum
     e_ACCESS_LEVEL_AUTH_USER,
     e_ACCESS_LEVEL_SERVICE_MODE
 }SecurityAccessLevelType;
+
+typedef struct
+{
+    uint8_t bytes[6];
+}MACAddress;
+
 #endif 

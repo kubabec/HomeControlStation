@@ -1,6 +1,7 @@
 #include <os/drivers/NetworkDriver.hpp>
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
+#include <esp_wifi.h>
 
 bool NetworkDriver::networkConnected = false;
 bool NetworkDriver::networkConnectionRequested = false;
@@ -81,6 +82,16 @@ void NetworkDriver::init()
 
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);
     packetReceivers.push_back(dummyTobeRemoved);
+
+
+    MACAddress mac;
+    esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
+    if (ret == ESP_OK) {
+        Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
+                    mac.bytes[0], mac.bytes[1], mac.bytes[2],
+                    mac.bytes[3], mac.bytes[4], mac.bytes[5]);
+    }
+    DataContainer::setSignalValue(SIG_MAC_ADDRESS, static_cast<MACAddress>(mac));
 
 
     Serial.println("... done");
