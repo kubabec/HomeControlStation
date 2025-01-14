@@ -27,7 +27,7 @@ public:
     static void cyclic();
     static void printTranslationMap();
 
-    
+    static void downloadExtendedData(uint8_t deviceId);
     static void tunnelDataUpdate(std::any remoteDevices);
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
 

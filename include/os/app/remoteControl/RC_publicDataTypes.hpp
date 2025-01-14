@@ -4,11 +4,13 @@
 
 #define REQUEST_DATA_SIZE 30
 #define RESPONSE_DATA_SIZE 10
+#define RESPONSE_DATA_SIZE_LONG 100
 #define REQEST_SIZE (REQUEST_DATA_SIZE + 8)
 
 typedef enum {
     REQ_FIRST,
     SERVICE_CALL_REQ = REQ_FIRST,
+    EXTENDED_DATA_DOWNLOAD_REQ,
     UNKNOWN_REQ,
     REQ_COUNT = UNKNOWN_REQ
 }RequestType;
@@ -73,6 +75,7 @@ typedef enum {
     POSITIVE_RESP,
     NEGATIVE_RESP,
     INVALID_REQ_RESP,
+    EXTENDED_DATA_DOWNLOAD_RESP,
     UNKNOWN_RESP
 }ResponseType;
 
@@ -106,5 +109,36 @@ typedef struct {
     }
 
 }RcResponse;
+
+typedef struct {
+    uint8_t responseId;
+    uint16_t responseNodeId = 255;
+    uint8_t requestType = UNKNOWN_REQ;
+    uint8_t responseType = UNKNOWN_RESP;   
+    uint8_t data[RESPONSE_DATA_SIZE_LONG] = {0xFF};
+    uint16_t crc ;
+
+    uint8_t getSize(){
+             
+        return 104;
+    }
+
+    void print() {
+        Serial.println("   Response ");
+        Serial.println("responseId :" + String((int)responseId));
+        Serial.println("responceNodeId :" + String((int)responseNodeId));
+        Serial.println("requestType :" + String((int)requestType));
+        Serial.println("responseType :" + String((int)responseType));
+        Serial.print(" Payload : ");
+        for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
+            Serial.print((int)data[i]);
+        }
+        Serial.println("");
+             
+        Serial.println("crc :" + String((int)crc));
+        Serial.println(" ");
+    }
+
+}RcResponseLong;
 
 #endif

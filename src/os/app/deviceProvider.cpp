@@ -1,10 +1,11 @@
 #include <os/app/DeviceProvider.hpp>
+//#include "deviceProvider.hpp"
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
 
 
 std::function<bool(RcResponse&)> DeviceProvider::requestResponse;
-
+std::function<bool(RcResponseLong&)> DeviceProvider::requestResponseLong;
 
 bool DeviceProvider::isRCServer = false;
 
@@ -58,9 +59,16 @@ void DeviceProvider::init()
     }else {
         std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
         (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (SERVICE_CALL_REQ, DeviceProvider::receiveRequest);
+        
+        std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>>
+        (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, DeviceProvider::receiveExtededDataRequest);
+    
                 
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
         requestResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
+        requestResponseLong = (std::any_cast<std::function<bool(RcResponseLong&)>>(responseCBK));
+
+        
     }
     
     updateDeviceDescriptionSignal();
@@ -232,11 +240,29 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     }
 
     requestResponse(response);
-
-
     
     return true;
     //
+}
+
+
+
+bool DeviceProvider::receiveExtededDataRequest(RcRequest& request) {
+    
+    Serial.println("DeviceProvider//: receiveExtededDataRequest");
+    request.print();
+
+    RcResponseLong responseLong;
+    responseLong.responseId = request.requestId;
+    responseLong.responseType = EXTENDED_DATA_DOWNLOAD_RESP;
+    responseLong.requestType = request.type;
+    responseLong.responseNodeId = request.targetNodeId;    
+
+    for (int i = 0; i < sizeof(responseLong.data); ++i) {
+        responseLong.data[i] = 0;
+    }
+
+    requestResponseLong(responseLong);
 }
 
 // uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {
