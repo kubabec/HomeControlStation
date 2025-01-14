@@ -16,7 +16,7 @@ struct DeviceTranslationDetails{
 class DeviceProvider 
 {
     
-    static std::function<bool(RcResponse&)> requestResponse;
+    static std::function<bool(RcResponse&)> sendResponse;
 
 
     static bool isRCServer;

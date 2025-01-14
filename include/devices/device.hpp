@@ -62,10 +62,71 @@ typedef struct
     uint8_t size = 0xff;
 }ServiceParameters_set3;
 
+// struct MACAddress
+// {
+//     MACAddress(){
+//         memset(bytes, 0xff, 6);
+//     }
+
+//     MACAddress(uint64_t mac){
+//         memcpy(bytes, &mac, 6);
+//     }
+
+//     MACAddress(const MACAddress& other){
+//         this->bytes[0] = other.bytes[0];
+//         this->bytes[1] = other.bytes[1];
+//         this->bytes[2] = other.bytes[2];
+//         this->bytes[3] = other.bytes[3];
+//         this->bytes[4] = other.bytes[4];
+//         this->bytes[5] = other.bytes[5];
+//     }
+
+//     uint8_t bytes[6];
+
+//     void print(){
+//         Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n", bytes[0], bytes[1],bytes[2],bytes[3],bytes[4],bytes[5]);
+//     }
+
+//     bool isValid(){
+//         return (bytes[0] != 255 && 
+//                 bytes[1] != 255 && 
+//                 bytes[2] != 255 && 
+//                 bytes[3] != 255 && 
+//                 bytes[4] != 255 && 
+//                 bytes[5] != 255);
+//     }
+
+//     void clear(){
+//         bytes[0] = 255;
+//         bytes[1] = 255;
+//         bytes[2] = 255;
+//         bytes[3] = 255;
+//         bytes[4] = 255;
+//         bytes[5] = 255;
+//     }
+
+//     uint64_t toUint64(){
+//         uint64_t value = 0;
+//         memcpy(&value, bytes, 6);
+
+//         return value;
+//     }
+// };
+
+// inline bool operator==(const MACAddress& lhv, const MACAddress& rhv){
+//         return (lhv.bytes[0] == rhv.bytes[0] && 
+//                 lhv.bytes[1] == rhv.bytes[1] && 
+//                 lhv.bytes[2] == rhv.bytes[2] && 
+//                 lhv.bytes[3] == rhv.bytes[3] && 
+//                 lhv.bytes[4] == rhv.bytes[4] && 
+//                 lhv.bytes[5] == rhv.bytes[5]);
+//     }
+
+
 typedef struct
 {
     uint8_t deviceType = 255;
-    uint8_t nodeId = 255;
+    uint64_t macAddress;
     uint8_t deviceId = -1;
     uint8_t roomId = 255;
     bool isEnabled;
@@ -75,7 +136,7 @@ typedef struct
     void print() {
         //Serial.println(" ======DEVICE DESCRIPTION=============");
         Serial.print("deviceType: " + String(deviceType) + " - ");
-        Serial.print("nodeId: " + String(nodeId) + " - ");
+        Serial.print("macAddress: " + String(macAddress) + " - ");
         Serial.print("deviceId: " + String(deviceId) + " - ");
         Serial.print("isEnabled: " + String(isEnabled) + " - ");
         Serial.println("deviceName: " + deviceName);

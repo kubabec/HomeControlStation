@@ -617,6 +617,20 @@ void HomeLightHttpServer::handleClientRequest()
   }
 }
 
+void HomeLightHttpServer::handleAsyncRequestTimeout()
+{
+  if((millis() - asyncRequest.receivedTime) > 10000){ /* 10s to expire the request and drop */
+    if(client){
+      client.stop();
+    }
+
+    asyncRequest.isResponsePositive = 0;
+    asyncRequest.state = ASYNC_NO_REQUEST;
+    asyncRequest.type = ASYNC_TYPE_INVALID;
+    asyncRequest.behavior = ASYNC_INTERNAL_INVALID;
+  }
+}
+
 bool HomeLightHttpServer::processAsyncRequest(){
   bool isSynchronousClientProcessingBlocked = false;
 
@@ -626,17 +640,19 @@ bool HomeLightHttpServer::processAsyncRequest(){
       /* Request is just received and must be processed */
       case ASYNC_REQUEST_RECEIVED:
         DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+        asyncRequest.receivedTime = millis();
         mapAsyncRequestToInternalAction();
         isSynchronousClientProcessingBlocked = true;
       break;
 
       /* Request processing is ongoing */
       case ASYNC_REQUEST_PROCESSING:
-        Serial.println("Request processing...");
         /* UI block will be released as indication of completion */
         if(!isUserInterfaceBlocked){
           asyncRequest.state = ASYNC_REQUEST_COMPLETED;
-          Serial.println("Request completed...");
+          Serial.println("XHTML Request completed...");
+        }else {
+          handleAsyncRequestTimeout();
         }
 
         isSynchronousClientProcessingBlocked = true;

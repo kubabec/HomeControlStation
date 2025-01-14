@@ -183,7 +183,6 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
 DeviceDescription OnOffDevice::getDeviceDescription(){
     DeviceDescription desc;
     desc.deviceType = type_ONOFFDEVICE;
-    desc.nodeId = 200;
     desc.deviceId = deviceId;
     desc.roomId = roomId;
     desc.isEnabled = isOn;

@@ -16,7 +16,6 @@
 
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct {
-    uint16_t nodeId = 255;                  /* Remote node identifier */
     uint8_t numberOfDevices = 255;          /* Count of on-Node devices */
     std::vector<DeviceDescription> devicesCollection;
     bool isDeviceCollectionCompleted = false;
@@ -26,12 +25,11 @@ typedef struct {
 
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
-        Serial.println("Node Id : " + String(nodeId));
         Serial.println("numberOfDevices : " + String(numberOfDevices));
         for(auto& device: devicesCollection) {
             device.print();
         }
-        Serial.println("Device Hash : " + String((int)lastKeepAliveReceivedTime));
+        Serial.println("Device Hash : " + String((int)lastKnownNodeHash));
         Serial.println("isDeviceCollectionCompleted : " + String(isDeviceCollectionCompleted));
         Serial.println("------- ----------------------- --------------");                
     }
@@ -45,16 +43,16 @@ class RemoteControlServer
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
     static std::queue<RcRequest> pendingRequestsQueue;
-    static std::queue<uint8_t> pendingDDRefreshNodeIdentifiers;
+    static std::queue<uint64_t> pendingDDRefreshNodeIdentifiers;
 
     static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
 
     static RequestProcessor requestProcessor;
 
-    static uint8_t detailedDataPendingNodeID;
+    static uint64_t detailedDataPendingNodeMAC;
     
     /* Kontener na informacje o zdalnych Nodach*/
-    static std::map<uint16_t, RemoteNodeInformation> remoteNodes;
+    static std::map<uint64_t, RemoteNodeInformation> remoteNodes;
 
     static void requestNodeInitialData();
     static void requestNodeDetailedData();
@@ -75,8 +73,8 @@ class RemoteControlServer
     static NodeInitialData getInitialDataFromPayload(MessageUDP& msg);
 
     static void updateDeviceDescriptionSignal();
-    static void triggerDDRefresh(uint8_t nodeID); /* Trigger detailed data refresh */
-    static void handleDetailedDataRefreshMech(std::vector <uint16_t>& nodesToBeRemoved);
+    static void triggerDDRefresh(uint64_t mac); /* Trigger detailed data refresh */
+    static void handleDetailedDataRefreshMech(std::vector <uint64_t>& nodesToBeRemoved);
 
     static uint8_t generateRequestId(); // funkcja do generowania Request Id
 
@@ -90,7 +88,7 @@ public:
     static void createRcRequest(RcRequest& newRequest);
 
     static bool registerResponseReceiver(RequestType request, std::function<bool(RcResponse&)> receiverCallback);
-    static void refreshRemoteNodeInfo(uint8_t nodeId);
+    static void refreshRemoteNodeInfo(uint64_t mac);
     
 };
 

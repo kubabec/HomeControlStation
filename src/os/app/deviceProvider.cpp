@@ -3,7 +3,7 @@
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
 
 
-std::function<bool(RcResponse&)> DeviceProvider::requestResponse;
+std::function<bool(RcResponse&)> DeviceProvider::sendResponse;
 
 
 bool DeviceProvider::isRCServer = false;
@@ -60,7 +60,7 @@ void DeviceProvider::init()
         (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (SERVICE_CALL_REQ, DeviceProvider::receiveRequest);
                 
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
-        requestResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
+        sendResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
     }
     
     updateDeviceDescriptionSignal();
@@ -144,10 +144,10 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                     .isLocal = false
                 };
 
-                device.deviceId = uniqueId;
+                //device.deviceId = uniqueId;
                 deviceDescriptionsTotal.push_back(device);                
                 //Serial.println("-------------------- Dodaje remote---------------");            
-                uniqueDeviceIdToNormalDeviceIdMap.insert({uniqueId, translationDetails});
+                uniqueDeviceIdToNormalDeviceIdMap.insert({device.deviceId, translationDetails});
                 uniqueId++;
                 if(uniqueId == 255) {
                     uniqueId = 7;
@@ -180,7 +180,7 @@ void DeviceProvider::deviceReset() {
 
 
 bool DeviceProvider::receiveRequest(RcRequest& request) {
-    request.print();
+    // request.print();
 
     RcResponse response;
     response.responseId = request.requestId;
@@ -231,7 +231,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
        Serial.println("No mapping found for received DeviceID (" + String((int)request.targetDeviceId)+ ") in request " + String((int) request.requestId));
     }
 
-    requestResponse(response);
+    sendResponse(response);
 
 
     
@@ -268,6 +268,7 @@ ServiceRequestErrorCode DeviceProvider::service(
                 serviceType
             );
 
+            Serial.println("UIBLOCKED:FALSE / localservice1");
             DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
@@ -303,6 +304,7 @@ ServiceRequestErrorCode DeviceProvider::service(
                 param
             );
 
+            Serial.println("UIBLOCKED:FALSE / localservice2");
             DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
@@ -339,6 +341,7 @@ ServiceRequestErrorCode DeviceProvider::service(
                 param
             );
 
+            Serial.println("UIBLOCKED:FALSE / localservice3");
             DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
@@ -375,6 +378,8 @@ ServiceRequestErrorCode DeviceProvider::service(
                 param
             );
 
+
+            Serial.println("UIBLOCKED:FALSE / localservice4");
             DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {

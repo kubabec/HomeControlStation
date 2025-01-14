@@ -20,7 +20,6 @@ void OperatingSystem::init()
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
     DataContainer::setSignalValue(
         CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
         static_cast<std::function<void(String)>>(OperatingSystem::requestSecurityAccessLevelChangeViaString)
@@ -43,6 +42,11 @@ void OperatingSystem::init()
 
     ErrorMonitor::init();
     ConfigProvider::init();
+
+
+    calculateRuntimeNodeHash();
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
+
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig = 
@@ -113,8 +117,7 @@ void OperatingSystem::task50ms()
         }
     }
 
-    runtimeNodeHash = calculateRuntimeNodeHash();
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
+    calculateRuntimeNodeHash();
 }
 
 void OperatingSystem::task1s()
@@ -204,7 +207,7 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
         for(auto& device : devicesVector)
         {
             hash += (uint8_t) device.deviceId;
-            hash += (uint8_t) device.nodeId;
+            hash += (uint8_t) device.macAddress;
             hash += (uint8_t) device.isEnabled;
             for(uint8_t idx = 0 ; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION ; idx ++)
             {
@@ -218,6 +221,10 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
     }catch (std::bad_any_cast ex){}
 
     //Serial.println("Hash : " + String((int)hash));
+
+    runtimeNodeHash = hash;
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(hash));
+    // Serial.println("New hash : " + String((int)hash));
 
     return hash;
 }
@@ -264,7 +271,8 @@ void OperatingSystem::handleUiBlockTimeExpiration()
     bool isUIBlocked = std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_UI_BLOCKED));
 
     if(isUIBlocked){
-        if(abs(millis() - uIBlockTime) > 1000){
+        if(abs(millis() - uIBlockTime) > 10000){ /* 10 sec*/
+            Serial.println("UIBLOCKED:FALSE / timeout handler");
             DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, false);
             uIBlockTime = 0;
         }

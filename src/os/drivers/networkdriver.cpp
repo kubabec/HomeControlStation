@@ -84,14 +84,16 @@ void NetworkDriver::init()
     packetReceivers.push_back(dummyTobeRemoved);
 
 
-    MACAddress mac;
-    esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
-    if (ret == ESP_OK) {
-        Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
-                    mac.bytes[0], mac.bytes[1], mac.bytes[2],
-                    mac.bytes[3], mac.bytes[4], mac.bytes[5]);
+    // esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
+    uint64_t _chipmacid = 0LL;
+    esp_efuse_mac_get_default((uint8_t*) (&_chipmacid));
+
+
+    Serial.println(_chipmacid);
+
+    if(0LL != _chipmacid){
+        DataContainer::setSignalValue(SIG_MAC_ADDRESS, static_cast<uint64_t>(_chipmacid));
     }
-    DataContainer::setSignalValue(SIG_MAC_ADDRESS, static_cast<MACAddress>(mac));
 
 
     Serial.println("... done");

@@ -94,6 +94,7 @@ class HomeLightHttpServer
 
     static void mapAsyncRequestToInternalAction();
     static void callServiceBasedOnAsyncRequest();
+    static void handleAsyncRequestTimeout();
 
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
