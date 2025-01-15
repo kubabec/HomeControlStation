@@ -30,10 +30,11 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
 
         /* Push fully prepared request to previously created empty UDP message  */
         if(message.pushData((byte*)(&currentRequest),reqestSize)){
+            Serial.println("Sending new request with ID "+String((int)currentRequest.requestId));
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
             /* Increment request send counter for further entries of this function */
-            currentRequest.requestSendCount ++;
+            currentRequest.requestSendCount = 1;
             lastSendTime = millis();
         }
         else{
@@ -45,12 +46,14 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         /* Does message send retry count exceed maximum allowed number? */
         if(currentRequest.requestSendCount >= 3){
             /* Max number reqests exceed , timeout request*/
+            Serial.println("Request "+String((int)currentRequest.requestId)+" processing failed");
             /* clear the current request */
             currentRequest = {};
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 3000){
+            if(millis() - lastSendTime > 5000){
+                Serial.println("Sending repeat request for request "+String((int)currentRequest.requestId));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 

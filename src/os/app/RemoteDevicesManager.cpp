@@ -2,6 +2,7 @@
 
 std::vector<DeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
 std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
+std::array<ExternalNodeMapping, MAX_EXTERNAL_NODES> RemoteDevicesManager::mappingSlotsForExternalNodes;
 
 void RemoteDevicesManager::init()
 {
@@ -13,8 +14,8 @@ void RemoteDevicesManager::init()
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
     (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (SERVICE_CALL_REQ, RemoteDevicesManager::receiveResponse);
 
-    std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>>
-    (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, RemoteDevicesManager::receiveResponse);
+    // std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>>
+    // (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, RemoteDevicesManager::receiveResponse);
 
    
 
@@ -51,28 +52,71 @@ void RemoteDevicesManager::init()
     Serial.println("... done");
 }
 
+uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t& nodeMAC){
+    uint8_t offset = 255;
+
+    /* We must do:
+    1. Check if this nodeMAC already exists in current mapping
+    2. If not, assign first empty mapping to it */
+
+    for(uint8_t i = 0; i < mappingSlotsForExternalNodes.size(); i++){
+        if(mappingSlotsForExternalNodes.at(i).isUsed &&
+           mappingSlotsForExternalNodes.at(i).mac == nodeMAC){
+                /* mapping found at offset 'i' */
+                return i;
+           }
+    }
+
+
+    /* nodeMAC does not exist yet, new mapping must be found for it */
+    for(uint8_t i = 0; i < mappingSlotsForExternalNodes.size(); i++){
+        /* if unused mapping found */
+        if(!mappingSlotsForExternalNodes.at(i).isUsed){
+            /* set this mapping index as used */
+            mappingSlotsForExternalNodes.at(i).isUsed = true;
+            /* save node */
+            mappingSlotsForExternalNodes.at(i).mac = nodeMAC;
+            
+            /* new slot found at offset 'i' */
+            return i;
+        }
+
+    }
+
+
+
+    return offset;
+}
+
 void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 {
     try{
         remoteDevicesCollection = std::any_cast<std::vector<DeviceDescription>>(remoteDevices);
     
         currentIdMapping.clear();
-        /* This ID will be present in the public Remote_devices signal to have all devices 
-        from all the nodes merged together to one vector with unique identifiers */
-        static uint8_t uniqueRcId = 0;
 
         std::vector<DeviceDescription> vecRemoteDevicesDescription;
+
+        const uint8_t numberOfLocalDevicesReserved = 10;
+        const uint8_t rangeForEachNode = numberOfLocalDevicesReserved;
         
         for(auto device : remoteDevicesCollection) {
+            /* find offset for the device */
+            /* UniqueID presented to upper layers is calculated based on formula :
+            (local devices count) + ((node identifiers range) * (offset for particular unique MAC)) + (local Device ID on it's node)
+            e.g. :
+            10 + (10 * 1) + 4 => 20 + 4 => 24 */
+            uint8_t uniqueRcId = numberOfLocalDevicesReserved + (rangeForEachNode * getMappingOffsetForNode(device.macAddress)) + device.deviceId;
+
             // Create new translation {node, device}
             RCTranslation translation = {
-                .nodeId = device.nodeId,
+                .mac = device.macAddress,
                 .onSourceNodeLocalId = device.deviceId
             };
-
+            Serial.println("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
+            
             /* Replace original ID with our new Unique */
             device.deviceId = uniqueRcId;
-            device.nodeId = 0xFF; /* Obfuscate nodeID that it can't be used in upper layers */
             /* Add modified record to public signal SIG_REMOTE_COLLECTION */
             vecRemoteDevicesDescription.push_back(device);
             
@@ -84,6 +128,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 
         DataContainer::setSignalValue(SIG_REMOTE_COLLECTION, vecRemoteDevicesDescription);
 
+        Serial.println("UIBLOCKED:FALSE / tunnelUpdate");
         DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         //Serial.println("->RCS - Ustawienie sygnalu w Data Container");   
         //printTranslationMap();
@@ -129,8 +174,6 @@ void RemoteDevicesManager::printTranslationMap() {
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
-    Serial.println("->Device Provider received response Node Id: " + String((int)response.responseNodeId));
-    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
     
     return true;
 }
@@ -143,11 +186,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
 ){
      RCTranslation val = getTranslationFromUnique(deviceId);
     // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
-    if(val.nodeId != 255){
+    if(val.isValid()){
         RcRequest request;
 
 
-        request.targetNodeId = val.nodeId;
+        request.targetNodeMAC = val.mac;
         request.targetDeviceId = val.onSourceNodeLocalId;
         request.type = SERVICE_CALL_REQ;
 
@@ -156,7 +199,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 0; //0 - no params, 1 - set1 ...
         
         /* TODO */
-        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -176,11 +218,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
 ){
   RCTranslation val = getTranslationFromUnique(deviceId);
     // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
-    if(val.nodeId != 255){
+    if(val.isValid()){
         RcRequest request;
 
 
-        request.targetNodeId = val.nodeId;
+        request.targetNodeMAC = val.mac;
         request.targetDeviceId = val.onSourceNodeLocalId;
         request.type = SERVICE_CALL_REQ;
 
@@ -189,7 +231,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 1; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */
@@ -209,11 +250,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
 ){
   RCTranslation val = getTranslationFromUnique(deviceId);
     // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
-    if(val.nodeId != 255){
+    if(val.isValid()){
         RcRequest request;
 
 
-        request.targetNodeId = val.nodeId;
+        request.targetNodeMAC = val.mac;
         request.targetDeviceId = val.onSourceNodeLocalId;
         request.type = SERVICE_CALL_REQ;
 
@@ -222,7 +263,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[1] = 2; //0 - no params, 1 - set1 ...
         memcpy(&(request.data[2]), &param, sizeof(param));
         /* TODO */
-        // DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
 
         try{
             /* Pass request for processing to RCServer */

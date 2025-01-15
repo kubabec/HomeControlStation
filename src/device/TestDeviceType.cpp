@@ -53,7 +53,7 @@ ServiceRequestErrorCode TestDeviceType::service(DeviceServicesType serviceType, 
 DeviceDescription TestDeviceType::getDeviceDescription(){
     DeviceDescription desc;
     desc.deviceType = 5;
-    desc.nodeId = 1;
+    //desc.nodeId = 1;
     desc.deviceId = 11;
     desc.roomId = 1;
     desc.isEnabled = true;

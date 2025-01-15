@@ -2,6 +2,7 @@
 #define RC_DATA_TYPES_H
 
 #include <Arduino.h>
+#include <devices/device.hpp>
 
 typedef enum {
     REQUEST_NODE_INITIAL_DATA = 50,
@@ -17,18 +18,18 @@ typedef enum {
 }UdpFrames_RCS; //Remote Control Server
 
 typedef struct {
-    uint16_t nodeId = 255;
+    uint64_t macAddress = 0LL;
     uint16_t nodeHash = 0;
     uint8_t numberOfDevices = 255;
     bool isValid() {
-        return (nodeId != 255 && numberOfDevices != 255);
+        return (macAddress != 0LL && numberOfDevices != 255);
         
     }
     
 }NodeInitialData;
 
 typedef struct {
-    uint16_t nodeId = 255;
+    uint64_t mac = 0LL;
     uint16_t nodeHash = 0;
 
 } KeepAliveData;

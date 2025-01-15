@@ -76,7 +76,8 @@ std::vector<String> parameterizedRequests = {
 
 std::vector<String> parameterizedAsyncRequests = {
   "dev",
-  "?bri"
+  "?bri",
+  "getPageContent"
 };
 
 
@@ -102,6 +103,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
   {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::constantHandler_asyncGetPageContent, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -115,7 +117,9 @@ void HomeLightHttpServer::cyclic()
       header = "";
       /* response to client when request processing is completed, otherwise wait */
       if(asyncRequest.state == ASYNC_REQUEST_COMPLETED){
-        updateAsyncResponseWithValidData();
+        if(asyncRequest.behavior != ASYNC_GET_PAGE_CONTENT){
+          updateAsyncResponseWithValidData();
+        }
         if(client){
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type:application/json");
@@ -170,32 +174,37 @@ void HomeLightHttpServer::updateAsyncResponseWithValidData()
 
 
 void HomeLightHttpServer::sendJsonResponse(){
-  client.println("{");
-  client.println("\"status\": \"succ\",");
-  switch(asyncRequest.behavior){
-    case ASYNC_INTERNAL_STATE_SWITCH: /* Device state switching */
-      client.println("\"type\": \"switch\",");
-      client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
-      if(asyncRequest.requestData[3]){
-        client.println("\"state\": \"on\"");
-      }else
-      {
-        client.println("\"state\": \"off\"");
-      }
-    break;
-    /* other cases to be handled here */
+  if(asyncRequest.behavior == ASYNC_GET_PAGE_CONTENT){
+    //Serial.println("Return page content to the client");
+    generateAsyncPageContentJson(client);
+  }else { 
+    client.println("{");
+    client.println("\"status\": \"succ\",");
+    switch(asyncRequest.behavior){
+      case ASYNC_INTERNAL_STATE_SWITCH: /* Device state switching */
+        client.println("\"type\": \"switch\",");
+        client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
+        if(asyncRequest.requestData[3]){
+          client.println("\"state\": \"on\"");
+        }else
+        {
+          client.println("\"state\": \"off\"");
+        }
+      break;
+      /* other cases to be handled here */
 
-    case ASYNC_INTERNAL_BRIGHTNESS_CHANGE:
-      client.println("\"type\": \"brightnessChange\",");
-      client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
-      client.println("\"level\": \""+String(asyncRequest.requestData[2])+"\"");
-    break;
+      case ASYNC_INTERNAL_BRIGHTNESS_CHANGE:
+        client.println("\"type\": \"brightnessChange\",");
+        client.println("\"id\": \""+String((int)asyncRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL])+"\",");
+        client.println("\"level\": \""+String(asyncRequest.requestData[2])+"\"");
+      break;
 
-    default: break;
+      default: break;
+    }
+    
+    
+    client.println("}");
   }
-  
-  
-  client.println("}");
 }
 
 void HomeLightHttpServer::deinit() {
@@ -617,6 +626,20 @@ void HomeLightHttpServer::handleClientRequest()
   }
 }
 
+void HomeLightHttpServer::handleAsyncRequestTimeout()
+{
+  if((millis() - asyncRequest.receivedTime) > 10000){ /* 10s to expire the request and drop */
+    if(client){
+      client.stop();
+    }
+
+    asyncRequest.isResponsePositive = 0;
+    asyncRequest.state = ASYNC_NO_REQUEST;
+    asyncRequest.type = ASYNC_TYPE_INVALID;
+    asyncRequest.behavior = ASYNC_INTERNAL_INVALID;
+  }
+}
+
 bool HomeLightHttpServer::processAsyncRequest(){
   bool isSynchronousClientProcessingBlocked = false;
 
@@ -625,18 +648,26 @@ bool HomeLightHttpServer::processAsyncRequest(){
     switch(asyncRequest.state){
       /* Request is just received and must be processed */
       case ASYNC_REQUEST_RECEIVED:
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
-        mapAsyncRequestToInternalAction();
-        isSynchronousClientProcessingBlocked = true;
+        if(asyncRequest.behavior != ASYNC_GET_PAGE_CONTENT){
+          DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+          asyncRequest.receivedTime = millis();
+          mapAsyncRequestToInternalAction();
+          isSynchronousClientProcessingBlocked = true;
+        }else {
+          //Serial.println("Received async page load request");
+          asyncRequest.state = ASYNC_REQUEST_COMPLETED;
+          isSynchronousClientProcessingBlocked = true;
+        }
       break;
 
       /* Request processing is ongoing */
       case ASYNC_REQUEST_PROCESSING:
-        Serial.println("Request processing...");
         /* UI block will be released as indication of completion */
         if(!isUserInterfaceBlocked){
           asyncRequest.state = ASYNC_REQUEST_COMPLETED;
-          Serial.println("Request completed...");
+          Serial.println("XHTML Request completed...");
+        }else {
+          handleAsyncRequestTimeout();
         }
 
         isSynchronousClientProcessingBlocked = true;
@@ -753,6 +784,64 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
     /* do nothing */
   }
   
+}
+
+void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
+{
+  client.println("{");
+  // Serial.println("{");
+  uint8_t roomIteratorCount = 1;
+  for(auto& room : deviceToRoomMappingList)
+  {
+    uint8_t deviceIteratorCount = 1;
+
+    if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
+      client.println("\""+String((int)room.first)+"\": [");
+      // Serial.println("\""+String((int)room.first)+"\": [");
+    }else
+    {
+      client.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
+      // Serial.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
+    }
+    for(auto& deviceInThisRoom : room.second){
+      client.println("{");
+      // Serial.println("{");
+      client.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
+      // Serial.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
+      client.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
+      // Serial.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
+      if(deviceInThisRoom->isEnabled){
+        client.println("\"status\":\"on\",");
+        // Serial.println("\"status\":\"on\",");
+      }else {
+        client.println("\"status\":\"off\",");
+        // Serial.println("\"status\":\"off\",");
+      }
+      client.println("\"hasBrightness\":" + String((int)deviceInThisRoom->customBytes[0]) + ",");
+      client.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
+      // Serial.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
+      if(deviceIteratorCount < room.second.size()){
+        client.println("},");
+        // Serial.println("},");
+      }else {
+        client.println("}");
+        // Serial.println("}");
+      }
+      deviceIteratorCount++;
+    }
+    
+    if(roomIteratorCount < deviceToRoomMappingList.size()){
+      client.println("],");
+      // Serial.println("],");
+    }else 
+    {
+      client.println("]");
+      // Serial.println("]");
+    }
+    roomIteratorCount++;
+  }
+  client.println("}");
+  // Serial.println("}");
 }
 
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
@@ -1166,23 +1255,25 @@ void printTestLedStrip(WiFiClient& client)
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
-  for(auto& room : deviceToRoomMappingList){
-    if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
-      client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
-    }else
-    {
-      client.println("<div class=\"room-container\"><div class=\"room-header\">"+ roomNamesMapping.find(room.first)->second + "</div>");
-    }
-    /* Generate UI for every available device in this room */
-    for(auto& device : room.second)
-    {
+  // for(auto& room : deviceToRoomMappingList){
+  //   if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
+  //     client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
+  //   }else
+  //   {
+  //     client.println("<div class=\"room-container\"><div class=\"room-header\">"+ roomNamesMapping.find(room.first)->second + "</div>");
+  //   }
+  //   /* Generate UI for every available device in this room */
+  //   for(auto& device : room.second)
+  //   {
 
-      if(device->deviceType == type_ONOFFDEVICE){
-        generateOnOffUi(*device, client);
-      }
-    }
-    client.println("</div>");
-  }
+  //     if(device->deviceType == type_ONOFFDEVICE){
+  //       generateOnOffUi(*device, client);
+  //     }
+  //   }
+  //   client.println("</div>");
+  // }
+
+  client.println("<div id=\"rooms\"></div>");
 
 
   /* Password popup code */
@@ -1208,6 +1299,110 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   {
     client.println("<br><a href=\"/config\" class=\"button\">Settings</a><br>");
   }
+
+
+
+  client.println("<script>\
+        let currentData = {};\
+\
+        function renderRooms(data) {\
+            const roomsContainer = document.getElementById('rooms');\
+\
+            roomsContainer.innerHTML = '';\
+\
+            for (const [roomId, devices] of Object.entries(data)) {\
+                const roomContainer = document.createElement('div');\
+                roomContainer.className = 'room-container';\
+\
+                const roomHeader = document.createElement('div');\
+                roomHeader.className = 'room-header';\
+                roomHeader.textContent = `Room: ${roomId}`;\
+                roomContainer.appendChild(roomHeader);\
+                devices.forEach(device => {\
+                    const deviceContainer = document.createElement('div');\
+                    deviceContainer.className = 'container';\
+                    deviceContainer.id = `container${device.id}`;\
+                    \
+                    const loadingOverlay = document.createElement('div');\
+                    loadingOverlay.className = 'loading-overlay';\
+                    loadingOverlay.style.display = 'none';\
+                    const spinner = document.createElement('div');\
+                    spinner.className = 'spinner';\
+                    const loadingText = document.createElement('div');\
+                    loadingText.className = 'loading-text';\
+                    loadingText.textContent = 'Loading...';\
+                    loadingOverlay.appendChild(spinner);\
+                    loadingOverlay.appendChild(loadingText);\
+                    deviceContainer.appendChild(loadingOverlay);\
+                    \
+                    const header = document.createElement('div');\
+                    header.className = 'header';\
+                    header.textContent = device.name;\
+                    deviceContainer.appendChild(header);\
+\
+                    const statusLight = document.createElement('div');\
+                    statusLight.className = `status-light ${device.status}`;\
+                    statusLight.id = `statusLight${device.id}`;\
+                    deviceContainer.appendChild(statusLight);\
+\
+                    const button = document.createElement('a');\
+                    button.className = 'button';\
+                    button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
+\
+                    var switchValue = 0;\
+                    if(device.status == 'off'){\
+                      switchValue = 1;\
+                    }\
+                    button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
+                    button.id = `switchBtn${device.id}`;\
+                    deviceContainer.appendChild(button);\
+\
+                    if(device.hasBrightness == 1){\
+                      const sliderLabel = document.createElement('div');\
+                      sliderLabel.className = 'header2';\
+                      sliderLabel.textContent = 'Brightness';\
+                      deviceContainer.appendChild(sliderLabel);\
+  \
+                      const slider = document.createElement('input');\
+                      slider.type = 'range';\
+                      slider.min = 0;\
+                      slider.max = 100;\
+                      slider.value = device.brightness;\
+                      slider.onchange = () => onRangeChanged(slider.value, device.id);\
+                      slider.id = `brightnessSlider${device.id}`;\
+                      deviceContainer.appendChild(slider);\
+                    }\
+\
+                    roomContainer.appendChild(deviceContainer);\
+                });\
+\
+                roomsContainer.appendChild(roomContainer);\
+            }\
+        }\
+\
+          async function fetchData() {\
+            try {\
+                const response = await fetch('/getPageContent');\
+                const newData = await response.json();\
+\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                    console.log(currentData);\
+                }\
+            } catch (error) {\
+                console.error('Error fetching data:', error);\
+            }\
+        }\
+\
+        fetchData();\
+\
+        setInterval(fetchData, 1000);\
+\
+\
+    </script>");
+
+
 }
 
 void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
@@ -1552,6 +1747,13 @@ void HomeLightHttpServer::parameterizedHandler_ledColor(String& request, WiFiCli
 
   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 
+}
+
+
+void HomeLightHttpServer::constantHandler_asyncGetPageContent(String& request, WiFiClient& client)
+{
+  asyncRequest.behavior = ASYNC_GET_PAGE_CONTENT;
+  asyncRequest.state = ASYNC_REQUEST_RECEIVED;
 }
 
 

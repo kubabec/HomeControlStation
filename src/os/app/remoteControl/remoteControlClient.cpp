@@ -9,7 +9,7 @@ std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requ
 std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
 std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
 
-uint8_t RemoteControlClient::localNodeId =255;
+uint64_t RemoteControlClient::localNodeMACAddress;
 
 void RemoteControlClient::deinit() {
     
@@ -23,7 +23,8 @@ void RemoteControlClient::init()
     DataContainer::setSignalValue(CBK_RESPONSE, static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
 
     currentState = STATE_NODE_INITIAL_DATA;
-    localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
+    //localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
+    localNodeMACAddress = std::any_cast<uint64_t>(DataContainer::getSignalValue(SIG_MAC_ADDRESS));
 
     Serial.println("... done");
 }
@@ -101,7 +102,7 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
         RcRequest newRequest;
         memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE); //memcopy(dokad, co, wielkosc)
         newRequest.print();
-        if(newRequest.targetNodeId == localNodeId) {
+        if(newRequest.targetNodeMAC == localNodeMACAddress) {
             if(newRequest.type >= REQ_FIRST && newRequest.type < UNKNOWN_REQ) {
                 //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
                 if(requestReceivers.at(newRequest.type)) {
@@ -144,7 +145,7 @@ void RemoteControlClient::sendInitialDataResponse(){
     MessageUDP initialDataResponse(RESPONSE_NODE_INITIAL_DATA, NETWORK_BROADCAST, 9001);
 
     NodeInitialData initialData = {
-        .nodeId = localNodeId,
+        .macAddress = localNodeMACAddress,
         .nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH)),
         .numberOfDevices = 0    
     };
@@ -157,6 +158,8 @@ void RemoteControlClient::sendInitialDataResponse(){
       initialData.numberOfDevices = deviceDescriptionVector.size();
 
     }catch (const std::bad_any_cast& e){ }
+
+    // Serial.println("InitialData hash content: " + String((int)initialData.nodeHash));
     
     initialDataResponse.pushData((byte*)&initialData, sizeof(NodeInitialData)); //wkleja do payload
     
@@ -176,7 +179,7 @@ void RemoteControlClient::sendDetailedDataResponse() {
       std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
 
       for(DeviceDescription& deviceDescription: deviceDescriptionVector) {
-            deviceDescription.nodeId = localNodeId;
+            deviceDescription.macAddress = localNodeMACAddress;
             MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
             
             detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
@@ -195,7 +198,7 @@ void RemoteControlClient::sendDetailedDataResponse() {
 
 void RemoteControlClient:: sendKeepAlive() {
     KeepAliveData keepAlive;
-    keepAlive.nodeId = localNodeId;
+    keepAlive.mac = localNodeMACAddress;
 
     /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
     keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
@@ -237,7 +240,7 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         RcResponse remoteControlResponse = vecResponseMessage.front();
-        remoteControlResponse.responseNodeId = localNodeId;
+        remoteControlResponse.responseNodeMAC = localNodeMACAddress;
         vecResponseMessage.pop();
 
         MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
@@ -263,7 +266,7 @@ void RemoteControlClient::sendDetailedDataResponseFromNode(){
       std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
 
       for(DeviceDescription& deviceDescription: deviceDescriptionVector) {
-        deviceDescription.nodeId = localNodeId;
+        deviceDescription.macAddress = localNodeMACAddress;
         MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
         
         detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
@@ -271,7 +274,7 @@ void RemoteControlClient::sendDetailedDataResponseFromNode(){
         /* TX transmission will be handled in the available time from cyclic() context */
         pendingTxQueue.push(detailedDataResponse);
 
-        Serial.println("->Remote Control Client - Wysyłam Detailed data z Node Id : " + String(localNodeId));
+        Serial.println("->Remote Control Client - Wysyłam Detailed data, MAC:" + String((int)localNodeMACAddress));
       }
       
     }catch (const std::bad_any_cast& e){ }

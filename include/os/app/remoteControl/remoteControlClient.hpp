@@ -18,7 +18,7 @@ class RemoteControlClient
     // kazdy element tablicy zawiera element typu funkcja typu bool z parametrem RcRequest
     // i drugi element okreslajacy wielkosc tablicy
     static std::array<std::function<bool(RcRequest&)>, REQ_COUNT> requestReceivers;
-    static uint8_t localNodeId;
+    static uint64_t localNodeMACAddress;
     static std::queue<RcResponse> vecResponseMessage; //vector containing the responses to the requests
     static std::queue<MessageUDP> pendingTxQueue;
     

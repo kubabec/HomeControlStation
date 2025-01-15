@@ -36,6 +36,7 @@ class HomeLightHttpServer
     typedef enum
     {
         ASYNC_INTERNAL_INVALID,
+        ASYNC_GET_PAGE_CONTENT,
         ASYNC_INTERNAL_STATE_SWITCH,
         ASYNC_INTERNAL_BRIGHTNESS_CHANGE
     }AsyncRequestInternalBehavior;
@@ -94,7 +95,9 @@ class HomeLightHttpServer
 
     static void mapAsyncRequestToInternalAction();
     static void callServiceBasedOnAsyncRequest();
+    static void handleAsyncRequestTimeout();
 
+    static void generateAsyncPageContentJson(WiFiClient& client);
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
     static void printErrorTable(WiFiClient& client);
@@ -150,6 +153,7 @@ public:
     static void constantHandler_roomAssignment(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
     static void constantHandler_asyncTest(WiFiClient& client);
+    static void constantHandler_asyncGetPageContent(String& request, WiFiClient& client);
     static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);

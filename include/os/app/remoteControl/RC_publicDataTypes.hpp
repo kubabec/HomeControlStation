@@ -1,11 +1,12 @@
 #ifndef RC_PUBLIC_DATA_TYPES
 #define RC_PUBLIC_DATA_TYPES
 #include <Arduino.h>
+#include <devices/device.hpp>
 
 #define REQUEST_DATA_SIZE 30
 #define RESPONSE_DATA_SIZE 10
+#define REQEST_SIZE (REQUEST_DATA_SIZE + 13)
 #define RESPONSE_DATA_SIZE_LONG 100
-#define REQEST_SIZE (REQUEST_DATA_SIZE + 8)
 
 typedef enum {
     REQ_FIRST,
@@ -17,7 +18,7 @@ typedef enum {
 
 typedef struct {
     uint8_t requestId = 255;
-    uint16_t targetNodeId = 255;
+    uint64_t targetNodeMAC;
     uint8_t targetDeviceId = 255;
     uint8_t type = UNKNOWN_REQ;
     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
@@ -27,14 +28,14 @@ typedef struct {
     bool toByteArray(uint8_t* buffer, uint8_t sizeCheck){
         if((buffer != 0) && (sizeCheck == this->getSize())) {
             buffer[0] = requestId;
-            memcpy(&buffer[1], &targetNodeId, 2);
-            buffer[3] = targetDeviceId;
-            buffer[4] = type;
-            memcpy(&buffer[5], data, REQUEST_DATA_SIZE);
-            buffer[36] = requestSendCount;
+            memcpy(&buffer[1], &targetNodeMAC, sizeof(uint64_t));
+            buffer[8] = targetDeviceId;
+            buffer[9] = type;
+            memcpy(&buffer[10], data, REQUEST_DATA_SIZE);
+            buffer[41] = requestSendCount;
             
             calculateCrc();
-            memcpy(&buffer[37], &crc, 2);
+            memcpy(&buffer[42], &crc, 2);
 
             return true;
         }
@@ -43,7 +44,7 @@ typedef struct {
     }
 
     void calculateCrc(){
-        crc = requestId + targetNodeId + targetDeviceId + type + requestSendCount ;
+        crc = requestId + targetNodeMAC + targetDeviceId + type + requestSendCount ;
         for(uint8_t i=0; i< REQUEST_DATA_SIZE; i++){
             crc += data[i];
         }
@@ -57,7 +58,7 @@ typedef struct {
     void print() {
         Serial.println("### Request ###");
         Serial.println("requestId :" + String((int)requestId));
-        Serial.println("targetNodeId :" + String((int)targetNodeId));
+        Serial.println("macAddress: " + String(targetNodeMAC));
         Serial.println("targetDeviceId :" + String((int)targetDeviceId));
         Serial.println("type :" + String((int)type));
         for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
@@ -81,7 +82,7 @@ typedef enum {
 
 typedef struct {
     uint8_t responseId;
-    uint16_t responseNodeId = 255;
+    uint64_t responseNodeMAC = 0LL;
     uint8_t requestType = UNKNOWN_REQ;
     uint8_t responseType = UNKNOWN_RESP;   
     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
@@ -95,7 +96,7 @@ typedef struct {
     void print() {
         Serial.println("   Response ");
         Serial.println("responseId :" + String((int)responseId));
-        Serial.println("responceNodeId :" + String((int)responseNodeId));
+        Serial.println("macAddress: " + String(responseNodeMAC));
         Serial.println("requestType :" + String((int)requestType));
         Serial.println("responseType :" + String((int)responseType));
         Serial.print(" Payload : ");
@@ -112,7 +113,7 @@ typedef struct {
 
 typedef struct {
     uint8_t responseId;
-    uint16_t responseNodeId = 255;
+    uint64_t responseNodeMAC = 0LL;
     uint8_t requestType = UNKNOWN_REQ;
     uint8_t responseType = UNKNOWN_RESP;   
     uint8_t data[RESPONSE_DATA_SIZE_LONG] = {0xFF};
@@ -126,7 +127,7 @@ typedef struct {
     void print() {
         Serial.println("   Response ");
         Serial.println("responseId :" + String((int)responseId));
-        Serial.println("responceNodeId :" + String((int)responseNodeId));
+        Serial.println("responceNodeMAC :" + String((int)responseNodeMAC));
         Serial.println("requestType :" + String((int)requestType));
         Serial.println("responseType :" + String((int)responseType));
         Serial.print(" Payload : ");

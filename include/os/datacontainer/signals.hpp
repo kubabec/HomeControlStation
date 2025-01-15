@@ -72,7 +72,7 @@ enum Signal
     SIG_SECURITY_ACCESS_LEVEL,
     /* Type: std:function<void(String)> - callback to try access level change in OS */
     CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
-    /* Type: MACAddress - Device MAC address */
+    /* Type: uint64_t - Device MAC address */
     SIG_MAC_ADDRESS
 
 };
