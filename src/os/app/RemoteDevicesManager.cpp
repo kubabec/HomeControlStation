@@ -14,6 +14,9 @@ void RemoteDevicesManager::init()
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>> 
     (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (SERVICE_CALL_REQ, RemoteDevicesManager::receiveResponse);
 
+    // std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>>
+    // (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, RemoteDevicesManager::receiveResponse);
+
    
 
 
@@ -280,5 +283,48 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     
     return SERV_GENERAL_FAILURE;
 }
+
+
+void RemoteDevicesManager::downloadExtendedData(uint8_t deviceId) {
+    
+    RcRequest request;
+    request.targetDeviceId = deviceId;
+    request.type = EXTENDED_DATA_DOWNLOAD_REQ;
+
+    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
+
+    try{
+        
+        std::any_cast<std::function<void(RcRequest&)>>(
+                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            
+    }catch(std::bad_any_cast ex){}    
+
+}
+
+
+// typedef struct {
+//     uint8_t requestId = 255;
+//     uint16_t targetNodeId = 255;
+//     uint8_t targetDeviceId = 255;
+//     uint8_t type = UNKNOWN_REQ;
+//     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
+//     uint8_t requestSendCount = 0;
+//     uint16_t crc = 5;
+
+//     bool toByteArray(uint8_t* buffer, uint8_t sizeCheck){
+//         if((buffer != 0) && (sizeCheck == this->getSize())) {
+//             buffer[0] = requestId;
+//             memcpy(&buffer[1], &targetNodeId, 2);
+//             buffer[3] = targetDeviceId;
+//             buffer[4] = type;
+//             memcpy(&buffer[5], data, REQUEST_DATA_SIZE);
+//             buffer[36] = requestSendCount;
+            
+//             calculateCrc();
+//             memcpy(&buffer[37], &crc, 2);
+
+//             return true;
+//         }
 
 /* TESTCODE */

@@ -15,8 +15,8 @@ struct DeviceTranslationDetails{
 
 class DeviceProvider 
 {
-    
     static std::function<bool(RcResponse&)> sendResponse;
+    static std::function<bool(RcResponseLong&)> requestResponseLong;
 
 
     static bool isRCServer;
@@ -45,7 +45,7 @@ public:
     static void printIdMap();
 
     static bool receiveRequest(RcRequest& request);
-
+    static bool receiveExtededDataRequest(RcRequest &request);
 
     /* TESTCODE */
     static ServiceRequestErrorCode service(

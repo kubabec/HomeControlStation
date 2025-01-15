@@ -789,24 +789,59 @@ void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
 void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
 {
   client.println("{");
+  // Serial.println("{");
+  uint8_t roomIteratorCount = 1;
   for(auto& room : deviceToRoomMappingList)
   {
-    client.println("\""+String((int)room.first)+"\": [");
+    uint8_t deviceIteratorCount = 1;
+
+    if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
+      client.println("\""+String((int)room.first)+"\": [");
+      // Serial.println("\""+String((int)room.first)+"\": [");
+    }else
+    {
+      client.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
+      // Serial.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
+    }
     for(auto& deviceInThisRoom : room.second){
       client.println("{");
+      // Serial.println("{");
       client.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
+      // Serial.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
       client.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
+      // Serial.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
       if(deviceInThisRoom->isEnabled){
         client.println("\"status\":\"on\",");
+        // Serial.println("\"status\":\"on\",");
       }else {
         client.println("\"status\":\"off\",");
+        // Serial.println("\"status\":\"off\",");
       }
+      client.println("\"hasBrightness\":" + String((int)deviceInThisRoom->customBytes[0]) + ",");
       client.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
-      client.println("}");
+      // Serial.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
+      if(deviceIteratorCount < room.second.size()){
+        client.println("},");
+        // Serial.println("},");
+      }else {
+        client.println("}");
+        // Serial.println("}");
+      }
+      deviceIteratorCount++;
     }
-    client.println("]");
+    
+    if(roomIteratorCount < deviceToRoomMappingList.size()){
+      client.println("],");
+      // Serial.println("],");
+    }else 
+    {
+      client.println("]");
+      // Serial.println("]");
+    }
+    roomIteratorCount++;
   }
   client.println("}");
+  // Serial.println("}");
 }
 
 //funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
@@ -1281,7 +1316,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 \
                 const roomHeader = document.createElement('div');\
                 roomHeader.className = 'room-header';\
-                roomHeader.textContent = `Room ID: ${roomId}`;\
+                roomHeader.textContent = `Room: ${roomId}`;\
                 roomContainer.appendChild(roomHeader);\
                 devices.forEach(device => {\
                     const deviceContainer = document.createElement('div');\
@@ -1322,19 +1357,21 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
                     button.id = `switchBtn${device.id}`;\
                     deviceContainer.appendChild(button);\
 \
-                    const sliderLabel = document.createElement('div');\
-                    sliderLabel.className = 'header2';\
-                    sliderLabel.textContent = 'Brightness';\
-                    deviceContainer.appendChild(sliderLabel);\
-\
-                    const slider = document.createElement('input');\
-                    slider.type = 'range';\
-                    slider.min = 0;\
-                    slider.max = 100;\
-                    slider.value = device.brightness;\
-                    slider.onchange = () => onRangeChanged(slider.value, device.id);\
-                    slider.id = `brightnessSlider${device.id}`;\
-                    deviceContainer.appendChild(slider);\
+                    if(device.hasBrightness == 1){\
+                      const sliderLabel = document.createElement('div');\
+                      sliderLabel.className = 'header2';\
+                      sliderLabel.textContent = 'Brightness';\
+                      deviceContainer.appendChild(sliderLabel);\
+  \
+                      const slider = document.createElement('input');\
+                      slider.type = 'range';\
+                      slider.min = 0;\
+                      slider.max = 100;\
+                      slider.value = device.brightness;\
+                      slider.onchange = () => onRangeChanged(slider.value, device.id);\
+                      slider.id = `brightnessSlider${device.id}`;\
+                      deviceContainer.appendChild(slider);\
+                    }\
 \
                     roomContainer.appendChild(deviceContainer);\
                 });\
@@ -1360,7 +1397,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 \
         fetchData();\
 \
-        setInterval(fetchData, 2000);\
+        setInterval(fetchData, 1000);\
 \
 \
     </script>");
