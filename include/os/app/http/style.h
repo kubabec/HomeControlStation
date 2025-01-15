@@ -32,9 +32,8 @@ body {\
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\
     margin-bottom: 20px;\
     width: 300px;\
-    opacity: 0;\
+    opacity: 1;\
     transform: translateY(20px);\
-    animation: fadeInSlide 1s forwards;\
 }\
 .header {\
     font-size: 18px;\
