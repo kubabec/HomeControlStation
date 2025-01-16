@@ -8,6 +8,8 @@
 - Temperature check
 - RC via customizable IrDA controler
 
+![System overview](https://github.com/kubabec/HomeControlStation/blob/main/ArchitectureOverview.png "System overview")
+
 Future plans:
 - Integration with Zigbee controls
 - Integration with 3rd party temperature sensors
