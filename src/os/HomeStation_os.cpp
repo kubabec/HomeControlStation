@@ -51,7 +51,7 @@ void OperatingSystem::init()
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig = 
         std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if(currentConfig.nodeId == 255 && currentConfig.nodeType == 255){
+    if(currentConfig.nodeType == 255){
         changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
     }
     
@@ -185,7 +185,6 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
         hash += (uint8_t) configuration.isHttpServer;
         hash += (uint8_t) configuration.isRcServer;
         hash += (uint8_t) configuration.networkCredentialsAvailable;
-        hash += (uint8_t) configuration.nodeId;
         hash += (uint8_t) configuration.nodeType;
         for(uint8_t idx = 0 ; idx < configuration.networkSSID.length(); idx ++)
         {

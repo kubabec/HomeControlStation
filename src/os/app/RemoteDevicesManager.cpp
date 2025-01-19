@@ -185,7 +185,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         DeviceServicesType serviceType
 ){
      RCTranslation val = getTranslationFromUnique(deviceId);
-    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
     if(val.isValid()){
         RcRequest request;
 
@@ -217,7 +216,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     ServiceParameters_set1 param
 ){
   RCTranslation val = getTranslationFromUnique(deviceId);
-    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
     if(val.isValid()){
         RcRequest request;
 
@@ -249,7 +247,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     ServiceParameters_set2 param
 ){
   RCTranslation val = getTranslationFromUnique(deviceId);
-    // Serial.println("->RCS Translation-Device Enable - NodeId: " + String(val.nodeId) + " Local Id: "+ String(val.onSourceNodeLocalId));
     if(val.isValid()){
         RcRequest request;
 
@@ -301,30 +298,5 @@ void RemoteDevicesManager::downloadExtendedData(uint8_t deviceId) {
     }catch(std::bad_any_cast ex){}    
 
 }
-
-
-// typedef struct {
-//     uint8_t requestId = 255;
-//     uint16_t targetNodeId = 255;
-//     uint8_t targetDeviceId = 255;
-//     uint8_t type = UNKNOWN_REQ;
-//     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
-//     uint8_t requestSendCount = 0;
-//     uint16_t crc = 5;
-
-//     bool toByteArray(uint8_t* buffer, uint8_t sizeCheck){
-//         if((buffer != 0) && (sizeCheck == this->getSize())) {
-//             buffer[0] = requestId;
-//             memcpy(&buffer[1], &targetNodeId, 2);
-//             buffer[3] = targetDeviceId;
-//             buffer[4] = type;
-//             memcpy(&buffer[5], data, REQUEST_DATA_SIZE);
-//             buffer[36] = requestSendCount;
-            
-//             calculateCrc();
-//             memcpy(&buffer[37], &crc, 2);
-
-//             return true;
-//         }
 
 /* TESTCODE */

@@ -21,7 +21,6 @@ typedef struct {
     bool isHttpServer = 0;
     bool isRcServer = 0;
     bool networkCredentialsAvailable = false;
-    uint8_t nodeId = 255;
     uint8_t nodeType = 0;
     String networkSSID = "";
     String networkPassword = "";

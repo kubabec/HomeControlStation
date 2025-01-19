@@ -14,7 +14,7 @@ ServerState RemoteControlServer::currentState = STATE_REQUEST_NODE_INITIAL_DATA;
 std::queue<MessageUDP> RemoteControlServer::receivedBuffer;
 
 std::queue<RcRequest> RemoteControlServer::pendingRequestsQueue;
-std::queue<uint64_t> RemoteControlServer::pendingDDRefreshNodeIdentifiers;
+std::queue<uint64_t> RemoteControlServer::pendingDDRefreshNodeMACs;
 
 RequestProcessor RemoteControlServer::requestProcessor;
 uint64_t RemoteControlServer::detailedDataPendingNodeMAC;
@@ -212,12 +212,12 @@ void RemoteControlServer::handleKeepAliveState() {
 void RemoteControlServer::handleDetailedDataRefreshMech(std::vector <uint64_t>& nodesToBeRemoved)
 {
     if( detailedDataPendingNodeMAC == 0 &&  /* No refresh ongoing */
-        !pendingDDRefreshNodeIdentifiers.empty() /* There is at least some node waiting for refresh */)
+        !pendingDDRefreshNodeMACs.empty() /* There is at least some node waiting for refresh */)
     {
-        detailedDataPendingNodeMAC = pendingDDRefreshNodeIdentifiers.front(); /* Start refresh for first in the queue */
-        pendingDDRefreshNodeIdentifiers.pop(); /* Remove already processed */
+        detailedDataPendingNodeMAC = pendingDDRefreshNodeMACs.front(); /* Start refresh for first in the queue */
+        pendingDDRefreshNodeMACs.pop(); /* Remove already processed */
 
-        remoteNodes.find(detailedDataPendingNodeMAC)->second.devicesCollection.clear(); // czyścimy wektor z urzadzeniami na danym nodeId
+        remoteNodes.find(detailedDataPendingNodeMAC)->second.devicesCollection.clear(); // czyścimy wektor z urzadzeniami na danym MAC
     }
 
     
@@ -346,7 +346,7 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
             Serial.println("Received Node ID Not Found");
         } else {
             // found
-            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego nodeID */
+            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego MAC */
             std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
             bool isDeviceAlreadyInCollection = false;
             /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
@@ -380,7 +380,7 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
             Serial.println("Received Node ID Not Found");
         } else {
             // found
-            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) device'ow dla otrzymanego nodeID */
+            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) device'ow dla otrzymanego MAC */
             std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
             bool isDeviceAlreadyInCollection = false;
             /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
@@ -467,7 +467,7 @@ void RemoteControlServer::triggerDDRefresh(uint64_t macAddr)
 {
     /* Add node id for which DetailedData shall be refreshed ,
     Refresh procedure takes place in handleDetailedDataRefreshMech() */
-    pendingDDRefreshNodeIdentifiers.push(macAddr);
+    pendingDDRefreshNodeMACs.push(macAddr);
 }
 
 bool RemoteControlServer::processPendingRequest(RcRequest& request){
@@ -499,11 +499,9 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
                 responseReceivers.at(response.requestType)(response);
             }
 
-            //refreshRemoteNodeInfo(response.responseNodeId);
             if(response.responseType == POSITIVE_RESP){
                 if(response.responseNodeMAC != 0LL){
                     /* Trigger Detailed Data refresh */
-                    //triggerDDRefresh(response.responseNodeId);
                     /* Handling of new device description will be detected by hash check mechanism ,
                     no explicit trigger needed here anymore ! */
                 }else{

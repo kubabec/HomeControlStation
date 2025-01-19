@@ -2,7 +2,6 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/datacontainer/SigMessages.hpp>
 
-//static uint16_t nodeId = 10;
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
@@ -23,7 +22,6 @@ void RemoteControlClient::init()
     DataContainer::setSignalValue(CBK_RESPONSE, static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
 
     currentState = STATE_NODE_INITIAL_DATA;
-    //localNodeId = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeId;
     localNodeMACAddress = std::any_cast<uint64_t>(DataContainer::getSignalValue(SIG_MAC_ADDRESS));
 
     Serial.println("... done");
@@ -202,7 +200,6 @@ void RemoteControlClient:: sendKeepAlive() {
 
     /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
     keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
-    // Serial.print("Node sending Keep Alive response local ID :" + String(keepAlive.nodeId));
     // Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
 
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);

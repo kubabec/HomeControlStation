@@ -1022,7 +1022,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     client.println("</select></label>");
 
     /* Is RC Server configuration */
-    client.println("<label>RC Mode:<select name=\"isRCServer\">");
+    client.println("<label>Is Master:<select name=\"isRCServer\">");
     if(currentConfig.isRcServer)
     {
       client.println(yesSelected);
@@ -1033,11 +1033,6 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       client.println(noSelected);
     }
     client.println("</select></label>");
-
-      /* Node ID */
-    client.println("<label>Node ID:<input value=\"");
-    client.println((int)currentConfig.nodeId);
-    client.println("\" type=\"text\" name=\"nodeid\"></label>");
     
     /* Device type  */
     client.println("<label>Type:<input value=\"");
@@ -1397,7 +1392,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 \
         fetchData();\
 \
-        setInterval(fetchData, 1000);\
+        setInterval(fetchData, 2500);\
 \
 \
     </script>");

@@ -43,7 +43,7 @@ class RemoteControlServer
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
     static std::queue<RcRequest> pendingRequestsQueue;
-    static std::queue<uint64_t> pendingDDRefreshNodeIdentifiers;
+    static std::queue<uint64_t> pendingDDRefreshNodeMACs;
 
     static std::array<std::function<bool(RcResponse&)>, REQ_COUNT> responseReceivers;
 
