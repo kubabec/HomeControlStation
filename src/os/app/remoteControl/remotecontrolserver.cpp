@@ -35,7 +35,7 @@ void RemoteControlServer::init(){
     
     DataContainer::setSignalValue(
         CBK_CREATE_RC_REQUEST,
-            static_cast<std::function<void(RcRequest&)>>(RemoteControlServer::createRcRequest)
+            static_cast<std::function<uint8_t(RcRequest&)>>(RemoteControlServer::createRcRequest)
         );
     
     
@@ -62,10 +62,20 @@ void RemoteControlServer::cyclic(){
         /* This call will return true as long as message is being processed, otherwise it will return false */
         if(processPendingRequest(pendingRequestsQueue.front()) == false){
             /* In this case processing returned true due to timeouted request */
+
+            /* we must notify the request sender that processing of the request is completed */
+            /* TODO : return status relevant to message timeout */
+            RcResponse emptyResponse;
+            emptyResponse.responseId = pendingRequestsQueue.front().requestId;
+            emptyResponse.requestType = pendingRequestsQueue.front().type;
+            if(responseReceivers.at(emptyResponse.requestType)){
+                /* forward response in a callback to the request sender */
+                responseReceivers.at(emptyResponse.requestType)(emptyResponse);
+            }
+
+
             /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
-            //Serial.println("UIBLOCKED:FALSE / request processing finished");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         
     }
@@ -312,9 +322,7 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
             //Serial.println("Sprawdzamy czy node jest w mapie.......................");
             //czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
             if (remoteNodes.find(receivedInitialData.macAddress) == remoteNodes.end()) {
-                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
-            // not found - brak info o node, dodajemy info do mapy
-                Serial.println("Nie jestesmy w mapie i dodajemy do mapy...");
+                // not found - brak info o node, dodajemy info do mapy
                 RemoteNodeInformation nodeInfo {
                     .numberOfDevices = receivedInitialData.numberOfDevices,
                     .lastKnownNodeHash = receivedInitialData.nodeHash
@@ -497,22 +505,6 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
             if(responseReceivers.at(response.requestType)){
                 /* forward response in a callback to the request sender */
                 responseReceivers.at(response.requestType)(response);
-                requestKeepAliveData();
-            }
-
-            if(response.responseType == POSITIVE_RESP){
-                if(response.responseNodeMAC != 0LL){
-                    /* Trigger Detailed Data refresh */
-                    /* Handling of new device description will be detected by hash check mechanism ,
-                    no explicit trigger needed here anymore ! */
-                }else{
-                    Serial.println("Response from invalid slave with ID 255 received");
-                    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
-                }
-            }else 
-            {
-                /* Unlock UI immediately as there is no detailed data refresh for NegativeResponse */
-                DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
             }
         }
     }
@@ -551,11 +543,13 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr){
 }
 
 
-void RemoteControlServer::createRcRequest(RcRequest& newRequest)
+uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 {
     newRequest.requestId = generateRequestId();
 
     /* Creating new request */
     Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.requestId));
     pendingRequestsQueue.push(newRequest);
+
+    return newRequest.requestId;
 }

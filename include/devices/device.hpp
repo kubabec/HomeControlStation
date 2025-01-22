@@ -7,18 +7,21 @@
 #define SERVICE_OVERLOADING_FUNCTION_INDEX 1
 #define SERVICE_NAME_INDEX 2
 
-enum {
+enum ServiceOverloadingFunction{
     serviceCall_NoParams,
     serviceCall_1,
     serviceCall_2,
-    serviceCall_3
-} ServiceOverloadingFunction;
+    serviceCall_3,
+    serviceCall_INVALID
+};
 
 typedef enum
 {
     SERV_SUCCESS,
     SERV_EXECUTION_FAILURE,
     SERV_GENERAL_FAILURE,
+    SERV_BUSY,
+    SERV_PENDING,
     SERV_NOT_SUPPORTED
 }ServiceRequestErrorCode;
 
@@ -29,7 +32,8 @@ typedef enum
     DEVSERVICE_SET_DATA,
     DEVSERVICE_GET_DATA,
     DEVSERVICE_STATE_SWITCH,
-    DEVSERVICE_BRIGHTNESS_CHANGE
+    DEVSERVICE_BRIGHTNESS_CHANGE,
+    DEVSERVICE_INVALID
 }DeviceServicesType;
 
 typedef enum {
@@ -60,7 +64,7 @@ typedef struct
 {
     uint8_t* buff = 0;
     uint8_t size = 0xff;
-    
+
 }ServiceParameters_set3;
 
 typedef struct

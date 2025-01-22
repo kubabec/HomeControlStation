@@ -19,7 +19,6 @@ const long HomeLightHttpServer::timeoutTime = 2000;
 int HomeLightHttpServer::pos1= 100;
 int HomeLightHttpServer::pos2 = 150; 
 int HomeLightHttpServer::pos3 = 150;
-bool HomeLightHttpServer::isUserInterfaceBlocked = false;
 SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NONE;
 
 std::vector<DeviceDescription> HomeLightHttpServer::descriptionVector;
@@ -324,7 +323,6 @@ void HomeLightHttpServer::init()
 
   DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
   DataContainer::subscribe(SIG_CONFIG_SLOTS, HomeLightHttpServer::onSlotConfigChange);
-  DataContainer::subscribe(SIG_IS_UI_BLOCKED, HomeLightHttpServer::onUiBlockedSignalChange);
 
   DataContainer::subscribe(SIG_SECURITY_ACCESS_LEVEL, [](std::any signal){
     try{
@@ -586,15 +584,10 @@ void HomeLightHttpServer::handleClientRequest()
               client.println("<body><div class=\"wrapper\">");
               client.println(popupContent);
 
-              if(!isUserInterfaceBlocked){
-                /* Process request only when user interface is NOT blocked */
-                Serial.println("Processing link...");
-                processLinkRequestData(client);
-              }else 
-              {
-                /* Wait in a loop until UI will be unlocked */
-                pending(client);
-              }
+              /* Process request only when user interface is NOT blocked */
+              Serial.println("Processing link...");
+              processLinkRequestData(client);
+            
 
 
               client.println("</div></body></html>");            
@@ -640,7 +633,6 @@ bool HomeLightHttpServer::processAsyncRequest(){
   //     /* Request is just received and must be processed */
   //     case ASYNC_REQUEST_RECEIVED:
   //       if(asyncRequest.behavior != ASYNC_GET_PAGE_CONTENT){
-  //         DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
   //         asyncRequest.receivedTime = millis();
   //         mapAsyncRequestToInternalAction();
   //         isSynchronousClientProcessingBlocked = true;
@@ -763,18 +755,6 @@ void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
   for(auto& slot : pinConfigSlotsCopy_HttpServer.slots) {
     slot.print();
   }
-}
-
-void HomeLightHttpServer::onUiBlockedSignalChange(std::any isBlockedValue)
-{
-  try {
-    isUserInterfaceBlocked = (std::any_cast<bool>(isBlockedValue));
-    //Serial.println("!!!!!!!!!!!!!!!!!!!!!UI blocked: " + String(isUserInterfaceBlocked));
-    }catch (std::bad_any_cast ex)
-  {
-    /* do nothing */
-  }
-  
 }
 
 void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)

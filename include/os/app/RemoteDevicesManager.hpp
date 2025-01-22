@@ -28,25 +28,44 @@ struct ExternalNodeMapping{
 
 class RemoteDevicesManager 
 {   
+    enum RDM_RequestProcessingState{
+        RDM_NO_REQUEST,
+        RDM_REQUEST_IN_PROGRESS,
+        RDM_REQUEST_COMPLETED
+    };
+
+    struct ServiceCallFingerprint {
+        uint8_t deviceId = 255;
+        DeviceServicesType serviceName = DEVSERVICE_INVALID;
+        ServiceOverloadingFunction overloading = serviceCall_INVALID;
+
+
+    bool operator==(ServiceCallFingerprint& other){
+            return (this->deviceId == other.deviceId && this->serviceName == other.serviceName && this->overloading == other.overloading);
+        }
+    };
+
     /* This vector is tunneled from RCServer when handshake is over via SIG_RC_DEVICES_INTERNAL_TUNEL signal */
     static std::vector<DeviceDescription> remoteDevicesCollection;
     static std::map<uint8_t, RCTranslation> currentIdMapping;
     static std::array<ExternalNodeMapping, MAX_EXTERNAL_NODES> mappingSlotsForExternalNodes;
     static uint8_t getMappingOffsetForNode(uint64_t& nodeMAC);
+
+    static RDM_RequestProcessingState requestProcessingState;
+    static ServiceCallFingerprint currentRequestFingerprint;
+    static uint8_t awaitingResponseId;
 public:
     static void init();
     static void deinit();
     static void cyclic();
     static void printTranslationMap();
 
-    static void downloadExtendedData(uint8_t deviceId);
     static void tunnelDataUpdate(std::any remoteDevices);
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
 
     static bool receiveResponse(RcResponse& response);
 
 
-    /* TESTCODE */
     static ServiceRequestErrorCode service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
@@ -66,7 +85,6 @@ public:
         DeviceServicesType serviceType,
         ServiceParameters_set3 param
     );
-    /* TESTCODE */
 
 };
 

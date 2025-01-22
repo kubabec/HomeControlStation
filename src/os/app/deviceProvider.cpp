@@ -163,8 +163,8 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
         }catch (const std::bad_any_cast& e){ }   
     }
     
-    Serial.println("DeviceProvider//: Content updated :");
-    printIdMap();
+    // Serial.println("DeviceProvider//: Content updated :");
+    // printIdMap();
     Serial.println("///");    
     DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);     
 }
@@ -268,20 +268,6 @@ bool DeviceProvider::receiveExtededDataRequest(RcRequest& request) {
     requestResponseLong(responseLong);
 }
 
-// uint8_t DeviceProvider::findUniqueIdByOriginalId(uint8_t originalId) {
-//     for (const auto& pair : uniqueDeviceIdToNormalDeviceIdMap) {
-//         if (pair.second.originalID == originalId) {
-//             Serial.println("Znaleziono unikalny ID: " + String(pair.first));
-//             return pair.first; // Zwracamy znaleziony unikalny ID
-//         }
-//     }
-//     // Jeśli nie znaleziono, zwróć wartość błędu (np. 0)
-//     Serial.println("Nie znaleziono unikalnego ID dla podanego oryginalnego ID");
-//     return 0;
-// }
-
-
-/* TESTCODE */
 ServiceRequestErrorCode DeviceProvider::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
@@ -292,20 +278,18 @@ ServiceRequestErrorCode DeviceProvider::service(
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
+            return (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
                 devicedetails.originalID,
                 serviceType
             );
 
-            Serial.println("UIBLOCKED:FALSE / localservice1");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
             if(isRCServer) {
                 //rcServer_DeviceEnable(devicedetails.originalID, state);
                 /* TODO */
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_NoParams(
+                return (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_NoParams(
                     devicedetails.originalID,
                     serviceType
                 );
@@ -327,21 +311,18 @@ ServiceRequestErrorCode DeviceProvider::service(
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+            return (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                 devicedetails.originalID,
                 serviceType,
                 param
             );
-
-            Serial.println("UIBLOCKED:FALSE / localservice2");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
             if(isRCServer) {
                 //rcServer_DeviceEnable(devicedetails.originalID, state);
                 /* TODO */
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set1(
+                return (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
                     serviceType,
                     param
@@ -364,21 +345,18 @@ ServiceRequestErrorCode DeviceProvider::service(
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set2(
+            return std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES)).serviceCall_set2(
                 devicedetails.originalID,
                 serviceType,
                 param
             );
-
-            Serial.println("UIBLOCKED:FALSE / localservice3");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
             if(isRCServer) {
                 //rcServer_DeviceEnable(devicedetails.originalID, state);
                 /* TODO */
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set2(
+                return std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES)).serviceCall_set2(
                     devicedetails.originalID,
                     serviceType,
                     param
@@ -401,22 +379,18 @@ ServiceRequestErrorCode DeviceProvider::service(
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set3(
+            return std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES)).serviceCall_set3(
                 devicedetails.originalID,
                 serviceType,
                 param
             );
-
-
-            Serial.println("UIBLOCKED:FALSE / localservice4");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         }
         else {
             //zawołaj deviceEnable() w RC Server
             if(isRCServer) {
                 //rcServer_DeviceEnable(devicedetails.originalID, state);
                 /* TODO */
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set3(
+                return std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES)).serviceCall_set3(
                     devicedetails.originalID,
                     serviceType,
                     param
@@ -426,5 +400,3 @@ ServiceRequestErrorCode DeviceProvider::service(
     }
     return SERV_GENERAL_FAILURE;
 }
-
-/* TESTCODE */

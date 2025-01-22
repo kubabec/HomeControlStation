@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 34
+#define NUMBER_OF_SIGNALS 33
 enum Signal
 {
     /* Type: bool , somme description */
@@ -60,8 +60,6 @@ enum Signal
     SIG_RC_DEVICES_INTERNAL_TUNNEL,
     /* Type: std:function<void(RcRequest&)> - callback add new generic RcRequest to RcServer for processing */
     CBK_CREATE_RC_REQUEST,
-    /* TYpe: bool - represents information if UI can be displayed to the user or not */
-    SIG_IS_UI_BLOCKED,
     /* Type: DeviceServicesAPI - set of services functions provided by Device Manager to Device Provider */
     SIG_LOCAL_DEVICE_SERVICES,
     /* Type: DeviceServicesAPI - set of services functions provided by RemooteDevicesManager to Device Provider */

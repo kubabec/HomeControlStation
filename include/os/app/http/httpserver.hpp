@@ -36,8 +36,6 @@ class HomeLightHttpServer
     static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
     static uint8_t activeErrorsCount;
     static ConfigSlotsDataType pinConfigSlotsCopy_HttpServer;
-
-    static bool isUserInterfaceBlocked;
     
     static String ipAddressString;
     static SecurityAccessLevelType secAccessLevel;
@@ -73,7 +71,6 @@ public:
     static void deinit();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
     static void onSlotConfigChange(std::any newSlotConfig);
-    static void onUiBlockedSignalChange(std::any isBlockedValue);
 
     static void generateOnOffUi(DeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);

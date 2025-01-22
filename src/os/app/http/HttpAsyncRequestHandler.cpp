@@ -29,7 +29,7 @@ HttpErrorCode HTTPAsyncRequestHandler::createRequest(
         /* save request creation time */
         currentRequest.receivedTime = millis();
         /* save request metadata */
-        currentRequest.state = ASYNC_REQUEST_RECEIVED;
+        currentRequest.state = ASYNC_REQUEST_PROCESSING;
         currentRequest.type = requestType;
 
         /* copy the parameters */
@@ -37,7 +37,7 @@ HttpErrorCode HTTPAsyncRequestHandler::createRequest(
             memcpy(currentRequest.requestData, requestParamsPtr, paramsLength);
         }
 
-        // Serial.println("HTTPAsyncRequestHandler: New request created");
+        Serial.println("HTTPAsyncRequestHandler: Starting new request processing ...");
         // currentRequest.print();
 
         return e_HTTP_OK;
@@ -62,11 +62,13 @@ void HTTPAsyncRequestHandler::createServiceCall()
     ServiceParameters_set2 set2;
     ServiceParameters_set3 set3;
 
+    ServiceRequestErrorCode serviceCallStatus = SERV_GENERAL_FAILURE;
+
     switch(currentRequest.requestData[SERVICE_OVERLOADING_FUNCTION_INDEX])
     {
         /* No parameters service */
         case serviceCall_NoParams:
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_NoParams(
+            serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_NoParams(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX] 
             );
@@ -75,7 +77,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
         /* Service with 1 parameter set */
         case serviceCall_1:
             memcpy(&set1, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set1));
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
+            serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],
                 set1
@@ -84,7 +86,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
         case serviceCall_2:
             memcpy(&set2, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set2));
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set2(
+            serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set2(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],
                 set2
@@ -93,7 +95,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
         case serviceCall_3:
             memcpy(&set3, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set3));
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set3(
+            serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set3(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],
                 set3
@@ -103,6 +105,38 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
         default:
         break;
+    }
+
+    /* we must check the status of service call */
+    switch(serviceCallStatus){
+        case SERV_SUCCESS:
+            /* Request completed successfully */
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
+        case SERV_PENDING:
+            /* We are waiting for the response, service must be polled */
+            currentRequest.state = ASYNC_REQUEST_PROCESSING;
+            break;
+        case SERV_BUSY:
+            /* Trying to send request, but actually it is not possible */
+            Serial.println("HTTPAsyncRequestHandler: Request call returned BUSY");
+            /* Dropping the request */
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            /* This will just do not return any valid JSON response */
+            currentRequest.type = ASYNC_TYPE_INVALID;
+            break;
+
+        case SERV_NOT_SUPPORTED:
+            /* Device does not support this service call */
+            Serial.println("HTTPAsyncRequestHandler: Request call returned NOT_SUPPORTED");
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            currentRequest.type = ASYNC_TYPE_INVALID;
+            break;
+
+        default:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            currentRequest.type = ASYNC_TYPE_INVALID;
+            break;
     }
 
 }
@@ -117,11 +151,10 @@ void HTTPAsyncRequestHandler::processRequest()
     switch(currentRequest.type)
     {
         case ASYNC_TYPE_DEVICE_SERVICE_CALL:
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
             createServiceCall();
-            currentRequest.state = ASYNC_REQUEST_PROCESSING;
         break;
 
+        /* Page content request is immediatelly finished */
         case ASYNC_GET_PAGE_CONTENT:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
 
@@ -192,23 +225,17 @@ void HTTPAsyncRequestHandler::createJsonResponse()
 
 void HTTPAsyncRequestHandler::mainFunction()
 {
-    if(currentRequest.state == ASYNC_REQUEST_RECEIVED){
+    if(currentRequest.state == ASYNC_REQUEST_PROCESSING){
         /* do the request processing here */
         processRequest();
-    }
-
-    if(currentRequest.state == ASYNC_REQUEST_PROCESSING){
-        /* monitor UI blocked signal to detect that processing is over */
-        bool isUiBlocked = std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_UI_BLOCKED));
-        if(!isUiBlocked){
-            currentRequest.state = ASYNC_REQUEST_COMPLETED;
-        }
+        Serial.println("HTTPAsyncRequestHandler: ...");
     }
 }
 
 
 String HTTPAsyncRequestHandler::getJsonResponse()
 {
+    Serial.println("HTTPAsyncRequestHandler: Completed, returning JSON ...");
     /* request processing is completed */
     createJsonResponse();
     /* Clear request data, as final state -> response is requested */

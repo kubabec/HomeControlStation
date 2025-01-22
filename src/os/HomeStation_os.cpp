@@ -33,12 +33,6 @@ void OperatingSystem::init()
         isRCServerRunning = (std::any_cast<bool>(signal));
     });
 
-    DataContainer::subscribe(SIG_IS_UI_BLOCKED, [](std::any signal) {
-        if (std::any_cast<bool>(signal)) {
-            uiBlockTime = millis();
-        }
-    });
-
 
     ErrorMonitor::init();
     ConfigProvider::init();
@@ -262,18 +256,5 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     default:
         Serial.println("INVALID");
         break;
-    }
-}
-
-void OperatingSystem::handleUiBlockTimeExpiration()
-{
-    bool isUIBlocked = std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_UI_BLOCKED));
-
-    if(isUIBlocked){
-        if(abs(millis() - uIBlockTime) > 10000){ /* 10 sec*/
-            Serial.println("UIBLOCKED:FALSE / timeout handler");
-            DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, false);
-            uIBlockTime = 0;
-        }
     }
 }

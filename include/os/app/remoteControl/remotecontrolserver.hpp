@@ -10,7 +10,7 @@
 
 #define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
 #define TIME_TO_REPEAT_DETAILED_DATA_REQEST 500
-#define TIME_TO_REPEAT_KEEP_ALIVE_REQEST 2000
+#define TIME_TO_REPEAT_KEEP_ALIVE_REQEST 500
 #define TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED 2000
 
 
@@ -85,7 +85,7 @@ public:
     static void cyclic();
     static void receiveUDP(MessageUDP& msg);
 
-    static void createRcRequest(RcRequest& newRequest);
+    static uint8_t createRcRequest(RcRequest& newRequest);
 
     static bool registerResponseReceiver(RequestType request, std::function<bool(RcResponse&)> receiverCallback);
     static void refreshRemoteNodeInfo(uint64_t mac);

@@ -3,6 +3,9 @@
 std::vector<DeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
 std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
 std::array<ExternalNodeMapping, MAX_EXTERNAL_NODES> RemoteDevicesManager::mappingSlotsForExternalNodes;
+RemoteDevicesManager::RDM_RequestProcessingState RemoteDevicesManager::requestProcessingState = RDM_NO_REQUEST;
+RemoteDevicesManager::ServiceCallFingerprint RemoteDevicesManager::currentRequestFingerprint;
+uint8_t RemoteDevicesManager::awaitingResponseId = 255;
 
 void RemoteDevicesManager::init()
 {
@@ -128,8 +131,6 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 
         DataContainer::setSignalValue(SIG_REMOTE_COLLECTION, vecRemoteDevicesDescription);
 
-        Serial.println("UIBLOCKED:FALSE / tunnelUpdate");
-        DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(false));
         //Serial.println("->RCS - Ustawienie sygnalu w Data Container");   
         //printTranslationMap();
     }catch (std::bad_any_cast ex){}
@@ -174,36 +175,79 @@ void RemoteDevicesManager::printTranslationMap() {
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
+
+    if(awaitingResponseId == response.responseId){
+        requestProcessingState = RDM_REQUEST_COMPLETED;
+    }
+
     return true;
 }
 
 
-/* TESTCODE */
 ServiceRequestErrorCode RemoteDevicesManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
-     RCTranslation val = getTranslationFromUnique(deviceId);
-    if(val.isValid()){
-        RcRequest request;
+    /* Check if RDM is capable to receive new request */
+    if(requestProcessingState == RDM_NO_REQUEST){
 
+        /* Try to evaluate target information */
+        RCTranslation val = getTranslationFromUnique(deviceId);
+        if(val.isValid()){
 
-        request.targetNodeMAC = val.mac;
-        request.targetDeviceId = val.onSourceNodeLocalId;
-        request.type = SERVICE_CALL_REQ;
+            /* Prepare new request */
+            RcRequest request;
+            request.targetNodeMAC = val.mac;
+            request.targetDeviceId = val.onSourceNodeLocalId;
+            request.type = SERVICE_CALL_REQ;
 
-        request.data[SERVICE_NAME_INDEX] = serviceType;
-        /* TODO */
-        request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_NoParams; //0 - no params, 1 - set1 ...
-        
-        /* TODO */
+            /* Fulfill the payload */
+            request.data[SERVICE_NAME_INDEX] = serviceType;
+            request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_NoParams; //0 - no params, 1 - set1 ...
+            
+            try{
+                /* Pass request for processing to RCServer */
+                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
+                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
 
-        try{
-            /* Pass request for processing to RCServer */
-            std::any_cast<std::function<void(RcRequest&)>>(
-                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+                /* Update current new request fingerprint */
+                currentRequestFingerprint = {
+                    .deviceId = deviceId,
+                    .serviceName = serviceType,
+                    .overloading = serviceCall_NoParams
+                };
+
+                /* Change request processing state to IN PROGRESS, this state will be 
+                set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
+                requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+
+                /* RDM starts to wait for the response */
+                return SERV_PENDING;
+            }catch(std::bad_any_cast ex){}
+        }
+
+    }else {
+
+        /* check if we really received the same request for which response we are waiting for */
+        ServiceCallFingerprint receivedRequestFingerprint = {
+            .deviceId = deviceId,
+            .serviceName = serviceType,
+            .overloading = serviceCall_NoParams
+        };
+        if(!(receivedRequestFingerprint == currentRequestFingerprint)){
+            /* When we received another request, when currently something else 
+            is waiting for the response, we must reject the new caller by returning BUSY */
+            return SERV_BUSY;
+        }
+
+        /* Here we are sure that we are working on this request ... */
+        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+            requestProcessingState = RDM_NO_REQUEST;
             return SERV_SUCCESS;
-        }catch(std::bad_any_cast ex){}
+        }
+
+        /* RDM is waiting for the response to this request */
+        return SERV_PENDING;
     }
     
     return SERV_GENERAL_FAILURE;  
@@ -214,27 +258,67 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
-  RCTranslation val = getTranslationFromUnique(deviceId);
-    if(val.isValid()){
-        RcRequest request;
+    /* Check if RDM is capable to receive new request */
+    if(requestProcessingState == RDM_NO_REQUEST){
+
+        RCTranslation val = getTranslationFromUnique(deviceId);
+        if(val.isValid()){
+            RcRequest request;
 
 
-        request.targetNodeMAC = val.mac;
-        request.targetDeviceId = val.onSourceNodeLocalId;
-        request.type = SERVICE_CALL_REQ;
+            request.targetNodeMAC = val.mac;
+            request.targetDeviceId = val.onSourceNodeLocalId;
+            request.type = SERVICE_CALL_REQ;
 
-        request.data[SERVICE_NAME_INDEX] = serviceType;
-        /* TODO */
-        request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; //0 - no params, 1 - set1 ...
-        memcpy(&(request.data[3]), &param, sizeof(param));
-        /* TODO */
+            request.data[SERVICE_NAME_INDEX] = serviceType;
+            /* TODO */
+            request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; //0 - no params, 1 - set1 ...
+            memcpy(&(request.data[3]), &param, sizeof(param));
+            /* TODO */
 
-        try{
-            /* Pass request for processing to RCServer */
-            std::any_cast<std::function<void(RcRequest&)>>(
-                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            try{
+                /* Pass request for processing to RCServer */
+                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
+                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+
+                /* Update current new request fingerprint */
+                currentRequestFingerprint = {
+                    .deviceId = deviceId,
+                    .serviceName = serviceType,
+                    .overloading = serviceCall_1
+                };
+
+                /* Change request processing state to IN PROGRESS, this state will be 
+                set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
+                requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+
+                /* RDM starts to wait for the response */
+                return SERV_PENDING;
+
+            }catch(std::bad_any_cast ex){}
+        }
+
+    }else {
+        /* check if we really received the same request for which response we are waiting for */
+        ServiceCallFingerprint receivedRequestFingerprint = {
+            .deviceId = deviceId,
+            .serviceName = serviceType,
+            .overloading = serviceCall_1
+        };
+        if(!(receivedRequestFingerprint == currentRequestFingerprint)){
+            /* When we received another request, when currently something else 
+            is waiting for the response, we must reject the new caller by returning BUSY */
+            return SERV_BUSY;
+        }
+
+        /* Here we are sure that we are working on this request ... */
+        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+            requestProcessingState = RDM_NO_REQUEST;
             return SERV_SUCCESS;
-        }catch(std::bad_any_cast ex){}
+        }
+
+        /* RDM is waiting for the response to this request */
+        return SERV_PENDING;
     }
     
     return SERV_GENERAL_FAILURE;  
@@ -245,27 +329,64 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set2 param
 ){
-  RCTranslation val = getTranslationFromUnique(deviceId);
-    if(val.isValid()){
-        RcRequest request;
+    /* Check if RDM is capable to receive new request */
+    if(requestProcessingState == RDM_NO_REQUEST){
+        RCTranslation val = getTranslationFromUnique(deviceId);
+        if(val.isValid()){
+            RcRequest request;
 
 
-        request.targetNodeMAC = val.mac;
-        request.targetDeviceId = val.onSourceNodeLocalId;
-        request.type = SERVICE_CALL_REQ;
+            request.targetNodeMAC = val.mac;
+            request.targetDeviceId = val.onSourceNodeLocalId;
+            request.type = SERVICE_CALL_REQ;
 
-        request.data[0] = serviceType;
-        /* TODO */
-        request.data[1] = 2; //0 - no params, 1 - set1 ...
-        memcpy(&(request.data[3]), &param, sizeof(param));
-        /* TODO */
+            request.data[0] = serviceType;
+            /* TODO */
+            request.data[1] = 2; //0 - no params, 1 - set1 ...
+            memcpy(&(request.data[3]), &param, sizeof(param));
+            /* TODO */
 
-        try{
-            /* Pass request for processing to RCServer */
-            std::any_cast<std::function<void(RcRequest&)>>(
-                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+            try{
+                /* Pass request for processing to RCServer */
+                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
+                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+
+                /* Update current new request fingerprint */
+                currentRequestFingerprint = {
+                    .deviceId = deviceId,
+                    .serviceName = serviceType,
+                    .overloading = serviceCall_2
+                };
+
+                /* Change request processing state to IN PROGRESS, this state will be 
+                set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
+                requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+
+                /* RDM starts to wait for the response */
+                return SERV_PENDING;
+            }catch(std::bad_any_cast ex){}
+        }
+    }else {
+        /* check if we really received the same request for which response we are waiting for */
+        ServiceCallFingerprint receivedRequestFingerprint = {
+            .deviceId = deviceId,
+            .serviceName = serviceType,
+            .overloading = serviceCall_2
+        };
+        if(!(receivedRequestFingerprint == currentRequestFingerprint)){
+            /* When we received another request, when currently something else 
+            is waiting for the response, we must reject the new caller by returning BUSY */
+            return SERV_BUSY;
+        }
+
+        /* Here we are sure that we are working on this request ... */
+        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+            requestProcessingState = RDM_NO_REQUEST;
             return SERV_SUCCESS;
-        }catch(std::bad_any_cast ex){}
+        }
+
+        /* RDM is waiting for the response to this request */
+        return SERV_PENDING;
     }
     
     return SERV_GENERAL_FAILURE;  
@@ -279,23 +400,3 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     
     return SERV_GENERAL_FAILURE;
 }
-
-
-void RemoteDevicesManager::downloadExtendedData(uint8_t deviceId) {
-    
-    RcRequest request;
-    request.targetDeviceId = deviceId;
-    request.type = EXTENDED_DATA_DOWNLOAD_REQ;
-
-    DataContainer::setSignalValue(SIG_IS_UI_BLOCKED, static_cast<bool>(true));
-
-    try{
-        
-        std::any_cast<std::function<void(RcRequest&)>>(
-                DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
-            
-    }catch(std::bad_any_cast ex){}    
-
-}
-
-/* TESTCODE */
