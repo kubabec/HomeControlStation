@@ -497,6 +497,7 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
             if(responseReceivers.at(response.requestType)){
                 /* forward response in a callback to the request sender */
                 responseReceivers.at(response.requestType)(response);
+                requestKeepAliveData();
             }
 
             if(response.responseType == POSITIVE_RESP){

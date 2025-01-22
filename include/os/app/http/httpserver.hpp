@@ -4,6 +4,7 @@
 #include <any>
 #include <map>
 #include <os/datacontainer/DataContainer.hpp>
+#include <os/app/http/HttpAsyncRequestHandler.hpp>
 
 #define MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS 15
 
@@ -16,52 +17,7 @@ class HomeLightHttpServer
         //uint8_t reserved[PERSISTENT_DATABLOCK_SIZE - 2];
     }HttpServerNvmMetadata;
 
-    /* Type to handle different request processing state */
-    typedef enum
-    {
-        ASYNC_NO_REQUEST,
-        ASYNC_REQUEST_RECEIVED,
-        ASYNC_REQUEST_PROCESSING,
-        ASYNC_REQUEST_COMPLETED
-    }AsyncRequestState;
-
-    /* Type describing async request possible actions to be performed internally by a device */
-    typedef enum
-    {
-        ASYNC_TYPE_INVALID,
-        ASYNC_TYPE_DEVICE_SERVICE_CALL,
-        ASYNC_TYPE_LAST = ASYNC_TYPE_DEVICE_SERVICE_CALL
-    }AsyncRequestType;
-
-    typedef enum
-    {
-        ASYNC_INTERNAL_INVALID,
-        ASYNC_GET_PAGE_CONTENT,
-        ASYNC_INTERNAL_STATE_SWITCH,
-        ASYNC_INTERNAL_BRIGHTNESS_CHANGE
-    }AsyncRequestInternalBehavior;
-
-    /* Request type definition */
-    typedef struct {
-        AsyncRequestState state = ASYNC_NO_REQUEST;
-        long receivedTime = 0;
-        AsyncRequestType type = ASYNC_TYPE_INVALID;
-        AsyncRequestInternalBehavior behavior = ASYNC_INTERNAL_INVALID;
-        uint8_t requestData[20];
-        uint8_t isResponsePositive = 0;
-
-        void print(){
-            Serial.println("Request type: " + String((int)type));
-            Serial.println("Request behavior: " + String((int)behavior));
-            Serial.println("requestData[0]: " + String((int)requestData[0]));
-            Serial.println("requestData[1]: " + String((int)requestData[1]));
-            Serial.println("requestData[2]: " + String((int)requestData[2]));
-            Serial.println("requestData[3]: " + String((int)requestData[3]));
-        }
-    }InternalAsyncHttpRequest;
-
     static HttpServerNvmMetadata nvmMetadata;
-    static InternalAsyncHttpRequest asyncRequest;
     static WiFiServer server;
     static String header;
     static unsigned long currentTime;
@@ -110,29 +66,6 @@ class HomeLightHttpServer
 
     static void restoreNvmData(uint8_t* nvmData, uint16_t length);
     static bool packNvmData(uint8_t* nvmData, uint16_t length);
-
-    /*TESTCODE*/
-    /* Devices control services */
-    static ServiceRequestErrorCode service(
-        uint8_t deviceId, 
-        DeviceServicesType serviceType
-    );
-    static ServiceRequestErrorCode service(
-        uint8_t deviceId,
-        DeviceServicesType serviceType,
-        ServiceParameters_set1 param
-    );
-    static ServiceRequestErrorCode service(
-        uint8_t deviceId,
-        DeviceServicesType serviceType,
-        ServiceParameters_set2 param
-    );
-    static ServiceRequestErrorCode service(
-        uint8_t deviceId,
-        DeviceServicesType serviceType,
-        ServiceParameters_set3 param
-    );
-    /*TESTCODE*/
 
 public:
     static void cyclic();

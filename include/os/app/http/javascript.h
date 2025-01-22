@@ -41,7 +41,12 @@ const char* javascript = "\
             if (xhr.readyState === 4) { \
                 const statusElement = document.getElementById(\"status\");\
                 if (xhr.status === 200) { \
-                    handleJsonResponse(xhr.responseText);\
+                    const newData = JSON.parse(xhr.responseText);\
+                    if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                        currentData = newData;\
+                        renderRooms(currentData);\
+                        console.log(currentData);\
+                    }\
                 } else { \
                     console.log('Error with AJAX request');\
                 }\
@@ -337,7 +342,12 @@ const char* javascript = "\
         if (xhr.readyState === 4) { \
             const statusElement = document.getElementById(\"status\");\
             if (xhr.status === 200) { \
-                handleJsonResponse(xhr.responseText);\
+                const newData = JSON.parse(xhr.responseText);\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                    console.log(currentData);\
+                }\
             } else { \
                 console.log('Error with AJAX request');\
             }\
@@ -389,6 +399,81 @@ function hideLoading(container) {\
     }\
 }\
 \
+function renderRooms(data) {\
+    const roomsContainer = document.getElementById('rooms');\
+\
+    roomsContainer.innerHTML = '';\
+\
+    for (const [roomId, devices] of Object.entries(data)) {\
+        const roomContainer = document.createElement('div');\
+        roomContainer.className = 'room-container';\
+\
+        const roomHeader = document.createElement('div');\
+        roomHeader.className = 'room-header';\
+        roomHeader.textContent = `Room: ${roomId}`;\
+        roomContainer.appendChild(roomHeader);\
+        devices.forEach(device => {\
+            const deviceContainer = document.createElement('div');\
+            deviceContainer.className = 'container';\
+            deviceContainer.id = `container${device.id}`;\
+            \
+            const loadingOverlay = document.createElement('div');\
+            loadingOverlay.className = 'loading-overlay';\
+            loadingOverlay.style.display = 'none';\
+            const spinner = document.createElement('div');\
+            spinner.className = 'spinner';\
+            const loadingText = document.createElement('div');\
+            loadingText.className = 'loading-text';\
+            loadingText.textContent = 'Loading...';\
+            loadingOverlay.appendChild(spinner);\
+            loadingOverlay.appendChild(loadingText);\
+            deviceContainer.appendChild(loadingOverlay);\
+            \
+            const header = document.createElement('div');\
+            header.className = 'header';\
+            header.textContent = device.name;\
+            deviceContainer.appendChild(header);\
+\
+            const statusLight = document.createElement('div');\
+            statusLight.className = `status-light ${device.status}`;\
+            statusLight.id = `statusLight${device.id}`;\
+            deviceContainer.appendChild(statusLight);\
+\
+            const button = document.createElement('a');\
+            button.className = 'button';\
+            button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
+\
+            var switchValue = 0;\
+            if(device.status == 'off'){\
+                switchValue = 1;\
+            }\
+            button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
+            button.id = `switchBtn${device.id}`;\
+            deviceContainer.appendChild(button);\
+\
+            if(device.hasBrightness == 1){\
+                const sliderLabel = document.createElement('div');\
+                sliderLabel.className = 'header2';\
+                sliderLabel.textContent = 'Brightness';\
+                deviceContainer.appendChild(sliderLabel);\
+\
+                const slider = document.createElement('input');\
+                slider.type = 'range';\
+                slider.min = 0;\
+                slider.max = 100;\
+                slider.value = device.brightness;\
+                slider.onchange = () => onRangeChanged(slider.value, device.id);\
+                slider.id = `brightnessSlider${device.id}`;\
+                deviceContainer.appendChild(slider);\
+            }\
+\
+            roomContainer.appendChild(deviceContainer);\
+        });\
+\
+        roomsContainer.appendChild(roomContainer);\
+    }\
+}\
+        \
 function fetchDataxxx() {\
                 const xhr = new XMLHttpRequest();\
                 var url = '/getPageContent';\
@@ -409,29 +494,6 @@ function fetchDataxxx() {\
 </script>";
 
 #endif
-            //        deviceConfigurationString = deviceConfigurationString + crc.toString().length + crc + \" \";\
-
-        //window.location.href = url;\
-
-
-            // crc = crc + Number(enableValue);\
-            // crc = crc + Number(dataId);\
-            // crc = crc + Number(dataType);\
-            // crc = crc + Number(dataPin);\
-            // crc = crc + Number(dataRoom);\
-            // crc = crc + Number(nameLength);\
-            // crc = crc + Number(extraValue);\
-            // for(let i = 0; i < dataName.length; i++){\
-            //     crc = crc + dataName.charCodeAt(i);\
-            // }\
-            // crc = crc + Number(stringLength) + Number(stringLengthBytes);\
-
-            /*        if(Password === Password2){\
-            window.location.href = url;\
-        }else {\
-            alert('Password must be the same!');\
-            window.location.href = '/';\
-        }\*/
 
 
         

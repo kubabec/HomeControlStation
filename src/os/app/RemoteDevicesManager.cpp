@@ -174,7 +174,6 @@ void RemoteDevicesManager::printTranslationMap() {
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
-    
     return true;
 }
 
@@ -193,9 +192,9 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.targetDeviceId = val.onSourceNodeLocalId;
         request.type = SERVICE_CALL_REQ;
 
-        request.data[0] = serviceType;
+        request.data[SERVICE_NAME_INDEX] = serviceType;
         /* TODO */
-        request.data[1] = 0; //0 - no params, 1 - set1 ...
+        request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_NoParams; //0 - no params, 1 - set1 ...
         
         /* TODO */
 
@@ -224,10 +223,10 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.targetDeviceId = val.onSourceNodeLocalId;
         request.type = SERVICE_CALL_REQ;
 
-        request.data[0] = serviceType;
+        request.data[SERVICE_NAME_INDEX] = serviceType;
         /* TODO */
-        request.data[1] = 1; //0 - no params, 1 - set1 ...
-        memcpy(&(request.data[2]), &param, sizeof(param));
+        request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; //0 - no params, 1 - set1 ...
+        memcpy(&(request.data[3]), &param, sizeof(param));
         /* TODO */
 
         try{
@@ -258,7 +257,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         request.data[0] = serviceType;
         /* TODO */
         request.data[1] = 2; //0 - no params, 1 - set1 ...
-        memcpy(&(request.data[2]), &param, sizeof(param));
+        memcpy(&(request.data[3]), &param, sizeof(param));
         /* TODO */
 
         try{

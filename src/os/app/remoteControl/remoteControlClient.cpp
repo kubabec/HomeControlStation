@@ -73,17 +73,17 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
 
             break;
         case REQUEST_NODE_DETAILED_DATA:
-            Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
+            // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
             sendDetailedDataResponse();
             break;
         
         case REQUEST_KEEP_ALIVE:
-            Serial.println("-> Dostałem UDP REQUEST_KEEP_ALIVE");
+            // Serial.println("-> Dostałem UDP REQUEST_KEEP_ALIVE");
             sendKeepAlive();
             break;
         
         case REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE:
-            Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
+            // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
             sendDetailedDataResponseFromNode();
             break;
 
@@ -271,7 +271,7 @@ void RemoteControlClient::sendDetailedDataResponseFromNode(){
         /* TX transmission will be handled in the available time from cyclic() context */
         pendingTxQueue.push(detailedDataResponse);
 
-        Serial.println("->Remote Control Client - Wysyłam Detailed data, MAC:" + String((int)localNodeMACAddress));
+        // Serial.println("->Remote Control Client - Wysyłam Detailed data, MAC:" + String((int)localNodeMACAddress));
       }
       
     }catch (const std::bad_any_cast& e){ }

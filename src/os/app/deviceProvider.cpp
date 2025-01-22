@@ -194,6 +194,11 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     response.requestType = request.type;
     ServiceParameters_set1 params;
 
+    Serial.println("DeviceProvider: Received request : " );
+    Serial.println("request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = " + String((int)request.data[SERVICE_OVERLOADING_FUNCTION_INDEX]));
+    Serial.println("request.data[SERVICE_NAME_INDEX] = " + String((int)request.data[SERVICE_NAME_INDEX]));
+    Serial.println("request.data[3] = " + String((int)request.data[3]));
+
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.targetDeviceId);
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
@@ -212,7 +217,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
             case serviceCall_1:
                 /* Copy function parameter values from the request */
                 
-                memcpy(&params, &request.data[2], sizeof(ServiceParameters_set1));
+                memcpy(&params, &request.data[3], sizeof(ServiceParameters_set1));
 
                 /* call the service */
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
@@ -220,6 +225,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     (DeviceServicesType)request.data[SERVICE_NAME_INDEX], /* TODO negative response*/
                     params
                 );
+                Serial.println("Setting state ");
                 response.responseType = POSITIVE_RESP;
                 break;
             

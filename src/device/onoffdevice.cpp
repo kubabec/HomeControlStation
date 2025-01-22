@@ -153,14 +153,17 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
         case DEVSERVICE_STATE_SWITCH:
             if(param.a ==1) {
                 on();
+                Serial.println("Setting state: ON");
             }
             else {
                 off();
+                Serial.println("Setting state: OFF");
             }
             return SERV_SUCCESS;
 
         case DEVSERVICE_BRIGHTNESS_CHANGE:
             changeBrightness(param.a);
+            Serial.println("Changing brightness to "+String((int)param.a));
             return SERV_SUCCESS;
         
         default: 
