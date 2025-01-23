@@ -36,6 +36,7 @@ void OperatingSystem::init()
 
     ErrorMonitor::init();
     ConfigProvider::init();
+    NotificationHandler::init();
 
 
     calculateRuntimeNodeHash();
@@ -71,8 +72,17 @@ void OperatingSystem::init()
     DeviceProvider::init();
     
 
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(ERR_MON_UNEXPECTED_RESET, 2);
+
+    /* notification test */
+    UserInterfaceNotification notif{
+        .title = "Title!",
+        .body = "Notification testing",
+        .type = UserInterfaceNotification::ERROR
+    };
+    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+    /* notification test */
 }
 
 
@@ -101,6 +111,7 @@ void OperatingSystem::task20ms()
 
 void OperatingSystem::task50ms()
 {
+    NotificationHandler::cyclic();
 
     if(resetPending){
         resetCountdown --;
@@ -144,6 +155,10 @@ void OperatingSystem::performReset()
     NetworkDriver::deinit();
 
     ErrorMonitor::deinit();
+    NotificationHandler::deinit();
+
+
+    /* This app must be last, as it saves NVM data */
     ConfigProvider::deinit();
 
     ESP.restart();

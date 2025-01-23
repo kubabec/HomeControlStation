@@ -158,6 +158,9 @@ void HTTPAsyncRequestHandler::processRequest()
         case ASYNC_GET_PAGE_CONTENT:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
 
+        case ASYNC_GET_NOTIFICATION_LIST:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+
         default : break;
     }
 }
@@ -207,6 +210,30 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
   jsonResponse +="}";
 }
 
+void HTTPAsyncRequestHandler::createNotificationListContentJson()
+{
+    uint8_t activeNotificationCount = 
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).getActiveNotificationsCount();
+
+    jsonResponse += "{";
+    jsonResponse += "\"count\": "+String((int)activeNotificationCount)+",";
+    jsonResponse += "\"notifications:\": [";
+    
+    for(uint8_t i = 0 ; i < activeNotificationCount; i++){
+        /* get each notification */
+        UserInterfaceNotification notification =
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).getOldestNotification();
+        /* Add notification content to JSON */
+        jsonResponse += notification.toJson();
+
+        if(i < activeNotificationCount-1){
+            jsonResponse += ",";
+        }
+    }
+    jsonResponse += "]";
+    jsonResponse += "}";
+}
+
 void HTTPAsyncRequestHandler::createJsonResponse()
 {
     jsonResponse = "";
@@ -217,6 +244,10 @@ void HTTPAsyncRequestHandler::createJsonResponse()
 
         case ASYNC_GET_PAGE_CONTENT:
             createMainPageContentJson();
+            break;
+        
+        case ASYNC_GET_NOTIFICATION_LIST:
+            createNotificationListContentJson();
             break;
 
         default : break;

@@ -74,7 +74,8 @@ std::vector<String> parameterizedRequests = {
 std::vector<String> parameterizedAsyncRequests = {
   "dev",
   "?bri",
-  "getPageContent"
+  "getPageContent",
+  "getNotifications"
 };
 
 
@@ -100,7 +101,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
   {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::constantHandler_asyncGetPageContent, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::constantHandler_asyncGetPageContent, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::constantHandler_asyncGetNotifications, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -1443,3 +1445,8 @@ void HomeLightHttpServer::constantHandler_asyncGetPageContent(String& request, W
   HTTPAsyncRequestHandler::createRequest(ASYNC_GET_PAGE_CONTENT, nullptr, 0);
 }
 
+
+void HomeLightHttpServer::constantHandler_asyncGetNotifications(String& request, WiFiClient& client)
+{
+  HTTPAsyncRequestHandler::createRequest(ASYNC_GET_NOTIFICATION_LIST, nullptr, 0);
+}

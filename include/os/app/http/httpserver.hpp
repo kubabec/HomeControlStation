@@ -77,6 +77,7 @@ public:
     static void constantHandler_massErase(WiFiClient& client);
     static void constantHandler_asyncTest(WiFiClient& client);
     static void constantHandler_asyncGetPageContent(String& request, WiFiClient& client);
+    static void constantHandler_asyncGetNotifications(String& request, WiFiClient& client);
     static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);

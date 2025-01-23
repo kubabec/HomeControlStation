@@ -162,4 +162,33 @@ typedef enum
     e_ACCESS_LEVEL_SERVICE_MODE
 }SecurityAccessLevelType;
 
+typedef struct
+{
+    enum Type{
+        INFO,
+        WARNING,
+        ERROR
+    };
+
+    String title;
+    String body;
+    Type type = INFO;
+
+    String toJson(){
+        String json = "";
+        json += "{";
+        json += "\"title\": \""+ title +"\",";
+        json += "\"body\": \""+ body +"\",";
+        json += "\"type\": "+ String((int)type);
+        json += "}";
+        return json;
+    }
+}UserInterfaceNotification;
+
+typedef struct{
+    std::function<bool(UserInterfaceNotification&)> createNotification;
+    std::function<uint8_t(void)> getActiveNotificationsCount;
+    std::function<UserInterfaceNotification(void)> getOldestNotification;
+}UINotificationsControlAPI;
+
 #endif 

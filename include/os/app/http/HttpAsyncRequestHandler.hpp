@@ -30,6 +30,7 @@ typedef enum
     ASYNC_TYPE_INVALID,
     ASYNC_TYPE_DEVICE_SERVICE_CALL,
     ASYNC_GET_PAGE_CONTENT,
+    ASYNC_GET_NOTIFICATION_LIST,
     ASYNC_TYPE_LAST = ASYNC_GET_PAGE_CONTENT
 }AsyncRequestType;
 
@@ -63,6 +64,7 @@ class HTTPAsyncRequestHandler{
     static void createJsonResponse();
 
     static void createMainPageContentJson();
+    static void createNotificationListContentJson();
 
     public :
 
