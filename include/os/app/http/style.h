@@ -605,6 +605,64 @@ to {\
 transform: rotate(360deg);\
 }\
 }\
+.notifications-popup {\
+    position: fixed;\
+    top: 50%;\
+    left: 50%;\
+    transform: translate(-50%, -50%);\
+    background: #ffffff;\
+    border-radius: 10px;\
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);\
+    width: 80%;\
+    max-width: 400px;\
+    padding: 20px;\
+    z-index: 11;\
+    display: none;\
+}\
+.notification {\
+    border: 1px solid;\
+    border-radius: 5px;\
+    padding: 10px;\
+    margin-bottom: 10px;\
+    display: flex;\
+    flex-direction: column;\
+    align: left;\
+}\
+\
+.notification-title {\
+    font-weight: bold;\
+    margin-bottom: 5px;\
+}\
+\
+.notification.error {\
+    background-color: #ffe5e5;\
+    border-color: #ff5c5c;\
+    color: #991f1f;\
+}\
+\
+.notification.warning {\
+    background-color: #fff4cc;\
+    border-color: #ffc107;\
+    color: #997a00;\
+}\
+\
+.notification.info {\
+    background-color: #e5f7ff;\
+    border-color: #17a2b8;\
+    color: #0a495c;\
+}\
+.project-name {\
+  position: fixed;\
+  bottom: 10px;\
+  width: 100%;\
+  text-align: center;\
+  font-size: 24px;\
+  color: rgba(0, 0, 0, 0.1);\
+  z-index: -1; \
+  font-weight: bold;\
+  pointer-events: none; \
+  user-select: none; \
+}\
 </style>\
 ";
 

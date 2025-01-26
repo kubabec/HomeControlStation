@@ -2,6 +2,33 @@
 
 std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> ErrorMonitor::errorList;
 
+/*
+typedef enum{
+    ERR_MON_UNEXPECTED_RESET = 1,
+    ERR_MON_INVALID_NVM_DATA,
+    ERR_MON_INVALID_LOCAL_CONFIG,
+    ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
+    ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
+    ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
+    ERR_MON_INVALID_ERROR_REPORTED,
+    ERR_MON_LAST_ERROR = ERR_MON_INVALID_ERROR_REPORTED,
+    ERR_MONT_ERROR_COUNT = ERR_MON_LAST_ERROR
+}ERR_MON_ERROR_TYPE;
+
+*/
+
+String codeToTextMapping[ERR_MONT_ERROR_COUNT]
+{
+    "Unexpected reset detected",
+    "Invalid NVM data detected",
+    "Wrong node configuration",
+    "Error during configuration creation",
+    "Wrong configuration setup created",
+    "Service for invalid device requested",
+    "Wrong ERROR reported"
+};
+
+
 void ErrorMonitor::deinit() {
     
 }
@@ -35,6 +62,22 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
         /* Need to have fixed length comment stored in NVM */
         String commentWithConstLength = comment.length() <= 32 ? comment : comment.substring(0, 31);
         errorRef.comment = commentWithConstLength;
+
+
+        /* Push error notification */
+        UserInterfaceNotification notif{
+            .title = codeToTextMapping[errorCode],
+            .body = comment,
+            .type = UserInterfaceNotification::ERROR
+        };
+
+        /* special handling */
+        if((errorCode+1) == ERR_MON_UNEXPECTED_RESET)
+        {
+            notif.body = "Try to avoid unexpected power supply disconnection";
+        }
+
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
 
         errorRef.lastOccurrenceTime = millis();
 

@@ -49,6 +49,14 @@ void ConfigProvider::init()
         saveRamMirrorToNvm();
         configRamMirror.serialPrint();
 
+        UserInterfaceNotification notif;
+        if(configRamMirror.networkSSID[0] == '\0'){
+            notif.title = "Missing WiFi credentials";
+            notif.body = "To connect to the WiFi network, navigate to 'Settings', enter network name and password.";
+            notif.type = UserInterfaceNotification::INFO;
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+        }
+
     }else 
     {
         std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
@@ -74,6 +82,20 @@ void ConfigProvider::init()
         DataContainer::setSignalValue(SIG_IS_RC_SERVER, static_cast<bool> (true));
         // New signal to be used in the future implementation
         DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, emptyConfiguration);
+
+        /* notification */
+        UserInterfaceNotification notif{
+            .title = "Configuration problem",
+            .body = "Looks like this device was never configured or there was some problem during configuration restore process.",
+            .type = UserInterfaceNotification::WARNING
+        };
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+
+        notif.title = "Missing WiFi credentials";
+        notif.body = "To connect to the WiFi network, navigate to 'Settings', enter network name and password.";
+        notif.type = UserInterfaceNotification::INFO;
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+
 
         // /* As device cannot restore correct configuration, Service Mode is granted by default */
         // DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE); /* moved to OS logic */

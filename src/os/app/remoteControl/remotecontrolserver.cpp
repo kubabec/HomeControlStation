@@ -212,6 +212,11 @@ void RemoteControlServer::handleKeepAliveState() {
         for(auto& MAC : nodesToBeRemoved) {
             remoteNodes.erase(MAC);
             Serial.println("Removing Node due to lack of communication MAC" + String((int)MAC));
+            UserInterfaceNotification notif;
+            notif.title = "Node disconnected";
+            notif.body = "Node with MAC" + String(MAC) + " disconnected.";
+            notif.type = UserInterfaceNotification::WARNING;
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
 
         updateDeviceDescriptionSignal();

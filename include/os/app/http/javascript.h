@@ -4,6 +4,7 @@
 
 const char* javascript = "\
 <script>\
+let isNotificationPollingActive = 1;\
     function applySettings() {\
         var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;\
         var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;\
@@ -175,9 +176,7 @@ const char* javascript = "\
     };\
 \
 \
-        function showPopup(message, action) {\
-            const popupOverlay = document.getElementById('popup-overlay');\
-            const popupContent = document.getElementById('popup-content');\
+        function showMessage(message, action) {\
             const popupMessage = document.getElementById('popup-message');\
             const popupButton = document.getElementById('popup-button');\
 \
@@ -193,22 +192,29 @@ const char* javascript = "\
                 };\
             }\
 \
+            showPopup('popup-overlay', 'popup-content');\
+\
+            document.getElementById('popup-overlay-close').onclick = function () {\
+                hidePopup('popup-overlay', 'popup-content');\
+            };\
+        }\
+        function showPopup(overlay, content) {\
+            const popupOverlay = document.getElementById(overlay);\
+            const popupContent = document.getElementById(content);\
+\
             popupOverlay.classList.remove('hidden-popup');\
             popupOverlay.classList.add('visible-popup');\
             popupContent.classList.add('show');\
-\
-            document.getElementById('popup-close').onclick = function () {\
-                hidePopup();\
-            };\
         }\
 \
-        function hidePopup() {\
-            const popupOverlay = document.getElementById('popup-overlay');\
-            const popupContent = document.getElementById('popup-content');\
+        function hidePopup(overlay, content) {\
+            const popupOverlay = document.getElementById(overlay);\
+            const popupContent = document.getElementById(content);\
 \
             popupOverlay.classList.remove('visible-popup');\
             popupOverlay.classList.add('hidden-popup');\
             popupContent.classList.remove('show');\
+            isNotificationPollingActive = 1;\
         };\
         function showPasswordPopup() {\
             const passwordPopupOverlay = document.getElementById('password-popup-overlay');\
@@ -219,13 +225,8 @@ const char* javascript = "\
             passwordPopupContent.classList.add('show');\
 \
             document.getElementById('password-popup-close').onclick = function () {\
-                hidePopup(passwordPopupOverlay, passwordPopupContent);\
+                hidePopup('password-popup-overlay', 'password-popup-content');\
             };\
-        }\
-        function hidePopup(popupOverlay, popupContent) {\
-            popupOverlay.classList.remove('visible-popup');\
-            popupOverlay.classList.add('hidden-popup');\
-            popupContent.classList.remove('show');\
         }\
 \
         function submitPassword() {\
@@ -235,7 +236,7 @@ const char* javascript = "\
         }\
         function submitPassword() {\
             const passwordValue = document.getElementById('password-input').value;\
-            hidePopup(document.getElementById('password-popup-overlay'), document.getElementById('password-popup-content'));\
+            hidePopup('password-popup-overlay', 'password-popup-content');\
             url = '/passwordApply' + passwordValue;\
             window.location.href = url;\
         }\
@@ -398,6 +399,50 @@ function hideLoading(container) {\
         overlay.style.display = \"none\";\
     }\
 }\
+function displayNotifications(data){\
+    console.log(data);\
+    if (data.count > 0) {\
+        isNotificationPollingActive = 0;\
+        const notificationsList = document.getElementById('notificationsList');\
+\
+        showPopup('notifications-popup-overlay', 'notificationsPopup');\
+\
+        notificationsList.innerHTML = \"\";\
+\
+        data[\"notifications:\"].forEach(notification => {\
+            const notificationDiv = document.createElement('div');\
+            notificationDiv.className = 'notification';\
+            switch (notification.type){\
+            case 0:\
+                notificationDiv.classList.add('info');\
+                break;\
+            case 1:\
+                notificationDiv.classList.add('warning');\
+                break;\
+            case 2:\
+                notificationDiv.classList.add('error');\
+                break;\
+            default:\
+            }\
+\
+            const titleDiv = document.createElement('div');\
+            titleDiv.className = 'notification-title';\
+            titleDiv.textContent = notification.title;\
+\
+            const bodyDiv = document.createElement('div');\
+            bodyDiv.textContent = notification.body;\
+\
+            notificationDiv.appendChild(titleDiv);\
+            notificationDiv.appendChild(bodyDiv);\
+\
+            notificationsList.appendChild(notificationDiv);\
+        });\
+\
+        document.getElementById('notification-popup-overlay-close').onclick = function () {\
+            hidePopup('notifications-popup-overlay', 'notificationsPopup');\
+        };\
+    }\
+}\
 \
 function renderRooms(data) {\
     const roomsContainer = document.getElementById('rooms');\
@@ -491,6 +536,20 @@ function fetchDataxxx() {\
                 };\
                 xhr.send();\
             }\
+\
+async function getNotifications() {\
+    if (isNotificationPollingActive) {\
+        try {\
+                console.log(\"Trying to get notifications\");\
+                const response = await fetch('/getNotifications');\
+                const newData = await response.json();\
+    \
+                displayNotifications(newData);\
+        } catch (error) {\
+            console.error('Error fetching notifications data:', error);\
+        }\ 
+    };\
+}\
 </script>";
 
 #endif

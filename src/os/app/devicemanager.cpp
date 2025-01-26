@@ -73,6 +73,15 @@ void DeviceManager::init()
 
             free(configBlock);
 
+
+            if(numberOfSuccessfullyRetrievedDevices == 0){
+                UserInterfaceNotification notif;
+                notif.title = "Missing GPIO setup";
+                notif.body = "Looks like there are no GPIO devices configured yet. Navigate to 'Settings -> Devices Management' to add the device.";
+                notif.type = UserInterfaceNotification::INFO;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+            }
+
             /* Publish retrieved DeviceConfigSlots signal to the system */
             DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
         }
@@ -223,13 +232,19 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             }
         }
         else {
-            Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-            DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(
-                ERR_MON_INVALID_LOCAL_CONFIG, 
-                String("Invalid Device type ("+ String((int)nvmData.deviceType)+") on slot " + String((int)configSlotID))
-            );
+            NodeConfiguration currentConfig = 
+                std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+
+            /* Handle errors only when device is properly configured */
+            if(currentConfig.networkSSID[0] != '\0'){
+                Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
+                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
+                DataContainer::getSignalValue(CBK_ERROR_REPORT)
+                )(
+                    ERR_MON_INVALID_LOCAL_CONFIG, 
+                    String("Invalid Device type ("+ String((int)nvmData.deviceType)+") on slot " + String((int)configSlotID))
+                );
+            }
         }
     }
     // else 

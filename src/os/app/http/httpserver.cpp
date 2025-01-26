@@ -523,6 +523,10 @@ void HomeLightHttpServer::handleClientRequest()
               processLinkRequestData(client);
             
 
+              client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
+              client.println("<script>\
+                setInterval(getNotifications, 3500);\
+              </script>");
 
               client.println("</div></body></html>");            
               client.println();
@@ -848,7 +852,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"Password2\"></label>");
 
   /* Apply button*/
-  client.println("<div class=\"error-button\" onclick=\"showPopup('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
+  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
   
   /* Room mapping button */
   client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
@@ -858,7 +862,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
   
     /* Clear all settings */
-    client.println("<div class=\"error-button\" onclick=\"showPopup('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
+    client.println("<div class=\"error-button\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
   }
 
   /* Common HTML tags closure */
@@ -883,7 +887,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
     slotIdx++;
   }
 
-  client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"showPopup('Do you wanna change node devices configuration?\
+  client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"showMessage('Do you wanna change node devices configuration?\
    GPIO pin setup will be loaded according to options selected on this page.', createConfigurationString);\">Save config</button>");
   client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
 
@@ -924,7 +928,7 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
     /* Display error clear button */
     const char* errorClearBtn = "\
     <button class=\"error-button\" \
-    onclick=\"showPopup('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
+    onclick=\"showMessage('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
 
     if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
       client.println("<div class=\"access-level-hidder\">");
@@ -1090,7 +1094,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         let currentData = {};\
 \
 \
-          async function fetchData() {\
+        async function fetchData() {\
             try {\
                 const response = await fetch('/getPageContent');\
                 const newData = await response.json();\
@@ -1105,13 +1109,14 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
             }\
         }\
 \
+\
         fetchData();\
+        getNotifications();\
 \
         setInterval(fetchData, 2500);\
 \
 \
     </script>");
-
 
 }
 
@@ -1129,8 +1134,10 @@ void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
 
 void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)
 {
+  client.println("<script>getNotifications();</script>");
   // Print config page if it is requested
   printConfigPage(client);
+  
 }
 
 void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient& client)

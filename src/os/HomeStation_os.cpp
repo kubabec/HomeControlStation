@@ -15,8 +15,6 @@ long long uiBlockTime = 0;
 
 void OperatingSystem::init()
 {
-    changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
-
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
@@ -35,8 +33,10 @@ void OperatingSystem::init()
 
 
     ErrorMonitor::init();
-    ConfigProvider::init();
     NotificationHandler::init();
+
+    changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
+    ConfigProvider::init();
 
 
     calculateRuntimeNodeHash();
@@ -71,18 +71,6 @@ void OperatingSystem::init()
 
     DeviceProvider::init();
     
-
-
-    /* notification test */
-    UserInterfaceNotification notif{
-        .title = "Title!",
-        .body = "Notification testing",
-        .type = UserInterfaceNotification::ERROR
-    };
-    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-    /* notification test */
 }
 
 
@@ -174,6 +162,14 @@ void OperatingSystem::handleSecurityAccessLevelExpiration()
             currentAccessLevel = e_ACCESS_LEVEL_NONE;
             DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
             Serial.println("Access level unlock expired.");
+
+            /* notification */
+            UserInterfaceNotification notif{
+                .title = "Device lock/unlock",
+                .body = "Unlock time expired, device is locked again.",
+                .type = UserInterfaceNotification::INFO
+            };
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
     }
 }
@@ -241,10 +237,16 @@ void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 {
     if(password == "admin"){
         changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
-    }
-
-    if(password == "user"){
+    }else if(password == "user"){
         changeSecurityAccessLevel(e_ACCESS_LEVEL_AUTH_USER);
+    }else {
+        /* notification */
+        UserInterfaceNotification notif{
+            .title = "Wrong password",
+            .body = "Device unlock try failed due to invalid password.",
+            .type = UserInterfaceNotification::WARNING
+        };
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 }
 
@@ -253,6 +255,13 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     currentAccessLevel = newAccessLevel;
     accessLevelGrantedTimeSnapshot = millis();
     DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
+
+    /* notification */
+    UserInterfaceNotification notif{
+        .title = "Device lock/unlock",
+        .body = "",
+        .type = UserInterfaceNotification::WARNING
+    };
 
     Serial.print("Access level granted: ");
     switch (currentAccessLevel)
@@ -263,10 +272,15 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     
     case e_ACCESS_LEVEL_AUTH_USER:
         Serial.println("e_ACCESS_LEVEL_AUTH_USER");
+        notif.type = UserInterfaceNotification::INFO;
+        notif.body = "Device is unlocked to authorized user level and will be automatically locked.";
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         break;
 
     case e_ACCESS_LEVEL_SERVICE_MODE:
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
+        notif.body = "Device is running in service mode";
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         break;
     default:
         Serial.println("INVALID");
