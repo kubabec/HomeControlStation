@@ -13,7 +13,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     //currentRequest.print();
     
     /* Is it new request or already known? */
-    if(currentRequest.requestId != newReqest.requestId) {
+    if(currentRequest.getRequestId() != newReqest.getRequestId()) {
         /* Set newRequest as currently processed one for further function entries */
         memcpy(&currentRequest, &newReqest, REQEST_SIZE);
 
@@ -30,30 +30,30 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
 
         /* Push fully prepared request to previously created empty UDP message  */
         if(message.pushData((byte*)(&currentRequest),reqestSize)){
-            Serial.println("Sending new request with ID "+String((int)currentRequest.requestId));
+            Serial.println("Sending new request with ID "+String((int)currentRequest.getRequestId()));
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
             /* Increment request send counter for further entries of this function */
-            currentRequest.requestSendCount = 1;
+            //currentRequest.requestSendCount = 1;
             lastSendTime = millis();
         }
         else{
-            Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
+            Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.getRequestId()));
         }
         
     } else{/* Processing allready known request */
         
         /* Does message send retry count exceed maximum allowed number? */
-        if(currentRequest.requestSendCount >= 3){
+        if(1 /*currentRequest.requestSendCount >= 3 */){
             /* Max number reqests exceed , timeout request*/
-            Serial.println("Request "+String((int)currentRequest.requestId)+" processing failed");
+            Serial.println("Request "+String((int)currentRequest.getRequestId())+" processing failed");
             /* clear the current request */
-            currentRequest = {};
+            currentRequest.clear();
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
             if(millis() - lastSendTime > 5000){
-                Serial.println("Sending repeat request for request "+String((int)currentRequest.requestId));
+                Serial.println("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
@@ -61,11 +61,11 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
                 
                 if(message.pushData((byte*)(&currentRequest),reqestSize)){
                     NetworkDriver::sendBroadcast(message);
-                    currentRequest.requestSendCount ++;
+                    //currentRequest.requestSendCount ++;
                     lastSendTime = millis();
                 }
                 else{
-                    Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.requestId));
+                    Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.getRequestId()));
                 }
                 
 

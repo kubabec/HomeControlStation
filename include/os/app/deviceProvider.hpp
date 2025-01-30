@@ -45,7 +45,7 @@ public:
     static void printIdMap();
 
     static bool receiveRequest(RcRequest& request);
-    static bool receiveExtededDataRequest(RcRequest &request);
+    
 
     /* TESTCODE */
     static ServiceRequestErrorCode service(

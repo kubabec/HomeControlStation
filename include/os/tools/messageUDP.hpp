@@ -31,7 +31,7 @@ public:
 private:
 
     int id = -1; /* uint8_t */
-    uint8_t totalSize = 0; /* Total size of message in bytes */
+    uint16_t totalSize = 0; /* Total size of message in bytes ^^^*/
     MessageUDP::IPAddr ipAddress{0, 0, 0, 0};
     int udpPort = 3333;
 
@@ -43,7 +43,7 @@ private:
     void updateTotalSize();
 
     static bool validateMessageId(int messageId);
-    static bool validateTotalSize(uint8_t bufferSize, uint8_t secondByteValue);
+    static bool validateTotalSize(uint16_t bufferSize, uint16_t tmpSize);
     static bool validateLastByteValue(uint8_t lastByteValue);
     static bool validateIpAddress(IPAddr& addr);
 

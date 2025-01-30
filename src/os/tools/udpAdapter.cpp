@@ -51,7 +51,7 @@ void UDPAdapter::send(MessageUDP& msg)
 
     // Serial.println("Sending via WiFi!");
     std::vector<uint8_t>& payloadRef = msg.getPayload();
-    IPAddress receiverIP(
+        IPAddress receiverIP(
         msg.getIPAddress().octet1, 
         msg.getIPAddress().octet2,
         msg.getIPAddress().octet3,

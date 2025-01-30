@@ -60,6 +60,7 @@ public:
     static void cyclic();
     static void printTranslationMap();
 
+
     static void tunnelDataUpdate(std::any remoteDevices);
     static RCTranslation getTranslationFromUnique(uint8_t uniqueId);
 

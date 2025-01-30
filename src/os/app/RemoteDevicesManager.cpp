@@ -188,27 +188,25 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
 ){
+
     /* Check if RDM is capable to receive new request */
     if(requestProcessingState == RDM_NO_REQUEST){
 
-        /* Try to evaluate target information */
-        RCTranslation val = getTranslationFromUnique(deviceId);
-        if(val.isValid()){
+     RCTranslation val = getTranslationFromUnique(deviceId);
+    if(val.isValid()){
+        RcRequest request (val.onSourceNodeLocalId, val.mac, SERVICE_CALL_REQ);
 
-            /* Prepare new request */
-            RcRequest request;
-            request.targetNodeMAC = val.mac;
-            request.targetDeviceId = val.onSourceNodeLocalId;
-            request.type = SERVICE_CALL_REQ;
 
-            /* Fulfill the payload */
-            request.data[SERVICE_NAME_INDEX] = serviceType;
-            request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_NoParams; //0 - no params, 1 - set1 ...
-            
+        request.pushData(serviceType);
+        
+        /* TODO */
+        request.pushData(serviceCall_NoParams); //0 - no params, 1 - set1 ...
+
             try{
                 /* Pass request for processing to RCServer */
                 awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
                     DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+
 
                 /* Update current new request fingerprint */
                 currentRequestFingerprint = {
@@ -258,23 +256,24 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
+
     /* Check if RDM is capable to receive new request */
     if(requestProcessingState == RDM_NO_REQUEST){
 
         RCTranslation val = getTranslationFromUnique(deviceId);
         if(val.isValid()){
-            RcRequest request;
+            RcRequest request (val.onSourceNodeLocalId, val.mac, SERVICE_CALL_REQ);
 
 
-            request.targetNodeMAC = val.mac;
-            request.targetDeviceId = val.onSourceNodeLocalId;
-            request.type = SERVICE_CALL_REQ;
+        
 
-            request.data[SERVICE_NAME_INDEX] = serviceType;
+        request.pushData(serviceType);
+        /* TODO */
+        
+        request.pushData(serviceCall_1); //0 - no params, 1 - set1 ...
+        request.pushData((uint8_t*)&param, sizeof(param));
             /* TODO */
-            request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; //0 - no params, 1 - set1 ...
-            memcpy(&(request.data[3]), &param, sizeof(param));
-            /* TODO */
+
 
             try{
                 /* Pass request for processing to RCServer */
@@ -329,22 +328,21 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set2 param
 ){
+
     /* Check if RDM is capable to receive new request */
     if(requestProcessingState == RDM_NO_REQUEST){
         RCTranslation val = getTranslationFromUnique(deviceId);
         if(val.isValid()){
-            RcRequest request;
+            RcRequest request (val.onSourceNodeLocalId, val.mac, SERVICE_CALL_REQ);
 
 
-            request.targetNodeMAC = val.mac;
-            request.targetDeviceId = val.onSourceNodeLocalId;
-            request.type = SERVICE_CALL_REQ;
+            request.pushData(serviceType);
+        /* TODO */
+        
+            request.pushData(2); //0 - no params, 1 - set1 ...
+            request.pushData((uint8_t*)&param, sizeof(param));
+                /* TODO */
 
-            request.data[0] = serviceType;
-            /* TODO */
-            request.data[1] = 2; //0 - no params, 1 - set1 ...
-            memcpy(&(request.data[3]), &param, sizeof(param));
-            /* TODO */
 
             try{
                 /* Pass request for processing to RCServer */

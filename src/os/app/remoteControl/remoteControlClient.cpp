@@ -99,13 +99,13 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
     if(msg.getPayload().size() == REQEST_SIZE) {
         RcRequest newRequest;
         memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE); //memcopy(dokad, co, wielkosc)
-        newRequest.print();
-        if(newRequest.targetNodeMAC == localNodeMACAddress) {
-            if(newRequest.type >= REQ_FIRST && newRequest.type < UNKNOWN_REQ) {
+        //newRequest.print();
+        if(newRequest.getRequestNodeMAC() == localNodeMACAddress) {
+            if(newRequest.getRequestType() >= REQ_FIRST && newRequest.getRequestType() < UNKNOWN_REQ) {
                 //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
-                if(requestReceivers.at(newRequest.type)) {
+                if(requestReceivers.at(newRequest.getRequestType())) {
                     //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
-                    (requestReceivers.at(newRequest.type))(newRequest);
+                    (requestReceivers.at(newRequest.getRequestType()))(newRequest);
 
                 }
             }

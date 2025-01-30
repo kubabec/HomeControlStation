@@ -46,12 +46,12 @@ void MessageUDP::setPort(int port){
 void MessageUDP::updateTotalSize()
 {
     /* MessageId + totalSizeChecksum + 4* IP addr byte + port INT + buffer size  + control byte */
-    totalSize = sizeof(id) + sizeof(uint8_t) + sizeof(ipAddress) + sizeof(udpPort) + (dataBuffer.size() * sizeof(byte)) + sizeof(lastByteCheckValue);
+    totalSize = sizeof(id) + sizeof(uint16_t) + sizeof(ipAddress) + sizeof(udpPort) + (dataBuffer.size() * sizeof(byte)) + sizeof(lastByteCheckValue);
 }
 
 uint8_t MessageUDP::getMinimumSize()
 {
-    return sizeof(id) + sizeof(uint8_t) + sizeof(ipAddress) + sizeof(udpPort) + sizeof(lastByteCheckValue);
+    return sizeof(id) + sizeof(uint16_t) + sizeof(ipAddress) + sizeof(udpPort) + sizeof(lastByteCheckValue);
 }
 
 bool MessageUDP::validateMessageId(int messageId)
@@ -64,7 +64,7 @@ bool MessageUDP::validateMessageId(int messageId)
     return false;
 }
 
-bool MessageUDP::validateTotalSize(uint8_t bufferSize, uint8_t secondByteValue)
+bool MessageUDP::validateTotalSize(uint16_t bufferSize, uint16_t secondByteValue)
 {
     if(bufferSize == secondByteValue)
     {
@@ -72,6 +72,7 @@ bool MessageUDP::validateTotalSize(uint8_t bufferSize, uint8_t secondByteValue)
     }
 
     return false;
+    
 }
 
 bool MessageUDP::validateLastByteValue(uint8_t lastByteValue)
@@ -82,6 +83,7 @@ bool MessageUDP::validateLastByteValue(uint8_t lastByteValue)
     }
 
     return false;
+    
 }
 
 bool MessageUDP::validateIpAddress(IPAddr& addr)
@@ -145,21 +147,26 @@ bool MessageUDP::isValid()
     return ((totalSize >= getMinimumSize()) && (id != -1) && (!(ipAddress == (IPAddr){0,0,0,0})));
 }
 
+/* Funkcja konwertuje obiekt MessageUDP na ciag bajtow */
 bool MessageUDP::toByteArray(byte* bufferPtr, size_t sizeCheck)
 {
-    updateTotalSize();
+    updateTotalSize(); /* Update total size */
     if(sizeCheck == totalSize && bufferPtr != nullptr) /* check if received bufferPtr size is expected */
     {
         memcpy(&(bufferPtr[0]), &id, sizeof(id)); /* copy ID */
-        bufferPtr[4] = (byte)totalSize; /* size checksum as a second byte */
-        memcpy(&(bufferPtr[5]), &ipAddress, sizeof(ipAddress)); /* copy IP address */
-        memcpy(&(bufferPtr[9]), &udpPort, sizeof(udpPort));
+        // bufferPtr[4] = (byte)totalSize; /* size checksum as a second byte */
+        // memcpy(&(bufferPtr[5]), &ipAddress, sizeof(ipAddress)); /* copy IP address */
+        // memcpy(&(bufferPtr[9]), &udpPort, sizeof(udpPort));
+
+        memcpy(bufferPtr + 4, &totalSize, sizeof(uint16_t)); // Kopiowanie rozmiaru (2 bajty)
+        memcpy(bufferPtr + 6, &ipAddress, sizeof(ipAddress)); // Kopiowanie adresu IP
+        memcpy(bufferPtr + 10, &udpPort, sizeof(udpPort)); // Kopiowanie portu
 
         if(dataBuffer.size() > 0){ /* There are any data in the buffer */
             /* 2 - const number of bytes before carried data buffer */
-            for(int i = 13 ; i < sizeCheck-1; i++) /* start copying from third byte */
+            for(int i = 14 ; i < sizeCheck-1; i++) /* start copying from fifth byte */
             {
-                bufferPtr[i]  = dataBuffer.at(i-13); /* copy all buffer data */
+                bufferPtr[i]  = dataBuffer.at(i-14); /* copy all buffer data */
             }
         }
         bufferPtr[sizeCheck-1] = (byte)lastByteCheckValue; /* End of message byte */
@@ -188,13 +195,13 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
         memcpy(&tmpId, idExtractBytes, sizeof(tmpId));
 
         // Copy size byte
-        uint8_t tmpSize = (uint8_t)vec.at(4);
-
+        uint16_t tmpSize; //= (uint8_t)vec.at(4);
+        memcpy(&tmpSize, vec.data() + 4, sizeof(uint16_t));  // Read 2 bytes
 
         // Extract IP address bytes from vector
         uint8_t ipAddrBytes[4] = {0};
         for(int i = 0; i < 4; i++) {
-            ipAddrBytes[i] = vec.at(i+5);  
+            ipAddrBytes[i] = vec.at(i+6);  
         }
         IPAddr tmpAddr{0,0,0,0};
         memcpy(&tmpAddr, ipAddrBytes, sizeof(tmpAddr));
@@ -203,7 +210,7 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
          // Extract port bytes from vector
         uint8_t portBytes[4] = {0};
         for(int i = 0; i < 4; i++) {
-            portBytes[i] = vec.at(i+9);  
+            portBytes[i] = vec.at(i+10);  
         }
         int tmpPort = 0;
         memcpy(&tmpPort, portBytes, sizeof(tmpPort));
@@ -228,7 +235,7 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
             if(dataOnlySize > 0){
                 returnedMessage.dataBuffer.reserve(dataOnlySize);
 
-                for(uint8_t i = 13; i < vec.size() - 1; i ++)
+                for(uint8_t i = 14; i < vec.size() - 1; i ++)
                 {
                     returnedMessage.dataBuffer.push_back(vec.at(i));
                 }
@@ -270,13 +277,13 @@ uint8_t MessageUDP::getCurrentByte()
 {
      // Serial.println("Total size: " + String(totalSize));
     // Serial.println("byteIterationIndex = " + String(byteIterationIndex));
-    if(byteIterationIndex > 12)
+    if(byteIterationIndex > 13)
     {
         //return 0;
         if(byteIterationIndex != totalSize - 1)
         {
             // Serial.println("Returning payload byte at index: " + String(byteIterationIndex-2));
-            return dataBuffer.at(byteIterationIndex-13); /* Return payload byte */
+            return dataBuffer.at(byteIterationIndex-14); /* Return payload byte */
         }else
         {
             // Serial.println("Returning checkusm byte");
@@ -294,15 +301,15 @@ uint8_t MessageUDP::getCurrentByte()
         {
             // Serial.println("Returning total size");
             return (uint8_t)totalSize;
-        } else if (byteIterationIndex >= 5 && byteIterationIndex <= 8)
+        } else if (byteIterationIndex >= 6 && byteIterationIndex <= 9)
         {
             // Return IP Address bytes
-            return *(((uint8_t*)&ipAddress) + (byteIterationIndex - 5));
+            return *(((uint8_t*)&ipAddress) + (byteIterationIndex - 6));
 
-        } else if (byteIterationIndex >= 9 && byteIterationIndex <= 12)
+        } else if (byteIterationIndex >= 10 && byteIterationIndex <= 13)
         {
             // Return port bytes
-            return *(((uint8_t*)&udpPort) + (byteIterationIndex - 9));
+            return *(((uint8_t*)&udpPort) + (byteIterationIndex - 10));
         }
     }
 

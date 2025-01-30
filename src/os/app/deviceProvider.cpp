@@ -189,27 +189,25 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     // request.print();
 
     RcResponse response;
-    response.responseId = request.requestId;
+    response.responseId = request.getRequestId();
     response.responseType = NEGATIVE_RESP; //200 is positive
-    response.requestType = request.type;
+    response.requestType = request.getRequestType();
     ServiceParameters_set1 params;
 
-    Serial.println("DeviceProvider: Received request : " );
-    Serial.println("request.data[SERVICE_OVERLOADING_FUNCTION_INDEX] = " + String((int)request.data[SERVICE_OVERLOADING_FUNCTION_INDEX]));
-    Serial.println("request.data[SERVICE_NAME_INDEX] = " + String((int)request.data[SERVICE_NAME_INDEX]));
-    Serial.println("request.data[3] = " + String((int)request.data[3]));
 
-    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.targetDeviceId);
+
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.getRequestDeviceId());
+
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
           
             /* Which function service overloading is received? */
-            switch (request.data[SERVICE_OVERLOADING_FUNCTION_INDEX])
+            switch (request.getData().at(SERVICE_OVERLOADING_FUNCTION_INDEX))
             {
             case serviceCall_NoParams:
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[SERVICE_NAME_INDEX] /* TODO negative response*/
+                    (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX) /* TODO negative response*/
                 );
                 response.responseType = POSITIVE_RESP;
                 break;
@@ -217,12 +215,13 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
             case serviceCall_1:
                 /* Copy function parameter values from the request */
                 
-                memcpy(&params, &request.data[3], sizeof(ServiceParameters_set1));
+
+                memcpy(&params, &request.getData().at(2), sizeof(ServiceParameters_set1));
 
                 /* call the service */
                 (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
-                    (DeviceServicesType)request.data[SERVICE_NAME_INDEX], /* TODO negative response*/
+                    (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
                     params
                 );
                 Serial.println("Setting state ");
@@ -236,11 +235,11 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
             Serial.println("Response sent.");
         }else 
         {
-            Serial.println("Device id corruption within received request " + String((int) request.requestId));
+            Serial.println("Device id corruption within received request " + String((int) request.getRequestId()));
         }
     }else 
     {
-       Serial.println("No mapping found for received DeviceID (" + String((int)request.targetDeviceId)+ ") in request " + String((int) request.requestId));
+       Serial.println("No mapping found for received DeviceID (" + String((int)request.getRequestDeviceId())+ ") in request " + String((int) request.getRequestId()));
     }
 
     sendResponse(response);    
@@ -250,23 +249,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
 
 
 
-bool DeviceProvider::receiveExtededDataRequest(RcRequest& request) {
-    
-    Serial.println("DeviceProvider//: receiveExtededDataRequest");
-    request.print();
 
-    RcResponseLong responseLong;
-    responseLong.responseId = request.requestId;
-    responseLong.responseType = EXTENDED_DATA_DOWNLOAD_RESP;
-    responseLong.requestType = request.type;
-    responseLong.responseNodeMAC = request.targetNodeMAC;    
-
-    for (int i = 0; i < sizeof(responseLong.data); ++i) {
-        responseLong.data[i] = 0;
-    }
-
-    requestResponseLong(responseLong);
-}
 
 ServiceRequestErrorCode DeviceProvider::service(
         uint8_t deviceId, 

@@ -66,8 +66,8 @@ void RemoteControlServer::cyclic(){
             /* we must notify the request sender that processing of the request is completed */
             /* TODO : return status relevant to message timeout */
             RcResponse emptyResponse;
-            emptyResponse.responseId = pendingRequestsQueue.front().requestId;
-            emptyResponse.requestType = pendingRequestsQueue.front().type;
+            emptyResponse.responseId = pendingRequestsQueue.front().getRequestId();
+            emptyResponse.requestType = pendingRequestsQueue.front().getRequestType();
             if(responseReceivers.at(emptyResponse.requestType)){
                 /* forward response in a callback to the request sender */
                 responseReceivers.at(emptyResponse.requestType)(emptyResponse);
@@ -501,8 +501,8 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
         /*PRINT*/
         //msg.serialPrintMessageUDP(msg);
         /* Does received response match currently processed request? */
-        if(pendingRequestsQueue.front().requestId == response.responseId &&
-           pendingRequestsQueue.front().type == response.requestType){
+        if(pendingRequestsQueue.front().getRequestId() == response.responseId &&
+           pendingRequestsQueue.front().getRequestType() == response.requestType){
             /* remove processed request as we received the response */
             pendingRequestsQueue.pop();
   
@@ -550,11 +550,11 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr){
 
 uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 {
-    newRequest.requestId = generateRequestId();
+    newRequest.setID(generateRequestId());
 
     /* Creating new request */
-    Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.requestId));
+    Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));
     pendingRequestsQueue.push(newRequest);
 
-    return newRequest.requestId;
+    return newRequest.getRequestId();
 }
