@@ -41,14 +41,6 @@ void OperatingSystem::init()
 
     calculateRuntimeNodeHash();
     DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
-
-
-    /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
-    NodeConfiguration currentConfig = 
-        std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if(currentConfig.nodeType == 255){
-        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
-    }
     
     // Initialize network settings such as 
     // WiFi network connection etc.
@@ -70,6 +62,25 @@ void OperatingSystem::init()
     }
 
     DeviceProvider::init();
+
+
+
+    /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
+    NodeConfiguration currentConfig = 
+        std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+    if( currentConfig.nodeType == 255 || /* invalid node type  */
+        !currentConfig.networkCredentialsAvailable || /* no network credentials */
+        (std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_COLLECTION)).size() == 0)){ /* no devices configured yet */
+        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
+
+
+        UserInterfaceNotification notif {
+            .title = "Service access granted",
+            .body = "Device received service mode access due to one of the following reasons: Invalid configuration / No WiFi configured / No local devices configured",
+            .type = UserInterfaceNotification::INFO
+        };
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+    }
     
 }
 
@@ -189,6 +200,7 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
             );
         hash += (uint8_t) configuration.isHttpServer;
         hash += (uint8_t) configuration.isRcServer;
+        hash += (uint8_t) configuration.isDefaultUserAdmin;
         hash += (uint8_t) configuration.networkCredentialsAvailable;
         hash += (uint8_t) configuration.nodeType;
         for(uint8_t idx = 0 ; idx < configuration.networkSSID.length(); idx ++)
@@ -235,10 +247,16 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 
 void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 {
+    NodeConfiguration currentConfig = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
     if(password == "admin"){
         changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
-    }else if(password == "user"){
-        changeSecurityAccessLevel(e_ACCESS_LEVEL_AUTH_USER);
+    }else if(password == currentConfig.panelPassword){ /* check is password for the user matches */
+        SecurityAccessLevelType userRights = e_ACCESS_LEVEL_AUTH_USER;
+
+        if(currentConfig.isDefaultUserAdmin){ /* verify if default user can have admin rights */
+            userRights = e_ACCESS_LEVEL_SERVICE_MODE;
+        }
+        changeSecurityAccessLevel(userRights);
     }else {
         /* notification */
         UserInterfaceNotification notif{

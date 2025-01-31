@@ -20,10 +20,12 @@ enum RequestProcessingState {
 typedef struct {
     bool isHttpServer = 0;
     bool isRcServer = 0;
+    bool isDefaultUserAdmin = 0;
     bool networkCredentialsAvailable = false;
     uint8_t nodeType = 0;
     String networkSSID = "";
     String networkPassword = "";
+    String panelPassword = "";
 }NodeConfiguration;
 
 /* NVM datablocks identifiers */

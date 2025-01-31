@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Strip Color Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .led-strip-container {
+            width: 300px;
+            background-color: #ddeff7;
+            border: 1px solid #b0c8d8;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .led-strip-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2b3a47;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .led-strip {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .led {
+            height: 20px;
+            border-radius: 4px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Pop-up container */
+        .color-picker-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            border: 1px solid #b0c8d8;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .popup-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9;
+            display: none;
+        }
+
+        .color-input {
+            margin: 10px 0;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .popup-buttons button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2b3a47;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .popup-buttons button:hover {
+            background-color: #1a262e;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Backdrop for popup -->
+    <div class="popup-backdrop"></div>
+
+    <!-- Popup -->
+    <div class="color-picker-popup" id="colorPickerPopup">
+        <h3>Pick a Color</h3>
+        <input type="color" id="colorInput" class="color-input" />
+        <div class="popup-buttons">
+            <button id="confirmColorButton">Confirm</button>
+            <button id="cancelColorButton">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Widget: LED Strip -->
+    <div class="led-strip-container">
+        <div class="led-strip-header">LED Strip</div>
+        <div id="ledStrip" class="led-strip"></div>
+    </div>
+
+    <script>
+        const ledContainerWidth = 300; // Width of LED container
+        const ledCount = 50; // Number of LEDs
+        const ledColors = Array(ledCount).fill("#00FF00"); // Initial color setup
+
+        const ledStrip = document.getElementById("ledStrip");
+        const colorPickerPopup = document.getElementById("colorPickerPopup");
+        const backdrop = document.querySelector(".popup-backdrop");
+        const colorInput = document.getElementById("colorInput");
+        const confirmButton = document.getElementById("confirmColorButton");
+        const cancelButton = document.getElementById("cancelColorButton");
+
+        let selectedLedIndex = null;
+
+        // Create LEDs
+        function createLedStrip() {
+            ledStrip.innerHTML = "";
+
+            const baseWidth = Math.floor(ledContainerWidth / ledCount);
+            const remainingPixels = ledContainerWidth % ledCount;
+
+            for (let i = 0; i < ledCount; i++) {
+                const led = document.createElement("div");
+                led.className = "led";
+
+                // Krańcowe diody z dopasowaną szerokością
+                if (i === 0 || i === ledCount - 1) {
+                    led.style.width = `${baseWidth + (remainingPixels > 0 ? 1 : 0)}px`;
+                } else {
+                    led.style.width = `${baseWidth}px`;
+                }
+
+                // Set initial color
+                led.style.backgroundColor = ledColors[i];
+
+                // Add click listener
+                led.addEventListener("click", () => openColorPicker(i));
+
+                ledStrip.appendChild(led);
+            }
+        }
+
+        // Open color picker popup
+        function openColorPicker(index) {
+            selectedLedIndex = index;
+            colorInput.value = rgbToHex(ledColors[index]);
+            colorPickerPopup.style.display = "flex";
+            backdrop.style.display = "block";
+        }
+
+        // Close popup
+        function closePopup() {
+            colorPickerPopup.style.display = "none";
+            backdrop.style.display = "none";
+        }
+
+        // Convert RGB to HEX
+        function rgbToHex(rgb) {
+            return rgb;
+        }
+
+        // Confirm color selection
+        confirmButton.addEventListener("click", () => {
+            const newColor = colorInput.value;
+            ledColors[selectedLedIndex] = newColor;
+            createLedStrip(); // Update LED strip with new color
+            closePopup();
+
+            // Redirect to URL with GET parameters
+            const url = `http://example.com/setColor?led=${selectedLedIndex}&color=${encodeURIComponent(
+                newColor
+            )}`;
+            window.location.href = url;
+        });
+
+        // Cancel color selection
+        cancelButton.addEventListener("click", closePopup);
+
+        // Initialize LEDs
+        createLedStrip();
+    </script>
+</body>
+
+</html>

@@ -8,10 +8,12 @@ let isNotificationPollingActive = 1;\
     function applySettings() {\
         var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;\
         var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;\
+        var isUserAdmin = document.querySelector('select[name=\"isUserAsAdmin\"]').value;\
         var nodeType = document.querySelector('input[name=\"nodetype\"]').value;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
-        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&nodeType=${encodeURIComponent(nodeType)}&end`;\
+        var PanelPassword = document.querySelector('input[name=\"UserPassword\"]').value;\
+        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&isUserAdmin=${encodeURIComponent(isUserAdmin)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&PanelPassword=${encodeURIComponent(PanelPassword)}&nodeType=${encodeURIComponent(nodeType)}&end`;\
         window.location.href = url;\
     }\
     function goToDevicesManagement() {\

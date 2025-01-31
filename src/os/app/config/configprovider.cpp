@@ -6,7 +6,7 @@
 
 
 
-ConfigData ConfigProvider::configRamMirror = {255, 0, 0, 255, "\0", "\0"};
+ConfigData ConfigProvider::configRamMirror = {255, 0, 0, 1, 255, "\0", "\0", "\0"};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[NUMBER_OF_PERSISTENT_DATABLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
@@ -59,12 +59,13 @@ void ConfigProvider::init()
 
     }else 
     {
-        std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-            DataContainer::getSignalValue(CBK_ERROR_REPORT)
-            )(
-                ERR_MON_INVALID_NVM_DATA,
-                "Unable to restore NVM data"
-            );
+        /* error unused anymore */
+        // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
+        //     DataContainer::getSignalValue(CBK_ERROR_REPORT)
+        //     )(
+        //         ERR_MON_INVALID_NVM_DATA,
+        //         "Unable to restore NVM data"
+        //     );
 
     
         Serial.println("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
@@ -72,8 +73,11 @@ void ConfigProvider::init()
         // Master device as default;
         emptyConfiguration.isHttpServer = true;
         emptyConfiguration.isRcServer = true;
+        emptyConfiguration.isDefaultUserAdmin = true;
         emptyConfiguration.networkCredentialsAvailable = false;
         emptyConfiguration.nodeType = 255;
+
+        emptyConfiguration.panelPassword = "user";
         
         /* Write DEFAULT configuration to DataContainer */
         // Obsolete signal to be removed
@@ -86,14 +90,9 @@ void ConfigProvider::init()
         /* notification */
         UserInterfaceNotification notif{
             .title = "Configuration problem",
-            .body = "Looks like this device was never configured or there was some problem during configuration restore process.",
+            .body = "Looks like this device was never configured or there was some problem during configuration restore process. Please go to 'Settings' and create device configuration.",
             .type = UserInterfaceNotification::WARNING
         };
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-
-        notif.title = "Missing WiFi credentials";
-        notif.body = "To connect to the WiFi network, navigate to 'Settings', enter network name and password.";
-        notif.type = UserInterfaceNotification::INFO;
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
 
 
@@ -128,8 +127,10 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.isHttpServer = configRamMirror.isHttpServer;
     validConfiguration.isRcServer = configRamMirror.isRcServer;
     validConfiguration.networkSSID = String(configRamMirror.networkSSID);
+    validConfiguration.isDefaultUserAdmin = configRamMirror.isDefaultUserAdmin;
     validConfiguration.networkPassword = String(configRamMirror.networkPassword);
     validConfiguration.nodeType = configRamMirror.nodeType;
+    validConfiguration.panelPassword = String(configRamMirror.panelPassword);
 
     if(validConfiguration.networkPassword.length() > 0  && validConfiguration.networkSSID.length() > 0){
         validConfiguration.networkCredentialsAvailable = true;
@@ -161,17 +162,19 @@ void ConfigProvider::setConfigViaString(String& configString)
 
     /* Check if device is unlocked that config can be modified */
     if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
-        String str_isHttpServer, str_isRcServer, str_Ssid, str_Passwd, str_nodeType;
+        String str_isHttpServer, str_isRcServer, str_isUserAdmin, str_Ssid, str_Passwd, str_PanelPassword, str_nodeType;
         MatchState matcher;
         matcher.Target(const_cast<char*>(configString.c_str()));
         /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
         Serial.println("New config received :");
         const String part1 = "apply?isHTTPServer=";
         const String part2 = "&isRCServer=";
-        const String part3 = "&SSID=";
-        const String part4 = "&Password=";
-        const String part5 = "&nodeType=";
-        const String part6 = "&end";
+        const String part3 = "&isUserAdmin=";
+        const String part4 = "&SSID=";
+        const String part5 = "&Password=";
+        const String part6 = "&PanelPassword=";
+        const String part7 = "&nodeType=";
+        const String part8 = "&end";
 
         char searchResult = matcher.Match(part2.c_str());
         uint16_t readStartIndex = 0;
@@ -202,15 +205,29 @@ void ConfigProvider::setConfigViaString(String& configString)
             if(searchResult > 0)
             {
                 // Read RC server config
+                str_isUserAdmin = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("str_Ssid : " + str_Ssid);
+            }
+
+
+            // Move start read index by part3 length
+            readStartIndex = matcher.MatchStart + part4.length();
+            // Search for next value
+            searchResult = matcher.Match(part5.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
                 str_Ssid = configString.substring(readStartIndex, matcher.MatchStart);
                 str_Ssid.replace("%20", " ");
                 //Serial.println("str_Ssid : " + str_Ssid);
             }
 
+
+
             // Move start read index by part4 length
-            readStartIndex = matcher.MatchStart + part4.length();
+            readStartIndex = matcher.MatchStart + part5.length();
             // Search for next value
-            searchResult = matcher.Match(part5.c_str());
+            searchResult = matcher.Match(part6.c_str());
             if(searchResult > 0)
             {
                 // Read RC server config
@@ -220,9 +237,21 @@ void ConfigProvider::setConfigViaString(String& configString)
 
 
             // Move start read index by part4 length
-            readStartIndex = matcher.MatchStart + part5.length();
+            readStartIndex = matcher.MatchStart + part6.length();
             // Search for next value
-            searchResult = matcher.Match(part6.c_str());
+            searchResult = matcher.Match(part7.c_str());
+            if(searchResult > 0)
+            {
+                // Read RC server config
+                str_PanelPassword = configString.substring(readStartIndex, matcher.MatchStart);
+                //Serial.println("////////str_nodeType : " + str_nodeType);
+            }
+
+
+            // Move start read index by part4 length
+            readStartIndex = matcher.MatchStart + part7.length();
+            // Search for next value
+            searchResult = matcher.Match(part8.c_str());
             if(searchResult > 0)
             {
                 // Read RC server config
@@ -236,18 +265,22 @@ void ConfigProvider::setConfigViaString(String& configString)
             if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
                 configRamMirror.isHttpServer = str_isHttpServer == "yes" ? 1 : 0;
                 configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
+                configRamMirror.isDefaultUserAdmin = str_isUserAdmin == "yes" ? 1 : 0;
                 configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
 
                 Serial.println("String values:");
                 Serial.println("str_isHttpServer " + str_isHttpServer) ;
                 Serial.println("str_isRcServer " + str_isRcServer) ;
+                Serial.println("str_IsUserAdmin " + str_isUserAdmin) ;
                 Serial.println("str_Ssid " + str_Ssid) ;
                 Serial.println("str_Passwd " + str_Passwd) ;
+                Serial.println("str_PanelPasswd " + str_PanelPassword) ;
                 Serial.println("str_nodeType " + str_nodeType) ;
             }
 
             configRamMirror.setSSID(str_Ssid);
             configRamMirror.setPassword(str_Passwd);
+            configRamMirror.setPanelPassword(str_PanelPassword);
 
             Serial.println("Applying following configuration :");
             configRamMirror.serialPrint();

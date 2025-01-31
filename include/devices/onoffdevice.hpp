@@ -27,6 +27,7 @@ private:
     
 public:
     OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId);
+    OnOffDevice(DeviceDescription& description, uint8_t pin);
 
     void on();
     void off();

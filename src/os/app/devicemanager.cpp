@@ -73,8 +73,8 @@ void DeviceManager::init()
 
             free(configBlock);
 
-
-            if(numberOfSuccessfullyRetrievedDevices == 0){
+            /* push this notification only when network is available and there are no devices configured */
+            if(std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).networkCredentialsAvailable && numberOfSuccessfullyRetrievedDevices == 0){
                 UserInterfaceNotification notif;
                 notif.title = "Missing GPIO setup";
                 notif.body = "Looks like there are no GPIO devices configured yet. Navigate to 'Settings -> Devices Management' to add the device.";

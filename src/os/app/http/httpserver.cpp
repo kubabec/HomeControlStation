@@ -826,6 +826,19 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       client.println(noSelected);
     }
     client.println("</select></label>");
+
+    /* Does user have admin rights to make configuration changes */
+    client.println("<label>User is admin:<select name=\"isUserAsAdmin\">");
+    if(currentConfig.isDefaultUserAdmin)
+    {
+      client.println(yesSelected);
+      client.println(noNotSelected);
+    }else
+    {
+      client.println(yesNotSelected);
+      client.println(noSelected);
+    }
+    client.println("</select></label>");
     
     /* Device type  */
     client.println("<label>Type:<input value=\"");
@@ -847,9 +860,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"Password\"></label>");
 
   /* Network Password */
-  client.println("<label>Panel Password:<input value=\"PWDHERE");
-  //client.println(currentConfig.networkPassword);
-  client.println("\" type=\"text\" name=\"Password2\"></label>");
+  client.println("<label>User Password:<input value=\"");
+  client.println(currentConfig.panelPassword);
+  client.println("\" type=\"text\" name=\"UserPassword\"></label>");
 
   /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");

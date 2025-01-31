@@ -102,7 +102,6 @@ private:
     uint8_t DeviceIdentifier = 0xFF;
     
 public:
-
     virtual void init() = 0; //funkcje ktore nazucaja potomka koniecznosc ich implementacji
     virtual void cyclic() = 0;
     virtual DeviceDescription getDeviceDescription() = 0;

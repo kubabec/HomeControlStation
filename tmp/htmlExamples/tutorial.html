@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlight Shadow Effect</title>
+    <style>
+        /* Klasa do efektu cienia */
+        .highlight-shadow {
+            position: relative;
+            z-index: 1;
+            animation: shadow-animation 1.5s infinite;
+        }
+
+        /* Animacja */
+        @keyframes shadow-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(173, 255, 47, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 15px 10px rgba(173, 255, 47, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(173, 255, 47, 0.7);
+            }
+        }
+
+        /* Styl dla lepszej wizualizacji */
+        .tutorial-box {
+            width: 200px;
+            padding: 10px;
+            margin: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="tutorial-box highlight-shadow">
+        Kliknij tutaj, aby kontynuować!
+    </div>
+
+    <div class="info-box">
+        <p>Ten element jest podświetlony dzięki efektowi animowanego cienia, który rozprasza się na zewnątrz. Dodaj klasę <code>highlight-shadow</code> do dowolnego elementu, aby uzyskać ten efekt.</p>
+    </div>
+</body>
+</html>

@@ -13,6 +13,15 @@ OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_
     //brightnessLevel = 50;
 }
 
+
+OnOffDevice::OnOffDevice(DeviceDescription& description, uint8_t pin){
+    deviceName = description.deviceName;
+    deviceId = description.deviceId;
+    roomId = description.deviceId;
+
+    pinNumber = pin;
+}
+
 void OnOffDevice::on() {
     isOn = true;
     digitalWrite(pinNumber,HIGH);
