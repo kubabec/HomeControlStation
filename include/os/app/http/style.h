@@ -70,7 +70,8 @@ background: linear-gradient(135deg, #e0f7ff, #c0e3ff);\
 outline: none;\
 }\
 .button-link, .button {\
-margin-top: 20px;\
+flex: 1;\
+margin-top: 10px;\
 margin-bottom: 5px;\
 padding: 10px 20px;\
 background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
@@ -84,6 +85,13 @@ cursor: pointer;\
 transition: background 0.3s;\
 font-family: inherit;\
 }\
+.button-container {\
+            display: flex;\
+            flex-wrap: wrap;\
+            justify-content: center;\
+            gap: 10px;\
+            width:100%;\
+        }\
 .button-link:hover, .button:hover {\
 background: linear-gradient(135deg, #5aa9d4, #337bbf);\
 }\
@@ -130,56 +138,6 @@ to {\
 opacity: 1;\
 transform: translateY(0);\
 }\
-}\
-.add-button-wrapper {\
-display: flex;\
-justify-content: center;\
-width: 100%;\
-margin-bottom: 20px;\
-}\
-.add-button {\
-display: flex;\
-justify-content: center;\
-align-items: center;\
-width: 50px;\
-height: 50px;\
-background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
-border: none;\
-border-radius: 50%;\
-color: white;\
-font-size: 24px;\
-cursor: pointer;\
-transition: background 0.3s;\
-font-family: inherit;\
-}\
-.add-button:hover {\
-background: linear-gradient(135deg, #5aa9d4, #337bbf);\
-}\
-.plus-icon {\
-display: block;\
-width: 20px;\
-height: 20px;\
-position: relative;\
-}\
-.plus-icon::before,\
-.plus-icon::after {\
-content: '';\
-position: absolute;\
-background-color: white;\
-}\
-.plus-icon::before {\
-width: 2px;\
-height: 100%;\
-left: 50%;\
-top: 0;\
-transform: translateX(-50%);\
-}\
-.plus-icon::after {\
-width: 100%;\
-height: 2px;\
-top: 50%;\
-left: 0;\
-transform: translateY(-50%);\
 }\
 .device-container {\
 display: flex;\
@@ -444,7 +402,6 @@ box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);\
 font-size: 18px;\
 font-weight: bold;\
 color: #2b3a47;\
-margin-bottom: 10px;\
 text-transform: uppercase;\
 letter-spacing: 1px;\
 border-bottom: 2px solid #7aaedb;\
@@ -454,6 +411,7 @@ padding-bottom: 5px;\
 display: flex;\
 flex-direction: column;\
 align-items: center;\
+margin-top:5px;\
 }\
 \
 .color-input {\
@@ -476,7 +434,7 @@ width: 250px;\
 height: 8px;\
 border-radius: 8px;\
 background-color:0xffffff;\
-margin-bottom: 10px;\
+margin-bottom: 5px;\
 border: 1px solid #ccc;\
 box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);\
 transition: all 0.3s ease;\
@@ -627,6 +585,7 @@ transform: rotate(360deg);\
     display: flex;\
     flex-direction: column;\
     align: left;\
+    box-shadow:1px 2px 6px lightgrey;\
 }\
 \
 .notification-title {\

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Gauges</title>
+    <style>
+        .temperature-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+        .temperature-widget {
+            text-align: center;
+            margin: 15px;
+            position: relative;
+        }
+        .temperature-widget canvas {
+            width: 150px;
+            height: 150px;
+        }
+        .temperature-value {
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            color: #e74c3c;
+            margin-top: -40px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="temperature-container">
+        <div id="gauge2" class="temperature-widget">
+            <canvas style="max-width: 100px;"></canvas>
+            <div class="temperature-value">20°C</div>
+        </div>
+    </div>
+
+    <script>
+        const gaugeRegistry = {};
+
+        class TemperatureGauge {
+            constructor(containerId, minTemp = -10, maxTemp = 40) {
+                this.container = document.getElementById(containerId);
+                this.canvas = this.container.querySelector('canvas');
+                this.valueDisplay = this.container.querySelector('.temperature-value');
+                this.minTemp = minTemp;
+                this.maxTemp = maxTemp;
+                this.currentTemp = minTemp;
+                this.ctx = this.canvas.getContext('2d');
+                this.initCanvas();
+                this.draw();
+            }
+
+            initCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const width = this.canvas.width / (window.devicePixelRatio || 1);
+                const height = this.canvas.height / (window.devicePixelRatio || 1);
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const radius = Math.min(width, height) * 0.4;
+
+                ctx.clearRect(0, 0, width, height);
+
+                let gradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
+                gradient.addColorStop(0, 'blue');
+                gradient.addColorStop(0.35, 'orange');
+                gradient.addColorStop(1, 'red');
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, -Math.PI * 1.25, Math.PI * 0.25);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 8;
+                ctx.stroke();
+
+                const scaleRange = this.maxTemp - this.minTemp;
+                const angleRange = 1.5 * Math.PI;
+                const tempAngle = -Math.PI * 0.75 + ((this.currentTemp - this.minTemp) / scaleRange) * angleRange;
+                const arrowLength = radius * 0.8;
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(tempAngle);
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -arrowLength);
+                ctx.strokeStyle = '#e74c3c';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(-3, -arrowLength + 10);
+                ctx.lineTo(0, -arrowLength);
+                ctx.lineTo(3, -arrowLength + 10);
+                ctx.fillStyle = '#e74c3c';
+                ctx.fill();
+
+                ctx.restore();
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+
+                this.drawLabels(ctx, centerX, centerY, radius);
+            }
+
+            drawLabels(ctx, centerX, centerY, radius) {
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.fillText('-10°', centerX - radius, centerY + 37);
+                ctx.fillText('40°', centerX + radius -2, centerY + 37);
+                ctx.fillText('15°', centerX+2, centerY - radius - 8);
+            }
+
+            update(temp) {
+                this.currentTemp = Math.max(this.minTemp, Math.min(this.maxTemp, temp));
+                this.valueDisplay.textContent = `${this.currentTemp}°C`;
+                this.draw();
+            }
+        }
+
+        function createGauge(containerId, minTemp = -10, maxTemp = 40) {
+            gaugeRegistry[containerId] = new TemperatureGauge(containerId, minTemp, maxTemp);
+        }
+
+        function setTemperature(containerId, temperature) {
+            if (gaugeRegistry[containerId]) {
+                gaugeRegistry[containerId].update(temperature);
+            } else {
+                console.error(`Gauge with ID ${containerId} not found`);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            createGauge('gauge2');
+            setTemperature('gauge2', 0);
+        });
+    </script>
+</body>
+</html>
