@@ -111,7 +111,7 @@ let isNotificationPollingActive = 1;\
 \
             var data43 =  document.getElementById('extra-43-' + i).value;\
             var data44 =  document.getElementById('extra-44-' + i).value;\
-            var extraValue = '';\
+            var extraValue = 0;\
             if(dataType == 43) { extraValue = data43;}\
             if(dataType == 44) { extraValue = data44;}\
             if(extraValue < 10) { extraValue = '0' + extraValue; }\

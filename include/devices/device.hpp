@@ -40,7 +40,8 @@ typedef enum
 typedef enum {
     type_ONOFFDEVICE = 43,
     type_LED_STRIP,
-    type_TEMP_SENSOR
+    type_TEMP_SENSOR,
+    type_DEVICE_TYPE_LAST = type_TEMP_SENSOR
 }DevType;
 
 typedef struct

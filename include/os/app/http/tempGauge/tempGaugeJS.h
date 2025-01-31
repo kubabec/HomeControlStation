@@ -5,6 +5,10 @@
 const char* tempGaugeJS = "\
 <script>\
         const gaugeRegistry = {};\
+        var listOfTempWidgets = [];\
+        var listOfTempValues = [];\
+        var listOfHumidWidgets = [];\
+        var listOfHumidValues = [];\
 \
         class TemperatureGauge {\
             constructor(containerId, minTemp = -10, maxTemp = 40) {\

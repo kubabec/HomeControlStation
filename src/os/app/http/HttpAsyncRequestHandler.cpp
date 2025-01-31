@@ -210,6 +210,13 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
             deviceInThisRoom->customBytes[4]);
         jsonResponse +="\"avgColor\":\"#"+rgbColor+"\",";
       }
+
+      if(deviceInThisRoom->deviceType == type_TEMP_SENSOR){
+        float temperature = 0.f;
+        memcpy(&temperature, &deviceInThisRoom->customBytes[3], sizeof(temperature));
+        jsonResponse +="\"temp\":"+ String(temperature)+",";
+        jsonResponse +="\"humid\":"+ String((int)deviceInThisRoom->customBytes[2])+",";
+      }
       
       jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]);
       

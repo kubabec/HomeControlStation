@@ -1,6 +1,7 @@
 #ifndef CONFIG_SLOT_DEFINITION_H
 #define CONFIG_SLOT_DEFINITION_H
 #include <Arduino.h>
+
 /* Description of single configuration NVM slot */
 typedef struct 
 {
@@ -54,7 +55,7 @@ typedef struct
 
     bool isValid()
     {
-        return (deviceType == 43 || deviceType == 44);
+        return (deviceType >= 43 || deviceType <= 45);
     }
 
     static uint8_t getSize()

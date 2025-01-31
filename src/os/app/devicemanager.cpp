@@ -5,6 +5,9 @@
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
+std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
+
+
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
 
@@ -96,13 +99,16 @@ void DeviceManager::init()
         /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
         for(OnOffDevice& device : vecOnOffDevices) 
         {
-            
-            devices.push_back(&device); //wrzucam pointer na device onOffDevice
-                    
+            devices.push_back(&device); //wrzucam pointer na device onOffDevice         
         }
 
         /* Add LED strips to common devices vector*/
         for(LedWS1228bDeviceType& device: ledws2812bDevices){
+            devices.push_back(&device);
+        }
+
+        /* Add temperature sensors to common devices vector*/
+        for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
             devices.push_back(&device);
         }
     }
@@ -162,11 +168,19 @@ void DeviceManager::init()
 
 void DeviceManager::cyclic()
 {
+    static long lastInternalDescriptionUpdateTime = 0; 
+
     for(auto device : devices) 
     {
         device->cyclic();
         
     }
+
+    if(millis() - lastInternalDescriptionUpdateTime > 5000){
+        updateDeviceDescriptionSignal();
+        lastInternalDescriptionUpdateTime = millis();
+    }
+
 }
 
 
@@ -219,6 +233,10 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 case e_LED_STRIP :
                     /* create WS2812b instance by forwarding NVM data to it */
                     ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
+                break;
+
+                case e_TEMP_SENSOR:
+                    tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                 break;
 
                 default:break;
@@ -345,6 +363,7 @@ void DeviceManager::setLocalConfigViaString(String& config)
                 DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
                 if(slotData.isValid())
                 {
+                    //Serial.println("Config valid!");
                     atLeastOneValid = true;
                     //pinConfigSlotsRamMirror.slots[i] = slotData;
                     temporaryConfigurationSet.slots[i] = slotData;
@@ -445,6 +464,9 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
         /* Parse type */
         uint8_t deviceType = confStr.substring(0, 2).toInt();
         newConfig.deviceType = deviceType;
+        // Serial.println();
+        // Serial.println("DUPADUPA: " + String((int)deviceType));
+        // Serial.println();
         confStr = confStr.substring(2);
 
         /* Parse PIN */

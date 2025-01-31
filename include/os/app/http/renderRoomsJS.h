@@ -14,7 +14,7 @@ function renderRooms(data) {\
 \
         const roomHeader = document.createElement('div');\
         roomHeader.className = 'room-header';\
-        roomHeader.textContent = `Room: ${roomId}`;\
+        roomHeader.textContent = `${roomId}`;\
         roomContainer.appendChild(roomHeader);\
         devices.forEach(device => {\
             const deviceContainer = document.createElement('div');\
@@ -101,7 +101,6 @@ function renderRooms(data) {\
                 const colorDisplay = document.createElement('div');\
                 colorDisplay.className = `color-display ${device.status}`;\
                 colorDisplay.style.backgroundColor = device.avgColor;\
-                console.log(hexToRgb(device.avgColor));\
                 colorPicker.appendChild(colorDisplay);\
                 deviceContainer.appendChild(colorPicker);\
 \
@@ -140,6 +139,40 @@ function renderRooms(data) {\
                 slider.id = `brightnessSlider${device.id}`;\
                 deviceContainer.appendChild(slider);\
             \
+            }else if(device.devType == 45){\
+                const loadingOverlay = document.createElement('div');\
+                loadingOverlay.className = 'loading-overlay';\
+                loadingOverlay.style.display = 'none';\
+                const spinner = document.createElement('div');\
+                spinner.className = 'spinner';\
+                const loadingText = document.createElement('div');\
+                loadingText.className = 'loading-text';\
+                loadingText.textContent = 'Loading...';\
+                loadingOverlay.appendChild(spinner);\
+                loadingOverlay.appendChild(loadingText);\
+                deviceContainer.appendChild(loadingOverlay);\
+                \
+                const header = document.createElement('div');\
+                header.className = 'header';\
+                header.textContent = device.name;\
+                deviceContainer.appendChild(header);\
+    \
+                const statusLight = document.createElement('div');\
+                statusLight.className = `status-light ${device.status}`;\
+                statusLight.id = `statusLight${device.id}`;\
+                deviceContainer.appendChild(statusLight);\
+\
+                const temperatureContainer = document.createElement('div');\
+                temperatureContainer.className = `temperature-container`;\
+                temperatureContainer.innerHTML = `<div id=\"gauge${device.id}\" class=\"temperature-widget\"><canvas style=\"max-width: 100px;\"></canvas><div class=\"temperature-value\">20°C</div></div><div id=\"humidity${device.id}\" class=\"humidity-widget\"><canvas></canvas><div class=\"value-display humidity-value\">50%</div></div>`;\
+                deviceContainer.appendChild(temperatureContainer);\
+\
+                listOfTempWidgets.push(`gauge${device.id}`);\
+                listOfTempValues.push(device.temp);\
+                listOfHumidWidgets.push(`humidity${device.id}`);\
+                listOfHumidValues.push(device.humid);\
+\
+                \
             }else{\
                 const header = document.createElement('div');\
                 header.className = 'header';\
@@ -152,6 +185,16 @@ function renderRooms(data) {\
 \
         roomsContainer.appendChild(roomContainer);\
     }\
+    for (var i = 0, l = listOfTempWidgets.length; i < l; ++i) {\
+        createGauge(listOfTempWidgets[i].toString());\
+        setTemperature(listOfTempWidgets[i].toString(), listOfTempValues[i]);\
+        createHumidGauge(listOfHumidWidgets[i].toString());\
+        setHumidity(listOfHumidWidgets[i].toString(), listOfHumidValues[i]);\
+    }\
+    listOfTempWidgets = [];\
+    listOfHumidWidgets = [];\
+    listOfHumidValues = [];\
+    listOfTempValues = [];\
 }\
 </script>";
 

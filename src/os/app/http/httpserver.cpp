@@ -531,9 +531,9 @@ void HomeLightHttpServer::handleClientRequest()
             
 
               client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
-              // client.println("<script>\
-              //   setInterval(getNotifications, 10000);\
-              // </script>");
+              client.println("<script>\
+                setInterval(getNotifications, 10000);\
+              </script>");
 
               client.println("</div></body></html>");            
               client.println();
@@ -711,21 +711,31 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Type: <select onchange=\"showExtraFields(this, 'device-"+String((int)slotNumber)+"');\" id=\"type"+String(slotNumber)+"\" >");
 
-  if(slot.deviceType == 43){
+  if(slot.deviceType == type_ONOFFDEVICE){
     client.println("<option value=\"43\" selected>On/Off Device</option>");
   }else
   {
     client.println("<option value=\"43\">On/Off Device</option>");
   }
   
-  if(slot.deviceType == 44){
+  if(slot.deviceType == type_LED_STRIP){
     client.println("<option value=\"44\" selected>LED strip</option>");
   }else
   {
     client.println("<option value=\"44\">LED strip</option>");
   }
 
-  if(slot.deviceType != 43 && slot.deviceType != 44){
+  if(slot.deviceType == type_TEMP_SENSOR){
+    client.println("<option value=\"45\" selected>Temperature sensor</option>");
+  }else
+  {
+    client.println("<option value=\"45\">Temperature sensor</option>");
+  }
+
+  if(
+    slot.deviceType != type_ONOFFDEVICE &&
+    slot.deviceType != type_LED_STRIP && 
+    slot.deviceType != type_TEMP_SENSOR){
     client.println("<option value=\"255\" selected>UNKNOWN</option>");
   }else {
     client.println("<option value=\"255\">UNKNOWN</option>");
@@ -1083,32 +1093,32 @@ void printTestLedStrip(WiFiClient& client)
   // client.println("</div>");
 
 
-  client.println("<div class=\"container\">"); 
-  client.println("<div class=\"header\">TemperatureSensor</div><div class=\"status-light on\"></div>");
-  client.println("<div class=\"temperature-container\">\
-        <div id=\"gauge2\" class=\"temperature-widget\">\
-            <canvas style=\"max-width: 100px;\"></canvas>\
-            <div class=\"temperature-value\">20°C</div>\
-        </div>\
-        <div id=\"humidity\" class=\"humidity-widget\">\
-            <canvas></canvas>\
-            <div class=\"value-display humidity-value\">50%</div>\
-        </div>\
-    </div>");
+  // client.println("<div class=\"container\">"); 
+  // client.println("<div class=\"header\">TemperatureSensor</div><div class=\"status-light on\"></div>");
+  // client.println("<div class=\"temperature-container\">\
+  //       <div id=\"gauge2\" class=\"temperature-widget\">\
+  //           <canvas style=\"max-width: 100px;\"></canvas>\
+  //           <div class=\"temperature-value\">20°C</div>\
+  //       </div>\
+  //       <div id=\"humidity\" class=\"humidity-widget\">\
+  //           <canvas></canvas>\
+  //           <div class=\"value-display humidity-value\">50%</div>\
+  //       </div>\
+  //   </div>");
 
-  client.println("<div class=\"button-container\"><button class=\"button\" href=\"/test\">. . . </button></div>");
+  // client.println("<div class=\"button-container\"><button class=\"button\" href=\"/test\">. . . </button></div>");
 
 
-  client.println("<script>\
-     window.addEventListener('DOMContentLoaded', () => {\
-            createGauge('gauge2');\
-            setTemperature('gauge2', 0);\
-            createHumidGauge('humidity');\
-            setHumidity('humidity', 20);\
-        });\
-    </script>");
+  // client.println("<script>\
+  //    window.addEventListener('DOMContentLoaded', () => {\
+  //           createGauge('gauge2');\
+  //           setTemperature('gauge2', 0);\
+  //           createHumidGauge('humidity');\
+  //           setHumidity('humidity', 20);\
+  //       });\
+  //   </script>");
 
-  client.println("</div>");
+  // client.println("</div>");
 
   
 
@@ -1186,11 +1196,13 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         fetchData();\
         getNotifications();\
 \
+        setInterval(fetchData, 2500);\
+\
 \
 \
     </script>");
 
-            // setInterval(fetchData, 2500);\
+            // 
 
 }
 
@@ -1445,7 +1457,11 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
       curerntProcessingIndex += processedBytes;
 
       if(nameLength > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
-        roomNamesMapping.insert({roomId, name});
+        if (roomNamesMapping.find(roomId) != roomNamesMapping.end()) {
+          roomNamesMapping[roomId] = name;
+        }else {
+          roomNamesMapping.insert({roomId, name});
+        }
       }
 
       configData = configData.substring(processedBytes);
