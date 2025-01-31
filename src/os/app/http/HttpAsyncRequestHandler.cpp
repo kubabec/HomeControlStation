@@ -165,6 +165,16 @@ void HTTPAsyncRequestHandler::processRequest()
     }
 }
 
+String getHexColor(uint8_t r, uint8_t g, uint8_t b){
+    String color = "";
+    r < 16 ? color += "0" + String((int)r, HEX) : color += String((int)r, HEX) ;
+    g < 16 ? color += "0" + String((int)g, HEX) : color += String((int)g, HEX) ;
+    b < 16 ? color += "0" + String((int)b, HEX) : color += String((int)b, HEX) ;
+
+    return color;
+}
+
+
 void HTTPAsyncRequestHandler::createMainPageContentJson()
 { 
 //   Serial.println("HTTPAsyncRequestHandler: Starting JSON response preparation ...");
@@ -183,14 +193,28 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
     for(auto& deviceInThisRoom : room.second){
       jsonResponse +="{";
       jsonResponse +="\"id\":" + String((int)deviceInThisRoom->deviceId) + ",";
+      jsonResponse +="\"devType\":" + String((int)deviceInThisRoom->deviceType) + ",";
       jsonResponse +="\"name\":\"" + deviceInThisRoom->deviceName + "\",";
       if(deviceInThisRoom->isEnabled){
         jsonResponse +="\"status\":\"on\",";
       }else {
         jsonResponse +="\"status\":\"off\",";
       }
+
+      /*custom for types */
       jsonResponse +="\"hasBrightness\":" + String((int)deviceInThisRoom->customBytes[0]) + ",";
+      if(deviceInThisRoom->deviceType == type_LED_STRIP){
+        String rgbColor = getHexColor(
+            deviceInThisRoom->customBytes[2],
+            deviceInThisRoom->customBytes[3],
+            deviceInThisRoom->customBytes[4]);
+        jsonResponse +="\"avgColor\":\"#"+rgbColor+"\",";
+      }
+      
       jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]);
+      
+      
+
       if(deviceIteratorCount < room.second.size()){
         jsonResponse +="},";
       }else {

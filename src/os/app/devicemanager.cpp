@@ -4,6 +4,7 @@
 
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
+std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
 
@@ -90,18 +91,24 @@ void DeviceManager::init()
         Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
 
-    /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
-    for(OnOffDevice& device : vecOnOffDevices) 
+    /* devices merging after NVM restoration */
     {
-        
-        devices.push_back(&device); //wrzucam pointer na device onOffDevice
-                
-    }
+        /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
+        for(OnOffDevice& device : vecOnOffDevices) 
+        {
+            
+            devices.push_back(&device); //wrzucam pointer na device onOffDevice
+                    
+        }
 
+        /* Add LED strips to common devices vector*/
+        for(LedWS1228bDeviceType& device: ledws2812bDevices){
+            devices.push_back(&device);
+        }
+    }
     for(auto device : devices){
         device->init(); // to jest init() danego typu device np. onoffDevice
     }
-
     
     /*TESTCODE*/
     /* Link service API functions to DeviceManager function calls */
@@ -210,7 +217,8 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 break;
 
                 case e_LED_STRIP :
-                    /*TBD*/
+                    /* create WS2812b instance by forwarding NVM data to it */
+                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
                 break;
 
                 default:break;

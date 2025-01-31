@@ -8,6 +8,7 @@
 #include "os/app/http/JavaScript.h"
 #include "os/app/http/tempGauge/tempGaugeJS.h"
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
+#include "os/app/http/renderRoomsJS.h"
 
 
 
@@ -513,6 +514,7 @@ void HomeLightHttpServer::handleClientRequest()
               client.println(pageHead);
               client.println(style_css);
               client.println(tempGaugeCSS);
+              client.println(renderRoomsJS);
               client.println(javascript);
               client.println(tempGaugeJS);
               client.println("</head>");
@@ -529,9 +531,9 @@ void HomeLightHttpServer::handleClientRequest()
             
 
               client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
-              client.println("<script>\
-                setInterval(getNotifications, 10000);\
-              </script>");
+              // client.println("<script>\
+              //   setInterval(getNotifications, 10000);\
+              // </script>");
 
               client.println("</div></body></html>");            
               client.println();
@@ -1003,8 +1005,8 @@ void printTestLedStrip(WiFiClient& client)
     </div>");
 
 
-  const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-  const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
+  // const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
+  // const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
   
 
   // client.println("<div class=\"container\">"); 
@@ -1059,26 +1061,26 @@ void printTestLedStrip(WiFiClient& client)
 //   client.println("</div>");
 
 
-  client.println("<div class=\"container\">"); 
-  client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
+  // client.println("<div class=\"container\">"); 
+  // client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
+  // // client.println("\
+  // //               <div class=\"color-picker\"> \
+  // //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
+  // //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
+  // //               </div>");
+
   // client.println("\
   //               <div class=\"color-picker\"> \
   //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-  //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
   //               </div>");
+  // client.println("<div class=\"button-container\">\
+  //                 <button class=\"button\" href=\"/test\">. . . </button>\
+  //                 <button class=\"button\" href=\"/test\">OFF</button>\
+  //                 </div>");
+  // //client.println("<button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
 
-  client.println("\
-                <div class=\"color-picker\"> \
-                    <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-                </div>");
-  client.println("<div class=\"button-container\">\
-                  <button class=\"button\" href=\"/test\">. . . </button>\
-                  <button class=\"button\" href=\"/test\">OFF</button>\
-                  </div>");
-  //client.println("<button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
-
-  client.println(brightnessSlider1 + 40 + brightnessSlider2);
-  client.println("</div>");
+  // client.println(brightnessSlider1 + 40 + brightnessSlider2);
+  // client.println("</div>");
 
 
   client.println("<div class=\"container\">"); 
@@ -1184,10 +1186,11 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         fetchData();\
         getNotifications();\
 \
-        setInterval(fetchData, 2500);\
 \
 \
     </script>");
+
+            // setInterval(fetchData, 2500);\
 
 }
 

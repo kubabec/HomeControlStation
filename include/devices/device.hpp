@@ -1,6 +1,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 #include "Arduino.h"
+#include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 
@@ -37,9 +38,9 @@ typedef enum
 }DeviceServicesType;
 
 typedef enum {
-    type_ONOFFDEVICE = 100,
-    type_TESTDEVICETYPE,
-    type_LEDSTRIP
+    type_ONOFFDEVICE = 43,
+    type_LED_STRIP,
+    type_TEMP_SENSOR
 }DevType;
 
 typedef struct
