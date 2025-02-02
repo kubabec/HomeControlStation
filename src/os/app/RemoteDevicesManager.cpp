@@ -256,6 +256,34 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
+     RcRequest request (255, 254, 253);
+
+
+        request.pushData(252);
+        
+        /* TODO */
+        request.pushData(251); //0 - no params, 1 - set1 ...
+
+            
+                /* Pass request for processing to RCServer */
+        awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
+            DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+
+        return SERV_SUCCESS;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* Check if RDM is capable to receive new request */
     if(requestProcessingState == RDM_NO_REQUEST){
@@ -264,14 +292,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         if(val.isValid()){
             RcRequest request (val.onSourceNodeLocalId, val.mac, SERVICE_CALL_REQ);
 
-
-        
-
-        request.pushData(serviceType);
-        /* TODO */
-        
-        request.pushData(serviceCall_1); //0 - no params, 1 - set1 ...
-        request.pushData((uint8_t*)&param, sizeof(param));
+            request.pushData(serviceType);
+            /* TODO */
+            
+            request.pushData(serviceCall_1); //0 - no params, 1 - set1 ...
+            request.pushData((uint8_t*)&param, sizeof(param));
             /* TODO */
 
 

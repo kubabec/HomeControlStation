@@ -15,21 +15,23 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     /* Is it new request or already known? */
     if(currentRequest.getRequestId() != newReqest.getRequestId()) {
         /* Set newRequest as currently processed one for further function entries */
-        memcpy(&currentRequest, &newReqest, REQEST_SIZE);
-
+        //memcpy(&currentRequest, &newReqest, REQEST_SIZE);
+        currentRequest = newReqest;
         
         /* Prepare UDP message with RC_REQUEST identifier */
         MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
         uint8_t reqestSize = currentRequest.getSize();
         // deklarujemy zmienną dataBuffer która jest pointerem typu uint8, malloc alokuje pamiec na stercie o rozmiarze requestSize i kastujemy na uint8 tzn informujemy kompilator ze bedziemy pod tym adresem przechowywać wartisci uint8
-        //uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
+        
 
         /* Calculate checksum byte based on the payload */
         currentRequest.calculateCrc();
-
+        uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
+        currentRequest.toByteArray(dataBuffer, reqestSize);
         /* Push fully prepared request to previously created empty UDP message  */
-        if(message.pushData((byte*)(&currentRequest),reqestSize)){
+
+        if(message.pushData((byte*)(dataBuffer),reqestSize)){
             Serial.println("Sending new request with ID "+String((int)currentRequest.getRequestId()));
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
@@ -40,11 +42,13 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         else{
             Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.getRequestId()));
         }
+
+        free(dataBuffer);
         
     } else{/* Processing allready known request */
         
         /* Does message send retry count exceed maximum allowed number? */
-        if(1 /*currentRequest.requestSendCount >= 3 */){
+        if(currentRequest.getRequestSendCount() >= 3 ){
             /* Max number reqests exceed , timeout request*/
             Serial.println("Request "+String((int)currentRequest.getRequestId())+" processing failed");
             /* clear the current request */
@@ -58,8 +62,11 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
                 uint8_t reqestSize = currentRequest.getSize();
+
+                uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
+                currentRequest.toByteArray(dataBuffer, reqestSize);
                 
-                if(message.pushData((byte*)(&currentRequest),reqestSize)){
+                if(message.pushData((byte*)(dataBuffer),reqestSize)){
                     NetworkDriver::sendBroadcast(message);
                     currentRequest.setRequestSendCount(currentRequest.getRequestSendCount() + 1);
                     lastSendTime = millis();
@@ -68,7 +75,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
                     Serial.println("Message UDP construction failed, Request Id : " + String((int) currentRequest.getRequestId()));
                 }
                 
-
+                free(dataBuffer);
                 
             }
         }

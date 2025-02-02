@@ -92,3 +92,15 @@ void RcResponse::setRequestType(uint8_t reqType)
 {
     requestType=reqType;
 }
+
+void RcResponse::pushData(uint8_t byte) {
+    data.push_back(byte);
+}
+
+//wstawiamy wektor do wektora data
+void RcResponse::pushData(uint8_t* data, uint16_t size) {
+    for (uint16_t i = 0; i < size; i++) {
+        this->data.push_back(data[i]);
+    }
+}
+

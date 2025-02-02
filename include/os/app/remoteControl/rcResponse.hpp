@@ -41,6 +41,9 @@ public:
     void setCrc(uint16_t crc);
     uint8_t getSize();
     void responsePrint() ;
+
+    void pushData(uint8_t byte);
+    void pushData(uint8_t* data, uint16_t size);
     
     void setResponseId(uint8_t id);
     void setRequestType(uint8_t reqType);

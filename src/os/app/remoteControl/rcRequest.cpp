@@ -6,8 +6,19 @@
 RcRequest::RcRequest(){}
 
 RcRequest::RcRequest(uint8_t id, uint64_t mac, uint8_t requestType)
-    : requestId(id), targetNodeMAC(mac), requestType(requestType) {
+    : targetDeviceId(id), targetNodeMAC(mac), requestType(requestType) {
 
+}
+
+RcRequest RcRequest::operator=(RcRequest& other) {
+    requestId = other.requestId;
+    targetNodeMAC = other.targetNodeMAC;
+    targetDeviceId = other.targetDeviceId;
+    requestType = other.requestType;
+    data = other.data;
+    requestSendCount = other.requestSendCount;
+    crc = other.crc;
+    return *this;
 }
 
 uint8_t RcRequest::getRequestId()  { return requestId;}
