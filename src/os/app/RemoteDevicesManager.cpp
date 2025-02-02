@@ -174,9 +174,9 @@ void RemoteDevicesManager::printTranslationMap() {
 
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
-    Serial.println("->Device Provider received response Id: " + String((int)response.responseId));
+    Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
 
-    if(awaitingResponseId == response.responseId){
+    if(awaitingResponseId == response.getResponseId()){
         requestProcessingState = RDM_REQUEST_COMPLETED;
     }
 

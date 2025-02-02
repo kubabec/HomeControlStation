@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 
+#define RC_REQUEST_MIN_SIZE 11
 
 typedef enum {
     REQ_FIRST,
@@ -21,9 +22,7 @@ class RcRequest {
     uint8_t requestType = UNKNOWN_REQ;
     std::vector<uint8_t> data ;
     uint8_t requestSendCount = 0;
-    uint16_t crc; 
-
-    
+    uint16_t crc;   
     
 
 public:
@@ -40,13 +39,17 @@ public:
     void pushData(uint8_t byte);
     void pushData(uint8_t* data, uint16_t size);
 
-    bool fromByteArray(uint8_t* buffer, uint16_t size);
-    void setID(uint8_t id);
-
+    bool fromByteArray(uint8_t* buffer, uint16_t size); 
     bool toByteArray(uint8_t* buffer, uint16_t size);
+    void setID(uint8_t id);
+    
     void calculateCrc();
+    void requestPrintRcRequestObject();
+    void printByteArray(uint8_t* buffer, uint16_t size);  
 
     void clear();
+    void setRequestSendCount(uint8_t count);
+    uint8_t getRequestSendCount();
 };
 
 #endif

@@ -34,7 +34,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
             /* Increment request send counter for further entries of this function */
-            //currentRequest.requestSendCount = 1;
+            currentRequest.setRequestSendCount(1);
             lastSendTime = millis();
         }
         else{
@@ -61,7 +61,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
                 
                 if(message.pushData((byte*)(&currentRequest),reqestSize)){
                     NetworkDriver::sendBroadcast(message);
-                    //currentRequest.requestSendCount ++;
+                    currentRequest.setRequestSendCount(currentRequest.getRequestSendCount() + 1);
                     lastSendTime = millis();
                 }
                 else{

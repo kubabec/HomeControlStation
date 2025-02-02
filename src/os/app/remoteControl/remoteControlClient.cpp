@@ -237,7 +237,7 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         RcResponse remoteControlResponse = vecResponseMessage.front();
-        remoteControlResponse.responseNodeMAC = localNodeMACAddress;
+        remoteControlResponse.getResponseNodeMAC();
         vecResponseMessage.pop();
 
         MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);

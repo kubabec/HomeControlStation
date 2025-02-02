@@ -65,12 +65,14 @@ void RemoteControlServer::cyclic(){
 
             /* we must notify the request sender that processing of the request is completed */
             /* TODO : return status relevant to message timeout */
-            RcResponse emptyResponse;
-            emptyResponse.responseId = pendingRequestsQueue.front().getRequestId();
-            emptyResponse.requestType = pendingRequestsQueue.front().getRequestType();
-            if(responseReceivers.at(emptyResponse.requestType)){
+            RcResponse emptyResponse ;
+
+            emptyResponse.setResponseId(pendingRequestsQueue.front().getRequestId()) ;
+            emptyResponse.setRequestType(pendingRequestsQueue.front().getRequestType());
+            
+            if(responseReceivers.at(emptyResponse.getRequestType())){
                 /* forward response in a callback to the request sender */
-                responseReceivers.at(emptyResponse.requestType)(emptyResponse);
+                responseReceivers.at(emptyResponse.getRequestType())(emptyResponse);
             }
 
 
@@ -501,15 +503,15 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
         /*PRINT*/
         //msg.serialPrintMessageUDP(msg);
         /* Does received response match currently processed request? */
-        if(pendingRequestsQueue.front().getRequestId() == response.responseId &&
-           pendingRequestsQueue.front().getRequestType() == response.requestType){
+        if(pendingRequestsQueue.front().getRequestId() == response.getResponseId() &&
+           pendingRequestsQueue.front().getRequestType() == response.getResponseId()){
             /* remove processed request as we received the response */
             pendingRequestsQueue.pop();
   
             /* Do we have receiver registered for this type of the request ? */
-            if(responseReceivers.at(response.requestType)){
+            if(responseReceivers.at(response.getRequestType())){
                 /* forward response in a callback to the request sender */
-                responseReceivers.at(response.requestType)(response);
+                responseReceivers.at(response.getRequestType())(response);
             }
         }
     }

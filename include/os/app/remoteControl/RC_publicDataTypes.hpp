@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <devices/device.hpp>
 #include <os/app/remoteControl/rcRequest.hpp>
+#include <os/app/remoteControl/rcResponse.hpp>
 
 #define REQUEST_DATA_SIZE 30
 #define RESPONSE_DATA_SIZE 10
@@ -67,44 +68,38 @@
 
 // }RcRequest;
 
-typedef enum {
-    POSITIVE_RESP,
-    NEGATIVE_RESP,
-    INVALID_REQ_RESP,
-    EXTENDED_DATA_DOWNLOAD_RESP,
-    UNKNOWN_RESP
-}ResponseType;
 
-typedef struct {
-    uint8_t responseId;
-    uint64_t responseNodeMAC = 0LL;
-    uint8_t requestType = UNKNOWN_REQ;
-    uint8_t responseType = UNKNOWN_RESP;   
-    uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
-    uint16_t crc ;
 
-    uint8_t getSize(){
+// typedef struct {
+//     uint8_t responseId;
+//     uint64_t responseNodeMAC = 0LL;
+//     uint8_t requestType = UNKNOWN_REQ;
+//     uint8_t responseType = UNKNOWN_RESP;   
+//     uint8_t data[REQUEST_DATA_SIZE] = {0xFF};
+//     uint16_t crc ;
+
+//     uint8_t getSize(){
              
-        return 34;
-    }
+//         return 34;
+//     }
 
-    void print() {
-        Serial.println("   Response ");
-        Serial.println("responseId :" + String((int)responseId));
-        Serial.println("macAddress: " + String(responseNodeMAC));
-        Serial.println("requestType :" + String((int)requestType));
-        Serial.println("responseType :" + String((int)responseType));
-        Serial.print(" Payload : ");
-        for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
-            Serial.print((int)data[i]);
-        }
-        Serial.println("");
+//     void print() {
+//         Serial.println("   Response ");
+//         Serial.println("responseId :" + String((int)responseId));
+//         Serial.println("macAddress: " + String(responseNodeMAC));
+//         Serial.println("requestType :" + String((int)requestType));
+//         Serial.println("responseType :" + String((int)responseType));
+//         Serial.print(" Payload : ");
+//         for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
+//             Serial.print((int)data[i]);
+//         }
+//         Serial.println("");
              
-        Serial.println("crc :" + String((int)crc));
-        Serial.println(" ");
-    }
+//         Serial.println("crc :" + String((int)crc));
+//         Serial.println(" ");
+//     }
 
-}RcResponse;
+// }RcResponse;
 
 typedef struct {
     uint8_t responseId;

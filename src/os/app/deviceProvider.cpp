@@ -1,4 +1,5 @@
 #include <os/app/DeviceProvider.hpp>
+
 //#include "deviceProvider.hpp"
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
@@ -189,9 +190,9 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     // request.print();
 
     RcResponse response;
-    response.responseId = request.getRequestId();
-    response.responseType = NEGATIVE_RESP; //200 is positive
-    response.requestType = request.getRequestType();
+    response.getResponseId();
+    response.getResponseType(); //200 is positive
+    response.getRequestType();
     ServiceParameters_set1 params;
 
 
@@ -209,7 +210,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     devicedetails.originalID,
                     (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX) /* TODO negative response*/
                 );
-                response.responseType = POSITIVE_RESP;
+                response.getResponseType();
                 break;
 
             case serviceCall_1:
@@ -225,7 +226,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     params
                 );
                 Serial.println("Setting state ");
-                response.responseType = POSITIVE_RESP;
+                response.getResponseType();
                 break;
             
             default:

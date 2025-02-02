@@ -3,17 +3,31 @@
 
 #include <Arduino.h>
 #include <vector>
+#include <os/app/remoteControl/rcRequest.hpp>
+
+#define RC_RESPONSE_MIN_SIZE 11
+
+typedef enum {
+    POSITIVE_RESP,
+    NEGATIVE_RESP,
+    INVALID_REQ_RESP,
+    EXTENDED_DATA_DOWNLOAD_RESP,
+    UNKNOWN_RESP
+}ResponseType;
+
 
 class RcResponse {
 
     uint8_t responseId;
     uint64_t responseNodeMAC;
-    uint8_t requestType;
-    uint8_t responseType;
+    uint8_t requestType = UNKNOWN_REQ;;
+    uint8_t responseType = UNKNOWN_RESP;;
     std::vector<uint8_t> data;
-    uint16_t crc;
+    uint8_t responseSendCount = 0;
+    uint16_t crc;    
 
 public:
+    RcResponse();
     RcResponse(uint8_t id, uint64_t mac, uint8_t reqType, uint8_t respType);
 
     uint8_t getResponseId() ;
@@ -25,11 +39,17 @@ public:
 
     void setData( std::vector<uint8_t>& data);
     void setCrc(uint16_t crc);
-
-    void print() ;
-
-private:
+    uint8_t getSize();
+    void responsePrint() ;
     
+    void setResponseId(uint8_t id);
+    void setRequestType(uint8_t reqType);
+
+    bool fromByteArray(uint8_t* buffer, uint16_t size);
+    bool toByteArray(uint8_t* buffer, uint16_t size);
+    //void responsePrint();
+
+ 
 };
 
 #endif // RC_RESPONSE_H
