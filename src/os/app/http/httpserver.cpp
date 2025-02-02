@@ -6,6 +6,10 @@
 #include "os/app/http/PageHead.h"
 #include "os/app/http/Style.h"
 #include "os/app/http/JavaScript.h"
+#include "os/app/http/tempGauge/tempGaugeJS.h"
+#include "os/app/http/tempGauge/tempGaugeCSS.h"
+#include "os/app/http/renderRoomsJS.h"
+
 
 
 
@@ -509,7 +513,10 @@ void HomeLightHttpServer::handleClientRequest()
               client.println("<head>");
               client.println(pageHead);
               client.println(style_css);
+              client.println(tempGaugeCSS);
+              client.println(renderRoomsJS);
               client.println(javascript);
+              client.println(tempGaugeJS);
               client.println("</head>");
 
               Serial.println("Processing regular request...");
@@ -525,7 +532,7 @@ void HomeLightHttpServer::handleClientRequest()
 
               client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
               client.println("<script>\
-                setInterval(getNotifications, 3500);\
+                setInterval(getNotifications, 10000);\
               </script>");
 
               client.println("</div></body></html>");            
@@ -704,21 +711,31 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Type: <select onchange=\"showExtraFields(this, 'device-"+String((int)slotNumber)+"');\" id=\"type"+String(slotNumber)+"\" >");
 
-  if(slot.deviceType == 43){
+  if(slot.deviceType == type_ONOFFDEVICE){
     client.println("<option value=\"43\" selected>On/Off Device</option>");
   }else
   {
     client.println("<option value=\"43\">On/Off Device</option>");
   }
   
-  if(slot.deviceType == 44){
+  if(slot.deviceType == type_LED_STRIP){
     client.println("<option value=\"44\" selected>LED strip</option>");
   }else
   {
     client.println("<option value=\"44\">LED strip</option>");
   }
 
-  if(slot.deviceType != 43 && slot.deviceType != 44){
+  if(slot.deviceType == type_TEMP_SENSOR){
+    client.println("<option value=\"45\" selected>Temperature sensor</option>");
+  }else
+  {
+    client.println("<option value=\"45\">Temperature sensor</option>");
+  }
+
+  if(
+    slot.deviceType != type_ONOFFDEVICE &&
+    slot.deviceType != type_LED_STRIP && 
+    slot.deviceType != type_TEMP_SENSOR){
     client.println("<option value=\"255\" selected>UNKNOWN</option>");
   }else {
     client.println("<option value=\"255\">UNKNOWN</option>");
@@ -826,6 +843,19 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       client.println(noSelected);
     }
     client.println("</select></label>");
+
+    /* Does user have admin rights to make configuration changes */
+    client.println("<label>User is admin:<select name=\"isUserAsAdmin\">");
+    if(currentConfig.isDefaultUserAdmin)
+    {
+      client.println(yesSelected);
+      client.println(noNotSelected);
+    }else
+    {
+      client.println(yesNotSelected);
+      client.println(noSelected);
+    }
+    client.println("</select></label>");
     
     /* Device type  */
     client.println("<label>Type:<input value=\"");
@@ -847,9 +877,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"Password\"></label>");
 
   /* Network Password */
-  client.println("<label>Panel Password:<input value=\"PWDHERE");
-  //client.println(currentConfig.networkPassword);
-  client.println("\" type=\"text\" name=\"Password2\"></label>");
+  client.println("<label>User Password:<input value=\"");
+  client.println(currentConfig.panelPassword);
+  client.println("\" type=\"text\" name=\"UserPassword\"></label>");
 
   /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
@@ -985,8 +1015,8 @@ void printTestLedStrip(WiFiClient& client)
     </div>");
 
 
-  const String brightnessSlider1  = "<br><div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-  const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
+  // const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
+  // const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
   
 
   // client.println("<div class=\"container\">"); 
@@ -1003,42 +1033,95 @@ void printTestLedStrip(WiFiClient& client)
 
   // client.println("</div>");
 
-  String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
-  String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
-  String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
+//   String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
+//   String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
+//   String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
 
 
-  client.println("<div class=\"container\">"); 
-  client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
-  client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
-  for(uint8_t i = 0; i < ledsCount; i++){
-    String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
+//   client.println("<div class=\"container\">"); 
+//   client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
+//   client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
+//   for(uint8_t i = 0; i < ledsCount; i++){
+//     String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
 
-    client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
-    if(enableStatus == "on"){
-      client.println("background-color: rgb(\
-      "+String((int)leds.red[i])+", \
-      "+String((int)leds.green[i])+", \
-      "+String((int)leds.blue[i])+");");
-    }
-    client.println("\"> </div>");
-  }
-  client.println("</div>");
-  client.println("\
-                <div class=\"color-picker\"> \
-                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
-"+firstLedRed+"\
-"+firstLedGreen+"\
-"+firstLedBlue+"\"> \
-                </div>\
-                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
-                <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
-                <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
-  client.println("<a class=\"button\" href=\"/test\">ON</a>\
-                ");
-  client.println(brightnessSlider1 + 70 + brightnessSlider2);
+//     client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
+//     if(enableStatus == "on"){
+//       client.println("background-color: rgb(\
+//       "+String((int)leds.red[i])+", \
+//       "+String((int)leds.green[i])+", \
+//       "+String((int)leds.blue[i])+");");
+//     }
+//     client.println("\"> </div>");
+//   }
+//   client.println("</div>");
+//   client.println("\
+//                 <div class=\"color-picker\"> \
+//                     <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
+// "+firstLedRed+"\
+// "+firstLedGreen+"\
+// "+firstLedBlue+"\"> \
+//                 </div>\
+//                 <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
+//                 <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
+//                 <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
+//   client.println("<a class=\"button\" href=\"/test\">ON</a>\
+//                 ");
+//   client.println(brightnessSlider1 + 70 + brightnessSlider2);
 
-  client.println("</div>");
+//   client.println("</div>");
+
+
+  // client.println("<div class=\"container\">"); 
+  // client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
+  // // client.println("\
+  // //               <div class=\"color-picker\"> \
+  // //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
+  // //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
+  // //               </div>");
+
+  // client.println("\
+  //               <div class=\"color-picker\"> \
+  //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
+  //               </div>");
+  // client.println("<div class=\"button-container\">\
+  //                 <button class=\"button\" href=\"/test\">. . . </button>\
+  //                 <button class=\"button\" href=\"/test\">OFF</button>\
+  //                 </div>");
+  // //client.println("<button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
+
+  // client.println(brightnessSlider1 + 40 + brightnessSlider2);
+  // client.println("</div>");
+
+
+  // client.println("<div class=\"container\">"); 
+  // client.println("<div class=\"header\">TemperatureSensor</div><div class=\"status-light on\"></div>");
+  // client.println("<div class=\"temperature-container\">\
+  //       <div id=\"gauge2\" class=\"temperature-widget\">\
+  //           <canvas style=\"max-width: 100px;\"></canvas>\
+  //           <div class=\"temperature-value\">20°C</div>\
+  //       </div>\
+  //       <div id=\"humidity\" class=\"humidity-widget\">\
+  //           <canvas></canvas>\
+  //           <div class=\"value-display humidity-value\">50%</div>\
+  //       </div>\
+  //   </div>");
+
+  // client.println("<div class=\"button-container\"><button class=\"button\" href=\"/test\">. . . </button></div>");
+
+
+  // client.println("<script>\
+  //    window.addEventListener('DOMContentLoaded', () => {\
+  //           createGauge('gauge2');\
+  //           setTemperature('gauge2', 0);\
+  //           createHumidGauge('humidity');\
+  //           setHumidity('humidity', 20);\
+  //       });\
+  //   </script>");
+
+  // client.println("</div>");
+
+  
+
 }
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
@@ -1076,7 +1159,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   </div>");
 
 
-  //printTestLedStrip(client);
+  printTestLedStrip(client);
 
   /* Display configuration button */
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){
@@ -1116,7 +1199,10 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         setInterval(fetchData, 2500);\
 \
 \
+\
     </script>");
+
+            // 
 
 }
 
@@ -1371,7 +1457,11 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
       curerntProcessingIndex += processedBytes;
 
       if(nameLength > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
-        roomNamesMapping.insert({roomId, name});
+        if (roomNamesMapping.find(roomId) != roomNamesMapping.end()) {
+          roomNamesMapping[roomId] = name;
+        }else {
+          roomNamesMapping.insert({roomId, name});
+        }
       }
 
       configData = configData.substring(processedBytes);

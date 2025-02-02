@@ -1,16 +1,21 @@
 #include <devices/OnOffDevice.hpp>
 
-#include "Adafruit_NeoPixel.h"
-Adafruit_NeoPixel testMcemoryConsumption;
-
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId) {
     pinNumber = pin;
     deviceName = devName;
     deviceId = a_deviceId;
     roomId = a_roomId;
 
-    testMcemoryConsumption.begin();
     //brightnessLevel = 50;
+}
+
+
+OnOffDevice::OnOffDevice(DeviceDescription& description, uint8_t pin){
+    deviceName = description.deviceName;
+    deviceId = description.deviceId;
+    roomId = description.deviceId;
+
+    pinNumber = pin;
 }
 
 void OnOffDevice::on() {

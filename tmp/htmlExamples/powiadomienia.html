@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2b3a47;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #1a262e;
+        }
+
+        /* Backdrop */
+        .popup-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            display: none;
+        }
+
+        /* Notifications Popup */
+        .notifications-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            z-index: 11;
+            display: none;
+        }
+
+        .popup-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .notification {
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Types of notifications */
+        .notification.error {
+            background-color: #ffe5e5;
+            border-color: #ff5c5c;
+            color: #991f1f;
+        }
+
+        .notification.warning {
+            background-color: #fff4cc;
+            border-color: #ffc107;
+            color: #997a00;
+        }
+
+        .notification.info {
+            background-color: #e5f7ff;
+            border-color: #17a2b8;
+            color: #0a495c;
+        }
+
+        /* Close button */
+        .close-popup {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .close-popup button {
+            background-color: #cc0000;
+        }
+
+        .close-popup button:hover {
+            background-color: #a30000;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="showNotificationsButton">Show Notifications</button>
+
+    <!-- Backdrop -->
+    <div class="popup-backdrop"></div>
+
+    <!-- Notifications Popup -->
+    <div class="notifications-popup" id="notificationsPopup">
+        <div class="popup-header">Notifications</div>
+        <div id="notificationsList">
+            <!-- Notifications will be dynamically populated -->
+        </div>
+        <div class="close-popup">
+            <button id="closePopupButton">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const showNotificationsButton = document.getElementById("showNotificationsButton");
+        const notificationsPopup = document.getElementById("notificationsPopup");
+        const backdrop = document.querySelector(".popup-backdrop");
+        const closePopupButton = document.getElementById("closePopupButton");
+        const notificationsList = document.getElementById("notificationsList");
+
+        // Sample notifications
+        const notifications = [
+            { type: "error", title: "Error 404", message: "Page not found." },
+            { type: "warning", title: "Low Disk Space", message: "Your disk space is below 10%." },
+            { type: "info", title: "Update Available", message: "A new version of the app is ready to download." },
+            { type: "error", title: "Server Error", message: "The server is temporarily unavailable." },
+            { type: "info", title: "Login Successful", message: "You have successfully logged in." },
+        ];
+
+        // Show notifications popup
+        showNotificationsButton.addEventListener("click", () => {
+            populateNotifications();
+            notificationsPopup.style.display = "block";
+            backdrop.style.display = "block";
+        });
+
+        // Close notifications popup
+        closePopupButton.addEventListener("click", () => {
+            notificationsPopup.style.display = "none";
+            backdrop.style.display = "none";
+        });
+
+        // Populate the notifications
+        function populateNotifications() {
+            notificationsList.innerHTML = ""; // Clear existing notifications
+            notifications.forEach((notification) => {
+                const notificationElement = document.createElement("div");
+                notificationElement.className = `notification ${notification.type}`;
+                notificationElement.innerHTML = `
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message">${notification.message}</div>
+                `;
+                notificationsList.appendChild(notificationElement);
+            });
+        }
+    </script>
+</body>
+
+</html>

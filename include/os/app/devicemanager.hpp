@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <devices/OnOffDevice.hpp>
 #include <devices/TestDeviceType.hpp>
+#include <devices/LedWS1228b.hpp>
+#include <devices/tempSensorDHT11.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
@@ -12,7 +14,8 @@ typedef enum
     e_DEVICE_TYPE_FIRST = 43,
     e_ON_OFF_DEVICE = e_DEVICE_TYPE_FIRST,
     e_LED_STRIP,
-    e_DEVICE_TYPE_LAST = e_LED_STRIP
+    e_TEMP_SENSOR,
+    e_DEVICE_TYPE_LAST = e_TEMP_SENSOR
 }DeviceType;
 
 class DeviceManager 
@@ -22,6 +25,9 @@ class DeviceManager
     // static TestDeviceType testDev;
     /*TESTCODE*/
     static std::vector<OnOffDevice> vecOnOffDevices;
+    static std::vector<LedWS1228bDeviceType> ledws2812bDevices;
+    static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
+
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
     static ExtendedDataAllocator extDataAllocator;
     static void updateDeviceDescriptionSignal();

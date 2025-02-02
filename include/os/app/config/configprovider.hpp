@@ -12,18 +12,22 @@ typedef struct
     uint8_t safeShutdownFlag = 255;
     uint8_t isHttpServer = 0;
     uint8_t isRcServer = 0;
+    uint8_t isDefaultUserAdmin = 1;
     uint8_t nodeType = 255;
     char networkSSID[SSID_LENGTH] = {'\0'};
     char networkPassword[PASSWORD_LENGTH] = {'\0'};
+    char panelPassword[PASSWORD_LENGTH] = {'\0'};
 
     uint16_t getSize()
     {
         return sizeof(uint8_t)  + //isHttpServer
             sizeof(uint8_t) + //isRcServer
+            sizeof(uint8_t) + //isDefaultUserAdmin
             sizeof(uint8_t) + //safeShutdownFlag
             sizeof(uint8_t) + //nodeType
             SSID_LENGTH + // networkSSID
-            PASSWORD_LENGTH; // Password
+            PASSWORD_LENGTH + // Password
+            PASSWORD_LENGTH; // user password
     }
 
     void serialPrint()
@@ -31,9 +35,11 @@ typedef struct
         Serial.println("<<<<< - - - - CONFIGURATION - - - - >>>>>");
         Serial.println("isHttpServer : " + String(isHttpServer));
         Serial.println("isRcServer : " + String(isRcServer));
+        Serial.println("isDefaultUserAdmin : " + String(isDefaultUserAdmin));
         Serial.println("Type : " + String((int)nodeType));
         Serial.println("network SSID : " + String(networkSSID));
         Serial.println("network Password : " + String(networkPassword));
+        Serial.println("Panel Password : " + String(panelPassword));
         Serial.println("<<<<< - - - - - - - - - - - - - - - >>>>>");
 
     }
@@ -62,6 +68,22 @@ typedef struct
             for(uint8_t i = 0; i < str.length(); i++)
             {
                 networkPassword[i] = c_str[i];
+            }
+        }
+        else
+        {
+            Serial.println("Invalid string length given for Password!");
+        }
+    }
+
+    void setPanelPassword(String& str)
+    {
+        const char* c_str = str.c_str();
+        memset(panelPassword, '\0', PASSWORD_LENGTH);
+        if(str.length() < PASSWORD_LENGTH){
+            for(uint8_t i = 0; i < str.length(); i++)
+            {
+                panelPassword[i] = c_str[i];
             }
         }
         else

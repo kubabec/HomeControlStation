@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Device Config</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            background: #f0f8ff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-y: auto;
+            padding-top: 20px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .device-container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            transition: all 0.5s ease;
+            margin-bottom: 10px;
+        }
+
+        .device-container:last-child {
+            margin-bottom: 10px;
+        }
+
+        .header {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label {
+            margin: 10px 0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input[type="text"],
+        select {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #f0faff, #d0eaff);
+            font-size: 14px;
+            transition: background 0.3s;
+            font-family: inherit;
+            width: 200px;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            background: linear-gradient(135deg, #e0f7ff, #c0e3ff);
+            outline: none;
+        }
+
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6ec1e4, #3a8bd6);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: inherit;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #5aa9d4, #337bbf);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            margin-bottom: 40px;
+        }
+
+        .collapsed {
+            max-height: 40px;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .collapsed input[type="text"],
+        .collapsed select {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .collapsed .button {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .disabled {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        .extra-fields {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+        }
+
+        .visible {
+            max-height: 500px;
+            opacity: 1;
+        }
+    </style>
+    <script>
+        function toggleDeviceEnabled(checkbox, deviceId) {
+            var container = document.getElementById(deviceId);
+            var header = container.querySelector('.header');
+
+            if (checkbox.checked) {
+                container.classList.remove('collapsed', 'disabled');
+                header.innerHTML = `Device ${deviceId.split('-')[1]} - Enabled`;
+            } else {
+                container.classList.add('collapsed', 'disabled');
+                header.innerHTML = `Device ${deviceId.split('-')[1]} - Disabled`;
+            }
+        }
+
+        function showExtraFields(select, deviceId) {
+            const deviceContainer = document.getElementById(deviceId);
+            const extraFields = deviceContainer.querySelectorAll('.extra-fields');
+
+            extraFields.forEach(field => {
+                field.classList.remove('visible');
+            });
+
+            const selectedValue = select.value;
+            const fieldsToShow = deviceContainer.querySelector(`.extra-${selectedValue}`);
+            if (fieldsToShow) {
+                fieldsToShow.classList.add('visible');
+            }
+        }
+
+        function redirectTo(link) {
+            window.location.href = link;
+        }
+        function applySettings() {
+        var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;
+        var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;
+        var SSID = document.querySelector('input[name=\"SSID\"]').value;
+        var Password = document.querySelector('input[name=\"Password\"]').value;
+        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}`;
+        window.location.href = url;}
+
+        function createConfigurationString() 
+        {
+            for (let i = 1; i < 6; i++) {
+                var container = document.getElementById("device-"+i);
+                container.style.display = 'none';
+                container.style.visibility = 'hidden';
+            }
+
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="device-container" id="device-1">
+            <div class="header">Device 1 - Enabled</div>
+            <label>Enabled:
+                <input type="checkbox" checked onchange="toggleDeviceEnabled(this, 'device-1')">
+            </label>
+            <label>Identifier:
+                <input type="text" value="ID-001">
+            </label>
+            <label>Name:
+                <input type="text" value="Device 1">
+            </label>
+            <label>Room Number:
+                <select onchange="showExtraFields(this, 'device-1')">
+                    <option value="101">101</option>
+                    <option value="102">102</option>
+                    <option value="103">103</option>
+                    <option value="104">104</option>
+                </select>
+            </label>
+
+            <!-- Extra fields for Room 101 -->
+            <div class="extra-fields extra-101">
+                <label>Temperature Range:
+                    <input type="text" placeholder="20-25°C">
+                </label>
+                <label>Humidity:
+                    <input type="text" placeholder="50%">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 102 -->
+            <div class="extra-fields extra-102">
+                <label>Lighting Intensity:
+                    <input type="text" placeholder="80%">
+                </label>
+                <label>Sound Level:
+                    <input type="text" placeholder="30dB">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 103 -->
+            <div class="extra-fields extra-103">
+                <label>Pressure Level:
+                    <input type="text" placeholder="1013hPa">
+                </label>
+                <label>CO2 Level:
+                    <input type="text" placeholder="400ppm">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 104 -->
+            <div class="extra-fields extra-104">
+                <label>Air Quality:
+                    <input type="text" placeholder="Good">
+                </label>
+                <label>Ventilation Rate:
+                    <input type="text" placeholder="5%">
+                </label>
+            </div>
+        </div>
+
+        <!-- Kopiujemy podobne bloki dla innych urządzeń, np. device-2, device-3 itd. -->
+        <div class="device-container" id="device-2">
+            <div class="header">Device 2 - Enabled</div>
+            <label>Enabled:
+                <input type="checkbox" checked onchange="toggleDeviceEnabled(this, 'device-2')">
+            </label>
+            <label>Identifier:
+                <input type="text" value="ID-002">
+            </label>
+            <label>Name:
+                <input type="text" value="Device 2">
+            </label>
+            <label>Room Number:
+                <select onchange="showExtraFields(this, 'device-2')">
+                    <option value="101">101</option>
+                    <option value="102">102</option>
+                    <option value="103">103</option>
+                    <option value="104">104</option>
+                </select>
+            </label>
+
+            <!-- Extra fields for Room 101 -->
+            <div class="extra-fields extra-101">
+                <label>Temperature Range:
+                    <input type="text" placeholder="20-25°C">
+                </label>
+                <label>Humidity:
+                    <input type="text" placeholder="50%">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 102 -->
+            <div class="extra-fields extra-102">
+                <label>Lighting Intensity:
+                    <input type="text" placeholder="80%">
+                </label>
+                <label>Sound Level:
+                    <input type="text" placeholder="30dB">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 103 -->
+            <div class="extra-fields extra-103">
+                <label>Pressure Level:
+                    <input type="text" placeholder="1013hPa">
+                </label>
+                <label>CO2 Level:
+                    <input type="text" placeholder="400ppm">
+                </label>
+            </div>
+
+            <!-- Extra fields for Room 104 -->
+            <div class="extra-fields extra-104">
+                <label>Air Quality:
+                    <input type="text" placeholder="Good">
+                </label>
+                <label>Ventilation Rate:
+                    <input type="text" placeholder="5%">
+                </label>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="button" onclick="redirectTo('link1.html')">Button 1</button>
+            <button class="button" onclick="redirectTo('link2.html')">Button 2</button>
+        </div>
+    </div>
+</body>
+
+</html>

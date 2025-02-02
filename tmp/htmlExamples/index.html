@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Device Config with Error Log and Popup</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            background: #f0f8ff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-y: auto;
+            padding-top: 20px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        /* Device and Error Table Styles (Omitted for Brevity) */
+
+        /* Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-content {
+            background: #ffffff;
+            width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-content.show {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .popup-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .popup-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6ec1e4, #3a8bd6);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: inherit;
+            display: inline-block;
+        }
+
+        .popup-button:hover {
+            background: linear-gradient(135deg, #5aa9d4, #337bbf);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 25px;
+            height: 25px;
+            background: #ff6666;
+            color: white;
+            font-size: 18px;
+            line-height: 25px;
+            text-align: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .popup-close:hover {
+            background: #ff4d4d;
+        }
+
+        .visible-popup {
+            display: flex;
+            opacity: 1;
+        }
+
+        .hidden-popup {
+            display: none;
+            opacity: 0;
+        }
+
+        /* Styles for the password input field in the second popup */
+        .popup-password-input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Existing Content (Device Containers, Error Log) -->
+
+        <!-- Main Buttons Section -->
+        <div class="button-container">
+            <button class="button" onclick="showPopup('Configuration complete. Do you want to go to the dashboard?', 'dashboard.html')">Open Popup with Link</button>
+            <button class="button" onclick="showPopup('Custom Action: Execute JavaScript Function?', customAction)">Open Popup with Function</button>
+            <button class="button" onclick="showPasswordPopup()">Open Password Popup</button>
+        </div>
+    </div>
+
+    <!-- Popup for General Purpose -->
+    <div class="popup-overlay hidden-popup" id="popup-overlay">
+        <div class="popup-content" id="popup-content">
+            <div class="popup-header">Notification</div>
+            <div class="popup-message" id="popup-message">Message goes here...</div>
+            <button class="popup-button" id="popup-button">Proceed</button>
+            <div class="popup-close" id="popup-close">&times;</div>
+        </div>
+    </div>
+
+    <!-- Second Popup for Password Input -->
+    <div class="popup-overlay hidden-popup" id="password-popup-overlay">
+        <div class="popup-content" id="password-popup-content">
+            <div class="popup-header">Enter Password</div>
+            <div class="popup-message">Please provide your password to continue:</div>
+            <input type="password" id="password-input" class="popup-password-input" placeholder="Password" />
+            <button class="popup-button" onclick="submitPassword()">Submit</button>
+            <div class="popup-close" id="password-popup-close">&times;</div>
+        </div>
+    </div>
+
+    <script>
+        // General popup function to show the popup with a message and action
+        function showPopup(message, action) {
+            const popupOverlay = document.getElementById('popup-overlay');
+            const popupContent = document.getElementById('popup-content');
+            const popupMessage = document.getElementById('popup-message');
+            const popupButton = document.getElementById('popup-button');
+
+            popupMessage.textContent = message;
+
+            if (typeof action === 'string') {
+                popupButton.onclick = function () {
+                    window.location.href = action;
+                };
+            } else if (typeof action === 'function') {
+                popupButton.onclick = function () {
+                    action();
+                };
+            }
+
+            popupOverlay.classList.remove('hidden-popup');
+            popupOverlay.classList.add('visible-popup');
+            popupContent.classList.add('show');
+
+            document.getElementById('popup-close').onclick = function () {
+                hidePopup(popupOverlay, popupContent);
+            };
+        }
+
+        // Function to show the password popup
+        function showPasswordPopup() {
+            const passwordPopupOverlay = document.getElementById('password-popup-overlay');
+            const passwordPopupContent = document.getElementById('password-popup-content');
+
+            passwordPopupOverlay.classList.remove('hidden-popup');
+            passwordPopupOverlay.classList.add('visible-popup');
+            passwordPopupContent.classList.add('show');
+
+            document.getElementById('password-popup-close').onclick = function () {
+                hidePopup(passwordPopupOverlay, passwordPopupContent);
+            };
+        }
+
+        // Function to hide any popup
+        function hidePopup(popupOverlay, popupContent) {
+            popupOverlay.classList.remove('visible-popup');
+            popupOverlay.classList.add('hidden-popup');
+            popupContent.classList.remove('show');
+        }
+
+        // Example function for handling password submission
+        function submitPassword() {
+            const passwordValue = document.getElementById('password-input').value;
+            alert(`Password entered: ${passwordValue}`);
+            hidePopup(document.getElementById('password-popup-overlay'), document.getElementById('password-popup-content'));
+        }
+
+        // Example function to demonstrate custom action
+        function customAction() {
+            alert('Custom JavaScript function executed!');
+            hidePopup(document.getElementById('popup-overlay'), document.getElementById('popup-content'));
+        }
+    </script>
+</body>
+
+</html>

@@ -4,6 +4,10 @@
 
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
+std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
+std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
+
+
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
 
@@ -73,8 +77,8 @@ void DeviceManager::init()
 
             free(configBlock);
 
-
-            if(numberOfSuccessfullyRetrievedDevices == 0){
+            /* push this notification only when network is available and there are no devices configured */
+            if(std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).networkCredentialsAvailable && numberOfSuccessfullyRetrievedDevices == 0){
                 UserInterfaceNotification notif;
                 notif.title = "Missing GPIO setup";
                 notif.body = "Looks like there are no GPIO devices configured yet. Navigate to 'Settings -> Devices Management' to add the device.";
@@ -90,18 +94,27 @@ void DeviceManager::init()
         Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
 
-    /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
-    for(OnOffDevice& device : vecOnOffDevices) 
+    /* devices merging after NVM restoration */
     {
-        
-        devices.push_back(&device); //wrzucam pointer na device onOffDevice
-                
-    }
+        /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
+        for(OnOffDevice& device : vecOnOffDevices) 
+        {
+            devices.push_back(&device); //wrzucam pointer na device onOffDevice         
+        }
 
+        /* Add LED strips to common devices vector*/
+        for(LedWS1228bDeviceType& device: ledws2812bDevices){
+            devices.push_back(&device);
+        }
+
+        /* Add temperature sensors to common devices vector*/
+        for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
+            devices.push_back(&device);
+        }
+    }
     for(auto device : devices){
         device->init(); // to jest init() danego typu device np. onoffDevice
     }
-
     
     /*TESTCODE*/
     /* Link service API functions to DeviceManager function calls */
@@ -155,11 +168,19 @@ void DeviceManager::init()
 
 void DeviceManager::cyclic()
 {
+    static long lastInternalDescriptionUpdateTime = 0; 
+
     for(auto device : devices) 
     {
         device->cyclic();
         
     }
+
+    if(millis() - lastInternalDescriptionUpdateTime > 5000){
+        updateDeviceDescriptionSignal();
+        lastInternalDescriptionUpdateTime = millis();
+    }
+
 }
 
 
@@ -210,7 +231,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 break;
 
                 case e_LED_STRIP :
-                    /*TBD*/
+                    /* create WS2812b instance by forwarding NVM data to it */
+                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
+                break;
+
+                case e_TEMP_SENSOR:
+                    tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                 break;
 
                 default:break;
@@ -337,6 +363,7 @@ void DeviceManager::setLocalConfigViaString(String& config)
                 DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
                 if(slotData.isValid())
                 {
+                    //Serial.println("Config valid!");
                     atLeastOneValid = true;
                     //pinConfigSlotsRamMirror.slots[i] = slotData;
                     temporaryConfigurationSet.slots[i] = slotData;
@@ -437,6 +464,9 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
         /* Parse type */
         uint8_t deviceType = confStr.substring(0, 2).toInt();
         newConfig.deviceType = deviceType;
+        // Serial.println();
+        // Serial.println("DUPADUPA: " + String((int)deviceType));
+        // Serial.println();
         confStr = confStr.substring(2);
 
         /* Parse PIN */

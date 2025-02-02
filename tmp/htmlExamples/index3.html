@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widgety Sterowania Oświetleniem</title>
+    <style>
+        /* Stylizacja widgetu */
+        .isEnabledWidget {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px;
+            display: inline-block;
+            position: relative;
+            width: 150px;
+            text-align: center;
+        }
+
+        /* Stylizacja kontrolki statusu */
+        .status-light {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Cień wokół kontrolki */
+            transition: all 0.3s ease;
+        }
+
+        /* Stylizacja dla statusu włączonego */
+        .status-light.on {
+            background: radial-gradient(circle, #00ff00 20%, #006600 70%);
+            box-shadow: 0 0 10px 4px rgba(0, 255, 0, 0.6), 0 0 20px 8px rgba(0, 255, 0, 0.4);
+        }
+
+        /* Stylizacja dla statusu wyłączonego */
+        .status-light.off {
+            background: radial-gradient(circle, #666 20%, #333 70%);
+            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <h1>Panel Sterowania Oświetleniem</h1>
+
+    <!-- Przykładowe widgety z kontrolkami statusu -->
+    <div class="isEnabledWidget" data-device-id="123">
+        <div class="status-light off"></div>
+        <p>Urządzenie 123</p>
+    </div>
+
+    <div class="isEnabledWidget" data-device-id="124">
+        <div class="status-light on"></div>
+        <p>Urządzenie 124</p>
+    </div>
+
+    <div class="isEnabledWidget" data-device-id="125">
+        <div class="status-light off"></div>
+        <p>Urządzenie 125</p>
+    </div>
+
+    <!-- Skrypt JavaScript, który zmienia status za pomocą klas CSS -->
+    <script>
+
+
+
+    </script>
+</body>
+</html>

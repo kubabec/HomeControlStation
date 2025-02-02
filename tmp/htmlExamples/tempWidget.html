@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Widget</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: white;
+            margin: 0;
+        }
+        .widget-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .gauge {
+            position: relative;
+            width: 100px;
+            height: 50px;
+        }
+        .gauge svg {
+            transform: rotate(0deg);
+        }
+        .needle {
+            position: absolute;
+            width: 2px;
+            height: 40px;
+            background: yellow;
+            top: 10px;
+            left: 50%;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease-in-out;
+            box-shadow: 1px 0px 7px black;
+        }
+        .label {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="gauge-container" id="gauge-low">
+            <div class="gauge">
+                <svg width="100" height="50" viewBox="0 0 100 50">
+                    <defs>
+                        <linearGradient id="tempGradient" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="blue" />
+                            <stop offset="20%" stop-color="purple" />
+                            <stop offset="50%" stop-color="orange" />
+                            <stop offset="100%" stop-color="red" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="url(#tempGradient)" stroke-width="8"/>
+                </svg>
+                <div class="needle" id="needle-low"></div>
+            </div>
+            <div class="label">Lowest: <span id="low-temp">-5</span>°C</div>
+        </div>
+        <div class="gauge-container" id="gauge-current">
+            <div class="gauge">
+                <svg width="100" height="50" viewBox="0 0 100 50">
+                    <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="url(#tempGradient)" stroke-width="8"/>
+                </svg>
+                <div class="needle" id="needle-current"></div>
+            </div>
+            <div class="label">Current: <span id="current-temp">20</span>°C</div>
+        </div>
+        <div class="gauge-container" id="gauge-high">
+            <div class="gauge">
+                <svg width="100" height="50" viewBox="0 0 100 50">
+                    <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="url(#tempGradient)" stroke-width="8"/>
+                </svg>
+                <div class="needle" id="needle-high"></div>
+            </div>
+            <div class="label">Highest: <span id="high-temp">35</span>°C</div>
+        </div>
+    </div>
+    
+    <script>
+        function updateGauge(gaugeId, value) {
+            const minTemp = -10;
+            const maxTemp = 40;
+            const angle = ((value - minTemp) / (maxTemp - minTemp)) * 180;
+            document.querySelector(`#${gaugeId} .needle`).style.transform = `rotate(${angle - 90}deg)`;
+        }
+
+        function setTemperature(gaugeId, value) {
+            document.querySelector(`#${gaugeId} .label span`).textContent = value;
+            updateGauge(gaugeId, value);
+        }
+
+        setTemperature("gauge-low", -5);
+        setTemperature("gauge-current", 20);
+        setTemperature("gauge-high", 35);
+    </script>
+</body>
+</html>

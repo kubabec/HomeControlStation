@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature & Humidity Gauges</title>
+    <style>
+        .temperature-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+
+        .temperature-widget, .humidity-widget {
+            text-align: center;
+            margin: 15px;
+            position: relative;
+        }
+
+        .temperature-widget canvas, .humidity-widget canvas {
+            width: 100px;
+            height: 130px;
+        }
+
+        .label {
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .value-display {
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="temperature-container">
+        <div id="gauge2" class="temperature-widget">
+            <canvas></canvas>
+            <div class="label">Current</div>
+            <div class="value-display temperature-value">20°C</div>
+        </div>
+        <div id="humidity" class="humidity-widget">
+            <canvas></canvas>
+            <div class="label">Humidity</div>
+            <div class="value-display humidity-value">50%</div>
+        </div>
+    </div>
+
+    <script>
+        const gaugeRegistry = {};
+
+        class HumidityGauge {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.canvas = this.container.querySelector('canvas');
+                this.valueDisplay = this.container.querySelector('.humidity-value');
+                this.ctx = this.canvas.getContext('2d');
+                this.humidity = 50;
+                this.initCanvas();
+                this.draw();
+            }
+
+            initCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const width = this.canvas.width / (window.devicePixelRatio || 1);
+                const height = this.canvas.height / (window.devicePixelRatio || 1);
+                ctx.clearRect(0, 0, width, height);
+
+                // Draw scale background
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 4; i++) {
+                    let y = height - (i * height / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(width / 4, y);
+                    ctx.lineTo((3 * width) / 4, y);
+                    ctx.stroke();
+                    
+                    
+                    if(i == 0){
+                        y -= 5;
+                    }else if(i == 4){
+                        y += 5;
+                    }
+                    ctx.fillText(`${i * 25}%`, (3 * width) / 4 + 5, y + 3);
+                }
+
+                // Draw humidity level
+                const barHeight = (this.humidity / 100) * height;
+                ctx.fillStyle = `rgba(0, 0, 255, ${this.humidity / 100})`;
+                ctx.fillRect(width / 3, height - barHeight, width / 3, barHeight);
+            }
+
+            update(humidity) {
+                this.humidity = Math.max(0, Math.min(100, humidity));
+                this.valueDisplay.textContent = `${this.humidity}%`;
+                this.draw();
+            }
+        }
+
+        function createGauge(containerId) {
+            gaugeRegistry[containerId] = new HumidityGauge(containerId);
+        }
+
+        function setHumidity(containerId, humidity) {
+            if (gaugeRegistry[containerId]) {
+                gaugeRegistry[containerId].update(humidity);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            createGauge('humidity');
+            setHumidity('humidity', 50);
+        });
+    </script>
+</body>
+</html>

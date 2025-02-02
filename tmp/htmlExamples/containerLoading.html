@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Loading Example</title>
+    <style>
+        /* Stylizacja kontenera */
+        .container {
+            position: relative; /* Umożliwia nakładanie elementów */
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 300px;
+            transition: opacity 0.3s ease;
+        }
+
+        .container.loading {
+            background-color: rgba(255, 255, 255, 0.8); /* Przygaszone tło */
+        }
+
+        /* Stylizacja nakładki ładowania */
+        .container .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: inherit; /* Dopasowanie do zaokrąglonych rogów kontenera */
+            pointer-events: none; /* Wyłącza interakcje z nakładką */
+        }
+
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid transparent;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-overlay .loading-text {
+            font-size: 16px;
+            color: #007bff;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        /* Animacja obrotu */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Centrum dla lepszej prezentacji */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- Treść kontenera -->
+        <p>To jest przykładowa zawartość kontenera.</p>
+
+        <!-- Nakładka ładowania -->
+        <div class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <button id="startRequestButton">Wyślij Request</button>
+
+    <script>
+        // Funkcje sterujące nakładką ładowania
+        function showLoading(container) {
+            // Dodanie klasy `loading` do kontenera
+            container.classList.add("loading");
+
+            // Wyświetlenie nakładki
+            const overlay = container.querySelector(".loading-overlay");
+            if (overlay) {
+                overlay.style.display = "flex";
+            }
+        }
+
+        function hideLoading(container) {
+            // Usunięcie klasy `loading` z kontenera
+            container.classList.remove("loading");
+
+            // Ukrycie nakładki
+            const overlay = container.querySelector(".loading-overlay");
+            if (overlay) {
+                overlay.style.display = "none";
+            }
+        }
+
+        // Obsługa przycisku
+        document.getElementById("startRequestButton").addEventListener("click", () => {
+            const container = document.getElementById("container");
+
+            // Pokaż ekran ładowania
+            showLoading(container);
+
+            // Symulacja requesta (np. XMLHttpRequest)
+            setTimeout(() => {
+                // Ukryj ekran ładowania po 3 sekundach
+                hideLoading(container);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

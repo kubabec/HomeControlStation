@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Strip Without Borders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .led-strip-container {
+            width: 189px;
+            background-color: #ddeff7;
+            border: 1px solid #b0c8d8;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .led-strip-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2b3a47;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .led-strip {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .led {
+            height: 15px;
+            border-radius: 1px; /* Zaokrąglenie narożników */
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Widget 1: 10 LEDs -->
+    <div class="led-strip-container">
+        <div class="led-strip-header">LED Strip - 10 LEDs</div>
+        <div id="ledStrip1" class="led-strip"></div>
+    </div>
+
+    <!-- Widget 2: 50 LEDs -->
+    <div class="led-strip-container">
+        <div class="led-strip-header">LED Strip - 50 LEDs</div>
+        <div id="ledStrip2" class="led-strip"></div>
+    </div>
+
+    <!-- Widget 3: 100 LEDs -->
+    <div class="led-strip-container">
+        <div class="led-strip-header">LED Strip - 100 LEDs</div>
+        <div id="ledStrip3" class="led-strip"></div>
+    </div>
+
+    <script>
+        const ledContainerWidth = 189; // Szerokość kontenera LED (stała)
+
+        // Funkcja obliczająca szerokość diod i ich ustawienie
+        function createLedStrip(containerId, count, colors) {
+            const ledStripElement = document.getElementById(containerId);
+            ledStripElement.innerHTML = '';
+
+            // Oblicz szerokość pojedynczej diody
+            const baseWidth = Math.floor(ledContainerWidth / count);
+            const remainingPixels = ledContainerWidth % count;
+
+            for (let i = 0; i < count; i++) {
+                const led = document.createElement("div");
+                led.className = "led";
+
+                // Krańcowe diody z dopasowaną szerokością
+                if (i === 0 || i === count - 1) {
+                    led.style.width = `${baseWidth + (remainingPixels > 0 ? 1 : 0)}px`;
+                } else {
+                    led.style.width = `${baseWidth}px`;
+                }
+
+                // Ustaw kolor diody
+                led.style.backgroundColor = colors[i] || "#ddd";
+
+                ledStripElement.appendChild(led);
+            }
+        }
+
+        // Przykładowe zestawy kolorów
+        const colors10 = Array(30).fill("#50F0A0");
+        const colors50 = Array(50).fill("#00FF00");
+        colors50[0] = "#FF0000"; // Pierwsza dioda czerwona
+        colors50[49] = "#0000FF"; // Ostatnia dioda niebieska
+
+        const colors100 = Array(63).fill("#FFA500"); // Wszystkie diody pomarańczowe
+
+        // Tworzenie pasków LED
+        createLedStrip("ledStrip1", 30, colors10);
+        createLedStrip("ledStrip2", 50, colors50);
+        createLedStrip("ledStrip3", 63, colors100);
+    </script>
+</body>
+
+</html>
