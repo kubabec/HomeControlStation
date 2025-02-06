@@ -759,6 +759,8 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     }
       client.println(pinStr);
   }
+  client.println("<option value=\"41\">41</option>");
+  client.println("<option value=\"42\">42</option>");
   client.println("</select>");
   client.println(labelEnd);
 

@@ -293,18 +293,6 @@ ServiceRequestErrorCode DeviceProvider::service(
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
 
-            (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_REMOTE_DEVICE_SERVICES))).serviceCall_set1(
-                    devicedetails.originalID,
-                    serviceType,
-                    param
-                );
-
-
-
-
-
-
-
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */

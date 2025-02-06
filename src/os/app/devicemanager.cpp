@@ -494,9 +494,9 @@ DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confSt
 bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
 {
     /* All dependencies in config need to be analyzed and verified before applying */
-    const uint8_t numberOfPinsAllowed = 10;
-    const uint8_t pinsAllowed[numberOfPinsAllowed] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; 
-    uint8_t pinsUsageCount[numberOfPinsAllowed] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const uint8_t numberOfPinsAllowed = 12;
+    const uint8_t pinsAllowed[numberOfPinsAllowed] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,41,42}; 
+    uint8_t pinsUsageCount[numberOfPinsAllowed] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0};
 
     bool validationSuccess = false;
     uint8_t errorFlag = 0;

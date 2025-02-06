@@ -20,7 +20,7 @@ OnOffDevice::OnOffDevice(DeviceDescription& description, uint8_t pin){
 
 void OnOffDevice::on() {
     isOn = true;
-    digitalWrite(pinNumber,HIGH);
+    digitalWrite(pinNumber,LOW);
     //Serial.println("Enabling device " + deviceName +" on pin " + String(pinNumber));
 }
 
@@ -93,6 +93,9 @@ void OnOffDevice::changeBrightness(int requestedBrightness) {
 
 
 void OnOffDevice::init() {
+    pinMode(pinNumber,OUTPUT);
+    off();
+    //Serial.println("Device " + deviceName + " initialized on pin " + String(pinNumber));
     
 }
 
