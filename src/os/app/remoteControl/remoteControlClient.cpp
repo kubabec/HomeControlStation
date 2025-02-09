@@ -96,25 +96,20 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
 
 
 void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
-    if(msg.getPayload().size() == REQEST_SIZE) {
-        RcRequest newRequest;
-        memcpy(&newRequest, &msg.getPayload().at(0),REQEST_SIZE); //memcopy(dokad, co, wielkosc)
-        //newRequest.print();
-        if(newRequest.getRequestNodeMAC() == localNodeMACAddress) {
-            if(newRequest.getRequestType() >= REQ_FIRST && newRequest.getRequestType() < UNKNOWN_REQ) {
-                //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
-                if(requestReceivers.at(newRequest.getRequestType())) {
-                    //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
-                    (requestReceivers.at(newRequest.getRequestType()))(newRequest);
+    RcRequest newRequest;
+    newRequest.fromByteArray(msg.getPayload().data(), msg.getPayload().size());
 
-                }
+    newRequest.print();
+    if(newRequest.getRequestNodeMAC() == localNodeMACAddress) {
+        if(newRequest.getRequestType() >= REQ_FIRST && newRequest.getRequestType() < UNKNOWN_REQ) {
+            //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
+            if(requestReceivers.at(newRequest.getRequestType())) {
+                //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
+                (requestReceivers.at(newRequest.getRequestType()))(newRequest);
+
             }
         }
-
-    }else {
-        Serial.println("Request with invalid lenght received, received : " + String((int)msg.getPayload().size()) + ", expected: " + String((int)REQEST_SIZE) );
     }
-
 }
 
 void RemoteControlClient::receiveUDP(MessageUDP& msg){
@@ -201,6 +196,7 @@ void RemoteControlClient:: sendKeepAlive() {
     /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
     keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
     // Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
+    // Serial.println("keepAlive.nodeHash : " + String((int)keepAlive.nodeHash ));
 
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));

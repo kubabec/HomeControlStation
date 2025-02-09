@@ -76,6 +76,7 @@ DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription(){
     desc.roomId = roomId;
     desc.isEnabled = true;
     desc.deviceName = deviceName;
+    memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
     desc.customBytes[2] = currentHumid; // humidity
     memcpy(&desc.customBytes[3], &currentTemp, sizeof(currentTemp));

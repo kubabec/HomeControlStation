@@ -76,6 +76,7 @@ DeviceDescription LedWS1228bDeviceType::getDeviceDescription(){
     desc.roomId = roomId;
     desc.isEnabled = isOn;
     desc.deviceName = deviceName;
+    memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
 
     desc.customBytes[1] = brightness; // brightness

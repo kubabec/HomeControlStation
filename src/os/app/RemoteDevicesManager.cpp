@@ -176,6 +176,11 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
     Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
 
+    /* TODO : 
+    - unpack the response success code ,
+    - Update Devices description based on received data 
+    - Update node hash
+    */
     if(awaitingResponseId == response.getResponseId()){
         requestProcessingState = RDM_REQUEST_COMPLETED;
     }
@@ -256,35 +261,6 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
-     RcRequest request (255, 254, 253);
-
-
-        request.pushData(252);
-        
-        /* TODO */
-        request.pushData(251); //0 - no params, 1 - set1 ...
-
-            
-                /* Pass request for processing to RCServer */
-        awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
-            DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
-
-        return SERV_SUCCESS;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /* Check if RDM is capable to receive new request */
     if(requestProcessingState == RDM_NO_REQUEST){
 

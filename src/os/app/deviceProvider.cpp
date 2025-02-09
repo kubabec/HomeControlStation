@@ -116,8 +116,6 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
 
     std::vector<DeviceDescription> deviceDescriptionsTotal;
 
-    static uint8_t uniqueId = 7; //unikalne ID dla wszystkich urządzeń na lokalnym ESP i zdalnych ESP
-
     try {
         // Pobieranie i przetwarzanie lokalnych urządzeń
 
@@ -130,6 +128,7 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                 .originalID = device.deviceId, 
                 .isLocal = true            
             };
+            // Serial.println("Local device id: " + String((int)device.deviceId));
 
             deviceDescriptionsTotal.push_back(device);
             uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t,DeviceTranslationDetails>{device.deviceId,translationDetails});
@@ -151,14 +150,10 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                     .isLocal = false
                 };
 
-                //device.deviceId = uniqueId;
                 deviceDescriptionsTotal.push_back(device);                
-                //Serial.println("-------------------- Dodaje remote---------------");            
+                Serial.println("-------------------- Dodaje remote---------------");            
                 uniqueDeviceIdToNormalDeviceIdMap.insert({device.deviceId, translationDetails});
-                uniqueId++;
-                if(uniqueId == 255) {
-                    uniqueId = 7;
-                }
+
             }
             
         }catch (const std::bad_any_cast& e){ }   
@@ -292,7 +287,6 @@ ServiceRequestErrorCode DeviceProvider::service(
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
-
             //zawołaj deviceEnable() w device manager
             //deviceManager_DeviceEnable(devicedetails.originalID, state);
             /* TODO */

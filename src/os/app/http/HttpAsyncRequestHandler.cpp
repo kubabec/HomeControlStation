@@ -37,7 +37,7 @@ HttpErrorCode HTTPAsyncRequestHandler::createRequest(
             memcpy(currentRequest.requestData, requestParamsPtr, paramsLength);
         }
 
-        Serial.println("HTTPAsyncRequestHandler: Starting new request processing ...");
+        // Serial.println("HTTPAsyncRequestHandler: Starting new request processing ...");
         // currentRequest.print();
 
         return e_HTTP_OK;
@@ -290,14 +290,14 @@ void HTTPAsyncRequestHandler::mainFunction()
     if(currentRequest.state == ASYNC_REQUEST_PROCESSING){
         /* do the request processing here */
         processRequest();
-        Serial.println("HTTPAsyncRequestHandler: ...");
+        //Serial.println("HTTPAsyncRequestHandler: ...");
     }
 }
 
 
 String HTTPAsyncRequestHandler::getJsonResponse()
 {
-    Serial.println("HTTPAsyncRequestHandler: Completed, returning JSON ...");
+    //Serial.println("HTTPAsyncRequestHandler: Completed, returning JSON ...");
     /* request processing is completed */
     createJsonResponse();
     /* Clear request data, as final state -> response is requested */

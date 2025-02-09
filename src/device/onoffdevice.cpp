@@ -198,6 +198,7 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
     desc.roomId = roomId;
     desc.isEnabled = isOn;
     desc.deviceName = deviceName;
+    memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     desc.customBytes[0] = brightnessLevelSupport;
     desc.customBytes[1] = brightnessLevelTarget;
     desc.customBytes[2] = brightnessLevel;
