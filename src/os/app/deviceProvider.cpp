@@ -158,10 +158,14 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     
     // Serial.println("DeviceProvider//: Content updated :");
     // printIdMap();
-    Serial.println("///");
+    // Serial.println("///");
        
+    // for(auto& dev : deviceDescriptionsTotal){
+    //     dev.print();
+    // }
+    // Serial.println("///");
     DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);   
-    std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH))();  
+    std::any_cast<std::function<uint16_t(void)>>(DataContainer::getSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH))();  
 }
 
 void DeviceProvider::printIdMap() {

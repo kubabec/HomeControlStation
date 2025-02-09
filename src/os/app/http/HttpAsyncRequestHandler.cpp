@@ -76,7 +76,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
         /* Service with 1 parameter set */
         case serviceCall_1:
-            memcpy(&set1, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set1));
+            memcpy(&set1, &currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL+1], sizeof(ServiceParameters_set1));
             serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set1(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],
@@ -85,7 +85,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
         break;
 
         case serviceCall_2:
-            memcpy(&set2, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set2));
+            memcpy(&set2, &currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL+1], sizeof(ServiceParameters_set2));
             serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set2(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],
@@ -94,7 +94,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
         break;
 
         case serviceCall_3:
-            memcpy(&set3, &currentRequest.requestData[SERVICE_NAME_INDEX+1], sizeof(ServiceParameters_set3));
+            memcpy(&set3, &currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL+1], sizeof(ServiceParameters_set3));
             serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set3(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],

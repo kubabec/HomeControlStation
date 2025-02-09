@@ -6,7 +6,7 @@
 #include <os/datacontainer/DataContainer.hpp>
 
 
-#define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 0
+#define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 2
 #define MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST 20
 
 typedef enum {
