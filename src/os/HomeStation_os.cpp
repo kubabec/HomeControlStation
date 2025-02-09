@@ -18,6 +18,8 @@ void OperatingSystem::init()
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
+    DataContainer::setSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH, static_cast<std::function<void()>>(OperatingSystem::calculateRuntimeNodeHash));
+
     DataContainer::setSignalValue(
         CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
         static_cast<std::function<void(String)>>(OperatingSystem::requestSecurityAccessLevelChangeViaString)

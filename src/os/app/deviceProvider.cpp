@@ -60,10 +60,7 @@ void DeviceProvider::init()
     }else {
         std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>> 
         (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (SERVICE_CALL_REQ, DeviceProvider::receiveRequest);
-        
-        // std::any_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)>>
-        // (DataContainer::getSignalValue(CBK_REGISTER_REQUEST_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, DeviceProvider::receiveExtededDataRequest);
-    
+       
                 
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
         sendResponse = (std::any_cast<std::function<bool(RcResponse&)>>(responseCBK));
@@ -161,8 +158,10 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
     
     // Serial.println("DeviceProvider//: Content updated :");
     // printIdMap();
-    Serial.println("///");    
-    DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);     
+    Serial.println("///");
+       
+    DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);   
+    std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH))();  
 }
 
 void DeviceProvider::printIdMap() {
@@ -185,43 +184,66 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     // request.print();
 
     RcResponse response;
-    response.getResponseId();
-    response.getResponseType(); //200 is positive
-    response.getRequestType();
+    response.setResponseId(request.getRequestId());
+    response.setRequestType(request.getRequestType());
+    response.setResponseType((uint8_t) INVALID_REQ_RESP);
     ServiceParameters_set1 params;
 
+    uint16_t payloadSize = request.getData().size();
+    const uint16_t MINIMAL_PAYLOAD_SIZE = 2;
 
+    if(payloadSize < MINIMAL_PAYLOAD_SIZE) {
+        Serial.println("Payload size too small");        
+        
+        sendResponse(response);
+        return false;
+    }
 
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.getRequestDeviceId());
-
+    
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
           
+            ServiceRequestErrorCode result = SERV_GENERAL_FAILURE;
             /* Which function service overloading is received? */
             switch (request.getData().at(SERVICE_OVERLOADING_FUNCTION_INDEX))
             {
             case serviceCall_NoParams:
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
+                result = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_NoParams(
                     devicedetails.originalID,
                     (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX) /* TODO negative response*/
                 );
-                response.getResponseType();
+                if(result == SERV_SUCCESS) {
+                    response.setResponseType((uint8_t) POSITIVE_RESP);
+                    addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
+                }
+
                 break;
 
             case serviceCall_1:
                 /* Copy function parameter values from the request */
                 
+                if(payloadSize < sizeof(ServiceParameters_set1) + MINIMAL_PAYLOAD_SIZE) {
+                    Serial.println("Payload size too small for set1");
+                    response.setResponseType((uint8_t) INVALID_REQ_RESP);
+                    sendResponse(response);
+                    return false;
+                }
 
                 memcpy(&params, &request.getData().at(2), sizeof(ServiceParameters_set1));
 
+                
                 /* call the service */
-                (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
+                result = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
                     (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
                     params
                 );
-                Serial.println("Setting state ");
-                response.getResponseType();
+                if(result == SERV_SUCCESS) {
+                    response.setResponseType((uint8_t) POSITIVE_RESP);
+                    addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
+                }
+                
                 break;
             
             default:
@@ -378,4 +400,16 @@ ServiceRequestErrorCode DeviceProvider::service(
         }
     }
     return SERV_GENERAL_FAILURE;
+}
+
+void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse& response, uint8_t deviceId) {
+    std::vector<DeviceDescription> deviceDescriptions = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES));
+    for(auto device: deviceDescriptions) {
+        if(device.deviceId == deviceId) {
+            response.pushData((byte*)&device, sizeof(device));
+            uint16_t nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
+            response.pushData((byte*)&nodeHash, sizeof(nodeHash));
+            break;
+        }
+    }
 }

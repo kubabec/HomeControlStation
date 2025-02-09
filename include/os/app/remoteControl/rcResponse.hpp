@@ -41,6 +41,7 @@ public:
     void pushData(uint8_t* data, uint16_t size);
     
     void setResponseId(uint8_t id);
+    void setResponseType(uint8_t respType);
     void setRequestType(uint8_t reqType);
 
     bool fromByteArray(uint8_t* buffer, uint16_t size);

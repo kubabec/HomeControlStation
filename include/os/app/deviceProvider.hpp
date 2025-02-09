@@ -30,6 +30,8 @@ class DeviceProvider
     static void initLocalDevicesSetup();
     static void initRemoteDevicesSetup();
 
+    static void addDeviceDescriptionToResponsePayload(RcResponse& response, uint8_t deviceId);
+
     
 
 

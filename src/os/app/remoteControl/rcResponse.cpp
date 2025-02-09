@@ -142,3 +142,7 @@ bool RcResponse::isValid()
 {
     return (crc == calculateCrc());
 }
+
+void RcResponse::setResponseType(uint8_t respType) {
+    responseType = respType;
+}

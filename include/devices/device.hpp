@@ -6,7 +6,7 @@
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 
 #define SERVICE_OVERLOADING_FUNCTION_INDEX 1
-#define SERVICE_NAME_INDEX 2
+#define SERVICE_NAME_INDEX 0
 
 enum ServiceOverloadingFunction{
     serviceCall_NoParams,

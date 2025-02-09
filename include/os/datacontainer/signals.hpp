@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 34
+#define NUMBER_OF_SIGNALS 35
 enum Signal
 {
     /* Type: bool , somme description */
@@ -73,7 +73,9 @@ enum Signal
     /* Type: uint64_t - Device MAC address */
     SIG_MAC_ADDRESS,
     /* Type: UINotificationsControlAPI - set of functions to controle UI notifications */
-    SIG_UI_NOTIFICATIONS_CONTROL
+    SIG_UI_NOTIFICATIONS_CONTROL,
+    /* Type: std::Function<void(void)> - callback to calculate runtime node hash */
+    CBK_CALCULATE_RUNTIME_NODE_HASH
 
 };
 #endif
