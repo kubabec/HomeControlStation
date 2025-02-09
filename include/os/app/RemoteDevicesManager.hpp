@@ -53,6 +53,7 @@ class RemoteDevicesManager
 
     static RDM_RequestProcessingState requestProcessingState;
     static ServiceCallFingerprint currentRequestFingerprint;
+    static ServiceRequestErrorCode currentRequestRespErrorCode;
     static uint8_t awaitingResponseId;
 public:
     static void init();

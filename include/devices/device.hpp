@@ -72,17 +72,17 @@ typedef struct
 typedef struct
 {
     uint8_t deviceType = 255;
-    uint64_t macAddress;
+    uint64_t macAddress = 0LL;
     uint8_t deviceId = -1;
     uint8_t roomId = 255;
     bool isEnabled;
-    uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION];
+    uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = { 0x00};
     
     String deviceName;
     void print() {
         //Serial.println(" ======DEVICE DESCRIPTION=============");
         Serial.print("deviceType: " + String(deviceType) + " - ");
-        Serial.print("macAddress: " + String(macAddress) + " - ");
+        Serial.print("macAddress: " + String((int)macAddress) + " - ");
         Serial.print("deviceId: " + String(deviceId) + " - ");
         Serial.print("isEnabled: " + String(isEnabled) + " - ");
         Serial.println("deviceName: " + deviceName);

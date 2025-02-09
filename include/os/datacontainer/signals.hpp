@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 35
+#define NUMBER_OF_SIGNALS 36
 enum Signal
 {
     /* Type: bool , somme description */
@@ -75,7 +75,9 @@ enum Signal
     /* Type: UINotificationsControlAPI - set of functions to controle UI notifications */
     SIG_UI_NOTIFICATIONS_CONTROL,
     /* Type: std::Function<void(void)> - callback to calculate runtime node hash */
-    CBK_CALCULATE_RUNTIME_NODE_HASH
+    CBK_CALCULATE_RUNTIME_NODE_HASH,
+    /* Type: std::function<void(DeviceDescription&, uint16_t)> - callback update RC slave info when RC response is received */
+    CBK_UPDATE_RC_SLAVE_INFORMATION
 
 };
 #endif

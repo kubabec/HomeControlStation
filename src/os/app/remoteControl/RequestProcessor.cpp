@@ -14,7 +14,6 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     
     /* Is it new request or already known? */
     if(currentRequest.getRequestId() != newReqest.getRequestId()) {
-        newReqest.print();
 
         /* Set newRequest as currently processed one for further function entries */
         //memcpy(&currentRequest, &newReqest, REQEST_SIZE);
@@ -31,6 +30,8 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         currentRequest.calculateCrc();
         uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
         currentRequest.toByteArray(dataBuffer, reqestSize);
+
+        // newReqest.print();
         /* Push fully prepared request to previously created empty UDP message  */
 
         if(message.pushData((byte*)(dataBuffer),reqestSize)){

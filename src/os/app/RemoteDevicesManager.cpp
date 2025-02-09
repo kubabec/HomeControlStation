@@ -5,6 +5,7 @@ std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
 std::array<ExternalNodeMapping, MAX_EXTERNAL_NODES> RemoteDevicesManager::mappingSlotsForExternalNodes;
 RemoteDevicesManager::RDM_RequestProcessingState RemoteDevicesManager::requestProcessingState = RDM_NO_REQUEST;
 RemoteDevicesManager::ServiceCallFingerprint RemoteDevicesManager::currentRequestFingerprint;
+ServiceRequestErrorCode RemoteDevicesManager::currentRequestRespErrorCode;
 uint8_t RemoteDevicesManager::awaitingResponseId = 255;
 
 void RemoteDevicesManager::init()
@@ -116,7 +117,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
                 .mac = device.macAddress,
                 .onSourceNodeLocalId = device.deviceId
             };
-            Serial.println("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
+            // Serial.println("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
             
             /* Replace original ID with our new Unique */
             device.deviceId = uniqueRcId;
@@ -181,7 +182,38 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
     - Update Devices description based on received data 
     - Update node hash
     */
+   /* did we receive response for which we are waiting? */
     if(awaitingResponseId == response.getResponseId()){
+        
+
+        if(response.getData().size() >= (sizeof(DeviceDescription) + sizeof(uint16_t))){
+            DeviceDescription responseDeviceDescription;
+            uint16_t responseNodeHash;
+
+            /* extract device description and node hash from the response */
+            memcpy(&responseDeviceDescription, response.getData().data(), sizeof(DeviceDescription));
+            memcpy(&responseNodeHash, (response.getData().data() + sizeof(DeviceDescription) ), sizeof(uint16_t));
+            responseDeviceDescription.macAddress = response.getResponseNodeMAC();
+
+            Serial.println("RDM : //// Received following description and hash");
+            responseDeviceDescription.print();
+            Serial.println("Hash: " +String((int)responseNodeHash));
+            /* inform RcServer, that slave's device description and nodeHash changed */
+
+            std::any_cast<std::function<void(DeviceDescription&, uint16_t)>>(
+                DataContainer::getSignalValue(CBK_UPDATE_RC_SLAVE_INFORMATION)) (
+                    responseDeviceDescription,
+                    responseNodeHash
+                );
+
+            currentRequestRespErrorCode = (response.getResponseType() == POSITIVE_RESP) ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+
+        }else {
+            Serial.println("Invalid data lenght received from remote slave, returning GENERAL_FAILURE");
+            /* invalid response payload length received */
+            currentRequestRespErrorCode = SERV_GENERAL_FAILURE;
+        }
+
         requestProcessingState = RDM_REQUEST_COMPLETED;
     }
 
@@ -246,7 +278,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         /* Here we are sure that we are working on this request ... */
         if(requestProcessingState == RDM_REQUEST_COMPLETED){
             requestProcessingState = RDM_NO_REQUEST;
-            return SERV_SUCCESS;
+            return currentRequestRespErrorCode;
         }
 
         /* RDM is waiting for the response to this request */

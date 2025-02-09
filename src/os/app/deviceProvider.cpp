@@ -148,7 +148,6 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
                 };
 
                 deviceDescriptionsTotal.push_back(device);                
-                Serial.println("-------------------- Dodaje remote---------------");            
                 uniqueDeviceIdToNormalDeviceIdMap.insert({device.deviceId, translationDetails});
 
             }
@@ -156,14 +155,6 @@ void DeviceProvider::updateDeviceDescriptionSignal() {
         }catch (const std::bad_any_cast& e){ }   
     }
     
-    // Serial.println("DeviceProvider//: Content updated :");
-    // printIdMap();
-    // Serial.println("///");
-       
-    // for(auto& dev : deviceDescriptionsTotal){
-    //     dev.print();
-    // }
-    // Serial.println("///");
     DataContainer::setSignalValue(SIG_DEVICE_COLLECTION, deviceDescriptionsTotal);   
     std::any_cast<std::function<uint16_t(void)>>(DataContainer::getSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH))();  
 }
@@ -187,10 +178,7 @@ void DeviceProvider::deviceReset() {
 bool DeviceProvider::receiveRequest(RcRequest& request) {
     // request.print();
 
-    RcResponse response;
-    response.setResponseId(request.getRequestId());
-    response.setRequestType(request.getRequestType());
-    response.setResponseType((uint8_t) INVALID_REQ_RESP);
+    RcResponse response(request.getRequestId(), request.getRequestNodeMAC(),request.getRequestType(), INVALID_REQ_RESP);
     ServiceParameters_set1 params;
 
     uint16_t payloadSize = request.getData().size();
@@ -218,6 +206,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX) /* TODO negative response*/
                 );
                 if(result == SERV_SUCCESS) {
+                    // Serial.println("Success, adding response metadata");
                     response.setResponseType((uint8_t) POSITIVE_RESP);
                     addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
                 }
@@ -253,8 +242,6 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
             default:
                 break;
             }
-
-            Serial.println("Response sent.");
         }else 
         {
             Serial.println("Device id corruption within received request " + String((int) request.getRequestId()));
@@ -264,6 +251,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
        Serial.println("No mapping found for received DeviceID (" + String((int)request.getRequestDeviceId())+ ") in request " + String((int) request.getRequestId()));
     }
 
+    Serial.println("sending a response ...");
     sendResponse(response);    
     return true;
     //
@@ -407,12 +395,12 @@ ServiceRequestErrorCode DeviceProvider::service(
 }
 
 void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse& response, uint8_t deviceId) {
-    std::vector<DeviceDescription> deviceDescriptions = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES));
-    for(auto device: deviceDescriptions) {
+    std::vector<DeviceDescription> deviceDescriptions = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_COLLECTION));
+    for(auto& device: deviceDescriptions) {
         if(device.deviceId == deviceId) {
-            response.pushData((byte*)&device, sizeof(device));
+            response.pushData((uint8_t*)&device, sizeof(DeviceDescription));
             uint16_t nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
-            response.pushData((byte*)&nodeHash, sizeof(nodeHash));
+            response.pushData((uint8_t*)&nodeHash, sizeof(nodeHash));
             break;
         }
     }

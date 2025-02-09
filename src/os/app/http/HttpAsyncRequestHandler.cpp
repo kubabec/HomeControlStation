@@ -111,6 +111,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
     switch(serviceCallStatus){
         case SERV_SUCCESS:
             /* Request completed successfully */
+            Serial.println("Service request processing finished.");
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
         case SERV_PENDING:

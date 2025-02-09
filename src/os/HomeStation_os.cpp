@@ -191,9 +191,9 @@ void OperatingSystem::handleSecurityAccessLevelExpiration()
 /* Funkcja do obliczenia unikalnego identyfikatora (hasha) dla bieżącego stanu systemu.*/
 uint16_t OperatingSystem::calculateRuntimeNodeHash()
 {
-    uint16_t hash = 0;
+    uint64_t hash = 0;
 
-    hash += uniqueLifecycleId;
+    //hash += uniqueLifecycleId;
 
     /* Get configuration */
     try{
@@ -201,18 +201,18 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
             std::any_cast<NodeConfiguration>(
                 DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)
             );
-        hash += (uint8_t) configuration.isHttpServer;
-        hash += (uint8_t) configuration.isRcServer;
-        hash += (uint8_t) configuration.isDefaultUserAdmin;
-        hash += (uint8_t) configuration.networkCredentialsAvailable;
-        hash += (uint8_t) configuration.nodeType;
+        hash +=  configuration.isHttpServer;
+        hash +=  configuration.isRcServer;
+        hash +=  configuration.isDefaultUserAdmin;
+        hash +=  configuration.networkCredentialsAvailable;
+        hash +=  configuration.nodeType;
         for(uint8_t idx = 0 ; idx < configuration.networkSSID.length(); idx ++)
         {
-            hash += (uint8_t) configuration.networkSSID.charAt(idx);
+            hash += configuration.networkSSID.charAt(idx);
         }
         for(uint8_t idx = 0 ; idx < configuration.networkPassword.length(); idx ++)
         {
-            hash += (uint8_t) configuration.networkPassword.charAt(idx);
+            hash += configuration.networkPassword.charAt(idx);
         }
     }catch (std::bad_any_cast ex){}
 
@@ -225,24 +225,24 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
             );
         for(auto& device : devicesVector)
         {
-            hash += (uint8_t) device.deviceId;
-            hash += (uint8_t) device.macAddress;
-            hash += (uint8_t) device.isEnabled;
+            hash += device.deviceId;
+            hash += device.macAddress;
+            hash += device.isEnabled;
             for(uint8_t idx = 0 ; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION ; idx ++)
             {
                 hash += device.customBytes[idx];
             }
             for(uint8_t idx = 0 ; idx < device.deviceName.length(); idx ++)
             {
-                hash += (uint8_t) device.deviceName.charAt(idx);
+                hash += device.deviceName.charAt(idx);
             }
         }
     }catch (std::bad_any_cast ex){}
 
     //Serial.println("Hash : " + String((int)hash));
 
-    runtimeNodeHash = hash;
-    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(hash));
+    memcpy(&runtimeNodeHash, &hash, sizeof(uint16_t));
+    DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
     // Serial.println("New hash : " + String((int)hash));
 
     return hash;

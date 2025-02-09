@@ -20,7 +20,7 @@ RequestProcessor RemoteControlServer::requestProcessor;
 uint64_t RemoteControlServer::detailedDataPendingNodeMAC;
 
 uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej statycznej poza klasą^^^^^^^^^^^^^^^^^^^^^^
-
+bool RemoteControlServer::slaveMonitoringBlockedDueToRequestProcessing = false;
 
 void RemoteControlServer::deinit() {
     
@@ -37,6 +37,11 @@ void RemoteControlServer::init(){
         CBK_CREATE_RC_REQUEST,
             static_cast<std::function<uint8_t(RcRequest&)>>(RemoteControlServer::createRcRequest)
         );
+    DataContainer::setSignalValue(
+        CBK_UPDATE_RC_SLAVE_INFORMATION,
+            static_cast<std::function<void(DeviceDescription&, uint16_t)>>(RemoteControlServer::updateSlaveInformation)
+        );
+
     
     
     requestIdCounter = 0; //inicjalizacja zmiennej do trzymania countera requestów^^^^^^^^^^^^^^^^^^^
@@ -45,27 +50,6 @@ void RemoteControlServer::init(){
     requestDetailedDataTimer = millis();
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
-
-
-
-    /* RC Request test */
-    // RcRequest request(31, 6538, 4);
-    // request.setID(99);
-
-    // uint8_t data[10] = {1,2,3,4,5,6,7,8,9,10};
-    // request.pushData(data, 10);
-    // request.calculateCrc();
-
-    // request.print();
-
-    // uint8_t* byteArray = (uint8_t*)malloc(request.getSize()); 
-    // request.toByteArray(byteArray, request.getSize());
-
-    // RcRequest req2;
-
-    // req2.fromByteArray(byteArray, request.getSize());
-    // Serial.print("Compared:");
-    // req2.print();
 
 
     Serial.println("... done");
@@ -108,6 +92,8 @@ void RemoteControlServer::cyclic(){
             pendingRequestsQueue.pop();
         }
         
+    }else {
+        slaveMonitoringBlockedDueToRequestProcessing = false;
     }
 
     switch (currentState) {
@@ -120,7 +106,9 @@ void RemoteControlServer::cyclic(){
             break;
 
         case STATE_KEEP_ALIVE:
-            handleKeepAliveState();
+            if(!slaveMonitoringBlockedDueToRequestProcessing){
+                handleKeepAliveState();
+            }
             break;
     }
 
@@ -309,7 +297,9 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
             //Serial.println("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
         }
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
-            handleSlaveAliveMonitoring(msg);
+            if(!slaveMonitoringBlockedDueToRequestProcessing){
+                handleSlaveAliveMonitoring(msg);
+            }
             //Serial.println("RESPONSE_KEEP_ALIVE");
         }
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE) {
@@ -478,6 +468,8 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
             /* Node hash validation */
             if(remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash != receivedKeepAlive.nodeHash)
             {
+                Serial.println("Old hash : " + String((int)remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash));
+                Serial.println("New hash : " + String((int)receivedKeepAlive.nodeHash));
                 Serial.println("RCServer//: Detected slave state change, DD refresh start ...");
                 /* Detailed data collection refresh needed */
                 triggerDDRefresh(receivedKeepAlive.mac);
@@ -514,9 +506,14 @@ void RemoteControlServer::triggerDDRefresh(uint64_t macAddr)
 }
 
 bool RemoteControlServer::processPendingRequest(RcRequest& request){
+    /* fake update of slaves activity to do not lost communication when other requests are being processed */
+    for(auto& remoteNode : remoteNodes){
+        remoteNode.second.lastKeepAliveReceivedTime = millis();
+    }
+
+
+    slaveMonitoringBlockedDueToRequestProcessing = true;
     return requestProcessor.processReqest(request);
-    //request.print();
-    //return false;
 }
 
 void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
@@ -526,21 +523,28 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 
     /* Try to construct response from the payload data */
     if(response.fromByteArray(msg.getPayload().data(), msg.getPayload().size())){
+        // Serial.println("Receiver response, checking validity ...");
+        // response.print();
 
         if(response.isValid()){
             /* Does received response match currently processed request? */
             if(pendingRequestsQueue.front().getRequestId() == response.getResponseId() &&
-                pendingRequestsQueue.front().getRequestType() == response.getResponseId()){
+                pendingRequestsQueue.front().getRequestType() == response.getRequestType()){
                 /* remove processed request as we received the response */
                 pendingRequestsQueue.pop();
 
                 /* Do we have receiver registered for this type of the request ? */
                 if(responseReceivers.at(response.getRequestType())){
+                    Serial.println("RCS:// Forwarding response to the request author...");
                     /* forward response in a callback to the request sender */
                     responseReceivers.at(response.getRequestType())(response);
                 }
             }
+        }else {
+            Serial.println("Invalid response received!");
         }
+    }else {
+        Serial.println("Unable to unpack the response");
     }
       
     /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
@@ -573,7 +577,7 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr){
     msg.pushData((byte*)&macAddr, sizeof(uint64_t));
     NetworkDriver::sendBroadcast(msg);
     Serial.println("->RCS - wysylam o detailed data dla node, MAC:"+ String(int(macAddr)));
-    msg.serialPrintMessageUDP(msg);
+    // msg.serialPrintMessageUDP(msg);
 }
 
 
@@ -581,13 +585,34 @@ uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 {
     newRequest.setID(generateRequestId());
 
-    /*tmp */
-    uint8_t data[10] = {1,2,3,4,5,6,7,8,9,10};
-    newRequest.pushData(data, 10);
-
     /* Creating new request */
     Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));
     pendingRequestsQueue.push(newRequest);
 
     return newRequest.getRequestId();
+}
+
+
+void RemoteControlServer::updateSlaveInformation(DeviceDescription& deviceDescription, uint16_t newNodeHash)
+{
+    uint64_t macOfUpdatedSlave = deviceDescription.macAddress;
+    Serial.println((int)macOfUpdatedSlave);
+
+    if (remoteNodes.find(macOfUpdatedSlave) != remoteNodes.end()) {
+        std::vector<DeviceDescription>& slaveDevices = remoteNodes.find(macOfUpdatedSlave)->second.devicesCollection;
+        remoteNodes.find(macOfUpdatedSlave)->second.lastKnownNodeHash = newNodeHash; /* update hash */
+        for(auto& device : slaveDevices){
+            if(device.deviceId == deviceDescription.deviceId) { /* device found in the list */
+                device = deviceDescription; /* overwrite description */
+                updateDeviceDescriptionSignal();
+                break;
+            }
+        }
+
+
+    }else {
+        /* Slave not found */
+        Serial.println("Trying to update information about non existing slave");
+    }
+
 }

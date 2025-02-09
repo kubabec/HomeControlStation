@@ -35,7 +35,6 @@ uint8_t RcRequest::getRequestDeviceId()  {
 
 void RcRequest::setID(uint8_t id) { 
     requestId = id;
-    this->print();
 }
 
 uint8_t RcRequest::getSize() {
@@ -56,8 +55,9 @@ void RcRequest::pushData(uint8_t byte) {
 //wstawiamy wektor do wektora data
 void RcRequest::pushData(uint8_t* data, uint16_t size) {
     if(data != nullptr && size > 0 ){
-        this->data.resize(size);
-        memcpy(this->data.data(), data, size);
+        for(uint16_t i = 0; i < size; ++i){
+            this->data.push_back(data[i]);
+        }
     }
 }
 
@@ -137,7 +137,7 @@ void RcRequest::calculateCrc() {
 
 void RcRequest::print() {
     Serial.println("Request ID: " + String((int)requestId));
-    Serial.println("Target Node MAC: " + String(targetNodeMAC));
+    Serial.println("Target Node MAC: " + String((int)targetNodeMAC));
     Serial.println("Target Device ID: " + String((int)targetDeviceId));
     Serial.println("Request Type: " + String((int)requestType));
     Serial.println("Data: ");

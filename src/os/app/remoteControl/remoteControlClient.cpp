@@ -116,7 +116,7 @@ void RemoteControlClient::receiveUDP(MessageUDP& msg){
     receivedBuffer.push(msg);
 
     if(msg.getId() == RC_REQUEST) {
-        MessageUDP::serialPrintMessageUDP(msg);
+        // MessageUDP::serialPrintMessageUDP(msg);
     }
 }
 
@@ -157,7 +157,7 @@ void RemoteControlClient::sendInitialDataResponse(){
     initialDataResponse.pushData((byte*)&initialData, sizeof(NodeInitialData)); //wkleja do payload
     
     Serial.println("<-Remote Control Client - ! Wysyłam Initial Data!");
-    MessageUDP::serialPrintMessageUDP(initialDataResponse);
+    // MessageUDP::serialPrintMessageUDP(initialDataResponse);
 
     /* TX transmission will be handled in the available time from cyclic() context */
     pendingTxQueue.push(initialDataResponse);
@@ -222,7 +222,6 @@ bool RemoteControlClient::registerRequestReceiver(RequestType request, std::func
 
 bool RemoteControlClient::sendResponse(RcResponse& response) {
     //Serial.println("!!! RemoteControlClient - sendResponse do vektora - ");
-    
     vecResponseMessage.push(response);
 
     return true;
@@ -233,22 +232,28 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         RcResponse remoteControlResponse = vecResponseMessage.front();
-        remoteControlResponse.getResponseNodeMAC();
-        vecResponseMessage.pop();
+        uint8_t* serializedResponse = (uint8_t*)malloc(remoteControlResponse.getSize());
+        if(serializedResponse != nullptr){
+            remoteControlResponse.toByteArray(serializedResponse, remoteControlResponse.getSize());
 
-        MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
-        msg.pushData((byte*)&remoteControlResponse, remoteControlResponse.getSize());
-        
+            vecResponseMessage.pop();
 
-        /* TX transmission will be handled in the available time from cyclic() context */
-        pendingTxQueue.push(msg);
+            MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
+            msg.pushData((byte*)serializedResponse, remoteControlResponse.getSize());
+            
 
-        return true;
+            /* TX transmission will be handled in the available time from cyclic() context */
+            pendingTxQueue.push(msg);
+
+            free(serializedResponse);
+
+            return true;
+        }
     } else {        
 
         return false;
     }
-    return true;
+    return false;
 }
 
 void RemoteControlClient::sendDetailedDataResponseFromNode(){

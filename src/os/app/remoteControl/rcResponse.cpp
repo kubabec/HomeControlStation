@@ -26,18 +26,18 @@ uint8_t RcResponse::getSize() {
 }
 
 void RcResponse::print() {
-    // std::cout << "### Response ###" << std::endl;
-    // std::cout << "responseId: " << (int)responseId << std::endl;
-    // std::cout << "macAddress: " << responseNodeMAC << std::endl;
-    // std::cout << "requestType: " << (int)requestType << std::endl;
-    // std::cout << "responseType: " << (int)responseType << std::endl;
-    // for(auto& byte : data) {
-    //     std::cout << (int)byte;
-    // }
-    // std::cout << std::endl;
-    // std::cout << "responseSendCount: " << (int)responseSendCount << std::endl;
-    // std::cout << "crc: " << (int)crc << std::endl;
-    // std::cout << "###############" << std::endl;
+    Serial.println("### Response ###");
+    Serial.println("responseId: " + String((int)responseId));
+    Serial.println("macAddress: " + String((int)responseNodeMAC));
+    Serial.println("requestType: " + String((int)requestType));
+    Serial.println("responseType: " + String((int)responseType));
+    for(auto& byte : data) {
+        Serial.print((int)byte);
+    }
+    Serial.println("");
+
+    Serial.println("crc: " + String((int)crc));
+    Serial.println("###############");
 }
 
 void RcResponse::setResponseId(uint8_t id)
@@ -57,8 +57,9 @@ void RcResponse::pushData(uint8_t byte) {
 //wstawiamy wektor do wektora data
 void RcResponse::pushData(uint8_t* data, uint16_t size) {
     if(data != nullptr && size > 0 ){
-        this->data.resize(size);
-        memcpy(this->data.data(), data, size);
+        for(uint16_t i = 0; i < size; ++i){
+            this->data.push_back(data[i]);
+        }
     }
 }
 
@@ -66,9 +67,6 @@ bool RcResponse::fromByteArray(uint8_t* buffer, uint16_t size) {
     if (buffer == nullptr || size < RC_REQUEST_MIN_SIZE) {
         return false; // Błąd: nieprawidłowy bufor lub za mały rozmiar
     }
-    
-    uint16_t crc;    
-
 
     const uint8_t dataLengthBeforeDynamicPart = 
         sizeof(responseId) + sizeof(responseNodeMAC) + sizeof(requestType) + sizeof(responseType);
@@ -104,6 +102,9 @@ bool RcResponse::toByteArray(uint8_t* buffer, uint16_t size) {
     if (buffer == nullptr ) {
         return false; 
     }  
+    crc = calculateCrc();
+    print();
+
     /* copy first part */
     uint16_t offset = 0;
     memcpy(&buffer[offset], &responseId, sizeof(responseId)); 
@@ -131,7 +132,7 @@ uint16_t RcResponse::calculateCrc()
     tmpCrc += requestType;
     tmpCrc += responseType;
     for(auto& byte : data){
-        tmpCrc *= byte;
+        tmpCrc += byte;
     }
     
     return tmpCrc;
@@ -140,6 +141,8 @@ uint16_t RcResponse::calculateCrc()
 
 bool RcResponse::isValid()
 {
+    Serial.println("CRC:| "+ String((int)crc));
+    Serial.println("CRC:| "+ String((int)calculateCrc()));
     return (crc == calculateCrc());
 }
 

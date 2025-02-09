@@ -39,7 +39,7 @@ typedef struct {
 class RemoteControlServer 
 {  
     static uint8_t requestIdCounter; //zmienna dla trzymania requestId pakietu UDP ^^^^^^^^^^^^^^
-
+    static bool slaveMonitoringBlockedDueToRequestProcessing;
     static ServerState currentState;
     static std::queue<MessageUDP> receivedBuffer;
     static std::queue<RcRequest> pendingRequestsQueue;
@@ -89,6 +89,8 @@ public:
 
     static bool registerResponseReceiver(RequestType request, std::function<bool(RcResponse&)> receiverCallback);
     static void refreshRemoteNodeInfo(uint64_t mac);
+
+    static void updateSlaveInformation(DeviceDescription& deviceDescription, uint16_t newNodeHash);
     
 };
 
