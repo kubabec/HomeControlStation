@@ -14,6 +14,8 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     
     /* Is it new request or already known? */
     if(currentRequest.getRequestId() != newReqest.getRequestId()) {
+        newReqest.print();
+
         /* Set newRequest as currently processed one for further function entries */
         //memcpy(&currentRequest, &newReqest, REQEST_SIZE);
         currentRequest = newReqest;
@@ -24,7 +26,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         uint8_t reqestSize = currentRequest.getSize();
         // deklarujemy zmienną dataBuffer która jest pointerem typu uint8, malloc alokuje pamiec na stercie o rozmiarze requestSize i kastujemy na uint8 tzn informujemy kompilator ze bedziemy pod tym adresem przechowywać wartisci uint8
         
-
+        currentRequest.setRequestSendCount(1);
         /* Calculate checksum byte based on the payload */
         currentRequest.calculateCrc();
         uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
@@ -36,7 +38,6 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
             /* Increment request send counter for further entries of this function */
-            currentRequest.setRequestSendCount(1);
             lastSendTime = millis();
         }
         else{
@@ -56,19 +57,21 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 5000){
+            if(millis() - lastSendTime > 3000){
                 Serial.println("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
                 uint8_t reqestSize = currentRequest.getSize();
+                currentRequest.setRequestSendCount(currentRequest.getRequestSendCount() + 1);
+
+                currentRequest.calculateCrc();
 
                 uint8_t* dataBuffer = (uint8_t*) malloc(reqestSize);
                 currentRequest.toByteArray(dataBuffer, reqestSize);
                 
                 if(message.pushData((byte*)(dataBuffer),reqestSize)){
                     NetworkDriver::sendBroadcast(message);
-                    currentRequest.setRequestSendCount(currentRequest.getRequestSendCount() + 1);
                     lastSendTime = millis();
                 }
                 else{

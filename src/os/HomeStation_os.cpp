@@ -42,6 +42,9 @@ void OperatingSystem::init()
     calculateRuntimeNodeHash();
     DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
     
+    // Inicialize device manager, devices settings etc.
+    DeviceManager::init();
+
     // Initialize network settings such as 
     // WiFi network connection etc.
     NetworkDriver::init();
@@ -49,10 +52,6 @@ void OperatingSystem::init()
     if(isHttpServerRunning){
         HomeLightHttpServer::init();
     }
-
-
-    // Inicialize device manager, devices settings etc.
-    DeviceManager::init();
 
     if(isRCServerRunning){
         RemoteControlServer::init();

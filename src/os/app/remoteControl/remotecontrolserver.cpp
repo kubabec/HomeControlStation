@@ -46,6 +46,28 @@ void RemoteControlServer::init(){
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
 
+
+
+    /* RC Request test */
+    // RcRequest request(31, 6538, 4);
+    // request.setID(99);
+
+    // uint8_t data[10] = {1,2,3,4,5,6,7,8,9,10};
+    // request.pushData(data, 10);
+    // request.calculateCrc();
+
+    // request.print();
+
+    // uint8_t* byteArray = (uint8_t*)malloc(request.getSize()); 
+    // request.toByteArray(byteArray, request.getSize());
+
+    // RcRequest req2;
+
+    // req2.fromByteArray(byteArray, request.getSize());
+    // Serial.print("Compared:");
+    // req2.print();
+
+
     Serial.println("... done");
 }
 
@@ -65,16 +87,22 @@ void RemoteControlServer::cyclic(){
 
             /* we must notify the request sender that processing of the request is completed */
             /* TODO : return status relevant to message timeout */
-            RcResponse emptyResponse ;
 
-            emptyResponse.setResponseId(pendingRequestsQueue.front().getRequestId()) ;
-            emptyResponse.setRequestType(pendingRequestsQueue.front().getRequestType());
+            RcResponse emptyResponse(
+                pendingRequestsQueue.front().getRequestId(),
+                0LL,
+                pendingRequestsQueue.front().getRequestType(),
+                INVALID_REQ_RESP
+            );
             
-            if(responseReceivers.at(emptyResponse.getRequestType())){
-                /* forward response in a callback to the request sender */
-                responseReceivers.at(emptyResponse.getRequestType())(emptyResponse);
-            }
+            if(emptyResponse.getRequestType() >= REQ_FIRST && emptyResponse.getRequestType() < UNKNOWN_REQ) {
+                if(responseReceivers.at(emptyResponse.getRequestType()) != nullptr){
+                    /* forward response in a callback to the request sender */
+                    responseReceivers.at(emptyResponse.getRequestType())(emptyResponse);
+                }else {
 
+                }
+            }
 
             /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
@@ -489,29 +517,28 @@ bool RemoteControlServer::processPendingRequest(RcRequest& request){
     return requestProcessor.processReqest(request);
     //request.print();
     //return false;
-    
 }
 
 void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 {
     /* TODO : Unpack payload MessageUdp -> RcResponse */
     RcResponse response;
-    /* Is received response in valid length ? */
-    if(msg.getPayload().size() == response.getSize()){
-        memcpy(&response, &msg.getPayload().at(0), response.getSize());
-        
-        /*PRINT*/
-        //msg.serialPrintMessageUDP(msg);
-        /* Does received response match currently processed request? */
-        if(pendingRequestsQueue.front().getRequestId() == response.getResponseId() &&
-           pendingRequestsQueue.front().getRequestType() == response.getResponseId()){
-            /* remove processed request as we received the response */
-            pendingRequestsQueue.pop();
-  
-            /* Do we have receiver registered for this type of the request ? */
-            if(responseReceivers.at(response.getRequestType())){
-                /* forward response in a callback to the request sender */
-                responseReceivers.at(response.getRequestType())(response);
+
+    /* Try to construct response from the payload data */
+    if(response.fromByteArray(msg.getPayload().data(), msg.getPayload().size())){
+
+        if(response.isValid()){
+            /* Does received response match currently processed request? */
+            if(pendingRequestsQueue.front().getRequestId() == response.getResponseId() &&
+                pendingRequestsQueue.front().getRequestType() == response.getResponseId()){
+                /* remove processed request as we received the response */
+                pendingRequestsQueue.pop();
+
+                /* Do we have receiver registered for this type of the request ? */
+                if(responseReceivers.at(response.getRequestType())){
+                    /* forward response in a callback to the request sender */
+                    responseReceivers.at(response.getRequestType())(response);
+                }
             }
         }
     }
@@ -553,6 +580,10 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr){
 uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 {
     newRequest.setID(generateRequestId());
+
+    /*tmp */
+    uint8_t data[10] = {1,2,3,4,5,6,7,8,9,10};
+    newRequest.pushData(data, 10);
 
     /* Creating new request */
     Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));

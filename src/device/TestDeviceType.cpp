@@ -57,5 +57,6 @@ DeviceDescription TestDeviceType::getDeviceDescription(){
     desc.roomId = 1;
     desc.isEnabled = true;
     desc.deviceName = "TestDeviceType";
+    memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     return desc;
 }

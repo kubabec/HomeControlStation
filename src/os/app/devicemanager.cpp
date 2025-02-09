@@ -176,7 +176,7 @@ void DeviceManager::cyclic()
         
     }
 
-    if(millis() - lastInternalDescriptionUpdateTime > 5000){
+    if(millis() - lastInternalDescriptionUpdateTime > 5000){ /* 30sec */
         updateDeviceDescriptionSignal();
         lastInternalDescriptionUpdateTime = millis();
     }

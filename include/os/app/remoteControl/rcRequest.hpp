@@ -27,11 +27,9 @@ class RcRequest {
 
 public:
     RcRequest();
-    RcRequest(uint8_t id, uint64_t mac, uint8_t requestType);
+    RcRequest(uint8_t targetDeviceId, uint64_t targetNodeMAC, uint8_t requestType);
 
-    RcRequest operator=(RcRequest& other);
-
-
+    RcRequest& operator=(RcRequest& other);
 
     uint8_t getSize();
     uint8_t getRequestId();
@@ -48,8 +46,7 @@ public:
     void setID(uint8_t id);
     
     void calculateCrc();
-    void requestPrintRcRequestObject();
-    void printByteArray(uint8_t* buffer, uint16_t size);  
+    void print();
 
     void clear();
     void setRequestSendCount(uint8_t count);
