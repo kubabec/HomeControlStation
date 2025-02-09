@@ -28,6 +28,10 @@ let isNotificationPollingActive = 1;\
         var url = `/masseraseviahttp`;\
         window.location.href = url;\
     }\
+    function resetDevice(){\
+        var url = `/resetDevice`;\
+        window.location.href = url;\
+    }\
     function onRangeTimChanged(value) {\
         value = parseInt(value);\
         window.location.assign(\"/?tim\"+value+\"&\");\

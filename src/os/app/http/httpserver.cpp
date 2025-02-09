@@ -59,6 +59,7 @@ const char* labelEnd = "</label>";
 std::vector<String> constantRequests = {
   "", /* Main page with no parameter */
   "config",
+  "resetDevice",
   "errclrbtn",
   "localDevices",
   "roomAssignment",
@@ -86,6 +87,7 @@ std::vector<String> parameterizedAsyncRequests = {
 std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>> constantRequestHandlers = {
   {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::constantHandler_resetDevice, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_clearErrors, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
@@ -888,10 +890,15 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   
   /* Room mapping button */
   client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
+
+  /* Reboot button*/
+  client.println("<div class=\"button-link\" onclick=\"showMessage('You really need to reboot device', resetDevice)\">REBOOT DEVICE</div>");
+    
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
+   
   
     /* Clear all settings */
     client.println("<div class=\"error-button\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
@@ -1227,6 +1234,15 @@ void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)
   printConfigPage(client);
   
 }
+
+void HomeLightHttpServer::constantHandler_resetDevice(WiFiClient& client)
+{
+  /* Reset device callback */
+  std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
+}
+
+  
 
 void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient& client)
 {

@@ -81,6 +81,8 @@ void OperatingSystem::init()
         };
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
+
+    //timeClient.begin();
     
 }
 
@@ -305,3 +307,22 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
         break;
     }
 }
+
+// void OperatingSystem::wyswietlDateICzas() {
+//     if (timeClient.update()) {
+//     String formattedDate = String(year()) + "-" + String(month()) + "-" + String(day());
+//     String formattedTime = String(hour()) + ":" + String(minute()) + ":" + String(second());
+
+//     Serial.print("Data: ");
+//     Serial.print(formattedDate);
+//     Serial.print(", Czas: ");
+//     Serial.println(formattedTime);
+//   }
+// }
+
+
+//   String OperatingSystem::pobierzCzas() {
+//     timeClient.update();
+//     String formattedTime = timeClient.getFormattedTime();
+//     return formattedTime;
+//   }

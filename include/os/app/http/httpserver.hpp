@@ -72,6 +72,7 @@ public:
     static void constantHandler_mainPage(WiFiClient& client);
     static void constantHandler_clearErrors(WiFiClient& client);
     static void constantHandler_configPage(WiFiClient& client);
+    static void constantHandler_resetDevice(WiFiClient& client);
     static void constantHandler_devicesSetup(WiFiClient& client);
     static void constantHandler_roomAssignment(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);

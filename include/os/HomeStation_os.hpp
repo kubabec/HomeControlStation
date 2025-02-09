@@ -1,6 +1,10 @@
 #ifndef HOME_LIGHT_OK_H
 #define HOME_LIGHT_OK_H
 
+#include <WiFiUdp.h>
+#include <TimeLib.h>
+#include <NTPClient.h>
+
 #include <os/app/http/HttpServer.hpp>
 #include <os/app/DeviceManager.hpp>
 #include <os/drivers/NetworkDriver.hpp>
@@ -37,7 +41,15 @@ private:
 
     static void handleUiBlockTimeExpiration();
 
+    
+
 public:
+
+    const char* ntpServer = "pool.ntp.org";
+    const long gmtOffset_sec = 3600; // CET (UTC+1)
+    NTPClient timeClient;
+
+    
     static void init();
     static void reset();
 
@@ -48,6 +60,9 @@ public:
     static void task20ms();
     static void task50ms();
     static void task1s();
+
+    static void wyswietlDateICzas();
+    static String pobierzCzas();
 
 };
 

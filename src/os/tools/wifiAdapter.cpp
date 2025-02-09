@@ -132,12 +132,17 @@ String WiFiAdapter::getLastConnectedPassword()
 
 void WiFiAdapter::createAccessPoint()
 {
+    String ssid = "ESP32_HomeStation";;
+    String macAddres = WiFi.macAddress();
+    String lastMacFourDigits = macAddres.substring(macAddres.length()-5);
+    String ssidWithMac = ssid + "_" + lastMacFourDigits;
+
     // const char* accessPointSSID = "ESP32_HomeStation";
     // Serial.println("Access Point initialization ...");
     //WiFi.mode(WIFI_AP);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(IPAddress(192, 168, 0, 1), IPAddress(192, 168, 0, 1), IPAddress(255,255,255,0));
-    WiFi.softAP("ESP32_HomeStation", "HomeStation");
+    WiFi.softAP(ssidWithMac, "HomeStation");
     Serial.println("AP created successfully");
 
 
