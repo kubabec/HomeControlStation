@@ -37,6 +37,10 @@ void TempSensorDHT11DeviceType::cyclic(){
 
 }
 
+uint16_t TempSensorDHT11DeviceType::getExtendedMemoryLength(){
+    return 0;
+}
+
 uint8_t TempSensorDHT11DeviceType::getDeviceIdentifier(){
     return deviceId;
 }

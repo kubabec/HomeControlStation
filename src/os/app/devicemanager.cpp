@@ -87,12 +87,19 @@ void DeviceManager::init()
             }
 
             /* Publish retrieved DeviceConfigSlots signal to the system */
-            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
+            Serial.println("DeviceManager//: Publishin config slots.");
+            DataContainer::setSignalValue(SIG_CONFIG_SLOTS, static_cast<ConfigSlotsDataType>(pinConfigSlotsRamMirror));
         }
     }else
     {
         Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
+
+    Serial.println("DeviceManager//: Config slots setup:");
+    for(auto& slot : pinConfigSlotsRamMirror.slots){
+        slot.print();
+    }
+
 
     /* devices merging after NVM restoration */
     {
@@ -112,6 +119,61 @@ void DeviceManager::init()
             devices.push_back(&device);
         }
     }
+
+    if(devices.size() > 0){
+        /* Extended memory allocation and assignment must happen here before init of each device*/
+        ExtendedMemoryCtrlAPI extMemoryFunctions = std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
+
+        bool isOneMoreRebootNeeded = false;
+        for(auto& device : devices){
+            uint16_t extendedMemoryLengthForEachDevice = device->getExtendedMemoryLength();
+            uint8_t deviceIdentifier = device->getDeviceIdentifier();
+
+            /* check if device even need extra memory */
+            if(extendedMemoryLengthForEachDevice > 0){
+                uint16_t checkSize = 0;
+                /* Try to get already existing extended memory for this particular device */
+                uint8_t* memoryPtr = extMemoryFunctions.getExtMemoryPtrByDeviceId(
+                    deviceIdentifier,
+                    &checkSize
+                );
+
+                /* Did we receive valid data pointer, so it means extended memory for this device was already existing? */
+                if(checkSize == extendedMemoryLengthForEachDevice && memoryPtr != nullptr){
+                    ServiceParameters_set3 extMemParams = {
+                        .buff = memoryPtr,
+                        .size = checkSize
+                    };
+                    device->service(DEVSERVICE_SET_EXT_MEMORY_PTR, extMemParams);
+                }else {
+                    /* We could not receive valid data from ExtendedMemoryManager if the record for this device 
+                        does not exist yet, it means device was just coded for the first time before reboot. */
+
+                    /* we need to use other function to reserve extended data for future runtime cycle */
+                    bool success = extMemoryFunctions.requestNewExtendedMemorySpace(
+                        deviceIdentifier, 
+                        extendedMemoryLengthForEachDevice
+                    );
+
+                    /* was memory space reservation successful ? */
+                    if(success){
+                        Serial.println("DeviceManager//:Additional reboot needed to prepare ExtMemory blocks");
+                        /* it means that we need one more reboot to have extended memory space prepared */
+                        isOneMoreRebootNeeded = true;
+                    }
+
+                }
+            }
+
+        }
+
+        if(isOneMoreRebootNeeded){
+            std::any_cast<std::function<void()>>
+                (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+        }
+    }
+
+
     for(auto device : devices){
         device->init(); // to jest init() danego typu device np. onoffDevice
     }
@@ -156,12 +218,6 @@ void DeviceManager::init()
     // devices.push_back(&testDev);
     /*TESTCODE*/
 
-
-
-    /* EXTENDED DATA ALLOCATOR TESTCODE */
-    ExtendedData newExtendedData = extDataAllocator.createNewExtendedData(200);
-    
-    /* */
 
     Serial.println("... done");
 }
@@ -500,6 +556,9 @@ bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
 
     bool validationSuccess = false;
     uint8_t errorFlag = 0;
+    ExtendedMemoryCtrlAPI extMemoryFunctions = 
+        std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
+
 
     for(uint8_t slot = 0; slot < 6; slot++)
     {
@@ -536,6 +595,10 @@ bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
                 Serial.println("Error: Pin value is out of allowed pins range ");
                 errorFlag |= 1;
             }
+        }else {
+            /* Release extended memory space for unused slot */
+            extMemoryFunctions.releaseExtendedMemorySpace(slot+1);
+
         }
     }
 

@@ -30,7 +30,6 @@ std::map<uint8_t, std::vector<DeviceDescription*>> HomeLightHttpServer::deviceTo
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
 std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
 uint8_t HomeLightHttpServer::activeErrorsCount = 0;
-ConfigSlotsDataType HomeLightHttpServer::pinConfigSlotsCopy_HttpServer = {};
 String HomeLightHttpServer::ipAddressString;
 
 
@@ -262,7 +261,6 @@ void HomeLightHttpServer::init()
 
 
   DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
-  DataContainer::subscribe(SIG_CONFIG_SLOTS, HomeLightHttpServer::onSlotConfigChange);
 
   DataContainer::subscribe(SIG_SECURITY_ACCESS_LEVEL, [](std::any signal){
     try{
@@ -580,14 +578,6 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
 
 }
 
-void HomeLightHttpServer::onSlotConfigChange(std::any newSlotConfig)
-{
-  pinConfigSlotsCopy_HttpServer = (std::any_cast<ConfigSlotsDataType>(newSlotConfig));
-  for(auto& slot : pinConfigSlotsCopy_HttpServer.slots) {
-    slot.print();
-  }
-}
-
 void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
 {
   client.println("{");
@@ -683,6 +673,7 @@ void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiCl
 
 void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
+
 
   client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
   
@@ -885,6 +876,13 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(currentConfig.panelPassword);
   client.println("\" type=\"text\" name=\"UserPassword\"></label>");
 
+  /* Extended memory usage */
+  ExtendedMemoryCtrlAPI extMemoryFunctions = 
+        std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
+  client.println("<label>Memory usage:<input disabled value=\"");
+  client.println(String((int)extMemoryFunctions.getCurrentMemoryUsage()) + " / 2 500 bytes");
+  client.println("\" type=\"text\" \"></label>");
+
   /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
   
@@ -919,8 +917,15 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
   client.println("<div class=\"wrapper\">\
         <div class=\"header\">Node Local Configuration</div>");
 
+
+  ConfigSlotsDataType cfgSlots = std::any_cast<ConfigSlotsDataType>(DataContainer::getSignalValue(SIG_CONFIG_SLOTS));
+  Serial.println("HTTPServer//:Printing config slots:");
+  for(auto& slot: cfgSlots.slots){
+    slot.print();
+  }
+
   uint8_t slotIdx = 1;
-  for(auto slot : pinConfigSlotsCopy_HttpServer.slots)
+  for(auto& slot : cfgSlots.slots)
   {
     generateConfigSlotUi(slotIdx, slot, client);
     slotIdx++;

@@ -8,6 +8,10 @@ void TestDeviceType::cyclic(){
 
 }
 
+uint16_t TestDeviceType::getExtendedMemoryLength(){
+    return 0;
+}
+
 uint8_t TestDeviceType::getDeviceIdentifier(){
     return 11;
 }

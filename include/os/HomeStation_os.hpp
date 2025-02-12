@@ -16,6 +16,7 @@
 #include <os/app/DeviceProvider.hpp>
 #include <os/app/ErrorMonitor.hpp>
 #include <os/app/NotificationHandler.hpp>
+#include <os/app/config/ExtendedMemoryManager.hpp>
 
 class   OperatingSystem
 {

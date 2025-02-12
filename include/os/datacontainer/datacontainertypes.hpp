@@ -49,7 +49,9 @@ typedef enum
     e_BLOCK_HTTP_7,
     e_BLOCK_HTTP_8,
     e_BLOCK_HTTP_LAST = e_BLOCK_HTTP_8,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_HTTP_8
+    e_BLOCK_EXT_MEMORY_METADATA,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_EXT_MEMORY_METADATA,
+    e_NUMBER_OF_PERSISTENT_BLOCKS = (e_PERSISTENT_BLOCK_LAST + 1)
 }PersistentDatablockID;
 
 /* Array of available configuration slots wrapper */
@@ -94,6 +96,14 @@ typedef struct
     std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set2 param)> serviceCall_set2;
     std::function<ServiceRequestErrorCode(uint8_t, DeviceServicesType, ServiceParameters_set3 param)> serviceCall_set3;
 }DeviceServicesAPI;
+
+
+typedef struct{
+    std::function<bool(uint8_t, uint16_t)>  requestNewExtendedMemorySpace;
+    std::function<void(uint8_t)>            releaseExtendedMemorySpace;
+    std::function<uint8_t*(uint8_t, uint16_t*)>  getExtMemoryPtrByDeviceId;
+    std::function<uint16_t(void)>           getCurrentMemoryUsage;
+}ExtendedMemoryCtrlAPI;
 
 typedef enum
 {

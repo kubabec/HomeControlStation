@@ -105,6 +105,10 @@ void OnOffDevice::cyclic() {
     
 }
 
+uint16_t OnOffDevice::getExtendedMemoryLength(){
+    return 0;
+}
+
 int OnOffDevice::getBrightnessLevel() {
     return brightnessLevel;
 }

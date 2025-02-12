@@ -24,6 +24,10 @@ void LedWS1228bDeviceType::cyclic(){
 
 }
 
+uint16_t LedWS1228bDeviceType::getExtendedMemoryLength(){
+    return 600;
+}
+
 uint8_t LedWS1228bDeviceType::getDeviceIdentifier(){
     return deviceId;
 }

@@ -34,6 +34,7 @@ typedef enum
     DEVSERVICE_GET_DATA,
     DEVSERVICE_STATE_SWITCH,
     DEVSERVICE_BRIGHTNESS_CHANGE,
+    DEVSERVICE_SET_EXT_MEMORY_PTR,
     DEVSERVICE_INVALID
 }DeviceServicesType;
 
@@ -65,7 +66,7 @@ typedef struct
 typedef struct
 {
     uint8_t* buff = 0;
-    uint8_t size = 0xff;
+    uint16_t size = 0xff;
 
 }ServiceParameters_set3;
 
@@ -109,6 +110,7 @@ public:
     virtual DeviceDescription getDeviceDescription() = 0;
     virtual uint8_t getDeviceIdentifier() = 0;
     virtual uint8_t getDeviceType() = 0;
+    virtual uint16_t getExtendedMemoryLength() = 0;
 
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType) = 0;
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param) = 0;

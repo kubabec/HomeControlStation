@@ -39,6 +39,7 @@ void OperatingSystem::init()
 
     changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
     ConfigProvider::init();
+    ExtendedMemoryManager::init();
 
 
     calculateRuntimeNodeHash();
@@ -85,6 +86,77 @@ void OperatingSystem::init()
 
     //timeClient.begin();
     
+    // uint16_t dataSize = 0;
+    // uint8_t* dataPtr = std::any_cast<ExtendedMemoryCtrlAPI>(
+    //     DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API)).getExtMemoryPtrByDeviceId(
+    //         1,
+    //         &dataSize
+    //     );
+    
+    // if(dataSize > 0 && dataPtr != nullptr){
+    //     Serial.println("ext data:");
+    //     for(uint16_t i  = 0; i < dataSize; i++){
+    //         // Serial.print((int)dataPtr[i]);
+    //         // Serial.print(",");
+
+    //         // dataPtr[i] = i;
+    //     }
+    //     Serial.println("");
+    // }
+
+    // Serial.println("dataPtr: " + String((int)dataPtr));
+
+
+    // uint16_t dataSize2 = 0;
+    // uint8_t* dataPtr2 = std::any_cast<ExtendedMemoryCtrlAPI>(
+    //     DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API)).getExtMemoryPtrByDeviceId(
+    //         3,
+    //         &dataSize2
+    //     );
+
+    // Serial.println("dataPtr2: " + String((int)dataPtr2));
+    
+    // if(dataSize2 > 0 && dataPtr2 != nullptr){
+    //     uint8_t dataValue = 17;
+    //     Serial.println("ext data2:");
+    //     for(uint16_t j  = 0; j < dataSize2; j++){
+    //     //     // Serial.print((int)dataPtr2[i]);
+    //     //     // Serial.print(",");
+
+    //         // dataPtr2[j] = dataValue;
+    //         // dataValue ++;
+    //         // if(dataValue == 255){
+    //         //     dataValue = 1;
+    //         // }
+    //     }
+    //     Serial.println("");
+
+        
+    // }
+
+
+    //     Serial.println("ext data:");
+    //     for(uint16_t i  = 0; i < dataSize; i++){
+    //         Serial.print((int)dataPtr[i]);
+    //         Serial.print(",");
+
+    //         // dataPtr[i] = i;
+    //     }
+    //     Serial.println("");
+
+
+    //     Serial.println("ext data2:");
+    //     for(uint16_t j  = 0; j < dataSize2; j++){
+    //         Serial.print((int)dataPtr2[j]);
+    //         Serial.print(",");
+
+    //         // dataPtr2[j] = dataValue;
+    //         // dataValue ++;
+    //         // if(dataValue == 255){
+    //         //     dataValue = 1;
+    //         // }
+    //     }
+    //     Serial.println("");
 }
 
 
@@ -114,6 +186,7 @@ void OperatingSystem::task20ms()
 void OperatingSystem::task50ms()
 {
     NotificationHandler::cyclic();
+    ExtendedMemoryManager::cyclic();
 
     if(resetPending){
         resetCountdown --;
@@ -159,7 +232,7 @@ void OperatingSystem::performReset()
     ErrorMonitor::deinit();
     NotificationHandler::deinit();
 
-
+    ExtendedMemoryManager::deinit();
     /* This app must be last, as it saves NVM data */
     ConfigProvider::deinit();
 

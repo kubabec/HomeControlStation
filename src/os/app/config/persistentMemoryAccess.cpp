@@ -5,6 +5,7 @@
 const uint8_t START_OF_DATA = 0b10101010;
 const uint8_t END_OF_DATA = 0b01010101;
 
+uint16_t PersistentMemoryAccess::standardDataEepromSize = 0;
 bool PersistentMemoryAccess::eepromInitializedSuccessfully = false;
 
 void PersistentMemoryAccess::init(uint16_t eepromSize)
@@ -15,7 +16,10 @@ void PersistentMemoryAccess::init(uint16_t eepromSize)
         eepromSize +
         sizeof(int);
 
-    eepromInitializedSuccessfully = EEPROM.begin(finalSize);
+    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 2500);
+    if(eepromInitializedSuccessfully){
+        standardDataEepromSize = finalSize;
+    }
 }
 
 
@@ -124,10 +128,48 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
-    Serial.println("NVM :: ERASING " + String((int)eepromSize) + " BYTES FROM FLASH MEMORY ... ");
-    for(uint16_t i = 0; i < eepromSize; i ++){
+    uint16_t eepromSize2 = standardDataEepromSize + 2500;
+    Serial.println("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
+    for(uint16_t i = 0; i < eepromSize2; i ++){
         EEPROM.write(i, 0);
     }
 
+    EEPROM.commit();
+}
+
+
+void PersistentMemoryAccess::readExtendedMemoryWithOffset(uint16_t offsetToStandardData, uint8_t* buffer, uint16_t size){
+    for(uint16_t i = 0; i < size; i++){
+        /*
+        STANDARD_NVM_START_OF_DATA
+        STANDARD_NVM_DATA . . . 
+        . . . 
+        . . . 
+        STANDARD_NVM_END_OF_DATA
+        FIRST_BYTE_OF_EXTENDED_MEMORY_DATA (offset: standardDataEepromSize)
+        . . . 
+        . . . 
+        . . . 
+        . . . 
+        . . . 
+        . . . 
+        . . . 
+        . . . 2,5kB
+        */
+        buffer[i] = EEPROM.read(standardDataEepromSize + offsetToStandardData + i);
+    }
+
+}
+
+void PersistentMemoryAccess::writeExtendedMemory(uint16_t offset, uint8_t* buffer, uint16_t size)
+{
+    for(uint16_t i = 0; i < size; i++)
+    {
+        EEPROM.write(standardDataEepromSize + offset + i, buffer[i]);
+    }
+}
+
+void PersistentMemoryAccess::flushExtendedMemory()
+{
     EEPROM.commit();
 }

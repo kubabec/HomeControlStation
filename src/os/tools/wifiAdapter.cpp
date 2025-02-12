@@ -79,7 +79,6 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password)
 
     DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
 
-    Serial.println("======== IP Adres =========");
 }
 
 void WiFiAdapter::disconnect()

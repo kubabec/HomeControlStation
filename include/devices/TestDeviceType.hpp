@@ -12,6 +12,7 @@ class TestDeviceType : public Device {
     virtual uint8_t getDeviceIdentifier();
     virtual uint8_t getDeviceType();
     virtual DeviceDescription getDeviceDescription();
+    virtual uint16_t getExtendedMemoryLength();
 
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
