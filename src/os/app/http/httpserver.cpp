@@ -919,6 +919,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 
 
   ConfigSlotsDataType cfgSlots = std::any_cast<ConfigSlotsDataType>(DataContainer::getSignalValue(SIG_CONFIG_SLOTS));
+  // ConfigSlotsDataType cfgSlots;
   Serial.println("HTTPServer//:Printing config slots:");
   for(auto& slot: cfgSlots.slots){
     slot.print();

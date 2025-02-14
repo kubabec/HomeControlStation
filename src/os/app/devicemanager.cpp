@@ -51,7 +51,7 @@ void DeviceManager::init()
             /* For each DEVICE relevant datablock */
             for(uint8_t datablock = e_BLOCK_DEVICE_1; datablock <= e_BLOCK_DEVICE_6; datablock ++){
                 /* Fill memory area with default 0xFF values */
-                memset(configBlock, 0xFF, DeviceConfigSlotType::getSize());
+                memset(configBlock, 0x00, DeviceConfigSlotType::getSize());
 
                 /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
                 std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(

@@ -15,6 +15,15 @@ void ExtendedMemoryManager::init(){
         extMemoryMetadata.memoryPerDeviceSlotNeeded[i] = 0x00;
     }
 
+
+    ExtendedMemoryCtrlAPI api;
+    api.requestNewExtendedMemorySpace = ExtendedMemoryManager::requestNewExtendedMemorySpace;
+    api.releaseExtendedMemorySpace = ExtendedMemoryManager::releaseExtendedMemorySpace;
+    api.getExtMemoryPtrByDeviceId = ExtendedMemoryManager::getExtMemoryPtrByDeviceId;
+    api.getCurrentMemoryUsage = ExtendedMemoryManager::getCurrentMemoryUsage;
+
+    DataContainer::setSignalValue(SIG_EXT_MEM_CTRL_API, static_cast<ExtendedMemoryCtrlAPI>(api));
+
     /* Try to read metadata block from NVM */
     bool success = std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
         DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK)
@@ -32,14 +41,6 @@ void ExtendedMemoryManager::init(){
     restoreExtMemoryFromNvm();
     Serial.println("ExtendedMemoryManager// Extended memory for " + String((int)extMemoryContainer.size()) + " devices restored with total size of "+String((int)extMemoryInUse)+ " bytes ");
 
-
-    ExtendedMemoryCtrlAPI api;
-    api.requestNewExtendedMemorySpace = ExtendedMemoryManager::requestNewExtendedMemorySpace;
-    api.releaseExtendedMemorySpace = ExtendedMemoryManager::releaseExtendedMemorySpace;
-    api.getExtMemoryPtrByDeviceId = ExtendedMemoryManager::getExtMemoryPtrByDeviceId;
-    api.getCurrentMemoryUsage = ExtendedMemoryManager::getCurrentMemoryUsage;
-
-    DataContainer::setSignalValue(SIG_EXT_MEM_CTRL_API, static_cast<ExtendedMemoryCtrlAPI>(api));
 
 
     for(auto& entry : extMemoryContainer){

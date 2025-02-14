@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 /* Description of single configuration NVM slot */
-typedef struct 
+struct DeviceConfigSlotType
 {
     bool isActive = false;            /* 1 byte */
     char deviceName[25] = {'\0'};   /* 25 bytes */
@@ -12,6 +12,11 @@ typedef struct
     uint8_t deviceId = 255;         /* 1 byte */
     uint8_t roomId = 255;           /* 1 byte */
     uint8_t customBytes[20] = {0xFA};          /* 20 bytes */
+
+    DeviceConfigSlotType(){
+        memset(deviceName, (char)'\0', 25);
+        memset(customBytes, 0xFA, 20);
+    }
 
     void print()
     {
@@ -63,6 +68,6 @@ typedef struct
         return sizeof(isActive) + 25 + sizeof(deviceType) + sizeof(pinNumber) + sizeof(deviceId) + sizeof(roomId) + 20;
     }
 
-}DeviceConfigSlotType;
+};
 
 #endif

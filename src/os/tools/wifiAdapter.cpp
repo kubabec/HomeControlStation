@@ -136,6 +136,11 @@ void WiFiAdapter::createAccessPoint()
     String lastMacFourDigits = macAddres.substring(macAddres.length()-5);
     String ssidWithMac = ssid + "_" + lastMacFourDigits;
 
+    // WiFiAdapter::connectToNetwork( "Xiaomi 12 Lite", "Goldie10");
+    // return;
+
+
+
     // const char* accessPointSSID = "ESP32_HomeStation";
     // Serial.println("Access Point initialization ...");
     //WiFi.mode(WIFI_AP);
