@@ -86,6 +86,7 @@ typedef struct
     uint8_t occurrenceCount = 0;
     String comment = "none";
     uint64_t lastOccurrenceTime = 0;
+    String timeOfOccurrence = "";
 }SystemErrorType;
 
 

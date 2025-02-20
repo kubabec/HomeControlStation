@@ -11,7 +11,7 @@
 #include "os/app/http/renderRoomsJS.h"
 
 
-
+MasterTimer HomeLightHttpServer::masterTimer;
 
 WiFiServer HomeLightHttpServer::server(80);
 WiFiClient client;
@@ -200,6 +200,8 @@ void HomeLightHttpServer::init()
   Serial.println("HomeLightHttpServer init ...");
 
   server.setTimeout(10);
+
+  masterTimer.begin();
 
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
@@ -804,6 +806,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
   client.println("<div class=\"header\">General configuration</div>");
+  client.println("<div class=\"current-time\">Aktualny czas: " + masterTimer.getFormattedTime() + "</div>");
+
   client.println("\
     <div class=\"container\">\
     <form onsubmit=\"return false;\">");
@@ -884,19 +888,17 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" \"></label>");
 
   /* Apply button*/
-  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");
+  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");  
   
   /* Room mapping button */
   client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
-
-  /* Reboot button*/
-  client.println("<div class=\"button-link\" onclick=\"showMessage('You really need to reboot device', resetDevice)\">REBOOT DEVICE</div>");
-    
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
-   
+
+  /* Reboot button*/
+  client.println("<div class=\"error-button\" style=\"background-color: red;\" onclick=\"showMessage('You really need to reboot device', resetDevice)\">REBOOT DEVICE</div>");
   
     /* Clear all settings */
     client.println("<div class=\"error-button\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
@@ -963,7 +965,7 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
                           <td>ERR-"+ String(i+1) +"</td>\
                           <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
                           <td>"+ systemErrorList.at(i).comment +"</td>\
-                          <td>"+ String((int)systemErrorList.at(i).lastOccurrenceTime) +"</td>\
+                          <td>" + systemErrorList.at(i).timeOfOccurrence + "</td>\
                       </tr>");
 
       }

@@ -5,6 +5,7 @@
 #include <map>
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/app/http/HttpAsyncRequestHandler.hpp>
+#include <os/tools/masterTimer.hpp>
 
 #define MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS 15
 
@@ -16,6 +17,8 @@ class HomeLightHttpServer
 
         //uint8_t reserved[PERSISTENT_DATABLOCK_SIZE - 2];
     }HttpServerNvmMetadata;
+
+    static MasterTimer masterTimer;
 
     static HttpServerNvmMetadata nvmMetadata;
     static WiFiServer server;

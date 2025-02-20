@@ -63,6 +63,8 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
         String commentWithConstLength = comment.length() <= 32 ? comment : comment.substring(0, 31);
         errorRef.comment = commentWithConstLength;
 
+        MasterTimer masterTimer;         
+        errorRef.timeOfOccurrence = masterTimer.getFormattedDateTime();
 
         /* Push error notification */
         UserInterfaceNotification notif{

@@ -11,6 +11,8 @@ uint16_t OperatingSystem::uniqueLifecycleId = 0;
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
+MasterTimer OperatingSystem::masterTimer; // Inicjalizacja obiektu MasterTimer
+
 long long uiBlockTime = 0;
 
 void OperatingSystem::init()
@@ -64,7 +66,8 @@ void OperatingSystem::init()
     }
 
     DeviceProvider::init();
-
+    
+    
 
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
@@ -84,7 +87,7 @@ void OperatingSystem::init()
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 
-    //timeClient.begin();
+    masterTimer.begin();
     
     // uint16_t dataSize = 0;
     // uint8_t* dataPtr = std::any_cast<ExtendedMemoryCtrlAPI>(
@@ -198,11 +201,13 @@ void OperatingSystem::task50ms()
     }
 
     calculateRuntimeNodeHash();
+    
 }
 
 void OperatingSystem::task1s()
 {
     handleSecurityAccessLevelExpiration();
+    masterTimer.cyclic();
 }
 
 void OperatingSystem::reset() {
@@ -373,7 +378,7 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
 
     case e_ACCESS_LEVEL_SERVICE_MODE:
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
-        notif.body = "Device is running in service mode";
+        notif.body = "Device is running in service mode " + masterTimer.getFormattedDateTime();
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         break;
     default:
@@ -382,21 +387,3 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     }
 }
 
-// void OperatingSystem::wyswietlDateICzas() {
-//     if (timeClient.update()) {
-//     String formattedDate = String(year()) + "-" + String(month()) + "-" + String(day());
-//     String formattedTime = String(hour()) + ":" + String(minute()) + ":" + String(second());
-
-//     Serial.print("Data: ");
-//     Serial.print(formattedDate);
-//     Serial.print(", Czas: ");
-//     Serial.println(formattedTime);
-//   }
-// }
-
-
-//   String OperatingSystem::pobierzCzas() {
-//     timeClient.update();
-//     String formattedTime = timeClient.getFormattedTime();
-//     return formattedTime;
-//   }

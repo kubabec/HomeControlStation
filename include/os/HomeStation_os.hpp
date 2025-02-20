@@ -17,6 +17,8 @@
 #include <os/app/ErrorMonitor.hpp>
 #include <os/app/NotificationHandler.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
+#include <os/tools/masterTimer.hpp>
+
 
 class   OperatingSystem
 {
@@ -32,6 +34,8 @@ private:
     static bool resetPending;
     static uint8_t resetCountdown;
 
+    static MasterTimer masterTimer; // Obiekt klasy MasterTimer
+
     static void performReset();
     static uint16_t calculateRuntimeNodeHash();
     static void handleSecurityAccessLevelExpiration();
@@ -46,9 +50,9 @@ private:
 
 public:
 
-    const char* ntpServer = "pool.ntp.org";
-    const long gmtOffset_sec = 3600; // CET (UTC+1)
-    NTPClient timeClient;
+    // const char* ntpServer = "pool.ntp.org";
+    // const long gmtOffset_sec = 3600; // CET (UTC+1)
+    // NTPClient timeClient;
 
     
     static void init();
@@ -62,8 +66,8 @@ public:
     static void task50ms();
     static void task1s();
 
-    static void wyswietlDateICzas();
-    static String pobierzCzas();
+    // static void wyswietlDateICzas();
+    // static String pobierzCzas();
 
 };
 
