@@ -1,7 +1,6 @@
 #include <os/app/http/HttpServer.hpp>
 #include <Regexp.h>
 
-
 #include "os/app/http/ConfigPageHttp.h"
 #include "os/app/http/PageHead.h"
 #include "os/app/http/Style.h"
@@ -10,8 +9,6 @@
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
 
-
-MasterTimer HomeLightHttpServer::masterTimer;
 
 WiFiServer HomeLightHttpServer::server(80);
 WiFiClient client;
@@ -200,8 +197,7 @@ void HomeLightHttpServer::init()
   Serial.println("HomeLightHttpServer init ...");
 
   server.setTimeout(10);
-
-  masterTimer.begin();
+  
 
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
@@ -283,6 +279,7 @@ void HomeLightHttpServer::init()
   //DataContainer::subscribe(CBK_DEVICE_ENABLE, "DeviceManager", ...);
 
   HTTPAsyncRequestHandler::init(&roomNamesMapping, &deviceToRoomMappingList);
+
 
   Serial.println("... done");
 }
@@ -806,7 +803,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
   client.println("<div class=\"header\">General configuration</div>");
-  client.println("<div class=\"current-time\">Aktualny czas: " + masterTimer.getFormattedTime() + "</div>");
+  //client.println("<div class=\"current-time\">Aktualny czas: " + timeMaster.getFormattedTime() + "</div>");
 
   client.println("\
     <div class=\"container\">\

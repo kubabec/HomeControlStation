@@ -63,8 +63,8 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
         String commentWithConstLength = comment.length() <= 32 ? comment : comment.substring(0, 31);
         errorRef.comment = commentWithConstLength;
 
-        MasterTimer masterTimer;         
-        errorRef.timeOfOccurrence = masterTimer.getFormattedDateTime();
+                
+        errorRef.timeOfOccurrence = 2222;
 
         /* Push error notification */
         UserInterfaceNotification notif{
@@ -88,6 +88,7 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
     }
     updateSystemErrorSignal();
 }
+
 
 void ErrorMonitor::errorClear(ERR_MON_ERROR_TYPE errorCode)
 {
