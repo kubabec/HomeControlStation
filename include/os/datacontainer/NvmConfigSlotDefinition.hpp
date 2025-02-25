@@ -11,11 +11,11 @@ struct DeviceConfigSlotType
     uint8_t pinNumber = 255;        /* 1 byte */
     uint8_t deviceId = 255;         /* 1 byte */
     uint8_t roomId = 255;           /* 1 byte */
-    uint8_t customBytes[20] = {0xFA};          /* 20 bytes */
+    uint8_t customBytes[20] = {0x00};          /* 20 bytes */
 
     DeviceConfigSlotType(){
         memset(deviceName, (char)'\0', 25);
-        memset(customBytes, 0xFA, 20);
+        memset(customBytes, 0x00, 20);
     }
 
     void print()
@@ -52,10 +52,11 @@ struct DeviceConfigSlotType
         Serial.println("PIN : " + String((int)pinNumber));
         Serial.println("Room : " + String((int)roomId));
         Serial.println("Extra data:");
-        for(int i = 0 ; i < 10; i ++)
+        for(int i = 0 ; i < 20; i ++)
         {
-            Serial.print(String((int)customBytes[i]));
+            Serial.print(String((int)customBytes[i]) + " ");
         }
+        Serial.println("");
     }
 
     bool isValid()

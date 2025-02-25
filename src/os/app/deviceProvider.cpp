@@ -17,8 +17,6 @@ void DeviceProvider::deinit() {
 void DeviceProvider::init()
 {
     Serial.println("DeviceProvider init ...");
-    DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, RequestProcessingState::eNO_REQUEST);
-
     
     /*TESTCODE*/
     /* Link service API functions to DeviceProvider function calls */

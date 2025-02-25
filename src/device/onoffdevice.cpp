@@ -93,8 +93,8 @@ void OnOffDevice::changeBrightness(int requestedBrightness) {
 
 
 void OnOffDevice::init() {
-    pinMode(pinNumber,OUTPUT);
-    off();
+    // pinMode(pinNumber,OUTPUT);
+    // off();
     //Serial.println("Device " + deviceName + " initialized on pin " + String(pinNumber));
     
 }

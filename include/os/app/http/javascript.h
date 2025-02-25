@@ -38,7 +38,7 @@ let isNotificationPollingActive = 1;\
     }\
     function onRangeChanged(value, devId) {\
         value = parseInt(value);\
-        var url = \"/?bri\"+value+\"DEV\"+devId+\"&\";\
+        var url = \"/chngdvbr\"+value+\"DEV\"+devId+\"&\";\
         const xhr = new XMLHttpRequest();\
         xhr.timeout = 10000;\
         const container = document.getElementById('container' + devId);\
@@ -87,64 +87,111 @@ let isNotificationPollingActive = 1;\
             fieldsToShow.classList.add('visible');\
         }\
     };\
-    function createConfigurationString()\
+    function getOnOffConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        var brightnessSupport =  document.getElementById('brightnessSupported-' + id).value;\
+        var activeSt = document.getElementById('activationState-' + id).value;\
+        return {\
+        type:\"OnOff\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        briSup:brightnessSupport,\
+        activeState:activeSt\
+      };\
+    }\
+    function getLedStripConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
+        var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
+        return {\
+        type:\"LedStrip\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        ledCount:ledsCnt,\
+        sideFlp:sideFlip\
+        };\
+    }\
+    function getTempSensorConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        return {\
+        type:\"TempSensor\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+      };\
+    }\
+    function getEmptyConfigurationJson(id){\
+        return {\
+        type:\"Empty\",\
+        id:id,\
+        enabled:false,\
+      };\
+    }\
+    function createConfigurationStringJson()\
     {\
-        var configStr = '';\
-        var url = '';\
-        var lengthCount = 0;\
-        var crc = 0;\
+        let devices = [];\
+\
         for (let i = 1; i <= 6; i++) {\
-            const container = document.getElementById(\"device-\"+i);\
-            var enable = \"enabled\" + i;\
-            var enableValue = document.getElementById(enable).checked;\
-            \
-            var dataEnable = '0';\
-            if(enableValue == true){\
-                dataEnable = '1';\
+            var deviceTypeValue = document.getElementById('type' + i).value;\
+\
+            if(deviceTypeValue == 43){\
+                devices.push(getOnOffConfigurationJson(i));\
+            } else if(deviceTypeValue == 44) {\
+                devices.push(getLedStripConfigurationJson(i));\
+            } else if(deviceTypeValue == 45) {\
+                devices.push(getTempSensorConfigurationJson(i));\
+            } else {\
+                devices.push(getEmptyConfigurationJson(i));\
             }\
+        }\
 \
-            var dataId = i;\
-            if(dataId < 10) { dataId = '0' + dataId; }\
-            var dataName = document.getElementById('name' + i).value;\
-            var dataType = document.getElementById('type' + i).value;\
-            var dataPin = document.getElementById('pin' + i).value;\
-            if(dataPin < 10) { dataPin = '0' + dataPin; }\
-            var dataRoom = document.getElementById('room' + i).value;\
-            if(dataRoom < 10) { dataRoom = '0' + dataRoom; }\
-            \
+        let finalJson = {\
+            devices: devices\
+        };\
+    \
+        let jsonString = JSON.stringify(finalJson);\
+        console.log(\"Wygenerowany JSON:\", jsonString);\
+        var url = '/lclSetupJson&' + jsonString;\
 \
-            var data43 =  document.getElementById('extra-43-' + i).value;\
-            var data44 =  document.getElementById('extra-44-' + i).value;\
-            var extraValue = 0;\
-            if(dataType == 43) { extraValue = data43;}\
-            if(dataType == 44) { extraValue = data44;}\
-            if(extraValue < 10) { extraValue = '0' + extraValue; }\
-            var nameLength = dataName.length;\
-            if(nameLength < 10) { nameLength = '0' + nameLength; }\
-            deviceConfigurationString = dataEnable + dataId + nameLength + dataName + dataType + dataPin + dataRoom + extraValue;\
-            stringLength = deviceConfigurationString.length;\
-            stringLengthBytes = 1;\
-            if(stringLength > 10){\
-                stringLengthBytes = 2;\
+        const xhr = new XMLHttpRequest();\
+        const container = document.getElementById('popup-content');\
+        showLoading(container);\
+        xhr.timeout = 10000;\
+        xhr.open(\"POST\", url, true);\
+        xhr.onreadystatechange = function() {\
+            if (xhr.readyState === 4) { \
+                if (xhr.status === 200) { \
+                    console.log('Config changed');\
+                } else { \
+                    console.log('Error with AJAX request');\
+                }\
             }\
-\
-\
-            lengthCount = lengthCount + 1 + stringLengthBytes + deviceConfigurationString.length;\
-            url = url + stringLengthBytes + stringLength + deviceConfigurationString;\
-        }\
-        var lengthCountLength = 2;\
-        if(lengthCount > 99){\
-            lengthCountLength = 3;\
-        }\
-        url = lengthCountLength.toString() + lengthCount.toString() + url;\
-        for(let i = 0; i < url.length; i++){\
-            crc = crc + Number(url.charCodeAt(i));\
-        }\
-        url = '/localSetup' + url;\
-\
-        url = url + crc.toString().length + crc;\
-        window.location.href = url;\
-    };\
+            hideLoading(container);\
+            url = '/';\
+            window.location.href = url;\
+        };\
+        xhr.send();\
+    }\
     function roomMappingCreateString(count)\
     {\
         var mappingStr = '';\
@@ -336,7 +383,7 @@ let isNotificationPollingActive = 1;\
   function asyncDeviceStateSwitch(device, state){\
     const xhr = new XMLHttpRequest();\
     xhr.timeout = 10000;\
-    var url = '/dev' + device.toString() + 'state';\
+    var url = '/stDvstte' + device.toString() + 'state';\
     const container = document.getElementById('container' + device);\
     showLoading(container);\
     if(state === 1){\
