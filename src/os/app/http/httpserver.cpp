@@ -939,6 +939,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
   client.println("</div>");
 }
 
+
 void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 {
   client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
@@ -991,7 +992,6 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
   }
   client.println("</div>");
 }
-
 
 /*** CONSTANT HANDLERS */
 

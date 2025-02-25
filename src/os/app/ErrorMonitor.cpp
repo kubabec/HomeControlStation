@@ -51,6 +51,7 @@ void ErrorMonitor::cyclic()
 }
 
 
+
 void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
 {
     errorCode = (ERR_MON_ERROR_TYPE)(errorCode - 1);
@@ -63,8 +64,14 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
         String commentWithConstLength = comment.length() <= 32 ? comment : comment.substring(0, 31);
         errorRef.comment = commentWithConstLength;
 
-                
-        errorRef.timeOfOccurrence = 2222;
+        // Pobierz aktualny czas z DataContainer
+        std::any timeValue = DataContainer::getSignalValue(SIG_CURRENT_TIME);
+        if (timeValue.has_value()) {
+            DataAndTime currentTime = std::any_cast<DataAndTime>(timeValue);
+            errorRef.timeOfOccurrence = formatTimeToString(currentTime); // Konwersja na String
+        } else {
+            errorRef.timeOfOccurrence = "Unknown time"; // Jeśli czas nie jest dostępny
+        }
 
         /* Push error notification */
         UserInterfaceNotification notif{
@@ -90,6 +97,7 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
 }
 
 
+
 void ErrorMonitor::errorClear(ERR_MON_ERROR_TYPE errorCode)
 {
     Serial.println("Clearing error : " + String((int)errorCode));
@@ -109,4 +117,13 @@ void ErrorMonitor::updateSystemErrorSignal()
     DataContainer::setSignalValue(SIG_SYSTEM_ERROR_LIST,
          errorList
     );
+}
+
+
+String ErrorMonitor::formatTimeToString(const DataAndTime& time) {
+    char buffer[20]; // Bufor na sformatowany czas
+    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
+             time.year, time.month, time.day,
+             time.hour, time.minute, time.second);
+    return String(buffer);
 }

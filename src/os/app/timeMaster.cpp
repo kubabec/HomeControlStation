@@ -4,25 +4,38 @@ TimeMaster TimeMaster::timeMaster;
 
 // Konstruktor
 TimeMaster::TimeMaster()
-    : timeClient(ntpUDP, "pool.ntp.org", 3600) {
+    : timeClient(ntpUDP, "pool.ntp.org", 3600), updateInterval(60000) {
 }
 
-// Inicjalizacja klienta NTP
+
 void TimeMaster::init() {
+    Serial.println("DeviceProvider init ...");
     timeMaster.timeClient.begin();
     timeMaster.timeClient.setTimeOffset(3600); // Ustawienie strefy czasowej na GMT+1
-    timeMaster.lastNTPTime = timeMaster.timeClient.getEpochTime();
+
+    // Próba synchronizacji z NTP
+    if (timeMaster.timeClient.update()) {
+        // Udało się pobrać nowy czas z NTP
+        timeMaster.lastNTPTime = timeMaster.timeClient.getEpochTime();
         timeMaster.lastMillis = millis();
         timeMaster.ntpAvailable = true;
         Serial.println("Synchronized with NTP!");
-        
-    DataContainer::setSignalValue(SIG_CURRENT_TIME, DataAndTime()); //przekazuje strukture do datacontainer
 
+        // Wyślij czas do DataContainer
+        timeMaster.sendTimeToDataContainer();
+    } else {
+        // NTP nie działa - przechodzimy na freerunning
+        timeMaster.ntpAvailable = false;
+        Serial.println("NTP unavailable, using freerunning mode.");
+    }
+
+    Serial.println("... done");
 }
 
 void TimeMaster::deinit() {
     
 }
+
 
 void TimeMaster::cyclic() {
     unsigned long now = millis();
@@ -33,18 +46,35 @@ void TimeMaster::cyclic() {
             // Udało się pobrać nowy czas z NTP
             timeMaster.lastNTPTime = timeMaster.timeClient.getEpochTime();
             timeMaster.lastMillis = millis();
-            timeMaster.ntpAvailable = true;
-            Serial.println("Synchronized with NTP!");
+            timeMaster.ntpAvailable = true;  // Ustaw flagę na true, bo NTP działa
+            timeMaster.updateInterval = 60000; // Przywróć interwał do 60 sekund
+            //Serial.println("Synchronized with NTP!");
         } else {
             // NTP nie działa - przechodzimy na freerunning
-            timeMaster.ntpAvailable = false;
-            Serial.println("NTP unavailable, using freerunning mode.");
+            if (timeMaster.ntpAvailable) {
+                // Tylko jeśli wcześniej NTP było dostępne, wyświetl komunikat
+                timeMaster.ntpAvailable = false;
+                timeMaster.updateInterval = 10000; // Skróć interwał do 10 sekund
+                timeMaster.lastUpdateTime = now;   // Zresetuj czas ostatniej aktualizacji
+                Serial.println("NTP unavailable, using freerunning mode.");
+            } else {
+                // NTP nadal niedostępne - wyświetl komunikat debugowy
+                Serial.println("NTP still unavailable, retrying in 10 seconds...");
+            }
+        }
+
+        // Korekta czasu w trybie freerunning
+        if (!timeMaster.ntpAvailable) {
+            unsigned long elapsed = millis() - timeMaster.lastMillis;
+            timeMaster.lastNTPTime += elapsed / 1000; // Dodaj upływający czas w sekundach
+            timeMaster.lastMillis = millis();
         }
 
         timeMaster.sendTimeToDataContainer(); // Aktualizacja DataContainer
         timeMaster.lastUpdateTime = now;
     }
 }
+
 
 
 // Pobranie sformatowanego czasu (HH:MM:SS)
@@ -94,9 +124,9 @@ void TimeMaster::sendTimeToDataContainer() {
     currentTime.minute = timeInfo->tm_min;
     currentTime.second = timeInfo->tm_sec;
 
-    Serial.printf("Time sent to DataContainer: %04d.%02d.%02d %02d:%02d:%02d\n",
-                  currentTime.year, currentTime.month, currentTime.day,
-                  currentTime.hour, currentTime.minute, currentTime.second);
+    // Serial.printf("Time sent to DataContainer: %04d.%02d.%02d %02d:%02d:%02d\n",
+    //               currentTime.year, currentTime.month, currentTime.day,
+    //               currentTime.hour, currentTime.minute, currentTime.second);
 
     DataContainer::setSignalValue(SIG_CURRENT_TIME, currentTime); // Przekazanie czasu do DataContainer
 }

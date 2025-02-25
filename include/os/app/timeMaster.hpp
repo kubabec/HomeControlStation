@@ -32,7 +32,7 @@ private:
     unsigned long lastMillis = 0;      // Czas w ms od startu lokalnego odliczania
     bool ntpAvailable = false;         // Flaga dostępności NTP
 
-    const unsigned long updateInterval = 60000; // Interwał aktualizacji (1 minuta)
+    unsigned long updateInterval = 60000; // Interwał aktualizacji (1 minuta)
 
     static TimeMaster timeMaster;
 

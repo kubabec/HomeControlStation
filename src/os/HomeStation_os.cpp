@@ -11,7 +11,6 @@ uint16_t OperatingSystem::uniqueLifecycleId = 0;
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
-//TimeMaster OperatingSystem::timeMaster; // Inicjalizacja obiektu MasterTimer
 
 long long uiBlockTime = 0;
 
@@ -66,7 +65,8 @@ void OperatingSystem::init()
         RemoteControlClient::init();
     }
 
-    DeviceProvider::init(); 
+    DeviceProvider::init();
+    TimeMaster::init(); 
     
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
@@ -203,7 +203,6 @@ void OperatingSystem::task50ms()
 
 void OperatingSystem::task1s()
 {
-    Serial.println("OperatingSystem::task1s()");
     handleSecurityAccessLevelExpiration();        
     TimeMaster::cyclic();
 }
@@ -234,6 +233,7 @@ void OperatingSystem::performReset()
 
     ErrorMonitor::deinit();
     NotificationHandler::deinit();
+    TimeMaster::deinit();
 
     ExtendedMemoryManager::deinit();
     /* This app must be last, as it saves NVM data */
@@ -391,70 +391,11 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
        
       
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-        break;
-
-
-        
+        break;      
     
    
-
     default:
         Serial.println("INVALID");
         break;
     }
 }
-
-// void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAccessLevel)
-// {
-//     DataAndTime currentTime;
-
-//     currentAccessLevel = newAccessLevel;
-//     accessLevelGrantedTimeSnapshot = millis();
-//     DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
-
-//     /* notification */
-//     UserInterfaceNotification notif{
-//         .title = "Device lock/unlock",
-//         .body = "",
-//         .type = UserInterfaceNotification::WARNING
-//     };
-
-//     Serial.print("Access level granted: ");
-//     switch (currentAccessLevel)
-//     {
-//     case e_ACCESS_LEVEL_NONE:
-//         Serial.println("e_ACCESS_LEVEL_NONE");
-//         break;
-    
-//     case e_ACCESS_LEVEL_AUTH_USER:
-//         Serial.println("e_ACCESS_LEVEL_AUTH_USER");
-//         notif.type = UserInterfaceNotification::INFO;
-//         notif.body = "Device is unlocked to authorized user level and will be automatically locked.";
-//         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-//         break;
-
-//     case e_ACCESS_LEVEL_SERVICE_MODE: {
-//         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
-
-//         // Pobierz aktualny czas z DataContainer
-//         currentTime = std::any_cast<DataAndTime>(DataContainer::getSignalValue(SIG_CURRENT_TIME));
-
-//         // Sformatuj czas do postaci "rok-miesiąc-dzień godzina:minuta:sekunda"
-//         char timeBuffer[20]; // Bufor na czas (np. "2023-10-05 12:34:56")
-//         snprintf(timeBuffer, sizeof(timeBuffer), "%04d-%02d-%02d %02d:%02d:%02d",
-//                  currentTime.year, currentTime.month, currentTime.day,
-//                  currentTime.hour, currentTime.minute, currentTime.second);
-
-//         // Dołącz sformatowany czas do wiadomości
-//         notif.body = "Device is running in service mode. Current time: " + String(timeBuffer);
-
-//         // Wyślij powiadomienie
-//         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-//         break;
-//     }
-
-//     default:
-//         Serial.println("INVALID");
-//         break;
-//     }
-//}

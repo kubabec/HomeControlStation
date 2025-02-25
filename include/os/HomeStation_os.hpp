@@ -2,8 +2,6 @@
 #define HOME_LIGHT_OK_H
 
 #include <WiFiUdp.h>
-//#include <TimeLib.h>
-//#include <NTPClient.h>
 #include <string>
 
 
@@ -35,8 +33,6 @@ private:
 
     static bool resetPending;
     static uint8_t resetCountdown;
-
-    //static TimeMaster timeMaster; // Deklaracja obiektu TimeMaster
     
     static void performReset();
     static uint16_t calculateRuntimeNodeHash();
