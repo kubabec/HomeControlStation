@@ -2,8 +2,8 @@
 #define HOME_LIGHT_OK_H
 
 #include <WiFiUdp.h>
-#include <TimeLib.h>
-#include <NTPClient.h>
+#include <string>
+
 
 #include <os/app/http/HttpServer.hpp>
 #include <os/app/DeviceManager.hpp>
@@ -17,7 +17,7 @@
 #include <os/app/ErrorMonitor.hpp>
 #include <os/app/NotificationHandler.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
-#include <os/tools/masterTimer.hpp>
+#include <os/app/timeMaster.hpp>
 
 
 class   OperatingSystem
@@ -33,9 +33,7 @@ private:
 
     static bool resetPending;
     static uint8_t resetCountdown;
-
-    static MasterTimer masterTimer; // Obiekt klasy MasterTimer
-
+    
     static void performReset();
     static uint16_t calculateRuntimeNodeHash();
     static void handleSecurityAccessLevelExpiration();
@@ -50,11 +48,6 @@ private:
 
 public:
 
-    // const char* ntpServer = "pool.ntp.org";
-    // const long gmtOffset_sec = 3600; // CET (UTC+1)
-    // NTPClient timeClient;
-
-    
     static void init();
     static void reset();
 
@@ -66,9 +59,7 @@ public:
     static void task50ms();
     static void task1s();
 
-    // static void wyswietlDateICzas();
-    // static String pobierzCzas();
-
+    
 };
 
 

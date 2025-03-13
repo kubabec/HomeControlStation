@@ -11,12 +11,12 @@ uint16_t OperatingSystem::uniqueLifecycleId = 0;
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
-MasterTimer OperatingSystem::masterTimer; // Inicjalizacja obiektu MasterTimer
 
 long long uiBlockTime = 0;
 
 void OperatingSystem::init()
 {
+    
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
@@ -67,9 +67,8 @@ void OperatingSystem::init()
     }
 
     DeviceProvider::init();
+    TimeMaster::init(); 
     
-    
-
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig = 
@@ -87,8 +86,6 @@ void OperatingSystem::init()
         };
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
-
-    masterTimer.begin();
 
 
     Serial.println("HomeStationOS:// Init completed.");
@@ -138,10 +135,9 @@ void OperatingSystem::task50ms()
 
 void OperatingSystem::task1s()
 {
-    handleSecurityAccessLevelExpiration();
-    masterTimer.cyclic();
     Serial.print(".");
-    Serial.flush();
+    handleSecurityAccessLevelExpiration();        
+    TimeMaster::cyclic();
 }
 
 void OperatingSystem::reset() {
@@ -170,6 +166,7 @@ void OperatingSystem::performReset()
 
     ErrorMonitor::deinit();
     NotificationHandler::deinit();
+    TimeMaster::deinit();
 
     ExtendedMemoryManager::deinit();
     /* This app must be last, as it saves NVM data */
@@ -285,6 +282,8 @@ void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 
 void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAccessLevel)
 {
+    DataAndTime currentTime;
+
     currentAccessLevel = newAccessLevel;
     accessLevelGrantedTimeSnapshot = millis();
     DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
@@ -311,13 +310,24 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
         break;
 
     case e_ACCESS_LEVEL_SERVICE_MODE:
+
+        currentTime = std::any_cast<DataAndTime>(DataContainer::getSignalValue(SIG_CURRENT_TIME));
+
+        char timeBuffer[20]; // Bufor na czas (np. "2023-10-05 12:34:56")
+        snprintf(timeBuffer, sizeof(timeBuffer), "%04d-%02d-%02d %02d:%02d:%02d",
+                 currentTime.year, currentTime.month, currentTime.day,
+                 currentTime.hour, currentTime.minute, currentTime.second);
+        
+
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
         notif.body = "Device is running in service mode ";
+
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-        break;
+        break;      
+    
+   
     default:
         Serial.println("INVALID");
         break;
     }
 }
-

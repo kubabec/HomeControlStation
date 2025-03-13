@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 37
+#define NUMBER_OF_SIGNALS 39
 enum Signal
 {
     /* Type: bool , somme description */
@@ -77,7 +77,8 @@ enum Signal
     /* Type: ExtendedMemoryCtrlAPI - function set to use extended memory for devices functionality */
     SIG_EXT_MEM_CTRL_API,
     /* Type: std::function<void(String)> - new pin setup creation via JSON callback */
-    CBK_SET_DEVICES_CONFIG_VIA_JSON
-
+    CBK_SET_DEVICES_CONFIG_VIA_JSON,
+    /* Type: std::struct "DataAndTime" with current time   */
+    SIG_CURRENT_TIME
 };
 #endif
