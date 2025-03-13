@@ -13,6 +13,19 @@ let isNotificationPollingActive = 1;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
         var PanelPassword = document.querySelector('input[name=\"UserPassword\"]').value;\
+
+        return {\
+        type:\"LedStrip\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        ledCount:ledsCnt,\
+        sideFlp:sideFlip\
+        }
+    }\
+
         var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&isUserAdmin=${encodeURIComponent(isUserAdmin)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&PanelPassword=${encodeURIComponent(PanelPassword)}&nodeType=${encodeURIComponent(nodeType)}&end`;\
         window.location.href = url;\
     }\

@@ -74,7 +74,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
             break;
         case REQUEST_NODE_DETAILED_DATA:
             // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
-            sendDetailedDataResponse();
+            sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA);
             break;
         
         case REQUEST_KEEP_ALIVE:
@@ -84,7 +84,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
         
         case REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE:
             // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
-            sendDetailedDataResponseFromNode();
+            sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE);
             break;
 
 
@@ -163,27 +163,37 @@ void RemoteControlClient::sendInitialDataResponse(){
     pendingTxQueue.push(initialDataResponse);
 }
 
-void RemoteControlClient::sendDetailedDataResponse() {   
+void RemoteControlClient::sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue) {   
     std::any deviceCollection = DataContainer::getSignalValue(SIG_DEVICE_COLLECTION);
 
     try
     {
-     // try to read collection if signal exist in data container
       std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
 
+      uint8_t* bufferForDeviceDescription = nullptr;
       for(DeviceDescription& deviceDescription: deviceDescriptionVector) {
-            deviceDescription.macAddress = localNodeMACAddress;
-            MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
-            
-            detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
+        deviceDescription.macAddress = localNodeMACAddress;
+        MessageUDP detailedDataResponse(udpHeaderValue, NETWORK_BROADCAST, 9001);
 
-            Serial.println("Size of DeviceDescription: " + String((int)sizeof(deviceDescription)));
-
+        /* serialize device description to byte array */
+        if(bufferForDeviceDescription == nullptr){
+            /* allocate buffer only once for the first DD */
+            bufferForDeviceDescription = (uint8_t*)malloc(deviceDescription.getSize());
+        }
+        /* Serialize to byte array */
+        if(deviceDescription.toByteArray(bufferForDeviceDescription, deviceDescription.getSize())){
+            detailedDataResponse.pushData((byte*)bufferForDeviceDescription, deviceDescription.getSize());
+        
             /* TX transmission will be handled in the available time from cyclic() context */
             pendingTxQueue.push(detailedDataResponse);
-
-            Serial.println("->Remote Control Client - ! Wysyłam Detaile Data!");        
-        }
+        }else {
+            Serial.println("RemoteControlClient:// Error during DeviceDescription serialization.");
+        }        
+      }
+      /* release resources if needed */
+      if(bufferForDeviceDescription != nullptr){
+        free(bufferForDeviceDescription);
+      }
       
     }catch (const std::bad_any_cast& e){ }
 
@@ -256,24 +266,3 @@ bool RemoteControlClient::processResponse() {
     return false;
 }
 
-void RemoteControlClient::sendDetailedDataResponseFromNode(){
-    std::any deviceCollection = DataContainer::getSignalValue(SIG_DEVICE_COLLECTION);
-
-    try
-    {
-      std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
-
-      for(DeviceDescription& deviceDescription: deviceDescriptionVector) {
-        deviceDescription.macAddress = localNodeMACAddress;
-        MessageUDP detailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, NETWORK_BROADCAST, 9001);
-        
-        detailedDataResponse.pushData((byte*)&deviceDescription, sizeof(deviceDescription));
-        
-        /* TX transmission will be handled in the available time from cyclic() context */
-        pendingTxQueue.push(detailedDataResponse);
-
-        // Serial.println("->Remote Control Client - Wysyłam Detailed data, MAC:" + String((int)localNodeMACAddress));
-      }
-      
-    }catch (const std::bad_any_cast& e){ }
-}

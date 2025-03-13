@@ -216,8 +216,28 @@ void DeviceManager::init()
 
 
     /*TESTCODE*/
-    /* Add pointer to all existing devices to the device list */
-    // devices.push_back(&testDev);
+
+
+    for(auto device : devices){
+        DeviceDescription desc = device->getDeviceDescription();
+        uint8_t* memory = (uint8_t*)malloc(desc.getSize());
+        if(memory != nullptr){
+            desc.toByteArray(memory, desc.getSize());
+            desc.print();
+            Serial.println("Serialized DeviceDescription:");
+            for(uint16_t i = 0 ; i < desc.getSize(); i++){
+                Serial.print(String((int)memory[i]));
+            }
+            Serial.println();
+
+
+            DeviceDescription desc2;
+            desc2.fromByteArray(memory, desc.getSize());
+            desc2.print();
+        }
+
+        free(memory);
+    }
     /*TESTCODE*/
 
 
