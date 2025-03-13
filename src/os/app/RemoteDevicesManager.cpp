@@ -185,14 +185,15 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
    /* did we receive response for which we are waiting? */
     if(awaitingResponseId == response.getResponseId()){
         
-
-        if(response.getData().size() >= (sizeof(DeviceDescription) + sizeof(uint16_t))){
-            DeviceDescription responseDeviceDescription;
+        DeviceDescription responseDeviceDescription;
+        if(response.getData().size() >= (responseDeviceDescription.getSize() + sizeof(uint16_t))){
+            
             uint16_t responseNodeHash;
 
             /* extract device description and node hash from the response */
-            memcpy(&responseDeviceDescription, response.getData().data(), sizeof(DeviceDescription));
-            memcpy(&responseNodeHash, (response.getData().data() + sizeof(DeviceDescription) ), sizeof(uint16_t));
+            //memcpy(&responseDeviceDescription, response.getData().data(), sizeof(DeviceDescription));
+            responseDeviceDescription.fromByteArray(response.getData().data(), responseDeviceDescription.getSize());
+            memcpy(&responseNodeHash, (response.getData().data() + responseDeviceDescription.getSize() ), sizeof(uint16_t));
             responseDeviceDescription.macAddress = response.getResponseNodeMAC();
 
             Serial.println("RDM : //// Received following description and hash");

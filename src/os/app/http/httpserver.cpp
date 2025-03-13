@@ -65,7 +65,6 @@ std::vector<String> constantRequests = {
 
 std::vector<String> parameterizedRequests = {
   "apply",
-  "localSetup",
   "roomMappingApply",
   "passwordApply",
   "ledStripColor",
@@ -73,10 +72,11 @@ std::vector<String> parameterizedRequests = {
 };
 
 std::vector<String> parameterizedAsyncRequests = {
-  "dev",
-  "?bri",
+  "stDvstte",
+  "chngdvbr",
   "getPageContent",
-  "getNotifications"
+  "getNotifications",
+  "lclSetupJson"
 };
 
 
@@ -93,18 +93,18 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
   {HomeLightHttpServer::parameterizedHandler_newConfigApply, e_ACCESS_LEVEL_AUTH_USER},
-  {HomeLightHttpServer::parameterizedHandler_newDevicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_roomNameMappingApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledStripColor, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
   {HomeLightHttpServer::parameterizedHandler_deviceSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_asyncGetPageContent, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::constantHandler_asyncGetNotifications, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::constantHandler_asyncGetNotifications, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_newSetupJson, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 
@@ -464,6 +464,7 @@ bool HomeLightHttpServer::processParameterizedAsyncRequests(String& request, WiF
       {
         /* Check if access level allows to enter the request */
         if(secAccessLevel >= parameterizedAsyncRequestHandlers.at(knownRequest).second){
+          //Serial.println("Running async function handler at index : " + String((int)knownRequest) + " for request " + request);
           parameterizedAsyncRequestHandlers.at(knownRequest).first(request, client);
           retVal = true;
         }
@@ -517,8 +518,6 @@ void HomeLightHttpServer::handleClientRequest()
               client.println(javascript);
               client.println(tempGaugeJS);
               client.println("</head>");
-
-              Serial.println("Processing regular request...");
 
               // Web Page Heading
               client.println("<body><div class=\"wrapper\">");
@@ -764,7 +763,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   /*<!-- Extra fields for ON/OFF -->*/
   client.println("<div class=\"extra-fields extra-43\">");
   client.println("<label>Brightness support:");
-  client.println("<select id=\"extra-43-"+String((int)slotNumber)+"\">");
+  client.println("<select id=\"brightnessSupported-"+String((int)slotNumber)+"\">");
   if(slot.customBytes[0]){
     client.println("<option value=\"0\" >No</option>");
     client.println("<option value=\"1\" selected>Yes</option>");
@@ -775,14 +774,45 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("</select>");
 
   client.println("</label>");
+
+
+  client.println("<label>Activation state:");
+  client.println("<select id=\"activationState-"+String((int)slotNumber)+"\">");
+  if(slot.customBytes[1]){
+    client.println("<option value=\"0\" >LOW</option>");
+    client.println("<option value=\"1\" selected>HIGH</option>");
+  }else {
+    client.println("<option value=\"0\" selected>LOW</option>");
+    client.println("<option value=\"1\">HIGH</option>");
+  }
+  client.println("</select>");
+
+  client.println("</label>");
+  /* some more extra fields for 43*/
+
   client.println("</div>");
 
   /*<!-- Extra fields for LED Strip -->*/
   client.println("<div class=\"extra-fields extra-44\">");
   client.println("<label>LEDs num.:");
-  client.println("<input id=\"extra-44-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\">");
+  client.println("<input id=\"ledsCount-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\" value=\""+ 
+  String((int)slot.customBytes[0]) +"\">");
 
   client.println("</label>");
+
+  client.println("<label>Sides flip:");
+  client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
+  if(slot.customBytes[1]){
+    client.println("<option value=\"0\" >No flip</option>");
+    client.println("<option value=\"1\" selected>Last diode is strip begin</option>");
+  }else {
+    client.println("<option value=\"0\" selected>No flip</option>");
+    client.println("<option value=\"1\">Last diode is strip begin</option>");
+  }
+  client.println("</select>");
+
+  client.println("</label>");
+
   client.println("</div>");
 
 
@@ -919,10 +949,10 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 
   ConfigSlotsDataType cfgSlots = std::any_cast<ConfigSlotsDataType>(DataContainer::getSignalValue(SIG_CONFIG_SLOTS));
   // ConfigSlotsDataType cfgSlots;
-  Serial.println("HTTPServer//:Printing config slots:");
-  for(auto& slot: cfgSlots.slots){
-    slot.print();
-  }
+  // Serial.println("HTTPServer//:Printing config slots:");
+  // for(auto& slot: cfgSlots.slots){
+  //   slot.print();
+  // }
 
   uint8_t slotIdx = 1;
   for(auto& slot : cfgSlots.slots)
@@ -932,7 +962,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
   }
 
   client.println("<button class=\"button\" id=\"confirmationButton\" onclick=\"showMessage('Do you wanna change node devices configuration?\
-   GPIO pin setup will be loaded according to options selected on this page.', createConfigurationString);\">Save config</button>");
+   GPIO pin setup will be loaded according to options selected on this page.', createConfigurationStringJson);\">Save config</button>");
   client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
 
 
@@ -1375,23 +1405,21 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
   client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
 }
 
-void HomeLightHttpServer::parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client)
+void HomeLightHttpServer::parameterizedHandler_newSetupJson(String& request, WiFiClient& client)
 {
-  Serial.println("Applying new device configuration!");
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
   std::any_cast<std::function<void(String&)>>
-    (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_STRING))(request);
+    (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_JSON))(request);
 
-  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
 }
 
 
 void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiFiClient& client)
 {
-  pos1 = request.indexOf("dev"); 
+  pos1 = request.indexOf("stDvstte"); 
   pos2 = request.indexOf("state"); 
   pos3 = request.indexOf("&");         
-  String devId = request.substring(pos1+3 , pos2);
+  String devId = request.substring(pos1+8 , pos2);
   String state = request.substring(pos2+5 , pos3);
   uint8_t deviceId = devId.toInt();
   uint8_t deviceState = state.toInt();
@@ -1420,10 +1448,10 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiF
 
 void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client)
 {
-  pos1 = request.indexOf("bri"); //Wyszukuje pozycję, na której występuje ciąg znaków 'bri' w nagłówku.
+  pos1 = request.indexOf("chngdvbr"); //Wyszukuje pozycję, na której występuje ciąg znaków 'bri' w nagłówku.
   pos2 = request.indexOf("DEV"); //Wyszukuje pozycję, na której występuje ciąg znaków 'DEV' w nagłówku.
   pos3 = request.indexOf("&"); //Wyszukuje pozycję, na której występuje ciąg znaków '&' w nagłówku.             
-  String brightnessString = request.substring(pos1+3, pos2); 
+  String brightnessString = request.substring(pos1+8, pos2); 
   String idDeviceString = request.substring(pos2+3, pos3);
   
   uint8_t newbrightness = brightnessString.toInt(); 

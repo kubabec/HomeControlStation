@@ -4,6 +4,7 @@
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
+#define DEVICE_NAME_MAX_LENGHT 25
 
 #define SERVICE_OVERLOADING_FUNCTION_INDEX 1
 #define SERVICE_NAME_INDEX 0
@@ -70,7 +71,7 @@ typedef struct
 
 }ServiceParameters_set3;
 
-typedef struct
+struct DeviceDescription
 {
     uint8_t deviceType = 255;
     uint64_t macAddress = 0LL;
@@ -80,6 +81,11 @@ typedef struct
     uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = { 0x00};
     
     String deviceName;
+
+    DeviceDescription(){
+        memset(customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
+    }
+
     void print() {
         //Serial.println(" ======DEVICE DESCRIPTION=============");
         Serial.print("deviceType: " + String(deviceType) + " - ");
@@ -88,15 +94,86 @@ typedef struct
         Serial.print("isEnabled: " + String(isEnabled) + " - ");
         Serial.println("deviceName: " + deviceName);
         Serial.println();
-        Serial.print(" customBytes: ");
-        Serial.println(" dla OnOff [0] = brightnessLevelSupport, [1] = brightnessLevel");
-        Serial.println();        
         for(int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++) {
             Serial.print(String(customBytes[i]) + " ");
         }        
         Serial.println();
         }
-}DeviceDescription;
+
+    uint16_t getSize(){
+        return (sizeof(deviceType) + sizeof(macAddress) + sizeof(deviceId) + sizeof(roomId) + sizeof(isEnabled) + DEVICE_NAME_MAX_LENGHT + NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
+    };
+
+    bool toByteArray(uint8_t* buffer, uint16_t size){
+        uint16_t offset = 0;
+        if(buffer != nullptr && size == getSize()){
+            memcpy(&buffer[offset], &deviceType, sizeof(deviceType)); 
+            offset += sizeof(deviceType);
+
+            memcpy(&buffer[offset], &macAddress, sizeof(macAddress)); 
+            offset += sizeof(macAddress);
+
+            memcpy(&buffer[offset], &deviceId, sizeof(deviceId)); 
+            offset += sizeof(deviceId);
+
+            memcpy(&buffer[offset], &roomId, sizeof(roomId)); 
+            offset += sizeof(roomId);
+
+            memcpy(&buffer[offset], &isEnabled, sizeof(isEnabled)); 
+            offset += sizeof(isEnabled);
+
+            /* prepare empty space string value */
+            memset(&buffer[offset], '\0', DEVICE_NAME_MAX_LENGHT);
+            if(deviceName.length() < DEVICE_NAME_MAX_LENGHT){
+                deviceName.getBytes(&buffer[offset], DEVICE_NAME_MAX_LENGHT);
+            }else {
+                return false;
+            }
+            offset += DEVICE_NAME_MAX_LENGHT;
+
+            memcpy(&buffer[offset], customBytes, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION); 
+
+            return true;
+        }
+        return false;
+    }
+
+
+    bool fromByteArray(uint8_t* buffer, uint16_t size){
+        uint16_t offset = 0;
+        if(buffer != nullptr && size == getSize()){
+            memcpy(&deviceType, &buffer[offset], sizeof(deviceType)); 
+            offset += sizeof(deviceType);
+
+            memcpy(&macAddress, &buffer[offset], sizeof(macAddress)); 
+            offset += sizeof(macAddress);
+
+            memcpy(&deviceId, &buffer[offset], sizeof(deviceId)); 
+            offset += sizeof(deviceId);
+
+            memcpy(&roomId, &buffer[offset], sizeof(roomId)); 
+            offset += sizeof(roomId);
+
+            memcpy(&isEnabled, &buffer[offset], sizeof(isEnabled)); 
+            offset += sizeof(isEnabled);
+
+            /* prepare empty space string value */
+            deviceName = String((char*)&buffer[offset]);
+            if(deviceName.length() > DEVICE_NAME_MAX_LENGHT){
+                return false;
+            }
+            offset += DEVICE_NAME_MAX_LENGHT;
+
+            memcpy(customBytes, &buffer[offset], NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION); 
+
+            return true;
+        }
+        else {
+            Serial.println("Wrong buffer length");
+        }
+        return false;
+    }
+};
 
 
 class Device

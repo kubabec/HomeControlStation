@@ -1,5 +1,7 @@
 #include <os/app/DeviceManager.hpp>
 #include <os/datacontainer/DataContainer.hpp>
+#include <ArduinoJson.h>
+
 
 
 
@@ -206,16 +208,36 @@ void DeviceManager::init()
     /*TESTCODE*/
 
     DataContainer::setSignalValue(
-        CBK_SET_DEVICES_CONFIG_VIA_STRING,
-        static_cast<std::function<void(String&)>>(DeviceManager::setLocalConfigViaString));
+            CBK_SET_DEVICES_CONFIG_VIA_JSON,
+            static_cast<std::function<void(String&)>>(DeviceManager::setLocalSetupViaJson));
    
 
     updateDeviceDescriptionSignal();
 
 
     /*TESTCODE*/
-    /* Add pointer to all existing devices to the device list */
-    // devices.push_back(&testDev);
+
+
+    for(auto device : devices){
+        DeviceDescription desc = device->getDeviceDescription();
+        uint8_t* memory = (uint8_t*)malloc(desc.getSize());
+        if(memory != nullptr){
+            desc.toByteArray(memory, desc.getSize());
+            desc.print();
+            Serial.println("Serialized DeviceDescription:");
+            for(uint16_t i = 0 ; i < desc.getSize(); i++){
+                Serial.print(String((int)memory[i]));
+            }
+            Serial.println();
+
+
+            DeviceDescription desc2;
+            desc2.fromByteArray(memory, desc.getSize());
+            desc2.print();
+        }
+
+        free(memory);
+    }
     /*TESTCODE*/
 
 
@@ -289,10 +311,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 case e_LED_STRIP :
                     /* create WS2812b instance by forwarding NVM data to it */
                     ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
+                    isValidDeviceGiven = true;
                 break;
 
                 case e_TEMP_SENSOR:
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
+                    isValidDeviceGiven = true;
                 break;
 
                 default:break;
@@ -342,287 +366,111 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
     return isValidDeviceGiven;
 }
 
-
-void DeviceManager::setLocalConfigViaString(String& config)
+void DeviceManager::setLocalSetupViaJson(String& json)
 {
-    SecurityAccessLevelType currentAccessLevel = 
-        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
+    json.replace("%7B", "{");
+    json.replace("%22", "\"");
+    json.replace("%7D", "}");
+    json.replace("/lclSetupJson&", "");
 
-    /* feature only available in SERVICE MODE */
-    if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
-        const String part1 = "localSetup";
-        const String part5 = "";
-        const uint8_t numberOfDevicesExpected = 6;
-        bool isValidConfigReceived = false;
-        String devicesConfigStrings[numberOfDevicesExpected];
+    Serial.println(json);
 
-        uint16_t charIndex = 0;
-        String configExtracted =  config.substring(part1.length());
-        uint8_t numberOfBytesForDataLength = String(configExtracted.charAt(0)).toInt();
-        uint8_t dataLength = String(configExtracted.substring(1, numberOfBytesForDataLength+1)).toInt();
+    JsonDocument doc;
+    deserializeJson(doc, json.c_str());
 
-        //Serial.println(String((int)numberOfBytesForDataLength) + " , " + String((int)dataLength));
-        String deviceConfigOnlyStr = "";
+    /* we will extract received JSON configuration to this instance, if is valid*/
+    ConfigSlotsDataType receivedConfigurationSet;
 
-        deviceConfigOnlyStr = configExtracted.substring(1+numberOfBytesForDataLength, dataLength + (1+numberOfBytesForDataLength));
+    Serial.println("DeviceManager:// Following configuration slots found in JSON:");
+    /* Process JSON to extrac each device slot*/
+    for(uint16_t i = 0; i < 6; i++)
+    {
+        /*this exist for every slot*/
+        String type =            String(doc["devices"][i]["type"]);
+        int id =                        doc["devices"][i]["id"];
+        bool isEnabled =                doc["devices"][i]["enabled"];
 
-        //Serial.println("Device only:" + deviceConfigOnlyStr);
-        //Serial.println("Extracted : " + configExtracted);
+        /*Validate identifier*/
+        if(id == (i+1)){
+            DeviceConfigSlotType& configSlot = receivedConfigurationSet.slots.at(i);
 
-        charIndex = 0;
-        for(int i = 0; i < numberOfDevicesExpected; i ++)
-        {
-            uint8_t numberOfBytesForSingleConfigLength = String(deviceConfigOnlyStr.charAt(charIndex)).toInt();
-            uint8_t singleConfigLength = String(deviceConfigOnlyStr.substring(charIndex+1, (charIndex+1 + numberOfBytesForSingleConfigLength))).toInt();
-            /* Copy single device config string to string array */
-            devicesConfigStrings[i] = String(deviceConfigOnlyStr.substring(
-                (charIndex + 1 + numberOfBytesForSingleConfigLength), // [CONFLENGTH] [LENGTH ...] [CONFIG ...]
-                (charIndex + 1 + numberOfBytesForSingleConfigLength + singleConfigLength))
-                );
-
-            // Serial.println("Single Length : " + String((int)numberOfBytesForSingleConfigLength) + " , lenght: " + String((int)singleConfigLength));
-        
-            /*Move char index by this particular length + 1 (length count byte)*/
-            charIndex += singleConfigLength + 1 + numberOfBytesForSingleConfigLength;
-        }
-
-        uint8_t crcLength = String(configExtracted.charAt(charIndex + 1 + numberOfBytesForDataLength)).toInt();
-
-        // Serial.println("CRC length: " + String((int)crcLength));
-        charIndex++;
-        uint16_t crc = String(
-            configExtracted.substring(
-                charIndex + 1 + numberOfBytesForDataLength,
-                (charIndex + 1 + numberOfBytesForDataLength + crcLength))
-                ).toInt();
-        // Serial.println("CRC : " + String((int)crc));
-
-        uint16_t localCrc = configCrcCalculation(
-            (uint8_t*)configExtracted.c_str(), 
-            dataLength + 1 + numberOfBytesForDataLength);
-        // Serial.println("Local Crc : " + String((int)localCrc));
-
-        /* Proceed with data analysis STARTs here */
-        /* Based on known algorithm, check if received CRC is equal to locally calculated */
-        if(crc == localCrc) {
-            /* further data extraction possible */
-
-            /* This temp config set needs to be used in order to validate dependencies
-            between separate slots and to apply or reject the whole configuration*/
-            ConfigSlotsDataType temporaryConfigurationSet;
-
-            Serial.println(deviceConfigOnlyStr);
-            bool atLeastOneValid = false;
-            for(int i = 0 ; i < 6 ; i++)
-            {
-                //Serial.println(devicesConfigStrings[i]);
-                DeviceConfigSlotType slotData = extractDeviceConfigFromString(devicesConfigStrings[i]);
-                if(slotData.isValid())
-                {
-                    //Serial.println("Config valid!");
-                    atLeastOneValid = true;
-                    //pinConfigSlotsRamMirror.slots[i] = slotData;
-                    temporaryConfigurationSet.slots[i] = slotData;
+            if(type == "OnOff"){
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
+                String brightnessSupport = String(doc["devices"][i]["briSup"]);
+                String activationState =   String(doc["devices"][i]["activeState"]);
+                
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_ONOFFDEVICE;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
                 }
-            }
-
-            if(atLeastOneValid){
-                if(validateConfigurationData(temporaryConfigurationSet))
-                {
-                    /* Temporary config validated correctly, settings can be applied */
-
-                    pinConfigSlotsRamMirror = temporaryConfigurationSet;
-                    isValidConfigReceived = true;
-
-                    /* Publish retrieved DeviceConfigSlots signal to the system */
-                    DataContainer::setSignalValue(SIG_CONFIG_SLOTS, pinConfigSlotsRamMirror);
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
+                configSlot.customBytes[0] = brightnessSupport.toInt();
+                configSlot.customBytes[1] = activationState.toInt();
+                
 
 
-                    Serial.println("New config found, reboot ...");
+            }else if(type == "LedStrip") {
 
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
+                String numberOfLeds =      String(doc["devices"][i]["ledCount"]);
+                String sideFlp =      String(doc["devices"][i]["sideFlp"]);
 
-                    Serial.println("Applying new config !!!!");
-                    for(auto& element : pinConfigSlotsRamMirror.slots)
-                    {
-                        element.print();
-                    }
-
-                    std::any_cast<std::function<void()>>
-                        (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-                }else 
-                {
-                    Serial.println("Invalid configuration set detected, ignoring.");
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_LED_STRIP;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
                 }
-            }
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
+                configSlot.customBytes[0] = numberOfLeds.toInt();
+                configSlot.customBytes[1] = sideFlp.toInt();
 
-        }else 
-        {
-            /* invalid CRC, reject the request */
-            Serial.println("Invalid CRC received for local config: " + String((int)crc) + " != " + String((int)localCrc));
-        }
+            }else if(type == "TempSensor"){
 
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
 
-        if(!isValidConfigReceived)
-        {
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(
-                    ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
-                    "Invalid configuration data loaded"
-                );
-        }
-    }else 
-    {
-        /* no access level to apply */
-    }
-}
-
-
-uint16_t DeviceManager::configCrcCalculation(uint8_t* data, uint16_t size)
-{
-    uint16_t crc = 0;
-    // Serial.println("Crc calculation");
-    for(uint i = 0; i < size; i ++)
-    {
-        // Serial.print((char)data[i]);
-        crc += (char)data[i];
-    }
-    // Serial.println();
-    return crc;
-}
-
-DeviceConfigSlotType DeviceManager::extractDeviceConfigFromString(String& confStr)
-{
-    DeviceConfigSlotType newConfig;
-    newConfig.isActive = false;
-
-    if(String(confStr.charAt(0)).toInt() == 1){
-        newConfig.isActive = true;
-    }
-    /* move config by 1 */
-    confStr = confStr.substring(1);
-
-    //if(newConfig.isActive){
-        /* Parse device ID */
-        uint8_t deviceId = confStr.substring(0, 2).toInt();
-        newConfig.deviceId = deviceId;
-        confStr = confStr.substring(2);
-
-        /* Parse name length */
-        uint8_t nameLength = confStr.substring(0, 2).toInt();
-        confStr = confStr.substring(2);
-
-        /* Parse name */
-        String deviceName = confStr.substring(0, nameLength);
-        memcpy(newConfig.deviceName, deviceName.c_str(), deviceName.length());
-        confStr = confStr.substring(nameLength);
-
-        /* Parse type */
-        uint8_t deviceType = confStr.substring(0, 2).toInt();
-        newConfig.deviceType = deviceType;
-        // Serial.println();
-        // Serial.println("DUPADUPA: " + String((int)deviceType));
-        // Serial.println();
-        confStr = confStr.substring(2);
-
-        /* Parse PIN */
-        uint8_t devicePin = confStr.substring(0, 2).toInt();
-        newConfig.pinNumber = devicePin;
-        confStr = confStr.substring(2);
-
-        /* Parse Room */
-        uint8_t deviceRoom = confStr.substring(0, 2).toInt();
-        newConfig.roomId = deviceRoom;
-        confStr = confStr.substring(2);
-
-
-        /* Parse Extra Data */
-        uint8_t extraData = confStr.substring(0, 2).toInt();
-        newConfig.customBytes[0] = extraData;
-
-        //Serial.println(String(deviceName));
-        newConfig.print();
-    //}
-
-    return newConfig;
-}
-
-bool DeviceManager::validateConfigurationData(ConfigSlotsDataType& data)
-{
-    /* All dependencies in config need to be analyzed and verified before applying */
-    const uint8_t numberOfPinsAllowed = 12;
-    const uint8_t pinsAllowed[numberOfPinsAllowed] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,41,42}; 
-    uint8_t pinsUsageCount[numberOfPinsAllowed] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0};
-
-    bool validationSuccess = false;
-    uint8_t errorFlag = 0;
-    ExtendedMemoryCtrlAPI extMemoryFunctions = 
-        std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
-
-
-    for(uint8_t slot = 0; slot < 6; slot++)
-    {
-        if(data.slots[slot].isActive){
-            if(data.slots[slot].deviceName[24] != '\0'){
-                /* EOS sign missing at the end of a name */
-                Serial.println("Error:EOS sign missing at the end of a name");
-                errorFlag |= 1;
-            }
-
-            if(data.slots[slot].deviceType != 255)
-            {
-                if(data.slots[slot].deviceType < e_DEVICE_TYPE_FIRST || 
-                data.slots[slot].deviceType > e_DEVICE_TYPE_LAST){
-                    /* In case of type different than unknown, type must be between FIRST and LAST types */
-                    Serial.println("Error: Wrong device type");
-                    errorFlag |= 1;
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_TEMP_SENSOR;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
                 }
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
+
             }
 
-            bool pinValid = false;
-            for(uint8_t i = 0; i < numberOfPinsAllowed; i ++)
-            {
-                if(data.slots[slot].pinNumber == pinsAllowed[i])
-                {
-                    pinsUsageCount[i] ++;
-                    pinValid = true;
-                    break;
-                }
-            }
-
-            if(!pinValid){
-                /* Pin value is out of allowed pins range */
-                Serial.println("Error: Pin value is out of allowed pins range ");
-                errorFlag |= 1;
-            }
-        }else {
-            /* Release extended memory space for unused slot */
-            extMemoryFunctions.releaseExtendedMemorySpace(slot+1);
-
+            configSlot.print();
         }
+
     }
 
+    pinConfigSlotsRamMirror = receivedConfigurationSet;
 
-    if(errorFlag == 0)
-    {
-        for(uint8_t i = 0 ; i < numberOfPinsAllowed; i++)
-        {
-            if(pinsUsageCount[i] > 1)
-            {
-                /* Pin used more than once */
-                Serial.println("Error: Pin used more than once ");
-                errorFlag |= 1;
-                break;
-            }
-        }
-    }
-    
-    if(errorFlag == 0)
-    {
-        validationSuccess = true;
-    }
+    Serial.println("New config JSON received, reboot ...");
 
-    return validationSuccess;
+    std::any_cast<std::function<void()>>
+        (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+
+
+    //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}
+
 }
 
 

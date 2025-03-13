@@ -81,13 +81,13 @@ public:
     static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);
-    static void parameterizedHandler_newDevicesSetup(String& request, WiFiClient& client);
     static void parameterizedHandler_deviceSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client);
     static void parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client);
     static void parameterizedHandler_passwordApply(String& request, WiFiClient& client);
     static void parameterizedHandler_ledStripColor(String& request, WiFiClient& client);
     static void parameterizedHandler_ledColor(String& request, WiFiClient& client);
+    static void parameterizedHandler_newSetupJson(String& request, WiFiClient& client);
     
 };
 

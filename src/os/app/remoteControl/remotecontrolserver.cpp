@@ -227,7 +227,7 @@ void RemoteControlServer::handleKeepAliveState() {
     handleDetailedDataRefreshMech(nodesToBeRemoved);
 
     if(nodesToBeRemoved.size() > 0) { 
-        for(auto& MAC : nodesToBeRemoved) {
+        for(auto MAC : nodesToBeRemoved) {
             remoteNodes.erase(MAC);
             Serial.println("Removing Node due to lack of communication MAC" + String((int)MAC));
             UserInterfaceNotification notif;
@@ -371,33 +371,42 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
     }
     else if(msg.getId() == RESPONSE_NODE_DETAILED_DATA) {
         DeviceDescription receivedDescription;
-        memcpy(&receivedDescription, &(msg.getPayload().at(0)), msg.getPayload().size()); //gdzie, skąd (getpayload to jest wektor databuffer), wielkosc
+        /* Size of payload (DeviceDescription only) and receivedDescription must be equal, otherwise message is incorrect */
+        if(msg.getPayload().size() == receivedDescription.getSize()){
+            /* Try to deserialize DeviceDescription from received payload */
+            if(receivedDescription.fromByteArray(msg.getPayload().data(), receivedDescription.getSize())){
         
-        /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
-        if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
-            // not found
-            Serial.println("Received Node ID Not Found");
-        } else {
-            // found
-            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego MAC */
-            std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
-            bool isDeviceAlreadyInCollection = false;
-            /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
-            for(auto& device: collectionVecRef) {
-                if(device.deviceId == receivedDescription.deviceId){
-                    isDeviceAlreadyInCollection = true;
-                    //Serial.println("Mam go w kolekcji");
-                    break;
+                /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
+                if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
+                    // not found
+                    Serial.println("Received Node ID Not Found");
+                } else {
+                    // found
+                    /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego MAC */
+                    std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
+                    bool isDeviceAlreadyInCollection = false;
+                    /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
+                    for(auto& device: collectionVecRef) {
+                        if(device.deviceId == receivedDescription.deviceId){
+                            isDeviceAlreadyInCollection = true;
+                            //Serial.println("Mam go w kolekcji");
+                            break;
+                        }
+                    }
+                    /* dodaj do kolekcji jesli nie istnieje*/
+                    if(!isDeviceAlreadyInCollection) {
+                        collectionVecRef.push_back(receivedDescription);
+                        //Serial.println("Dodaje do kolekcji");
+                    }
+                    else{
+                        Serial.println("Device allready PRESENT");
+                    }   
                 }
+            }else {
+                Serial.println("RemoteControlServer:// Problem during DeviceDescription deserialization");
             }
-            /* dodaj do kolekcji jesli nie istnieje*/
-            if(!isDeviceAlreadyInCollection) {
-                collectionVecRef.push_back(receivedDescription);
-                //Serial.println("Dodaje do kolekcji");
-            }
-            else{
-                Serial.println("Device allready PRESENT");
-            }   
+        }else {
+            Serial.println("RemoteControlServer:// Invalid length of received DeviceDescription message");
         }
     }
 }
@@ -405,37 +414,46 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
 void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
 
     DeviceDescription receivedDescription;
-        memcpy(&receivedDescription, &(msg.getPayload().at(0)), msg.getPayload().size()); //gdzie, skąd (getpayload to jest wektor databuffer), wielkosc
+    /* Size of payload (DeviceDescription only) and receivedDescription must be equal, otherwise message is incorrect */
+    if(msg.getPayload().size() == receivedDescription.getSize()){
+        /* Try to deserialize DeviceDescription from received payload */
+        if(receivedDescription.fromByteArray(msg.getPayload().data(), receivedDescription.getSize())){
         
-        /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
-        if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
-            // not found
-            Serial.println("Received Node ID Not Found");
-        } else {
-            // found
-            /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) device'ow dla otrzymanego MAC */
-            std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
-            bool isDeviceAlreadyInCollection = false;
-            /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
-            for(auto& device: collectionVecRef) {
-                if(device.deviceId == receivedDescription.deviceId){
-                    isDeviceAlreadyInCollection = true;
-                    //Serial.println("Mam go w kolekcji");
-                    break;
+            /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
+            if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
+                // not found
+                Serial.println("Received Node ID Not Found");
+            } else {
+                // found
+                /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) device'ow dla otrzymanego MAC */
+                std::vector<DeviceDescription>& collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
+                bool isDeviceAlreadyInCollection = false;
+                /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
+                for(auto& device: collectionVecRef) {
+                    if(device.deviceId == receivedDescription.deviceId){
+                        isDeviceAlreadyInCollection = true;
+                        //Serial.println("Mam go w kolekcji");
+                        break;
+                    }
                 }
-            }
-            /* dodaj do kolekcji jesli nie istnieje*/
-            if(!isDeviceAlreadyInCollection){
-                collectionVecRef.push_back(receivedDescription);
-                if(remoteNodes.find(receivedDescription.macAddress)->second.numberOfDevices == collectionVecRef.size()) {
-                    detailedDataPendingNodeMAC = 0 ; /* reset ID to do not repeat the requests anymore */
-                    updateDeviceDescriptionSignal();
+                /* dodaj do kolekcji jesli nie istnieje*/
+                if(!isDeviceAlreadyInCollection){
+                    collectionVecRef.push_back(receivedDescription);
+                    if(remoteNodes.find(receivedDescription.macAddress)->second.numberOfDevices == collectionVecRef.size()) {
+                        detailedDataPendingNodeMAC = 0 ; /* reset ID to do not repeat the requests anymore */
+                        updateDeviceDescriptionSignal();
+                    }
                 }
+                else{
+                    Serial.println("Device allready PRESENT");
+                }   
             }
-            else{
-                Serial.println("Device allready PRESENT");
-            }   
+        }else {
+            Serial.println("RemoteControlServer:// Problem during DeviceDescription deserialization");
         }
+    }else {
+        Serial.println("RemoteControlServer:// Invalid length of received DeviceDescription message");
+    }
 }
 
 NodeInitialData RemoteControlServer::getInitialDataFromPayload(MessageUDP& msg) {

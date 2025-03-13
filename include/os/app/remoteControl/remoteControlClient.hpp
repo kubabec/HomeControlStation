@@ -27,8 +27,7 @@ class RemoteControlClient
     static void handleKeepAliveState();
     static void processUDPRequest(MessageUDP& msg);
     static void sendInitialDataResponse();
-    static void sendDetailedDataResponse();
-    static void sendDetailedDataResponseFromNode();
+    static void sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue);
     
     static void sendKeepAlive();
     static void processGenericRequest(MessageUDP& msg);

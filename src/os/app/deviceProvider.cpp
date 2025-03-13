@@ -17,8 +17,6 @@ void DeviceProvider::deinit() {
 void DeviceProvider::init()
 {
     Serial.println("DeviceProvider init ...");
-    DataContainer::setSignalValue(SIG_CURRENT_REQUEST_PROCESSING_STATE, RequestProcessingState::eNO_REQUEST);
-
     
     /*TESTCODE*/
     /* Link service API functions to DeviceProvider function calls */
@@ -398,7 +396,17 @@ void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse& response,
     std::vector<DeviceDescription> deviceDescriptions = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_COLLECTION));
     for(auto& device: deviceDescriptions) {
         if(device.deviceId == deviceId) {
-            response.pushData((uint8_t*)&device, sizeof(DeviceDescription));
+            uint8_t* serializedDescription = (uint8_t*)malloc(device.getSize());
+            if(serializedDescription != nullptr){
+                /*Serialize DeviceDescription to memory buffer*/
+                device.toByteArray(serializedDescription, device.getSize());
+                /*Add memory buffer to response payload*/
+                response.pushData(serializedDescription, device.getSize());
+
+                free(serializedDescription);
+            }else {
+                Serial.println("DeviceProvider:// Error during response memory allocation");
+            }
             uint16_t nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
             response.pushData((uint8_t*)&nodeHash, sizeof(nodeHash));
             break;
