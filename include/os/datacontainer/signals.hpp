@@ -20,8 +20,8 @@ enum Signal
     SIG_IS_RC_SERVER,
     /* Type: NodeConfiguration - value of device configuration provided by ConfigProvider when EEPROM data read succeeded */
     SIG_DEVICE_CONFIGURATION,
-    /* Type: std:function<void(String&)> - callback to parse and apply device configuration using String class */
-    CBK_SET_CONFIG_VIA_STRING,
+    /* Type: std:function<bool(String&)> - callback to parse and apply device configuration using String class */
+    CBK_SET_CONFIG_VIA_JSON_STRING,
     /* Type: String - current IP Address */
     SIG_IP_ADDRESS_STRING,
     /* Type: uint32 - current IP Address  as 4 bytes */

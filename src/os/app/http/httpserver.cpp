@@ -1,6 +1,6 @@
 #include <os/app/http/HttpServer.hpp>
 #include <Regexp.h>
-
+#include <ArduinoJson.h>
 #include "os/app/http/ConfigPageHttp.h"
 #include "os/app/http/PageHead.h"
 #include "os/app/http/Style.h"
@@ -64,7 +64,7 @@ std::vector<String> constantRequests = {
 };
 
 std::vector<String> parameterizedRequests = {
-  "apply",
+  "newCfgApply",
   "roomMappingApply",
   "passwordApply",
   "ledStripColor",
@@ -915,17 +915,23 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" \"></label>");
 
   /* Apply button*/
-  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");  
+  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr>");  
   
-  /* Room mapping button */
-  client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
+
+  /* display room settings only if there are devices already configured */
+  std::vector<DeviceDescription>  deviceCollection = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+
+  if(deviceCollection.size() > 0){
+    /* Room mapping button */
+    client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
+  }
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
 
   /* Reboot button*/
-  client.println("<div class=\"error-button\" style=\"background-color: red;\" onclick=\"showMessage('You really need to reboot device', resetDevice)\">REBOOT DEVICE</div>");
+  client.println("<div class=\"error-button\" style=\"background-color: yellow;\" onclick=\"showMessage('You really want to reboot this device?', resetDevice)\">Restart</div>");
   
     /* Clear all settings */
     client.println("<div class=\"error-button\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
@@ -1396,13 +1402,14 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
 
   Serial.println("Applying new config!");
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-  std::any_cast<std::function<void(String&)>>
-    (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_STRING))(request);
+  if(std::any_cast<std::function<bool(String&)>>
+      (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_JSON_STRING))(request)) {
 
-  std::any_cast<std::function<void()>>
-    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+        std::any_cast<std::function<void()>>
+          (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
 
-  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+        client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+      }
 }
 
 void HomeLightHttpServer::parameterizedHandler_newSetupJson(String& request, WiFiClient& client)
@@ -1478,49 +1485,55 @@ void HomeLightHttpServer::pending(WiFiClient& client){
 
 void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client)
 {
-  /* remove header from the payload : roomMappingApply */
-  request = request.substring(String("roomMappingApply").length());
+    SecurityAccessLevelType currentAccessLevel = 
+        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
 
-  uint8_t amountOfDigitsForTotalLength = (uint8_t) request.substring(0, 1).toInt();
-  uint16_t totalRequestLength = (uint8_t) request.substring(1, 1+amountOfDigitsForTotalLength).toInt();
+    UserInterfaceNotification notification;
+    notification.title = "Room name management failure";
+    notification.type = UserInterfaceNotification::WARNING;
 
-  // Serial.println(request.substring(1, 1+amountOfDigitsForTotalLength));
-  // Serial.println("Digits : " + String((int)amountOfDigitsForTotalLength));
-  // Serial.println("Length : " + String((int)totalRequestLength));
+    /* Check if device is unlocked that config can be modified */
+    if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
+        request.replace("%7B", "{");
+        request.replace("%22", "\"");
+        request.replace("%7D", "}");
+        request.replace("roomMappingApply&", "");
 
-  String configData = request.substring(1+amountOfDigitsForTotalLength);
-  /*totalRequestLength evaluated correctly and request length matches input payload*/
-  if(totalRequestLength > 0 && (totalRequestLength == configData.length()))
-  {
-    uint16_t curerntProcessingIndex = 0;
-    while(curerntProcessingIndex < totalRequestLength)
-    {
-      uint8_t idDigits = configData.substring(0, 1).toInt();
-      uint8_t roomId = configData.substring(1, 1 + idDigits).toInt();
-      uint8_t nameLengthDigits = configData.substring(1 + idDigits, (1 + idDigits) + 1).toInt();
-      uint8_t nameLength = configData.substring(2 + idDigits, nameLengthDigits + (2 + idDigits)).toInt();
-      String name = configData.substring(nameLengthDigits + (2 + idDigits), (nameLengthDigits + (2 + idDigits)) + nameLength);
+        // Serial.println("Json request:" + request);
 
-      // Serial.println("room ID: " + String((int)roomId));
-      // Serial.println("room name: " + name);
+        JsonDocument doc;
+        DeserializationError success = deserializeJson(doc, request.c_str());
+        if(success == DeserializationError::Code::Ok){
+            String mappingsCount = String(doc["mappingsCount"]);
+            uint8_t numberOfMappings = mappingsCount.toInt();
 
-      uint8_t processedBytes = 1 + idDigits + 1 + nameLengthDigits + nameLength;
-      curerntProcessingIndex += processedBytes;
+            for(uint8_t i = 0 ; i < numberOfMappings; i++)
+            {
+              String roomId   = String(doc["roomMapping"][i]["roomId"]);
+              String roomName = String(doc["roomMapping"][i]["roomName"]);
+              int roomIdInt = roomId.toInt();
 
-      if(nameLength > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
-        if (roomNamesMapping.find(roomId) != roomNamesMapping.end()) {
-          roomNamesMapping[roomId] = name;
+              if(roomName.length() > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
+                if (roomNamesMapping.find(roomIdInt) != roomNamesMapping.end()) {
+                  roomNamesMapping[roomIdInt] = roomName;
+                }else {
+                  roomNamesMapping.insert({roomIdInt, roomName});
+                }
+              }
+            }
+            client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"/roomAssignment'>");
+            
         }else {
-          roomNamesMapping.insert({roomId, name});
+            Serial.println("ConfigProvider://Problem with JSON parsing.");
+            notification.body = "Room names JSON content cannot be correctly evaluated";
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
         }
-      }
-
-      configData = configData.substring(processedBytes);
+    } else 
+    {
+        /* No access level to apply */
+        notification.body = "Device cannot be locked to apply new configuration";
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
     }
-
-    client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"/roomAssignment'>");
-
-  }
 
 }
 

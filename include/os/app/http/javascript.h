@@ -13,7 +13,20 @@ let isNotificationPollingActive = 1;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
         var PanelPassword = document.querySelector('input[name=\"UserPassword\"]').value;\
-        var url = `/apply?isHTTPServer=${encodeURIComponent(isHTTPServer)}&isRCServer=${encodeURIComponent(isRCServer)}&isUserAdmin=${encodeURIComponent(isUserAdmin)}&SSID=${encodeURIComponent(SSID)}&Password=${encodeURIComponent(Password)}&PanelPassword=${encodeURIComponent(PanelPassword)}&nodeType=${encodeURIComponent(nodeType)}&end`;\
+\
+        let finalJson = {\
+        httpActive:isHTTPServer,\
+        rcServerActive:isRCServer,\
+        usrAdmin:isUserAdmin,\
+        type:nodeType,\
+        network:SSID,\
+        netPwd:Password,\
+        cfgPwd:PanelPassword\
+        };\
+\
+        let jsonString = JSON.stringify(finalJson);\
+        console.log(\"Wygenerowany Config:\", jsonString);\
+        var url = '/newCfgApply&' + jsonString;\
         window.location.href = url;\
     }\
     function goToDevicesManagement() {\
@@ -194,21 +207,25 @@ let isNotificationPollingActive = 1;\
     }\
     function roomMappingCreateString(count)\
     {\
+        let roomMappings = [];\
         var mappingStr = '';\
         var lengthCount = 0;\
         for (let i = 1; i <= count; i++) {\
             var dataId = document.getElementById(\"roomMappingID\" + i).value;\
-            var idLength = dataId.length;\
             var dataName = document.getElementById(\"roomMappingName\" + i).value;\
-            var nameLength = dataName.length;\
             \
-            var idLengthLength = 1;\
-            \
-            mappingStr = mappingStr + idLength + dataId + nameLength.toString().length + nameLength + dataName;\
-            lengthCount = lengthCount + 1  + dataId.length + 1 + nameLength.toString().length + dataName.length;\
+            roomMappings.push({\
+            roomId:dataId,\
+            roomName:dataName\
+            });\
         }\
-        mappingStr = lengthCount.toString().length.toString() + lengthCount + mappingStr;\
-        url = '/roomMappingApply' + mappingStr;\
+        let finalJson = {\
+            mappingsCount:count,\
+            roomMapping:roomMappings\
+        };\
+        let jsonString = JSON.stringify(finalJson);\
+        console.log(\"Wygenerowany room mapping JSON:\", jsonString);\
+        url = '/roomMappingApply&' + jsonString;\
         window.location.href = url;\
     };\
     window.onload = function() {\

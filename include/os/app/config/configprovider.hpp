@@ -114,7 +114,7 @@ public:
     static void deinit();
     static void cyclic();
 
-    static void setConfigViaString(String& configString);
+    static bool setConfigViaString(String& configString);
 
     static bool setDatablock(PersistentDatablockID blockID, uint8_t* data);
     static bool getDatablock(PersistentDatablockID blockID, uint8_t* buffer);

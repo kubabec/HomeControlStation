@@ -237,7 +237,8 @@ text-align: center;\
 }\
 .error-button {\
 padding: 10px 20px;\
-margin-top: 15px;\
+margin-top: 10px;\
+margin-bottom: 5px;\
 background: linear-gradient(135deg, #ff6666, #ff3333);\
 border: none;\
 border-radius: 25px;\

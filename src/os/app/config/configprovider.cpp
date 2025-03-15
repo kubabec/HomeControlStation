@@ -1,7 +1,7 @@
 #include <os/app/config/ConfigProvider.hpp>
 
 #include <os/app/config/PersistentMemoryAccess.hpp>
-
+#include <ArduinoJson.h>
 #include <Regexp.h>
 
 
@@ -102,8 +102,8 @@ void ConfigProvider::init()
 
     
     DataContainer::setSignalValue(
-        CBK_SET_CONFIG_VIA_STRING,
-        static_cast<std::function<void(String&)>>(ConfigProvider::setConfigViaString));
+        CBK_SET_CONFIG_VIA_JSON_STRING,
+        static_cast<std::function<bool(String&)>>(ConfigProvider::setConfigViaString));
 
     DataContainer::setSignalValue(
         CBK_SET_NVM_DATABLOCK,
@@ -155,157 +155,74 @@ void ConfigProvider::cyclic()
 }
 
 
-void ConfigProvider::setConfigViaString(String& configString)
+bool ConfigProvider::setConfigViaString(String& configString)
 {
+    bool retVal = false;
+
     SecurityAccessLevelType currentAccessLevel = 
         std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
 
+    UserInterfaceNotification notification;
+    notification.title = "Configuration change failure";
+    notification.type = UserInterfaceNotification::ERROR;
+
     /* Check if device is unlocked that config can be modified */
     if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
-        String str_isHttpServer, str_isRcServer, str_isUserAdmin, str_Ssid, str_Passwd, str_PanelPassword, str_nodeType;
-        MatchState matcher;
-        matcher.Target(const_cast<char*>(configString.c_str()));
-        /* GET /apply?isHTTPServer=yes&isRCServer=no&SSID=NetworkSSID&Password=SomeRandomPassword HTTP/1.1 */
-        Serial.println("New config received :");
-        const String part1 = "apply?isHTTPServer=";
-        const String part2 = "&isRCServer=";
-        const String part3 = "&isUserAdmin=";
-        const String part4 = "&SSID=";
-        const String part5 = "&Password=";
-        const String part6 = "&PanelPassword=";
-        const String part7 = "&nodeType=";
-        const String part8 = "&end";
+        configString.replace("%7B", "{");
+        configString.replace("%22", "\"");
+        configString.replace("%7D", "}");
+        configString.replace("newCfgApply&", "");
 
-        char searchResult = matcher.Match(part2.c_str());
-        uint16_t readStartIndex = 0;
-        Serial.println((uint16_t)searchResult);
-        if(searchResult > 0)
-        {
-            readStartIndex = part1.length();
-            // Read HTTP server config
-            str_isHttpServer = configString.substring(readStartIndex, matcher.MatchStart);
-            //Serial.println("isHttpServer : " + str_isHttpServer);
+        JsonDocument doc;
+        DeserializationError success = deserializeJson(doc, configString.c_str());
+        if(success == DeserializationError::Code::Ok){
+            String isHttpServerActive       = String(doc["httpActive"]);
+            String isRcServerActive         = String(doc["rcServerActive"]);
+            String hasUserAdminRights       = String(doc["usrAdmin"]);
+            String nodeType                 = String(doc["type"]);
+            String networkSSID              = String(doc["network"]);
+            String networkPassword          = String(doc["netPwd"]);
+            String panelPassword            = String(doc["cfgPwd"]);
 
-            // Move start read index by part2 length
-            readStartIndex = matcher.MatchStart + part2.length();
-            
-            // Search for next value
-            searchResult = matcher.Match(part3.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_isRcServer = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("str_isRcServer : " + str_isRcServer);
-            }
+            if(isHttpServerActive.length() > 0 && isRcServerActive.length() > 0 && hasUserAdminRights.length() > 0 &&
+               nodeType.length() > 0 && networkSSID.length() > 0 && networkPassword.length() > 0 && panelPassword.length() > 0 ) {
+                /* Some of configs are only allowed to be changed in Service mode */
+                if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
+                    configRamMirror.isHttpServer = isHttpServerActive == "yes" ? 1 : 0;
+                    configRamMirror.isRcServer = isRcServerActive == "yes" ? 1 : 0;
+                    configRamMirror.isDefaultUserAdmin = hasUserAdminRights == "yes" ? 1 : 0;
+                    configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
+                }
 
-            // Move start read index by part3 length
-            readStartIndex = matcher.MatchStart + part3.length();
-            // Search for next value
-            searchResult = matcher.Match(part4.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_isUserAdmin = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("str_Ssid : " + str_Ssid);
-            }
+                configRamMirror.setSSID(networkSSID);
+                configRamMirror.setPassword(networkPassword);
+                configRamMirror.setPanelPassword(panelPassword);
 
+                Serial.println("Applying following configuration :");
+                configRamMirror.serialPrint();
 
-            // Move start read index by part3 length
-            readStartIndex = matcher.MatchStart + part4.length();
-            // Search for next value
-            searchResult = matcher.Match(part5.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_Ssid = configString.substring(readStartIndex, matcher.MatchStart);
-                str_Ssid.replace("%20", " ");
-                //Serial.println("str_Ssid : " + str_Ssid);
-            }
-
-
-
-            // Move start read index by part4 length
-            readStartIndex = matcher.MatchStart + part5.length();
-            // Search for next value
-            searchResult = matcher.Match(part6.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_Passwd = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("str_Passwd : " + str_Passwd);
-            }
-
-
-            // Move start read index by part4 length
-            readStartIndex = matcher.MatchStart + part6.length();
-            // Search for next value
-            searchResult = matcher.Match(part7.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_PanelPassword = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("////////str_nodeType : " + str_nodeType);
-            }
-
-
-            // Move start read index by part4 length
-            readStartIndex = matcher.MatchStart + part7.length();
-            // Search for next value
-            searchResult = matcher.Match(part8.c_str());
-            if(searchResult > 0)
-            {
-                // Read RC server config
-                str_nodeType = configString.substring(readStartIndex, matcher.MatchStart);
-                //Serial.println("////////str_nodeType : " + str_nodeType);
+                /* return success */
+                retVal = true;
+            }else {
+                /* Some of JSON fields was not fulfilled */
+                notification.body = "Some configuration parameters are missing";
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
             }
             
-
-            /* Prepare configuration data */
-            /* Some of configs are only allowed to be changed in Service mode */
-            if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
-                configRamMirror.isHttpServer = str_isHttpServer == "yes" ? 1 : 0;
-                configRamMirror.isRcServer = str_isRcServer == "yes" ? 1 : 0;
-                configRamMirror.isDefaultUserAdmin = str_isUserAdmin == "yes" ? 1 : 0;
-                configRamMirror.nodeType = str_nodeType.toInt() < 10 ? str_nodeType.toInt() : 255;
-
-                Serial.println("String values:");
-                Serial.println("str_isHttpServer " + str_isHttpServer) ;
-                Serial.println("str_isRcServer " + str_isRcServer) ;
-                Serial.println("str_IsUserAdmin " + str_isUserAdmin) ;
-                Serial.println("str_Ssid " + str_Ssid) ;
-                Serial.println("str_Passwd " + str_Passwd) ;
-                Serial.println("str_PanelPasswd " + str_PanelPassword) ;
-                Serial.println("str_nodeType " + str_nodeType) ;
-            }
-
-            configRamMirror.setSSID(str_Ssid);
-            configRamMirror.setPassword(str_Passwd);
-            configRamMirror.setPanelPassword(str_PanelPassword);
-
-            Serial.println("Applying following configuration :");
-            configRamMirror.serialPrint();
-
-            /* Save changed configuration + all the rest of RAM mirrors to NVM */
-            //saveRamMirrorToNvm();
-
-        }else
-        {
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(
-                    ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
-                    "Invalid configuration string received"
-                );
-
-            Serial.println("Invalid config passed! Rejecting...");
+        }else {
+            Serial.println("ConfigProvider://Problem with JSON parsing.");
+            notification.body = "Config JSON content cannot be correctly evaluated";
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
         }
-
-        Serial.println(configString);
-
     } else 
     {
         /* No access level to apply */
+        notification.body = "Device cannot be locked to apply new configuration";
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
     }
+
+
+    return retVal;
 }
 
 
