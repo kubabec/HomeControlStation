@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Operacje JSON</title>
+</head>
+<body>
+  <button id="downloadBtn">Pobierz JSON</button>
+  <button id="uploadBtn">Wgraj JSON</button>
+  <input type="file" id="fileInput" style="display:none;">
+
+  <script>
+    // Pobieranie JSONa i zapis do pliku
+    document.getElementById("downloadBtn").addEventListener("click", function(){
+      fetch('/getPageContent')
+        .then(response => response.json())
+        .then(data => {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "data.json";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Błąd podczas pobierania JSON:', error));
+    });
+
+    // Wywołanie wyboru pliku
+    document.getElementById("uploadBtn").addEventListener("click", function(){
+      document.getElementById("fileInput").click();
+    });
+
+    // Odczyt wybranego pliku i wysłanie danych do serwera
+    document.getElementById("fileInput").addEventListener("change", function(event){
+      const file = event.target.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          const jsonContent = e.target.result;
+          // Zakodowanie zawartości JSON, aby bezpiecznie umieścić ją w URL
+          const encodedData = encodeURIComponent(jsonContent);
+          // Przekierowanie do serwera z danymi w URL (metoda GET)
+          window.location.href = `/upload-json?data=${encodedData}`;
+        };
+        reader.readAsText(file);
+      }
+    });
+  </script>
+</body>
+</html>

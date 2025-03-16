@@ -100,10 +100,14 @@ void ConfigProvider::init()
         // DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, e_ACCESS_LEVEL_SERVICE_MODE); /* moved to OS logic */
     }
 
-    
+    DeviceConfigManipulationAPI cfgControls = {
+        .setDeviceCfgViaJson = ConfigProvider::setConfigViaString,
+        .getDeviceCfgJson = ConfigProvider::getConfigJson
+    };
+
     DataContainer::setSignalValue(
-        CBK_SET_CONFIG_VIA_JSON_STRING,
-        static_cast<std::function<bool(String&)>>(ConfigProvider::setConfigViaString));
+        SIG_SET_CONFIG_VIA_JSON_STRING,
+        static_cast<DeviceConfigManipulationAPI>(cfgControls));
 
     DataContainer::setSignalValue(
         CBK_SET_NVM_DATABLOCK,
@@ -152,6 +156,36 @@ void ConfigProvider::updateNodeConfigurationSignal()
 void ConfigProvider::cyclic()
 {
     
+}
+
+
+String ConfigProvider::getConfigJson(){
+    String nodeCfgJson = "\"NodeConfig\":[";
+
+    /* Values initialization */
+    String isHttpServerActive = configRamMirror.isHttpServer == true ? "true" : "false";
+    String isRcServerActive = configRamMirror.isRcServer == true ? "true" : "false";
+    String hasUserAdminRights = configRamMirror.isDefaultUserAdmin == true ? "true" : "false";
+    String nodeType = String((int)configRamMirror.nodeType);
+    String networkSSID = String(configRamMirror.networkSSID);
+    String networkPassword = String(configRamMirror.networkPassword);
+    String panelPassword = String(configRamMirror.panelPassword);
+
+    /* Add values to JSON */
+    nodeCfgJson += "{";
+    nodeCfgJson += "\"isHttpActive\":"+isHttpServerActive+",";
+    nodeCfgJson += "\"isRcServer\":"+isRcServerActive+",";
+    nodeCfgJson += "\"isUsrAdmin\":"+hasUserAdminRights+",";
+    nodeCfgJson += "\"nodeType\":\""+nodeType+"\",";
+    nodeCfgJson += "\"ssid\":\""+networkSSID+"\",";
+    nodeCfgJson += "\"wifiPass\":\""+networkPassword+"\",";
+    nodeCfgJson += "\"usrPass\":\""+panelPassword+"\"";
+    nodeCfgJson += "}";
+
+
+    nodeCfgJson += "]";
+
+    return nodeCfgJson;
 }
 
 

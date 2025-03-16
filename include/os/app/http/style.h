@@ -71,8 +71,8 @@ outline: none;\
 }\
 .button-link, .button {\
 flex: 1;\
-margin-top: 10px;\
-margin-bottom: 5px;\
+margin-top: 7px;\
+margin-bottom: 7px;\
 padding: 10px 20px;\
 background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
 border: none;\
@@ -234,6 +234,12 @@ font-weight: bold;\
 color: #b30000;\
 margin-bottom: 15px;\
 text-align: center;\
+}\
+hr.custom-hr {\
+  border: none;\
+  height: 1px;\
+  background-color:rgb(109, 165, 232);\
+  margin: 1px 0;\
 }\
 .error-button {\
 padding: 10px 20px;\

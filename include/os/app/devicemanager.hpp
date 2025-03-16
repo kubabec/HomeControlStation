@@ -40,8 +40,8 @@ public:
     static void deinit();
     static void cyclic();
     
-    static void setLocalSetupViaJson(String& json);
-
+    static bool setLocalSetupViaJson(String& json);
+    static String getLocalSetupJson();
 
     /* TESTCODE */
     static ServiceRequestErrorCode service(

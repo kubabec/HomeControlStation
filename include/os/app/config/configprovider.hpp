@@ -115,6 +115,7 @@ public:
     static void cyclic();
 
     static bool setConfigViaString(String& configString);
+    static String getConfigJson();
 
     static bool setDatablock(PersistentDatablockID blockID, uint8_t* data);
     static bool getDatablock(PersistentDatablockID blockID, uint8_t* buffer);

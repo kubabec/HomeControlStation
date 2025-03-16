@@ -67,6 +67,8 @@ public:
     static void generateOnOffUi(DeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
 
+    static String getRoomsCfgJson();
+
 
     static void constantHandler_mainPage(WiFiClient& client);
     static void constantHandler_clearErrors(WiFiClient& client);
@@ -88,6 +90,8 @@ public:
     static void parameterizedHandler_ledStripColor(String& request, WiFiClient& client);
     static void parameterizedHandler_ledColor(String& request, WiFiClient& client);
     static void parameterizedHandler_newSetupJson(String& request, WiFiClient& client);
+    static void parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client);
+    static void parameterizedHandler_loadDeviceConfiguration(String& request, WiFiClient& client);
     
 };
 

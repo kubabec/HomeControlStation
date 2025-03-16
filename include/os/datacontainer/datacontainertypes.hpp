@@ -142,6 +142,14 @@ typedef struct{
     std::function<UserInterfaceNotification(void)> getOldestNotification;
 }UINotificationsControlAPI;
 
+
+typedef struct
+{
+    std::function<bool(String&)> setDeviceCfgViaJson;
+    std::function<String()> getDeviceCfgJson;
+}DeviceConfigManipulationAPI;
+
+
 typedef struct{
     uint16_t year;
     uint8_t month;

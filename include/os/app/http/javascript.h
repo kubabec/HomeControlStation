@@ -546,6 +546,48 @@ async function getNotifications() {\
         }\ 
     };\
 }\
+function downloadDeviceConfiguration(){\
+    const xhr = new XMLHttpRequest();\
+    var urlreq = '/dwlddevcfg';\
+    xhr.open(\"GET\", urlreq, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                console.log(xhr.responseText);\
+                    const element = document.createElement('a'); \
+                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + (xhr.responseText));\
+                    element.setAttribute('download', 'HomeControlStationConfig.json');\
+                    document.body.appendChild(element);\
+                    element.click();\
+                    document.body.removeChild(element);\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+    };\
+    xhr.send();\
+}\
+function uploadConfigFile() {\
+  const input = document.createElement('input');\
+  input.type = 'file';\
+  input.accept = 'text/plain';\
+  input.addEventListener('change', function (event) {\
+    const file = event.target.files[0];\
+    if (file) {\
+      const reader = new FileReader();\
+      reader.onload = function (e) {\
+        console.log(\"Zawartość pliku:\", e.target.result);\
+      };\
+      reader.readAsText(file);\
+    }\
+  });\
+  input.click();\
+}\
+document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
+  if (event.key === \"Enter\") {\
+    submitPassword();\
+  }\
+});\
 </script>";
 
 #endif

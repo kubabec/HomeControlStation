@@ -207,9 +207,14 @@ void DeviceManager::init()
         static_cast<DeviceServicesAPI>(servicesFunctionSet));
     /*TESTCODE*/
 
+    DeviceConfigManipulationAPI cfgControls = {
+        .setDeviceCfgViaJson = DeviceManager::setLocalSetupViaJson,
+        .getDeviceCfgJson = DeviceManager::getLocalSetupJson
+    };
+
     DataContainer::setSignalValue(
-            CBK_SET_DEVICES_CONFIG_VIA_JSON,
-            static_cast<std::function<void(String&)>>(DeviceManager::setLocalSetupViaJson));
+        SIG_SET_DEVICES_CONFIG_VIA_JSON,
+        static_cast<DeviceConfigManipulationAPI>(cfgControls));
    
 
     updateDeviceDescriptionSignal();
@@ -366,7 +371,54 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
     return isValidDeviceGiven;
 }
 
-void DeviceManager::setLocalSetupViaJson(String& json)
+String DeviceManager::getLocalSetupJson(){
+    String nodeCfgJson = "\"PinConfig\":{";
+
+    // bool isActive = false;            /* 1 byte */
+    // char deviceName[25] = {'\0'};   /* 25 bytes */
+    // uint8_t deviceType = 255;       /* 1 byte */
+    // uint8_t pinNumber = 255;        /* 1 byte */
+    // uint8_t deviceId = 255;         /* 1 byte */
+    // uint8_t roomId = 255;           /* 1 byte */
+    // uint8_t customBytes[20] = {0x00};          /* 20 bytes */
+
+    int slotId = 1;
+    for(auto& slot: pinConfigSlotsRamMirror.slots){
+        String isActive = slot.isActive == true ? "true" : "false";
+        String deviceName = String(slot.deviceName);
+        String deviceType = String((int)slot.deviceType);
+        String pinNumber = String((int)slot.pinNumber);
+        String deviceId = String((int)slot.deviceId);
+        String roomId = String((int)slot.roomId);
+
+
+        
+        nodeCfgJson += "\"slot"+String((int)slotId)+"\":{";
+
+        nodeCfgJson += "\"isActive\":"+isActive+",";
+        nodeCfgJson += "\"deviceName\":\""+deviceName+"\",";
+        nodeCfgJson += "\"deviceType\":"+deviceType+",";
+        nodeCfgJson += "\"pinNumber\":"+pinNumber+",";
+        nodeCfgJson += "\"deviceId\":"+deviceId+",";
+        nodeCfgJson += "\"roomId\":"+roomId+",";
+
+
+        for(uint8_t i = 0 ; i < 20; i++){
+            nodeCfgJson += "\"byte"+String((int)i)+"\":"+slot.customBytes[i]+",";
+        }
+
+        nodeCfgJson += "}},";
+        nodeCfgJson.replace(",}", "");
+        
+        slotId++;
+    }
+    nodeCfgJson += "}}";
+    nodeCfgJson.replace(",}", "");
+
+    return nodeCfgJson;
+}
+
+bool DeviceManager::setLocalSetupViaJson(String& json)
 {
     json.replace("%7B", "{");
     json.replace("%22", "\"");

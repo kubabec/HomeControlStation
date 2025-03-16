@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 39
+#define NUMBER_OF_SIGNALS 40
 enum Signal
 {
     /* Type: bool , somme description */
@@ -20,8 +20,8 @@ enum Signal
     SIG_IS_RC_SERVER,
     /* Type: NodeConfiguration - value of device configuration provided by ConfigProvider when EEPROM data read succeeded */
     SIG_DEVICE_CONFIGURATION,
-    /* Type: std:function<bool(String&)> - callback to parse and apply device configuration using String class */
-    CBK_SET_CONFIG_VIA_JSON_STRING,
+    /* Type: DeviceConfigManipulationAPI - callback to parse and apply device configuration using String class */
+    SIG_SET_CONFIG_VIA_JSON_STRING,
     /* Type: String - current IP Address */
     SIG_IP_ADDRESS_STRING,
     /* Type: uint32 - current IP Address  as 4 bytes */
@@ -77,8 +77,10 @@ enum Signal
     /* Type: ExtendedMemoryCtrlAPI - function set to use extended memory for devices functionality */
     SIG_EXT_MEM_CTRL_API,
     /* Type: std::function<void(String)> - new pin setup creation via JSON callback */
-    CBK_SET_DEVICES_CONFIG_VIA_JSON,
+    SIG_SET_DEVICES_CONFIG_VIA_JSON,
     /* Type: std::struct "DataAndTime" with current time   */
-    SIG_CURRENT_TIME
+    SIG_CURRENT_TIME,
+    /* Type: std::function<String()> - new pin setup creation via JSON callback */
+    CBK_GET_ROOMS_CFG_JSON
 };
 #endif

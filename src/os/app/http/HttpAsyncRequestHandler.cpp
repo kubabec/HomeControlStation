@@ -162,6 +162,9 @@ void HTTPAsyncRequestHandler::processRequest()
         case ASYNC_GET_NOTIFICATION_LIST:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
 
+        case ASYNC_DOWNLOAD_CONFIGURATION:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+
         default : break;
     }
 }
@@ -266,6 +269,20 @@ void HTTPAsyncRequestHandler::createNotificationListContentJson()
     jsonResponse += "}";
 }
 
+void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
+{
+    String deviceCfg = std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).getDeviceCfgJson();
+
+    String localSetup = std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).getDeviceCfgJson();
+
+    String roomsCfg = std::any_cast<std::function<String(void)>>
+        (DataContainer::getSignalValue(CBK_GET_ROOMS_CFG_JSON))();
+
+    jsonResponse += "{"+localSetup+","+deviceCfg+","+roomsCfg+"}";
+}
+
 void HTTPAsyncRequestHandler::createJsonResponse()
 {
     jsonResponse = "";
@@ -280,6 +297,10 @@ void HTTPAsyncRequestHandler::createJsonResponse()
         
         case ASYNC_GET_NOTIFICATION_LIST:
             createNotificationListContentJson();
+            break;
+        
+        case ASYNC_DOWNLOAD_CONFIGURATION:
+            createDeviceConfigurationJson();
             break;
 
         default : break;

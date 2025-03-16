@@ -76,7 +76,9 @@ std::vector<String> parameterizedAsyncRequests = {
   "chngdvbr",
   "getPageContent",
   "getNotifications",
-  "lclSetupJson"
+  "lclSetupJson",
+  "dwlddevcfg",
+  "loaddeicvcfg"
 };
 
 
@@ -104,7 +106,9 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_asyncGetPageContent, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_asyncGetNotifications, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_newSetupJson, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::parameterizedHandler_newSetupJson, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 
@@ -198,6 +202,9 @@ void HomeLightHttpServer::init()
 
   server.setTimeout(10);
   
+  DataContainer::setSignalValue(
+    CBK_GET_ROOMS_CFG_JSON, 
+    static_cast<std::function<String(void)>>(HomeLightHttpServer::getRoomsCfgJson));
 
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
@@ -371,6 +378,26 @@ void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
       Serial.println("Invalid request received : " + linkRequest);
     }
   }
+}
+
+
+String HomeLightHttpServer::getRoomsCfgJson()
+{
+  if(roomNamesMapping.size() > 0){
+    String roomConfigJson = "\"RoomsSetup\":[";
+
+
+    for(auto& room : roomNamesMapping){
+      roomConfigJson += "{\"id\":\""+String(room.first)+"\", \"name\":\""+room.second+"\"},";
+    }
+
+    roomConfigJson += "]]";
+    roomConfigJson.replace(",]", "");
+
+    return roomConfigJson;
+  }
+
+  return "";
 }
 
 bool HomeLightHttpServer::processConstantRequests(const String& request, WiFiClient& client)
@@ -915,7 +942,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" \"></label>");
 
   /* Apply button*/
-  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr>");  
+  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr class=\"custom-hr\">");  
   
 
   /* display room settings only if there are devices already configured */
@@ -929,6 +956,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
+    client.println("<hr class=\"custom-hr\">");
+    client.println("<div class=\"button-link\" onclick=\"downloadDeviceConfiguration()\">Download config file</div>");
+    client.println("<div class=\"button-link\" onclick=\"uploadConfigFile()\">Load configuration file</div>");
+    client.println("<hr class=\"custom-hr\">");
 
   /* Reboot button*/
   client.println("<div class=\"error-button\" style=\"background-color: yellow;\" onclick=\"showMessage('You really want to reboot this device?', resetDevice)\">Restart</div>");
@@ -1402,8 +1433,8 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
 
   Serial.println("Applying new config!");
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-  if(std::any_cast<std::function<bool(String&)>>
-      (DataContainer::getSignalValue(CBK_SET_CONFIG_VIA_JSON_STRING))(request)) {
+  if(std::any_cast<DeviceConfigManipulationAPI>
+    (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).setDeviceCfgViaJson(request)) {
 
         std::any_cast<std::function<void()>>
           (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
@@ -1415,8 +1446,8 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
 void HomeLightHttpServer::parameterizedHandler_newSetupJson(String& request, WiFiClient& client)
 {
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-  std::any_cast<std::function<void(String&)>>
-    (DataContainer::getSignalValue(CBK_SET_DEVICES_CONFIG_VIA_JSON))(request);
+  std::any_cast<DeviceConfigManipulationAPI>
+    (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).setDeviceCfgViaJson(request);
 
 }
 
@@ -1450,6 +1481,27 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiF
   Serial.println("Async request processing started ");
   /* Request will be processed in next cycle of the HttpServer */
 
+
+}
+
+
+void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& request, WiFiClient& client)
+{
+  Serial.println("Loading configuration from file request ...");
+
+}
+
+void HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client)
+{
+
+  HTTPAsyncRequestHandler::createRequest(
+    ASYNC_DOWNLOAD_CONFIGURATION,
+    nullptr,
+    0
+  );
+
+  Serial.println("Device configuration download requested ...");
+  /* Request will be processed in next cycle of the HttpServer */
 
 }
 
