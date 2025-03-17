@@ -16,7 +16,7 @@ long long uiBlockTime = 0;
 
 void OperatingSystem::init()
 {
-    
+    pinMode(0, INPUT_PULLUP);
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
@@ -138,6 +138,8 @@ void OperatingSystem::task1s()
     Serial.print(".");
     handleSecurityAccessLevelExpiration();        
     TimeMaster::cyclic();
+
+    detectHwMassEraseRequest();
 }
 
 void OperatingSystem::reset() {
@@ -320,14 +322,35 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
         
 
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
-        notif.body = "Device is running in service mode ";
-
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         break;      
     
    
     default:
         Serial.println("INVALID");
         break;
+    }
+}
+
+
+void OperatingSystem::detectHwMassEraseRequest(){
+    static uint8_t activationTimeCounter = 0;
+    static bool isMassEraseRequestActivated = false;
+
+    if(isMassEraseRequestActivated){ /* keep it first, to execute reset in the next execution to avoid reset when bootloader btn is pressed */
+        if(digitalRead(0) == 1){ /* button was released, reset can be performed */
+            std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
+            std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+        }
+    }
+
+    if(digitalRead(0) == 0){ /* Button is pressed */
+        activationTimeCounter++;
+    }else {
+        activationTimeCounter = 0; /* reset activation timer */
+    }
+
+    if(activationTimeCounter > 5){ /* 5 sec to activate reset */
+        isMassEraseRequestActivated = true;
+        Serial.println("OS://HW MASS ERASE ACTIVATED.");
     }
 }

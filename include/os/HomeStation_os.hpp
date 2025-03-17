@@ -43,6 +43,7 @@ private:
     static SecurityAccessLevelType currentAccessLevel;
 
     static void handleUiBlockTimeExpiration();
+    static void detectHwMassEraseRequest();
 
     
 

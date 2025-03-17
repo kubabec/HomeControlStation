@@ -135,6 +135,8 @@ void PersistentMemoryAccess::massErase(uint16_t eepromSize)
     }
 
     EEPROM.commit();
+
+    EEPROM.end();
 }
 
 
