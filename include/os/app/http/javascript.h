@@ -297,6 +297,9 @@ let isNotificationPollingActive = 1;\
             document.getElementById('password-popup-close').onclick = function () {\
                 hidePopup('password-popup-overlay', 'password-popup-content');\
             };\
+            setTimeout(function() {\
+                document.getElementById(\"password-input\").focus();\
+            }, 0);\
         }\
 \
         function submitPassword() {\
@@ -576,13 +579,13 @@ function uploadConfigFile() {\
     if (file) {\
       const reader = new FileReader();\
       reader.onload = function (e) {\
-      console.log(\"Zawartość pliku:\", e.target.result);\
       var url = '/loaddeicvcfg&' + e.target.result;\
       const xhr = new XMLHttpRequest();\
       xhr.open(\"GET\", url, true);\
       xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
+                window.location.href = '/';\
             } else { \
                 console.log('Error with AJAX request');\
             }\

@@ -793,20 +793,20 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
-  for(uint8_t i = 1 ; i <= 10 ; i ++){
+  const std::array<int, 12> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,41,42};
+
+  for(auto& val : pinsAllowed){
     String pinStr = "";
-    if(slot.pinNumber != i)
+    if(slot.pinNumber != val)
     {
-      pinStr = "<option value=\"" + String(i) + "\">" + String(i) + "</option>";
+      pinStr = "<option value=\"" + String((int)val) + "\">" + String((int)val) + "</option>";
     }
     else
     {
-      pinStr = "<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>";
+      pinStr = "<option value=\"" + String((int)val) + "\" selected>" + String((int)val) + "</option>";
     }
       client.println(pinStr);
   }
-  client.println("<option value=\"41\">41</option>");
-  client.println("<option value=\"42\">42</option>");
   client.println("</select>");
   client.println(labelEnd);
 
@@ -1037,10 +1037,8 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 
 void HomeLightHttpServer::printErrorTable(WiFiClient& client)
 {
-  client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
-  
   if(activeErrorsCount > 0){
-  
+    client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
     client.println("<thead>\
                       <tr>\
                           <th>Code</th>\
@@ -1079,13 +1077,8 @@ void HomeLightHttpServer::printErrorTable(WiFiClient& client)
       client.println("</div>");
     }
 
-  }else 
-  {
-    /* no errors */
-    client.println("No active errors.");
-    client.println("</table>");
+    client.println("</div>");
   }
-  client.println("</div>");
 }
 
 /*** CONSTANT HANDLERS */
@@ -1267,17 +1260,27 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         </div>\
   </div>");
 
+  client.println("<script>document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
+  if (event.key === \"Enter\") {\
+    submitPassword();\
+  }\
+  });</script>");
+
 
   printTestLedStrip(client);
 
   /* Display configuration button */
+  uint8_t nodeType = 
+    std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeType;
+  const String configPageButtonText = nodeType != 255 ? "Settings" : "Configure";
+
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){
-    const char* configButtonLink = "\
-    <br><button class=\"button\" onclick=\"showPasswordPopup()\">Settings</button><br>";
+    String configButtonLink = "\
+    <br><button class=\"button\" onclick=\"showPasswordPopup()\">"+configPageButtonText+"</button><br>";
     client.println(configButtonLink);
   }else 
   {
-    client.println("<br><a href=\"/config\" class=\"button\">Settings</a><br>");
+    client.println("<br><a href=\"/config\" class=\"button\">"+configPageButtonText+"</a><br>");
   }
 
 
@@ -1438,8 +1441,8 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
     /* redirect */
     client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
     /* restart */
-    // std::any_cast<std::function<void()>>
-    // (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+    std::any_cast<std::function<void()>>
+    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
   }catch (std::bad_any_cast ex)
   {
 
@@ -1545,6 +1548,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
     notification.title = "New configuration loaded";
     notification.type = UserInterfaceNotification::INFO;
     notification.body = "Config file loaded successfully. Device will be restarted.";
+    HTTPAsyncRequestHandler::createRequest(ASYNC_REDIRECT_TO_MAIN_PAGE, nullptr, 0);
 
   }else {
 
@@ -1555,7 +1559,6 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
   }
 
   std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
-
 
   /* successfully loaded */
   if(notification.type == UserInterfaceNotification::INFO){

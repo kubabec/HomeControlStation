@@ -4,7 +4,7 @@
 bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
 bool OperatingSystem::resetPending = false;
-uint8_t OperatingSystem::resetCountdown = 10;
+uint8_t OperatingSystem::resetCountdown = 50;
 uint16_t OperatingSystem::runtimeNodeHash = 0;
 uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
