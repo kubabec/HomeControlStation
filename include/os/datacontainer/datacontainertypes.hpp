@@ -5,6 +5,7 @@
 #include "os/app/remoteControl/RC_publicDataTypes.hpp"
 #include "devices/Device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include <ArduinoJson.h>
 
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
@@ -147,6 +148,7 @@ typedef struct
 {
     std::function<bool(String&)> setDeviceCfgViaJson;
     std::function<String()> getDeviceCfgJson;
+    std::function<bool(JsonDocument&)> loadConfigFromFile;
 }DeviceConfigManipulationAPI;
 
 

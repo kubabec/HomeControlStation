@@ -40,6 +40,7 @@ public:
     static void deinit();
     static void cyclic();
     
+    static bool loadConfigFromFile(JsonDocument& doc);
     static bool setLocalSetupViaJson(String& json);
     static String getLocalSetupJson();
 

@@ -556,7 +556,7 @@ function downloadDeviceConfiguration(){\
                 console.log(xhr.responseText);\
                     const element = document.createElement('a'); \
                     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + (xhr.responseText));\
-                    element.setAttribute('download', 'HomeControlStationConfig.json');\
+                    element.setAttribute('download', 'HomeControlStationConfig.txt');\
                     document.body.appendChild(element);\
                     element.click();\
                     document.body.removeChild(element);\
@@ -576,18 +576,25 @@ function uploadConfigFile() {\
     if (file) {\
       const reader = new FileReader();\
       reader.onload = function (e) {\
-        console.log(\"Zawartość pliku:\", e.target.result);\
+      console.log(\"Zawartość pliku:\", e.target.result);\
+      var url = '/loaddeicvcfg&' + e.target.result;\
+      const xhr = new XMLHttpRequest();\
+      xhr.open(\"GET\", url, true);\
+      xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
       };\
+      xhr.send();\
+    };\
       reader.readAsText(file);\
     }\
   });\
   input.click();\
 }\
-document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
-  if (event.key === \"Enter\") {\
-    submitPassword();\
-  }\
-});\
 </script>";
 
 #endif

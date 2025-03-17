@@ -68,6 +68,7 @@ public:
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
 
     static String getRoomsCfgJson();
+    static bool loadConfigFromFile(JsonDocument& doc);
 
 
     static void constantHandler_mainPage(WiFiClient& client);

@@ -114,6 +114,7 @@ public:
     static void deinit();
     static void cyclic();
 
+    static bool loadConfigFromFile(JsonDocument& doc);
     static bool setConfigViaString(String& configString);
     static String getConfigJson();
 

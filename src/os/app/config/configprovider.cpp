@@ -102,7 +102,8 @@ void ConfigProvider::init()
 
     DeviceConfigManipulationAPI cfgControls = {
         .setDeviceCfgViaJson = ConfigProvider::setConfigViaString,
-        .getDeviceCfgJson = ConfigProvider::getConfigJson
+        .getDeviceCfgJson = ConfigProvider::getConfigJson,
+        .loadConfigFromFile = ConfigProvider::loadConfigFromFile
     };
 
     DataContainer::setSignalValue(
@@ -188,6 +189,49 @@ String ConfigProvider::getConfigJson(){
     return nodeCfgJson;
 }
 
+bool isNotNull(const String& str){
+    return (str != "null");
+}
+
+bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
+{
+    
+    String isHttpServerActive       = String(doc["NodeConfig"][0]["isHttpActive"]);
+    String isRcServerActive         = String(doc["NodeConfig"][0]["isRcServer"]);
+    String hasUserAdminRights       = String(doc["NodeConfig"][0]["isUsrAdmin"]);
+    String nodeType                 = String(doc["NodeConfig"][0]["nodeType"]);
+    String networkSSID              = String(doc["NodeConfig"][0]["ssid"]);
+    String networkPassword          = String(doc["NodeConfig"][0]["wifiPass"]);
+    String panelPassword            = String(doc["NodeConfig"][0]["usrPass"]);
+
+    //Serial.println(isHttpServerActive + " " + isRcServerActive + " " + hasUserAdminRights+ " " +  nodeType+ " " +  networkSSID+ " " +  networkPassword+ " " +  panelPassword);
+
+    /*Assign parameters to RAM mirror whenever there was valid value in the configuration file */
+    if(isNotNull(isHttpServerActive)){
+        configRamMirror.isHttpServer = isHttpServerActive == "true" ? 1 : 0;
+    }
+    if(isNotNull(isRcServerActive)){
+        configRamMirror.isRcServer = isRcServerActive == "true" ? 1 : 0;
+    }
+    if(isNotNull(hasUserAdminRights)){
+        configRamMirror.isDefaultUserAdmin = hasUserAdminRights == "true" ? 1 : 0;
+    }
+    if(isNotNull(nodeType)){
+        configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
+    }
+    if(isNotNull(networkSSID)){
+        configRamMirror.setSSID(networkSSID);
+    }
+    if(isNotNull(networkPassword)){
+        configRamMirror.setPassword(networkPassword);
+    }
+    if(isNotNull(panelPassword)){
+        configRamMirror.setPanelPassword(panelPassword);
+    }
+
+    /* no failure */
+    return false;
+}
 
 bool ConfigProvider::setConfigViaString(String& configString)
 {

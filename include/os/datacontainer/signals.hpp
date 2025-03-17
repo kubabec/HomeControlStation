@@ -80,7 +80,7 @@ enum Signal
     SIG_SET_DEVICES_CONFIG_VIA_JSON,
     /* Type: std::struct "DataAndTime" with current time   */
     SIG_CURRENT_TIME,
-    /* Type: std::function<String()> - new pin setup creation via JSON callback */
+    /* Type: DeviceConfigManipulationAPI - new pin setup creation via JSON callback */
     CBK_GET_ROOMS_CFG_JSON
 };
 #endif

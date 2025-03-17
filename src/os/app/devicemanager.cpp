@@ -209,7 +209,8 @@ void DeviceManager::init()
 
     DeviceConfigManipulationAPI cfgControls = {
         .setDeviceCfgViaJson = DeviceManager::setLocalSetupViaJson,
-        .getDeviceCfgJson = DeviceManager::getLocalSetupJson
+        .getDeviceCfgJson = DeviceManager::getLocalSetupJson,
+        .loadConfigFromFile = DeviceManager::loadConfigFromFile
     };
 
     DataContainer::setSignalValue(
@@ -416,6 +417,73 @@ String DeviceManager::getLocalSetupJson(){
     nodeCfgJson.replace(",}", "");
 
     return nodeCfgJson;
+}
+
+bool isNull(const String& str){
+    return (str == "null");
+}
+
+bool DeviceManager::loadConfigFromFile(JsonDocument& doc){
+        
+    ConfigSlotsDataType receivedConfigurationSet;
+
+    for(int i = 1; i <= 6; i++){
+        DeviceConfigSlotType& configSlot = receivedConfigurationSet.slots.at(i-1);
+
+        String slotNumber = String((int)i);
+
+        String isActive       = String(doc["PinConfig"]["slot"+slotNumber]["isActive"]);
+        String deviceName       = String(doc["PinConfig"]["slot"+slotNumber]["deviceName"]);
+        String deviceType       = String(doc["PinConfig"]["slot"+slotNumber]["deviceType"]);
+        String pinNumber       = String(doc["PinConfig"]["slot"+slotNumber]["pinNumber"]);
+        String deviceId       = String(doc["PinConfig"]["slot"+slotNumber]["deviceId"]);
+        String roomId       = String(doc["PinConfig"]["slot"+slotNumber]["roomId"]);
+
+        String byteValues[20];
+        for(uint8_t j = 0 ; j < 20; j++){
+            byteValues[j] = String(doc["PinConfig"]["slot"+slotNumber]["byte"+String((int)j)]);
+        }
+
+
+        /* none of the string values can be corrupted to assume whole config slot as correct */
+        bool isCorrupted = false;
+        isCorrupted |= isNull(isActive);
+        isCorrupted |= isNull(deviceName);
+        isCorrupted |= isNull(deviceType);
+        isCorrupted |= isNull(pinNumber);
+        isCorrupted |= isNull(deviceId);
+        isCorrupted |= isNull(roomId);
+
+        for(uint8_t j = 0 ; j < 20; j++){
+            isCorrupted |= isNull(byteValues[j]);
+        }
+
+        if(isCorrupted){
+            Serial.println("Missing configuration for slot ID: " + slotNumber);
+            continue;
+        }
+
+        configSlot.deviceType = deviceType.toInt();
+        configSlot.isActive = (isActive == "true" ? 1 : 0);
+        configSlot.deviceId = deviceId.toInt();
+        if(deviceName.length() < 25){
+            memcpy(configSlot.deviceName, deviceName.c_str(), deviceName.length());
+        }
+        configSlot.pinNumber = pinNumber.toInt();
+        configSlot.roomId = roomId.toInt();
+
+        for(uint8_t j = 0 ; j < 20; j++){
+            configSlot.customBytes[j] = byteValues[j].toInt();
+        }
+
+        // configSlot.print();
+
+    }
+
+    pinConfigSlotsRamMirror = receivedConfigurationSet;
+
+    /* no failure */
+    return false;
 }
 
 bool DeviceManager::setLocalSetupViaJson(String& json)

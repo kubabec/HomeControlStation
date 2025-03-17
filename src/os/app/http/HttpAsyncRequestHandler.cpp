@@ -277,8 +277,8 @@ void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
     String localSetup = std::any_cast<DeviceConfigManipulationAPI>
         (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).getDeviceCfgJson();
 
-    String roomsCfg = std::any_cast<std::function<String(void)>>
-        (DataContainer::getSignalValue(CBK_GET_ROOMS_CFG_JSON))();
+    String roomsCfg = std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(CBK_GET_ROOMS_CFG_JSON)).getDeviceCfgJson();
 
     jsonResponse += "{"+localSetup+","+deviceCfg+","+roomsCfg+"}";
 }

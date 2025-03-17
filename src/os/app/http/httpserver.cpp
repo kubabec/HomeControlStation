@@ -201,10 +201,17 @@ void HomeLightHttpServer::init()
   Serial.println("HomeLightHttpServer init ...");
 
   server.setTimeout(10);
-  
+
+
+  DeviceConfigManipulationAPI cfgControls = {
+    .setDeviceCfgViaJson = nullptr,
+    .getDeviceCfgJson = HomeLightHttpServer::getRoomsCfgJson,
+    .loadConfigFromFile = HomeLightHttpServer::loadConfigFromFile
+  };
+
   DataContainer::setSignalValue(
     CBK_GET_ROOMS_CFG_JSON, 
-    static_cast<std::function<String(void)>>(HomeLightHttpServer::getRoomsCfgJson));
+    static_cast<DeviceConfigManipulationAPI>(cfgControls));
 
   DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
     systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
@@ -378,6 +385,27 @@ void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
       Serial.println("Invalid request received : " + linkRequest);
     }
   }
+}
+
+bool HomeLightHttpServer::loadConfigFromFile(JsonDocument& doc){
+  roomNamesMapping.clear();
+
+  for(uint8_t i = 0 ; i < 15; i++){
+    String roomId = String(doc["RoomsSetup"][i]["id"]);
+    String roomName = String(doc["RoomsSetup"][i]["name"]);
+
+    if(roomId != "null" && roomName != "null"){
+      if(roomId.toInt() < 255 && roomName.length() < 25){
+        roomNamesMapping.insert({roomId.toInt(), roomName});
+      }
+    }else 
+    {
+      break;
+    }
+  }
+
+  /* no error */
+  return false;
 }
 
 
@@ -1489,6 +1517,50 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 {
   Serial.println("Loading configuration from file request ...");
 
+  request.replace("%7B", "{");
+  request.replace("%22", "\"");
+  request.replace("%7D", "}");
+  request.replace("%20", " ");
+  request.replace("loaddeicvcfg&", "");
+
+
+  // Serial.println(request);
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  UserInterfaceNotification notification;
+
+  if(success == DeserializationError::Code::Ok){
+    Serial.println("Json deserialized successfully");
+    bool loadingFailure = false;
+    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).loadConfigFromFile(doc);
+
+    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).loadConfigFromFile(doc);
+
+    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
+        (DataContainer::getSignalValue(CBK_GET_ROOMS_CFG_JSON)).loadConfigFromFile(doc);
+
+    notification.title = "New configuration loaded";
+    notification.type = UserInterfaceNotification::INFO;
+    notification.body = "Config file loaded successfully. Device will be restarted.";
+
+  }else {
+
+    Serial.println("Json file loading error");
+    notification.title = "Config file loading failure";
+    notification.type = UserInterfaceNotification::ERROR;
+    notification.body = "Problem occurred with configuration file loading.";
+  }
+
+  std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
+
+
+  /* successfully loaded */
+  if(notification.type == UserInterfaceNotification::INFO){
+    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+  }
 }
 
 void HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client)
