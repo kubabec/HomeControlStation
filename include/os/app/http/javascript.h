@@ -559,7 +559,7 @@ function downloadDeviceConfiguration(){\
                 console.log(xhr.responseText);\
                     const element = document.createElement('a'); \
                     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + (xhr.responseText));\
-                    element.setAttribute('download', 'HomeControlStationConfig.txt');\
+                    element.setAttribute('download', 'HomeControlStationConfig.json');\
                     document.body.appendChild(element);\
                     element.click();\
                     document.body.removeChild(element);\
@@ -573,7 +573,7 @@ function downloadDeviceConfiguration(){\
 function uploadConfigFile() {\
   const input = document.createElement('input');\
   input.type = 'file';\
-  input.accept = 'text/plain';\
+  input.accept = '.json';\
   input.addEventListener('change', function (event) {\
     const file = event.target.files[0];\
     if (file) {\

@@ -591,6 +591,8 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
 
     //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}
 
+    return true;
+
 }
 
 
