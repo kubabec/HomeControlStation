@@ -32,7 +32,7 @@ private:
     static long long uIBlockTime;
 
     static bool resetPending;
-    static uint8_t resetCountdown;
+    static int resetCountdown;
     
     static void performReset();
     static uint16_t calculateRuntimeNodeHash();
@@ -50,7 +50,7 @@ private:
 public:
 
     static void init();
-    static void reset();
+    static void reset(uint16_t delay);
 
     static void requestSecurityAccessLevelChangeViaString(String password);
 

@@ -170,8 +170,8 @@ void DeviceManager::init()
         }
 
         if(isOneMoreRebootNeeded){
-            std::any_cast<std::function<void()>>
-                (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+            std::any_cast<std::function<void(uint16_t)>>
+                (DataContainer::getSignalValue(CBK_RESET_DEVICE))(100);
         }
     }
 
@@ -491,6 +491,7 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
     json.replace("%7B", "{");
     json.replace("%22", "\"");
     json.replace("%7D", "}");
+    json.replace("%20", " ");
     json.replace("/lclSetupJson&", "");
 
     Serial.println(json);
@@ -585,8 +586,8 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
 
     Serial.println("New config JSON received, reboot ...");
 
-    std::any_cast<std::function<void()>>
-        (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+    std::any_cast<std::function<void(uint16_t)>>
+        (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
 
 
     //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}

@@ -5,22 +5,15 @@
 
 class WiFiAdapter{
     static bool isConnectedFlag;
-    static bool wasConnectionRequestedFlag;
-    static String lastConnectedSSID;
-    static String lastConnectedPassword;
-    static bool connectionLostNotificationSent;
-
     static void waitForConnection500ms();
 
 public:
-    static void connectToNetwork(const String ssid, const String password);
+    static void connectToNetwork(const String ssid, const String password, bool activeWait);
     static void disconnect();
     static bool isConnected();
-    static bool wasConnectionRequested();
-    static String getLastConnectedSSID();
-    static String getLastConnectedPassword();
 
     static void createAccessPoint();
+    static String getIpString();
 
 
     static void task();

@@ -3,8 +3,7 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <esp_wifi.h>
 
-bool NetworkDriver::networkConnected = false;
-bool NetworkDriver::networkConnectionRequested = false;
+bool NetworkDriver::networkCredentialsAvailable = false;
 
 std::vector<int> NetworkDriver::packetRanges;
 std::vector<std::function<void(MessageUDP&)>> NetworkDriver::packetReceivers;
@@ -20,30 +19,26 @@ void NetworkDriver::deinit() {
 void NetworkDriver::init()
 {
     Serial.println("NetworkDriver init ...");
-/*******     WiFi connection section       ******/
-    // Try to reach the network
-    //WiFiAdapter::connectToNetwork( "GedUPC", "EmilaEryk2005");
+
+    DataContainer::setSignalValue(CBK_RUN_IP_DETECTION_TRICK_ON_NETWORK_CHANGE, static_cast<std::function<void(String, String)>>(NetworkDriver::runIpDetectionTrick));
 
     /* Try to access device configuration to extract WiFi credentials */
     try {
         std::any nodeConfiguration = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
         NodeConfiguration config = std::any_cast<NodeConfiguration>(nodeConfiguration);
-
-        // Serial.println("SSID Length : " + String(config.networkSSID.length()));
-        // Serial.println("Password Length : " + String(config.networkPassword.length()));
-        // Serial.println("Config available: " + String((int)config.networkCredentialsAvailable));
+        networkCredentialsAvailable = config.networkCredentialsAvailable;
 
         // Is config valid?
-        if(config.networkCredentialsAvailable)
-        {
-            WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword);
+        if(networkCredentialsAvailable)
+        {   
+            /* Try connect to known network with active wait flag */
+            WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword, true);
         }else 
         {
             // Connect to defaults
             /* Host accesspoint */
             Serial.println("Starting AP due to invalid WiFi credentials");
             WiFiAdapter::createAccessPoint();
-            //WiFiAdapter::connectToNetwork( "", "");
         }
 
     }catch (const std::bad_any_cast& e){ 
@@ -51,11 +46,6 @@ void NetworkDriver::init()
         Serial.println("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
         WiFiAdapter::createAccessPoint();
     }
-    
-
-
-    // Save 'wasRequested' flag
-    networkConnectionRequested = WiFiAdapter::wasConnectionRequested();
 
 
 /*******     UDP communication section       ******/
@@ -105,14 +95,46 @@ void NetworkDriver::cyclic()
     // Update WiFi Adapter to be updated with connection lost status
     WiFiAdapter::task();
 
-    // get 'isConnected' flag
-    networkConnected = WiFiAdapter::isConnected();
 
+    if(networkCredentialsAvailable){ /* we shall monitor the connection in order to detect the failure*/
+        static long long lastRetryTime = 0;
+        if(!WiFiAdapter::isConnected()){ /* We are not connected, but shall be as credentials are known */
+            if(abs(millis() - lastRetryTime > 10000)){
+                NodeConfiguration config = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+                WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword, false);
+                lastRetryTime = millis();
+            }
+        }
+    }
 
 /*******     UDP communication section       ******/
     // Update UDP task to be able to receive UDP packets
     UDPAdapter::task();
 
+}
+
+
+void NetworkDriver::runIpDetectionTrick(String ssid, String pwd)
+{
+    String assumedIp = "";
+    WiFiAdapter::disconnect();
+    for(int i = 0 ; i < 10; i++){
+        if(!WiFiAdapter::isConnected()){
+            WiFiAdapter::connectToNetwork(ssid, pwd, true);
+        }else {
+            assumedIp = WiFiAdapter::getIpString();
+            break;
+        }
+    }
+    WiFiAdapter::disconnect();
+    WiFiAdapter::createAccessPoint();
+
+    UserInterfaceNotification notif{
+        .title = "Network credentials valid",
+        .body = "Connection with IP: " + assumedIp + " ongoing.",
+        .type = UserInterfaceNotification::INFO
+    };
+    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
 }
 
 
@@ -133,7 +155,7 @@ bool NetworkDriver::send(MessageUDP& data)
     }
     else
     {
-        Serial.println("No network connection. Sending data failed.");
+        //Serial.println("No network connection. Sending data failed.");
         return false;
     }
 }

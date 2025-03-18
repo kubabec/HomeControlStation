@@ -16,9 +16,7 @@ static const MessageUDP::IPAddr NETWORK_BROADCAST{192, 168, 1, 255};
 
 class NetworkDriver
 {
-    static bool networkConnected;
-    static bool networkConnectionRequested;
-
+    static bool networkCredentialsAvailable;
 
     static void mapReceivedPacketToInternalReceiver(MessageUDP& packet);
 
@@ -35,6 +33,8 @@ public:
     static void udpReceive(MessageUDP data);
     static bool send(MessageUDP& data);
     static bool sendBroadcast(MessageUDP& data);
+
+    static void runIpDetectionTrick(String ssid, String pwd);
     
 
 

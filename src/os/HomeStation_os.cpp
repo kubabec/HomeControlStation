@@ -4,7 +4,7 @@
 bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
 bool OperatingSystem::resetPending = false;
-uint8_t OperatingSystem::resetCountdown = 50;
+int OperatingSystem::resetCountdown = 50;
 uint16_t OperatingSystem::runtimeNodeHash = 0;
 uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
@@ -19,7 +19,7 @@ void OperatingSystem::init()
     pinMode(0, INPUT_PULLUP);
     uniqueLifecycleId = (uint16_t)random(10, 10000);
 
-    DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void()>>(OperatingSystem::reset));
+    DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void(uint16_t)>>(OperatingSystem::reset));
     DataContainer::setSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH, static_cast<std::function<uint16_t()>>(OperatingSystem::calculateRuntimeNodeHash));
 
     DataContainer::setSignalValue(
@@ -121,9 +121,9 @@ void OperatingSystem::task50ms()
     ExtendedMemoryManager::cyclic();
 
     if(resetPending){
-        resetCountdown --;
+        resetCountdown -= 50;
 
-        if(resetCountdown == 0)
+        if(resetCountdown <= 0)
         {
             performReset();
         }
@@ -142,8 +142,11 @@ void OperatingSystem::task1s()
     detectHwMassEraseRequest();
 }
 
-void OperatingSystem::reset() {
-    resetPending = true;
+void OperatingSystem::reset(uint16_t delay) {
+    if(!resetPending){
+        resetPending = true;
+        resetCountdown = delay;
+    }
 }
 
 
@@ -339,7 +342,7 @@ void OperatingSystem::detectHwMassEraseRequest(){
     if(isMassEraseRequestActivated){ /* keep it first, to execute reset in the next execution to avoid reset when bootloader btn is pressed */
         if(digitalRead(0) == 1){ /* button was released, reset can be performed */
             std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
-            std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+            std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
         }
     }
 

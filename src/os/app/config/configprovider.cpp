@@ -137,7 +137,7 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.nodeType = configRamMirror.nodeType;
     validConfiguration.panelPassword = String(configRamMirror.panelPassword);
 
-    if(validConfiguration.networkPassword.length() > 0  && validConfiguration.networkSSID.length() > 0){
+    if(validConfiguration.networkSSID.length() > 0){
         validConfiguration.networkCredentialsAvailable = true;
     }
     Serial.println(validConfiguration.networkPassword);
@@ -249,11 +249,14 @@ bool ConfigProvider::setConfigViaString(String& configString)
         configString.replace("%7B", "{");
         configString.replace("%22", "\"");
         configString.replace("%7D", "}");
+        configString.replace("%20", " ");
         configString.replace("newCfgApply&", "");
 
         JsonDocument doc;
         DeserializationError success = deserializeJson(doc, configString.c_str());
         if(success == DeserializationError::Code::Ok){
+            String oldWiFiSSID = String(configRamMirror.networkSSID); /* IP detection workaround need */
+
             String isHttpServerActive       = String(doc["httpActive"]);
             String isRcServerActive         = String(doc["rcServerActive"]);
             String hasUserAdminRights       = String(doc["usrAdmin"]);
@@ -263,7 +266,7 @@ bool ConfigProvider::setConfigViaString(String& configString)
             String panelPassword            = String(doc["cfgPwd"]);
 
             if(isHttpServerActive.length() > 0 && isRcServerActive.length() > 0 && hasUserAdminRights.length() > 0 &&
-               nodeType.length() > 0 && networkSSID.length() > 0 && networkPassword.length() > 0 && panelPassword.length() > 0 ) {
+               nodeType.length() > 0 && networkSSID.length() > 0 && panelPassword.length() > 0 ) {
                 /* Some of configs are only allowed to be changed in Service mode */
                 if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
                     configRamMirror.isHttpServer = isHttpServerActive == "yes" ? 1 : 0;
@@ -281,6 +284,13 @@ bool ConfigProvider::setConfigViaString(String& configString)
 
                 /* return success */
                 retVal = true;
+
+                String newWiFiSSID = String(configRamMirror.networkSSID); /* IP detection workaround need */
+                if(oldWiFiSSID != newWiFiSSID){ /* Network configuration has changed */
+                    /* run workaround, to try connect, then save valid IP address and push as notification back in the AccessPoint mode */
+                    std::any_cast<std::function<void(String, String)>>(DataContainer::getSignalValue(CBK_RUN_IP_DETECTION_TRICK_ON_NETWORK_CHANGE))(newWiFiSSID, networkPassword);
+                }
+
             }else {
                 /* Some of JSON fields was not fulfilled */
                 notification.body = "Some configuration parameters are missing";

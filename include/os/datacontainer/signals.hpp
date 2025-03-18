@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 40
+#define NUMBER_OF_SIGNALS 41
 enum Signal
 {
     /* Type: bool , somme description */
@@ -81,6 +81,8 @@ enum Signal
     /* Type: std::struct "DataAndTime" with current time   */
     SIG_CURRENT_TIME,
     /* Type: DeviceConfigManipulationAPI - new pin setup creation via JSON callback */
-    CBK_GET_ROOMS_CFG_JSON
+    CBK_GET_ROOMS_CFG_JSON,
+    /* Type: std::function<void(void)> - callback to function performing workaround trick  */
+    CBK_RUN_IP_DETECTION_TRICK_ON_NETWORK_CHANGE
 };
 #endif

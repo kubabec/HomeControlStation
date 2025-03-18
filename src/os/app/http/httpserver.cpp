@@ -941,7 +941,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
     /* Device type  */
     const std::map<uint8_t, String> typeToNameMappings = {
-      {9, "HomeConstolStation v1 (StirTech)"},
+      {9, "HomeControlStation v1 (StirTech)"},
       {1, "ESP32 devkit v1"},
       {2, "ESP32 S3"},
       {255, "UNDEFINED"}
@@ -1354,7 +1354,7 @@ void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)
 void HomeLightHttpServer::constantHandler_resetDevice(WiFiClient& client)
 {
   /* Reset device callback */
-  std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+  std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(100);
   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
 
@@ -1454,8 +1454,8 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
     /* redirect */
     client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
     /* restart */
-    std::any_cast<std::function<void()>>
-    (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+    std::any_cast<std::function<void(uint16_t)>>
+    (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
   }catch (std::bad_any_cast ex)
   {
 
@@ -1477,13 +1477,15 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
 
   Serial.println("Applying new config!");
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
+  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+  client.println("</div></body></html>");
+  client.flush();
+  client.stop();
   if(std::any_cast<DeviceConfigManipulationAPI>
     (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).setDeviceCfgViaJson(request)) {
 
-        std::any_cast<std::function<void()>>
-          (DataContainer::getSignalValue(CBK_RESET_DEVICE))();
-
-        client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
+        std::any_cast<std::function<void(uint16_t)>>
+          (DataContainer::getSignalValue(CBK_RESET_DEVICE))(7000);
       }
 }
 
@@ -1575,7 +1577,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 
   /* successfully loaded */
   if(notification.type == UserInterfaceNotification::INFO){
-    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+    std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(5000);
   }
 }
 
@@ -1637,6 +1639,7 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
         request.replace("%7B", "{");
         request.replace("%22", "\"");
         request.replace("%7D", "}");
+        request.replace("%20", " ");
         request.replace("roomMappingApply&", "");
 
         // Serial.println("Json request:" + request);
