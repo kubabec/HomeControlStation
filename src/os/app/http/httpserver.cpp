@@ -281,6 +281,9 @@ void HomeLightHttpServer::init()
   });
 
   /* Get IP address from DataContainer to have it for further client redirections */
+  DataContainer::subscribe(SIG_IP_ADDRESS_STRING, [&](std::any signal) {
+    ipAddressString = std::any_cast<String>(signal);
+  });
   ipAddressString = std::any_cast<String>(
     DataContainer::getSignalValue(SIG_IP_ADDRESS_STRING)
   );
