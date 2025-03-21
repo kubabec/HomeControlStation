@@ -93,6 +93,7 @@ public:
     static void parameterizedHandler_newSetupJson(String& request, WiFiClient& client);
     static void parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client);
     static void parameterizedHandler_loadDeviceConfiguration(String& request, WiFiClient& client);
+    static void parameterizedHandler_getExtendedControls(String& request, WiFiClient& client);
     
 };
 

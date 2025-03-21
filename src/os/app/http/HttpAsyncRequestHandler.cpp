@@ -166,6 +166,8 @@ void HTTPAsyncRequestHandler::processRequest()
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
         case ASYNC_REDIRECT_TO_MAIN_PAGE:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
+        case ASYNC_GET_EXTENDED_CONTROLS:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
 
         default : break;
     }
@@ -285,6 +287,11 @@ void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
     jsonResponse += "{"+localSetup+","+deviceCfg+","+roomsCfg+"}";
 }
 
+void HTTPAsyncRequestHandler::createExtendedControls()
+{
+    jsonResponse += "";
+}
+
 void HTTPAsyncRequestHandler::createRedirectToMainJson()
 {
     jsonResponse += "{\"redirect\":\"mainPage\"}";
@@ -312,6 +319,10 @@ void HTTPAsyncRequestHandler::createJsonResponse()
 
         case ASYNC_REDIRECT_TO_MAIN_PAGE:
             createRedirectToMainJson();
+            break;
+
+        case ASYNC_GET_EXTENDED_CONTROLS:
+            createExtendedControls();
             break;
 
         default : break;

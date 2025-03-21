@@ -301,6 +301,19 @@ let isNotificationPollingActive = 1;\
                 document.getElementById(\"password-input\").focus();\
             }, 0);\
         }\
+        function showAdvancedControls() {\
+            const popupOverlay = document.getElementById('advanced-ctrl-overlay');\
+            const popupContent = document.getElementById('advanced-ctrl-popup');\
+\
+            document.getElementById('advanced-ctrl-popup-close').onclick = function () {\
+                hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+            };\
+\
+            popupOverlay.classList.remove('hidden-popup');\
+            popupOverlay.classList.add('visible-popup');\
+            popupContent.classList.add('show');\
+\
+        }\
 \
         function submitPassword() {\
             const passwordValue = document.getElementById('password-input').value;\
@@ -597,6 +610,26 @@ function uploadConfigFile() {\
     }\
   });\
   input.click();\
+}\
+function getExtendedControlsRequest(id, devContainer){\
+    let json = {\"devId\":2};\
+    let jsonString = JSON.stringify(json);\
+    var url = '/getExtendedControls&' + jsonString;\
+    showLoading(devContainer);\
+    const xhr = new XMLHttpRequest();\
+    xhr.open(\"POST\", url, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                console.log('Response for controls received');\
+                showAdvancedControls();\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+        hideLoading(devContainer);\
+    };\
+    xhr.send();\
 }\
 </script>";
 

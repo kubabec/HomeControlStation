@@ -33,7 +33,8 @@ typedef enum
     ASYNC_GET_NOTIFICATION_LIST,
     ASYNC_DOWNLOAD_CONFIGURATION,
     ASYNC_REDIRECT_TO_MAIN_PAGE,
-    ASYNC_TYPE_LAST = ASYNC_REDIRECT_TO_MAIN_PAGE
+    ASYNC_GET_EXTENDED_CONTROLS,
+    ASYNC_TYPE_LAST = ASYNC_GET_EXTENDED_CONTROLS
 }AsyncRequestType;
 
 class HTTPAsyncRequestHandler{
@@ -69,6 +70,7 @@ class HTTPAsyncRequestHandler{
     static void createNotificationListContentJson();
     static void createDeviceConfigurationJson();
     static void createRedirectToMainJson();
+    static void createExtendedControls();
 
     public :
 

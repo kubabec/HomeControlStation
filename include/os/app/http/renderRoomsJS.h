@@ -44,6 +44,9 @@ function renderRooms(data) {\
                 statusLight.id = `statusLight${device.id}`;\
                 deviceContainer.appendChild(statusLight);\
     \
+                const btnContainer = document.createElement('div');\
+                btnContainer.className = 'button-container';\
+                \
                 const button = document.createElement('a');\
                 button.className = 'button';\
                 button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
@@ -54,7 +57,14 @@ function renderRooms(data) {\
                 }\
                 button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
                 button.id = `switchBtn${device.id}`;\
-                deviceContainer.appendChild(button);\
+\
+                const buttonMore = document.createElement('a');\
+                buttonMore.className = 'button';\
+                buttonMore.textContent = '. . .';\
+                buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
+                btnContainer.appendChild(buttonMore);\
+                btnContainer.appendChild(button);\
+                deviceContainer.appendChild(btnContainer);\
     \
                 if(device.hasBrightness == 1){\
                     const sliderLabel = document.createElement('div');\
@@ -121,6 +131,7 @@ function renderRooms(data) {\
                 const buttonMore = document.createElement('a');\
                 buttonMore.className = 'button';\
                 buttonMore.textContent = '. . .';\
+                buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
                 btnContainer.appendChild(buttonMore);\
                 btnContainer.appendChild(button);\
                 deviceContainer.appendChild(btnContainer);\
