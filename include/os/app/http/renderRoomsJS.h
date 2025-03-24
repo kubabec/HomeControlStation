@@ -56,6 +56,7 @@ function renderRooms(data) {\
                     switchValue = 1;\
                 }\
                 button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
+                statusLight.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
                 button.id = `switchBtn${device.id}`;\
 \
                 const buttonMore = document.createElement('a');\
@@ -126,6 +127,7 @@ function renderRooms(data) {\
                     switchValue = 1;\
                 }\
                 button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
+                statusLight.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
                 button.id = `switchBtn${device.id}`;\
 \
                 const buttonMore = document.createElement('a');\

@@ -304,6 +304,7 @@ let isNotificationPollingActive = 1;\
         function showAdvancedControls() {\
             const popupOverlay = document.getElementById('advanced-ctrl-overlay');\
             const popupContent = document.getElementById('advanced-ctrl-popup');\
+            const popupMessage = document.getElementById('advanced-ctrl-popup-msg');\
 \
             document.getElementById('advanced-ctrl-popup-close').onclick = function () {\
                 hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
@@ -312,6 +313,7 @@ let isNotificationPollingActive = 1;\
             popupOverlay.classList.remove('hidden-popup');\
             popupOverlay.classList.add('visible-popup');\
             popupContent.classList.add('show');\
+            popupMessage.innerHTML = '';\
 \
         }\
 \
@@ -612,7 +614,7 @@ function uploadConfigFile() {\
   input.click();\
 }\
 function getExtendedControlsRequest(id, devContainer){\
-    let json = {\"devId\":2};\
+    let json = {\"devId\":id};\
     let jsonString = JSON.stringify(json);\
     var url = '/getExtendedControls&' + jsonString;\
     showLoading(devContainer);\
@@ -621,8 +623,9 @@ function getExtendedControlsRequest(id, devContainer){\
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                console.log('Response for controls received');\
+                console.log(xhr.responseText);\
                 showAdvancedControls();\
+                eval(xhr.responseText);\
             } else { \
                 console.log('Error with AJAX request');\
             }\

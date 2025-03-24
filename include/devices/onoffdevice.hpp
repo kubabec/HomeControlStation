@@ -8,6 +8,8 @@
 class OnOffDevice : public Device
 {
 private:
+    AdvancedControlsOnOff controls;
+
     bool isOn = false; //stan urzadzenia
     int pinNumber;
     uint8_t deviceId;

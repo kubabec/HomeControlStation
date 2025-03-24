@@ -2,6 +2,7 @@
 #define DEVICE_H
 #include "Arduino.h"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include "AdvancedControls.hpp"
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 #define DEVICE_NAME_MAX_LENGHT 25
@@ -36,6 +37,7 @@ typedef enum
     DEVSERVICE_STATE_SWITCH,
     DEVSERVICE_BRIGHTNESS_CHANGE,
     DEVSERVICE_SET_EXT_MEMORY_PTR,
+    DEVSERVICE_GET_ADVANCED_CONTROLS,
     DEVSERVICE_INVALID
 }DeviceServicesType;
 
@@ -64,11 +66,18 @@ typedef struct
     float e = 0xff;
 }ServiceParameters_set2;
 
+typedef enum{
+    e_OUT_from_DEVICE = 0,
+    e_IN_to_DEVICE,
+    e_UNKNOWN_PARAM_DIRECTION
+}ServiceDirectionType;
+
 typedef struct
 {
     uint8_t* buff = 0;
     uint16_t size = 0xff;
-
+    uint16_t additionalParam = 0xFF;
+    uint8_t direction = (uint8_t)e_UNKNOWN_PARAM_DIRECTION;
 }ServiceParameters_set3;
 
 struct DeviceDescription

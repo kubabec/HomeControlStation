@@ -1,4 +1,5 @@
 #include <os/app/http/HttpAsyncRequestHandler.hpp>
+#include <os/app/http/AdvancedControlsLoader.hpp>
 
 
 
@@ -142,6 +143,39 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
 }
 
+void HTTPAsyncRequestHandler::downloadAdvancedControls(){
+    uint16_t deviceId = 255;
+
+    /* Copy device ID from request parameters */
+    memcpy(&deviceId, currentRequest.requestData, sizeof(deviceId));
+
+    Serial.println("Requesting controls for id " + String((int)deviceId));
+    /* call loading processing function */
+    ServiceRequestErrorCode errorCode = 
+        AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);
+
+    switch(errorCode){
+        case SERV_SUCCESS:
+            /* Request completed successfully */
+            Serial.println("Advanced controls download processing finished.");
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            /* hack to fulfill output string data already in processing function, not return of the JSON */
+            // jsonResponse += outputJS;
+            break;
+        case SERV_PENDING:
+            /* We are waiting for the response, service must be polled */
+            currentRequest.state = ASYNC_REQUEST_PROCESSING;
+            break;
+
+        default :
+            Serial.println("Loading failed with error: " + String((int)errorCode));
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            currentRequest.type = ASYNC_TYPE_INVALID;
+            break; 
+    }
+}
+
+
 AsyncRequestState HTTPAsyncRequestHandler::getProcessingState()
 {
     return currentRequest.state;
@@ -155,19 +189,26 @@ void HTTPAsyncRequestHandler::processRequest()
             createServiceCall();
         break;
 
+        case ASYNC_GET_ADVANCED_CONTROLS:
+            downloadAdvancedControls();
+            break;
+
         /* Page content request is immediatelly finished */
         case ASYNC_GET_PAGE_CONTENT:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
 
         case ASYNC_GET_NOTIFICATION_LIST:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
 
         case ASYNC_DOWNLOAD_CONFIGURATION:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
         case ASYNC_REDIRECT_TO_MAIN_PAGE:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
-        case ASYNC_GET_EXTENDED_CONTROLS:
-            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
+
 
         default : break;
     }
@@ -289,7 +330,7 @@ void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
 
 void HTTPAsyncRequestHandler::createExtendedControls()
 {
-    jsonResponse += "";
+    jsonResponse += AdvancedControlsLoader::getOutpuJavaScript();
 }
 
 void HTTPAsyncRequestHandler::createRedirectToMainJson()
@@ -321,7 +362,7 @@ void HTTPAsyncRequestHandler::createJsonResponse()
             createRedirectToMainJson();
             break;
 
-        case ASYNC_GET_EXTENDED_CONTROLS:
+        case ASYNC_GET_ADVANCED_CONTROLS:
             createExtendedControls();
             break;
 

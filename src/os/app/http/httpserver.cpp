@@ -110,7 +110,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_newSetupJson, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -1283,6 +1283,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
     <div class=\"popup-content\" id=\"advanced-ctrl-popup\">\
         <div class=\"popup-header\">Advanced controls</div>\
         <div class=\"popup-close\" id=\"advanced-ctrl-popup-close\">&times;</div>\
+        <div class=\"popup-message\" id=\"advanced-ctrl-popup-msg\"></div>\
     </div>\
 </div>");
 
@@ -1596,11 +1597,29 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 
 
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){
-  HTTPAsyncRequestHandler::createRequest(
-    ASYNC_GET_EXTENDED_CONTROLS,
-    nullptr,
-    0
-  );
+    Serial.println("Extended controls requested");
+    request.replace("%7B", "{");
+    request.replace("%22", "\"");
+    request.replace("%7D", "}");
+    request.replace("%20", " ");
+    request.replace("/getExtendedControls&", "");
+
+    Serial.println(request);
+
+    JsonDocument doc;
+    DeserializationError success = deserializeJson(doc, request.c_str());
+    if(success == DeserializationError::Code::Ok){
+      String deviceIdStr = doc["devId"];
+      if(deviceIdStr != "null"){
+        uint16_t deviceId = deviceIdStr.toInt();
+        Serial.println("Advanced controls requested.");
+        HTTPAsyncRequestHandler::createRequest(
+            ASYNC_GET_ADVANCED_CONTROLS,
+            (uint8_t*)&deviceId,
+            sizeof(deviceId)
+          );
+      }
+    }
 }
 
 void HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client)

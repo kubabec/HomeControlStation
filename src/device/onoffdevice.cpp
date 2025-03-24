@@ -95,6 +95,9 @@ void OnOffDevice::changeBrightness(int requestedBrightness) {
 void OnOffDevice::init() {
     pinMode(pinNumber,OUTPUT);
     off();
+
+
+    controls.switchAnimationTime = 200 + deviceId;
     //Serial.println("Device " + deviceName + " initialized on pin " + String(pinNumber));
     
 }
@@ -157,6 +160,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType){
         
 
         default: 
+            Serial.println("Device_"+String((int)deviceId)+":Service {"+ String((int)serviceType) + "} is not supported (noParam)");
             return SERV_NOT_SUPPORTED;
     };
 }
@@ -179,18 +183,30 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             return SERV_SUCCESS;
         
         default: 
+            Serial.println("Device_"+String((int)deviceId)+":Service {"+ String((int)serviceType) + "} is not supported (param1)");
             return SERV_NOT_SUPPORTED;
     };
 }
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
     switch(serviceType){
         default: 
+            Serial.println("Device_"+String((int)deviceId)+":Service {"+ String((int)serviceType) + "} is not supported (param2)");
             return SERV_NOT_SUPPORTED;
     };
 }
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
     switch(serviceType){
+        case DEVSERVICE_GET_ADVANCED_CONTROLS:
+            Serial.println("DEVSERVICE_GET_ADVANCED_CONTROLS");
+            if(param.size == sizeof(AdvancedControlsOnOff)){
+                memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
+            }
+
+            return SERV_SUCCESS;
+        break;
+
         default: 
+            Serial.println("Device_"+String((int)deviceId)+":Service {"+ String((int)serviceType) + "} is not supported (param3)");
             return SERV_NOT_SUPPORTED;
     };
 }

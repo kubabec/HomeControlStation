@@ -389,6 +389,7 @@ ServiceRequestErrorCode DeviceProvider::service(
             }
         }
     }
+    Serial.println("DeviceProvider:// General failure.");
     return SERV_GENERAL_FAILURE;
 }
 
