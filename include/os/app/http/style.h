@@ -286,6 +286,10 @@ text-align: center;\
 position: relative;\
 transform: scale(0.8);\
 transition: transform 0.3s ease;\
+-webkit-user-select: none;\
+-moz-user-select: none;\
+-ms-user-select: none;\
+user-select: none;\
 }\
 \
 .popup-content.show {\
@@ -479,7 +483,7 @@ overflow: hidden;\
 \
 .led {\
 height: 20px;\
-width:4px;\
+width:2px;\
 background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
@@ -490,9 +494,12 @@ background-color:rgb(21, 177, 244);\
 background-color: rgba(0, 0, 0, 0.1);\
 }\
 \
-.led.marked {\
-border-top: 5px solid orange;\
-border-bottom: 5px solid orange;\
+.ledContainer {\
+padding: 2px;\
+background-color:rgb(255, 255, 255);\
+}\
+.ledContainer.marked {\
+background-color:rgb(200, 222, 237);\
 }\
 .color-picker-popup {\
 position: fixed;\

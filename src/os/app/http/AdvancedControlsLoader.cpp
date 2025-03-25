@@ -189,42 +189,87 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "ledStrip.className = 'led-strip';";
     popupContentJavaScript += "var ledsTab = [];";
     popupContentJavaScript += "var ledMarkingState = 0;";
+    popupContentJavaScript += "var ledMarkingStartId = 0;";
     popupContentJavaScript += "function ledOnMouseDown(){\
         if(this.classList.contains('marked')){\
             ledMarkingState = 2;\
         }else {\
             ledMarkingState = 1;\
         }\
+        \
+        ledMarkingStartId = parseInt(this.id.replace('ledContainer', ''));\
+        ledUpdateMarkedState(this);\
     };";
     popupContentJavaScript += "function ledOnMouseMove(){\
-        if(ledMarkingState == 2 && this.classList.contains('marked')){\
-            this.classList.remove('marked');\
-        }else if(ledMarkingState == 1 && !this.classList.contains('marked')){\
-            this.classList.add('marked');\
+        if(ledMarkingState != 0){\
+            let ledId = parseInt(this.id.replace('ledContainer', ''));\
+            let startIdx = Math.min(ledMarkingStartId, ledId);\
+            let endIdx = Math.max(ledMarkingStartId, ledId);\
+            for(let i = startIdx; i <= endIdx; i++){\
+                ledUpdateMarkedState(ledsTab[i]);\
+            }\
         }\
     };";
     popupContentJavaScript += "function ledOnMouseUp(){\
-        if(ledMarkingState == 2 && this.classList.contains('marked')){\
-            this.classList.remove('marked');\
-        }else if(ledMarkingState == 1 && !this.classList.contains('marked')){\
-            this.classList.add('marked');\
-        }\
+        ledUpdateMarkedState(this);\
         ledMarkingState = 0;\
     };";
     popupContentJavaScript += "document.addEventListener('mouseup', function(evnt){\
         ledMarkingState = 0;\
     });";
-    for(uint16_t i = 0 ; i < ledsCount; i++){
-        popupContentJavaScript += "var led"+String((int)i)+" = document.createElement('div');";
-        popupContentJavaScript += "led"+String((int)i)+".classList.add('led');";
-        popupContentJavaScript += "led"+String((int)i)+".classList.add('on');";
-        popupContentJavaScript += "led"+String((int)i)+".id = 'led"+String((int)i)+"';";
-        popupContentJavaScript += "led"+String((int)i)+".onmousedown = ledOnMouseDown;";
-        popupContentJavaScript += "led"+String((int)i)+".onmouseup = ledOnMouseUp;";
-        popupContentJavaScript += "led"+String((int)i)+".onmousemove = ledOnMouseMove;";
-        popupContentJavaScript += "ledsTab.push(led"+String((int)i)+");";
-        popupContentJavaScript += "ledStrip.appendChild(led"+String((int)i)+");";
-    }
+    popupContentJavaScript += "document.addEventListener('touchend', function(evnt){\
+        ledMarkingState = 0;\
+    });";
+    popupContentJavaScript += "document.addEventListener('touchcancel', function(evnt){\
+        ledMarkingState = 0;\
+    });";
+    
+    popupContentJavaScript += "function ledUpdateMarkedState(ledContainer){\
+        if(ledMarkingState == 2 && ledContainer.classList.contains('marked')){\
+            ledContainer.classList.remove('marked');\
+        }else if(ledMarkingState == 1 && !ledContainer.classList.contains('marked')){\
+            ledContainer.classList.add('marked');\
+        }\
+    };";
+
+
+    popupContentJavaScript += "\
+    for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
+        var ledContainer = document.createElement('div');\
+        ledContainer.classList.add('ledContainer');\
+        ledContainer.id = 'ledContainer'+i;\
+        ledContainer.onmousedown = ledOnMouseDown;\
+        ledContainer.onmouseup = ledOnMouseUp;\
+        ledContainer.onmousemove = ledOnMouseMove;\
+        \
+        ledContainer.ontouchstart = function(e){\
+            e.preventDefault();\
+            ledOnMouseDown.call(this, e);\
+        };\
+        ledContainer.ontouchend = function(e){\
+            e.preventDefault();\
+            ledOnMouseUp.call(this, e);\
+        };\
+        \
+        var led = document.createElement('div');\
+        led.classList.add('led');\
+        led.id = 'led'+i;\
+        \
+        ledContainer.appendChild(led);\
+        ledStrip.appendChild(ledContainer);\
+        ledsTab.push(ledContainer);\
+    }";
+
+    popupContentJavaScript += "ledStrip.addEventListener('touchmove', \
+    function(e){\
+        e.preventDefault();\
+        let touch = e.touches[0];\
+        let targetElem = document.elementFromPoint(touch.clientX, touch.clientY);\
+        if(targetElem && targetElem.classList.contains('ledContainer')){\
+            ledOnMouseMove.call(targetElem, e);\
+        }\
+    });";
+
     popupContentJavaScript += "popup.appendChild(ledStrip);";
 
     popupContentJavaScript += "var colorPickerDiv = document.createElement('div');";
