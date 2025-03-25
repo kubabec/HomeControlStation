@@ -1153,42 +1153,41 @@ void printTestLedStrip(WiFiClient& client)
 
   // client.println("</div>");
 
-//   String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
-//   String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
-//   String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
+  String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
+  String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
+  String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
 
 
-//   client.println("<div class=\"container\">"); 
-//   client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
-//   client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
-//   for(uint8_t i = 0; i < ledsCount; i++){
-//     String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
+  client.println("<div class=\"container\">"); 
+  client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
+  client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
+  for(uint8_t i = 0; i < ledsCount; i++){
+    String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
 
-//     client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
-//     if(enableStatus == "on"){
-//       client.println("background-color: rgb(\
-//       "+String((int)leds.red[i])+", \
-//       "+String((int)leds.green[i])+", \
-//       "+String((int)leds.blue[i])+");");
-//     }
-//     client.println("\"> </div>");
-//   }
-//   client.println("</div>");
-//   client.println("\
-//                 <div class=\"color-picker\"> \
-//                     <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
-// "+firstLedRed+"\
-// "+firstLedGreen+"\
-// "+firstLedBlue+"\"> \
-//                 </div>\
-//                 <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
-//                 <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
-//                 <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
-//   client.println("<a class=\"button\" href=\"/test\">ON</a>\
-//                 ");
-//   client.println(brightnessSlider1 + 70 + brightnessSlider2);
+    client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
+    if(enableStatus == "on"){
+      client.println("background-color: rgb(\
+      "+String((int)leds.red[i])+", \
+      "+String((int)leds.green[i])+", \
+      "+String((int)leds.blue[i])+");");
+    }
+    client.println("\"> </div>");
+  }
+  client.println("</div>");
+  client.println("\
+                <div class=\"color-picker\"> \
+                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
+"+firstLedRed+"\
+"+firstLedGreen+"\
+"+firstLedBlue+"\"> \
+                </div>\
+                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
+                <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
+                <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
+  client.println("<a class=\"button\" href=\"/test\">ON</a>\
+                ");
 
-//   client.println("</div>");
+  client.println("</div>");
 
 
   // client.println("<div class=\"container\">"); 
@@ -1281,7 +1280,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   /* Advanced controls popup */
   client.println("<div class=\"popup-overlay hidden-popup\" id=\"advanced-ctrl-overlay\">\
     <div class=\"popup-content\" id=\"advanced-ctrl-popup\">\
-        <div class=\"popup-header\">Advanced controls</div>\
+        <div class=\"popup-header\" id=\"adv-ctrl-head\"></div>\
         <div class=\"popup-close\" id=\"advanced-ctrl-popup-close\">&times;</div>\
         <div class=\"popup-message\" id=\"advanced-ctrl-popup-msg\"></div>\
     </div>\

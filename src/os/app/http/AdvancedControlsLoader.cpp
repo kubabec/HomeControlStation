@@ -53,27 +53,84 @@ String AdvancedControlsLoader::createJsForOnOff(){
 
 
     popupContentJavaScript += "var popup = document.getElementById('advanced-ctrl-popup-msg');";
+    popupContentJavaScript += "var advCtrlHead = document.getElementById('adv-ctrl-head');";
+    popupContentJavaScript += "advCtrlHead.innerHTML = '"+currentlyRequestedDeviceDescription.deviceName+"';";
 
-    popupContentJavaScript += "var description = document.createElement('label');";
-    popupContentJavaScript += "description.innerText = 'State change animation';";
+    /* Enable animation */
+    popupContentJavaScript += "var enableAnimDesc = document.createElement('label');";
+    popupContentJavaScript += "enableAnimDesc.innerText = 'Enable animation';";
 
-    popupContentJavaScript += "var animSelector = document.createElement('select');";
-    popupContentJavaScript += "animSelector.id = \"animSelect\";";
+    popupContentJavaScript += "var enableAnimSelector = document.createElement('select');";
+    popupContentJavaScript += "enableAnimSelector.id = \"EnAnimSelect\";";
 
-    popupContentJavaScript += "var option1 = document.createElement(\"option\");";
-    popupContentJavaScript += "var option2 = document.createElement(\"option\");";
-    popupContentJavaScript += "option1.value = 1;";
-    popupContentJavaScript += "option1.text = 'switch';";
-    popupContentJavaScript += "animSelector.appendChild(option1);";
-    popupContentJavaScript += "option2.value = 2;";
-    popupContentJavaScript += "option2.text = 'fade';";
-    popupContentJavaScript += "animSelector.appendChild(option2);";
-    popupContentJavaScript += "animSelector.onchange = function() {\
-        var animSelector = document.getElementById('animSelect');\
-        console.log('select change ' + animSelector.value);\
+    popupContentJavaScript += "var optEn1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optEn1.value = 0;";
+    popupContentJavaScript += "optEn1.text = 'switch';";
+    popupContentJavaScript += "optEn2.value = 1;";
+    popupContentJavaScript += "optEn2.text = 'fade';";
+    popupContentJavaScript += "optEn3.value = 2;";
+    popupContentJavaScript += "optEn3.text = 'blink';";
+
+    switch(controls.switchOnAnimation){
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_SWITCH:
+            popupContentJavaScript += "optEn1.setAttribute('selected', true);";
+        break;
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_FADE:
+            popupContentJavaScript += "optEn2.setAttribute('selected', true);";
+        break;
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_BLINK:
+            popupContentJavaScript += "optEn3.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn1);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn2);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn3);";
+
+
+    /* Disable animation */
+    popupContentJavaScript += "var disableAnimDesc = document.createElement('label');";
+    popupContentJavaScript += "disableAnimDesc.innerText = 'Disable animation';";
+
+    popupContentJavaScript += "var disableAnimSelector = document.createElement('select');";
+    popupContentJavaScript += "disableAnimSelector.id = \"DisAnimSelect\";";
+
+    popupContentJavaScript += "var optDi1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optDi2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optDi3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optDi1.value = 0;";
+    popupContentJavaScript += "optDi1.text = 'switch';";
+    popupContentJavaScript += "optDi2.value = 1;";
+    popupContentJavaScript += "optDi2.text = 'fade';";
+    popupContentJavaScript += "optDi3.value = 2;";
+    popupContentJavaScript += "optDi3.text = 'blink';";
+
+    switch(controls.switchOffAnimation){
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_SWITCH:
+            popupContentJavaScript += "optDi1.setAttribute('selected', true);";
+        break;
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_FADE:
+            popupContentJavaScript += "optDi2.setAttribute('selected', true);";
+        break;
+        case AdvancedControlsOnOff::OnOffAnimations::ONOFF_BLINK:
+            popupContentJavaScript += "optDi3.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi1);";
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi2);";
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi3);";
+
+
+
+    popupContentJavaScript += "enableAnimSelector.onchange = function() {\
+        var enableAnimSelector = document.getElementById('EnAnimSelect');\
+        var disableAnimSelector = document.getElementById('DisAnimSelect');\
         var animeTimeVal = document.getElementById('animTimeVal');\
         var animeTimeLabel = document.getElementById('animTimeLabel');\
-        if(animSelector.value == 1){\
+        if(enableAnimSelector.value == 0 && disableAnimSelector.value == 0){\
             animeTimeVal.style.display = 'none';\
             animeTimeLabel.style.display = 'none';\
         }\
@@ -84,9 +141,12 @@ String AdvancedControlsLoader::createJsForOnOff(){
         }\
     };";
 
+    popupContentJavaScript += "disableAnimSelector.onchange = enableAnimSelector.onchange;";
 
+    
+    /* animation time */
     popupContentJavaScript += "var animTime = document.createElement('label');";
-    popupContentJavaScript += "animTime.innerText = 'Switch animation time:';";
+    popupContentJavaScript += "animTime.innerText = 'Switch animation time [ms]:';";
     popupContentJavaScript += "animTime.id = 'animTimeLabel';";
 
     popupContentJavaScript += "var animTimeVal = document.createElement('input');";
@@ -94,13 +154,24 @@ String AdvancedControlsLoader::createJsForOnOff(){
     popupContentJavaScript += "animTimeVal.type = \"text\";";
     popupContentJavaScript += "animTimeVal.value = \""+String((int)controls.switchAnimationTime)+"\";";
 
-    popupContentJavaScript += "popup.appendChild(description);";
-    popupContentJavaScript += "popup.appendChild(animSelector);";
+    popupContentJavaScript += "var saveBtn = document.createElement('button');";
+    popupContentJavaScript += "saveBtn.innerHTML = 'Save';";
+    popupContentJavaScript += "saveBtn.className = 'popup-button';";
+    popupContentJavaScript += "saveBtn.style.marginTop = '10px';";
+
+    popupContentJavaScript += "popup.appendChild(enableAnimDesc);";
+    popupContentJavaScript += "popup.appendChild(enableAnimSelector);";
+
+    popupContentJavaScript += "popup.appendChild(disableAnimDesc);";
+    popupContentJavaScript += "popup.appendChild(disableAnimSelector);";
 
     popupContentJavaScript += "popup.appendChild(animTime);";
     popupContentJavaScript += "popup.appendChild(animTimeVal);";
 
-    popupContentJavaScript += "animSelector.onchange();";
+    popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
+    popupContentJavaScript += "popup.appendChild(saveBtn);";
+    
+    popupContentJavaScript += "enableAnimSelector.onchange();";
 
     return popupContentJavaScript;
 }
