@@ -623,9 +623,9 @@ function getExtendedControlsRequest(id, devContainer){\
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                console.log(xhr.responseText);\
+                console.log('Advanced controls respose:' + xhr.responseText);\
                 showAdvancedControls();\
-                eval(xhr.responseText);\
+                window.eval(xhr.responseText);\
             } else { \
                 console.log('Error with AJAX request');\
             }\

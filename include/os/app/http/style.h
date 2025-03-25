@@ -472,22 +472,27 @@ background-color: #0056b3;\
 .led-strip {\
 display: flex;\
 padding: 10px 0px;\
-justify-content: space-between;\
+justify-content: center;\
 align-items: center;\
 overflow: hidden;\
 }\
 \
 .led {\
-height: 10px;\
-width:3px;\
+height: 20px;\
+width:4px;\
 background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
-box-shadow: 0 0 1px 1px rgba(217, 255, 27, 0.4), 0 0 1px 1px rgba(251, 255, 0, 0.5);\
+//box-shadow: 0 0 1px 1px rgba(217, 255, 27, 0.4), 0 0 1px 1px rgba(251, 255, 0, 0.5);\
 }\
 \
 .led.off {\
 background-color: rgba(0, 0, 0, 0.1);\
+}\
+\
+.led.marked {\
+border-top: 5px solid orange;\
+border-bottom: 5px solid orange;\
 }\
 .color-picker-popup {\
 position: fixed;\

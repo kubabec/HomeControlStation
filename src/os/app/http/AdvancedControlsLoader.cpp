@@ -187,12 +187,42 @@ String AdvancedControlsLoader::createJsForLedStrip(){
 
     popupContentJavaScript += "var ledStrip = document.createElement('div');";
     popupContentJavaScript += "ledStrip.className = 'led-strip';";
+    popupContentJavaScript += "var ledsTab = [];";
+    popupContentJavaScript += "var ledMarkingState = 0;";
+    popupContentJavaScript += "function ledOnMouseDown(){\
+        if(this.classList.contains('marked')){\
+            ledMarkingState = 2;\
+        }else {\
+            ledMarkingState = 1;\
+        }\
+    };";
+    popupContentJavaScript += "function ledOnMouseMove(){\
+        if(ledMarkingState == 2 && this.classList.contains('marked')){\
+            this.classList.remove('marked');\
+        }else if(ledMarkingState == 1 && !this.classList.contains('marked')){\
+            this.classList.add('marked');\
+        }\
+    };";
+    popupContentJavaScript += "function ledOnMouseUp(){\
+        if(ledMarkingState == 2 && this.classList.contains('marked')){\
+            this.classList.remove('marked');\
+        }else if(ledMarkingState == 1 && !this.classList.contains('marked')){\
+            this.classList.add('marked');\
+        }\
+        ledMarkingState = 0;\
+    };";
+    popupContentJavaScript += "document.addEventListener('mouseup', function(evnt){\
+        ledMarkingState = 0;\
+    });";
     for(uint16_t i = 0 ; i < ledsCount; i++){
         popupContentJavaScript += "var led"+String((int)i)+" = document.createElement('div');";
         popupContentJavaScript += "led"+String((int)i)+".classList.add('led');";
         popupContentJavaScript += "led"+String((int)i)+".classList.add('on');";
         popupContentJavaScript += "led"+String((int)i)+".id = 'led"+String((int)i)+"';";
-
+        popupContentJavaScript += "led"+String((int)i)+".onmousedown = ledOnMouseDown;";
+        popupContentJavaScript += "led"+String((int)i)+".onmouseup = ledOnMouseUp;";
+        popupContentJavaScript += "led"+String((int)i)+".onmousemove = ledOnMouseMove;";
+        popupContentJavaScript += "ledsTab.push(led"+String((int)i)+");";
         popupContentJavaScript += "ledStrip.appendChild(led"+String((int)i)+");";
     }
     popupContentJavaScript += "popup.appendChild(ledStrip);";
