@@ -478,12 +478,12 @@ overflow: hidden;\
 }\
 \
 .led {\
-height: 12px;\
-border-radius: 0px; \
-margin: 0;\
+height: 10px;\
+width:3px;\
+background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
-box-shadow: 0 0 1px 1px rgba(217, 255, 27, 0.4), 0 0 2px 1px rgba(251, 255, 0, 0.5);\
+box-shadow: 0 0 1px 1px rgba(217, 255, 27, 0.4), 0 0 1px 1px rgba(251, 255, 0, 0.5);\
 }\
 \
 .led.off {\

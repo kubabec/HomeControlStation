@@ -16,6 +16,7 @@ class AdvancedControlsLoader{
     static void prepareJsStringWithAdvancedControls();
 
     static String createJsForOnOff();
+    static String createJsForLedStrip();
 
     public :
 

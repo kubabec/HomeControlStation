@@ -68,6 +68,8 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
     switch(serviceType){
+        case DEVSERVICE_GET_ADVANCED_CONTROLS:
+            return SERV_SUCCESS;
         default: 
             return SERV_NOT_SUPPORTED;
     };

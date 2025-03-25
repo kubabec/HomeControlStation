@@ -176,7 +176,45 @@ String AdvancedControlsLoader::createJsForOnOff(){
     return popupContentJavaScript;
 }
 
+String AdvancedControlsLoader::createJsForLedStrip(){
+    String popupContentJavaScript = "";
 
+    popupContentJavaScript += "var popup = document.getElementById('advanced-ctrl-popup-msg');";
+    popupContentJavaScript += "var advCtrlHead = document.getElementById('adv-ctrl-head');";
+    popupContentJavaScript += "advCtrlHead.innerHTML = '"+currentlyRequestedDeviceDescription.deviceName+"';";
+
+    uint16_t ledsCount = 100;
+
+    popupContentJavaScript += "var ledStrip = document.createElement('div');";
+    popupContentJavaScript += "ledStrip.className = 'led-strip';";
+    for(uint16_t i = 0 ; i < ledsCount; i++){
+        popupContentJavaScript += "var led"+String((int)i)+" = document.createElement('div');";
+        popupContentJavaScript += "led"+String((int)i)+".classList.add('led');";
+        popupContentJavaScript += "led"+String((int)i)+".classList.add('on');";
+        popupContentJavaScript += "led"+String((int)i)+".id = 'led"+String((int)i)+"';";
+
+        popupContentJavaScript += "ledStrip.appendChild(led"+String((int)i)+");";
+    }
+    popupContentJavaScript += "popup.appendChild(ledStrip);";
+
+    popupContentJavaScript += "var colorPickerDiv = document.createElement('div');";
+    popupContentJavaScript += "colorPickerDiv.className = 'color-picker';";
+    popupContentJavaScript += "var colorPicker = document.createElement('input');";
+    popupContentJavaScript += "colorPicker.className = 'color-input';";
+    popupContentJavaScript += "colorPicker.type = 'color';";
+
+    popupContentJavaScript += "popup.appendChild(colorPickerDiv);";
+    popupContentJavaScript += "popup.appendChild(colorPicker);";
+
+    popupContentJavaScript += "var saveBtn = document.createElement('button');";
+    popupContentJavaScript += "saveBtn.innerHTML = 'Apply';";
+    popupContentJavaScript += "saveBtn.className = 'popup-button';";
+    popupContentJavaScript += "saveBtn.style.marginTop = '10px';";
+    popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
+    popupContentJavaScript += "popup.appendChild(saveBtn);";
+
+    return popupContentJavaScript;
+}
 
 void AdvancedControlsLoader::prepareJsStringWithAdvancedControls()
 {
@@ -189,7 +227,7 @@ void AdvancedControlsLoader::prepareJsStringWithAdvancedControls()
                     currentRequestJS = createJsForOnOff();
                     break;
                 case type_LED_STRIP:
-
+                    currentRequestJS = createJsForLedStrip();
                     break;
                 case type_TEMP_SENSOR:
 
