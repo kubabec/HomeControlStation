@@ -3,9 +3,13 @@
 
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
 {
+    int count = NUMBER_OF_DIODES;
+
     adafruit_ws2812b = new Adafruit_NeoPixel(
-        nvmData.customBytes[0], /* leds count */
-        nvmData.pinNumber,
+        // nvmData.customBytes[0], /* leds count */
+        // nvmData.pinNumber,
+        count,
+        40,
         NEO_GRB + NEO_KHZ800
     );
 
@@ -14,6 +18,36 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
     deviceId = nvmData.deviceId;
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
+
+    adafruit_ws2812b->begin();
+    adafruit_ws2812b->setBrightness(200);
+
+    for(int i = 0; i < count; i++)
+    {
+        // adafruit_ws2812b->setPixelColor(i, adafruit_ws2812b->Color(100, 150, 190));
+        // delay(30);
+        // adafruit_ws2812b->show();
+
+        stripContent[i] = {
+            .r = 130,
+            .g = 70,
+            .b = 170
+        };
+
+    }
+
+    stripContent[0] = {
+        .r = 200,
+        .g = 100,
+        .b = 50
+    };
+    stripContent[NUMBER_OF_DIODES-1] = {
+        .r = 100,
+        .g = 200,
+        .b = 60
+    };
+
+    applyColors();
 }
 
 void LedWS1228bDeviceType::init(){
@@ -23,6 +57,49 @@ void LedWS1228bDeviceType::init(){
 void LedWS1228bDeviceType::cyclic(){
 
 }
+
+bool LedWS1228bDeviceType::isStripInitialized()
+{
+    return (adafruit_ws2812b != nullptr);
+}
+
+void LedWS1228bDeviceType::applyColors(){
+    for(uint16_t i = 0 ; i < NUMBER_OF_DIODES ; i ++){
+        adafruit_ws2812b->setPixelColor(
+            i,
+            adafruit_ws2812b->Color(
+                stripContent[i].r,
+                stripContent[i].g,
+                stripContent[i].b
+            )
+        );
+    }
+    adafruit_ws2812b->show();
+}
+
+void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
+{
+    if(count == NUMBER_OF_DIODES){
+        memcpy(stripContent, ledsArray, (count*sizeof(LedColor)));
+        // LedColor* currentDiode = ledsArray;
+        // for(uint16_t i = 0; i < count; i++){
+        //     stripContent[i].r = currentDiode->r;
+        //     stripContent[i].g = currentDiode->g;
+        //     stripContent[i].b = currentDiode->b;
+
+        //     currentDiode++;
+        // }
+        applyColors();
+    }
+}
+
+void LedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t count)
+{
+    if(count == NUMBER_OF_DIODES){
+        memcpy(memoryBuffer, stripContent, (count*sizeof(LedColor)));
+    }  
+}
+
 
 uint16_t LedWS1228bDeviceType::getExtendedMemoryLength(){
     return 600;
@@ -69,7 +146,22 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
-            return SERV_SUCCESS;
+        case DEVSERVICE_GET_DETAILED_COLORS:
+            if(isStripInitialized() && param.size == (NUMBER_OF_DIODES*sizeof(LedColor)))
+            {
+                getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+                return SERV_SUCCESS;
+            }else {
+                return SERV_EXECUTION_FAILURE;
+            }
+        case DEVSERVICE_SET_DETAILED_COLORS:
+            if(isStripInitialized() && param.size == (NUMBER_OF_DIODES*sizeof(LedColor)))
+            {
+                setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+                return SERV_SUCCESS;
+            }else {
+                return SERV_EXECUTION_FAILURE;
+            }
         default: 
             return SERV_NOT_SUPPORTED;
     };
