@@ -177,14 +177,17 @@ String AdvancedControlsLoader::createJsForOnOff(){
 }
 
 String AdvancedControlsLoader::createJsForLedStrip(){
+    String popupContentJavaScript = "";
     LedColor* ledColors = (LedColor*) currentAdvancedControls; // array[NUMBER_OF_DIODES]
+
+    popupContentJavaScript += "var ledColors = [";
     for(int i = 0 ; i < NUMBER_OF_DIODES; i ++){
         Serial.println("-- LED --");
         Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
+        popupContentJavaScript += "['"+String((int)ledColors[i].r)+"', '"+String((int)ledColors[i].g)+"', '"+String((int)ledColors[i].b)+"'],";
     }
-
-
-    String popupContentJavaScript = "";
+    popupContentJavaScript.remove(popupContentJavaScript.length()-1);
+    popupContentJavaScript += "];";
 
     popupContentJavaScript += "var popup = document.getElementById('advanced-ctrl-popup-msg');";
     popupContentJavaScript += "var advCtrlHead = document.getElementById('adv-ctrl-head');";
@@ -261,6 +264,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         var led = document.createElement('div');\
         led.classList.add('led');\
         led.id = 'led'+i;\
+        led.style.backgroundColor = 'rgb(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ')';\
         \
         ledContainer.appendChild(led);\
         ledStrip.appendChild(ledContainer);\
@@ -287,6 +291,25 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "var colorPicker = document.createElement('input');";
     popupContentJavaScript += "colorPicker.className = 'color-input';";
     popupContentJavaScript += "colorPicker.type = 'color';";
+    popupContentJavaScript += "colorPicker.onchange = function (){\
+        const r = parseInt(this.value.substr(1,2), 16);\
+        const g = parseInt(this.value.substr(3,2), 16);\
+        const b = parseInt(this.value.substr(5,2), 16);\
+        \
+        let isAnyLedMarked = false;\
+        for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
+            if(ledsTab[i].classList.contains('marked')){\
+                isAnyLedMarked = true;\
+                break;\
+            }\
+        }\
+        for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
+            if(!isAnyLedMarked || ledsTab[i].classList.contains('marked')){\
+                ledsTab[i].childNodes[0].style.backgroundColor = 'rgb('+r+', '+g+', '+b+')';\
+                ledsTab[i].classList.remove('marked');\
+            }\
+        }\
+    };";
 
     popupContentJavaScript += "popup.appendChild(colorPickerDiv);";
     popupContentJavaScript += "popup.appendChild(colorPicker);";
@@ -297,6 +320,25 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "saveBtn.style.marginTop = '10px';";
     popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
     popupContentJavaScript += "popup.appendChild(saveBtn);";
+
+    popupContentJavaScript += "\
+    function nameToRgb(name) {\
+        let canvas = document.createElement('canvas');\
+        let context = canvas.getContext('2d');\
+        context.fillStyle = name;\
+        context.fillRect(0,0,1,1);\
+        let data = context.getImageData(0,0,1,1).data;\
+        return [String(data[0]), String(data[1]), String(data[2])];\
+    }";
+
+    popupContentJavaScript += "function ledGetStateJson()\
+    {\
+        let ledState = {'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'color': []};\
+        for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
+            ledState.color.push(nameToRgb(ledsTab[i].childNodes[0].style.backgroundColor));\
+        }\
+        return ledState;\
+    }";
 
     return popupContentJavaScript;
 }
