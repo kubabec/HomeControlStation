@@ -95,7 +95,12 @@ void HTTPAsyncRequestHandler::createServiceCall()
         break;
 
         case serviceCall_3:
-            memcpy(&set3, &currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL+1], sizeof(ServiceParameters_set3));
+            /* Fulfill device service call parameters based on HTTP async request data */
+            set3.buff = &(currentRequest.requestData[DYNAMIC_REQUEST_START_OF_DATA_IDX]);
+            set3.direction = currentRequest.requestData[DYNAMIC_REQUEST_DIRECTION_IDX];
+            set3.additionalParam = currentRequest.requestData[DYNAMIC_REQUEST_ADDITIONAL_PARAM_IDX];
+            set3.size = currentRequest.requestData[DYNAMIC_REQUEST_MEMORY_LENGTH_IDX];
+            
             serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set3(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],
                 (DeviceServicesType)currentRequest.requestData[SERVICE_NAME_INDEX],

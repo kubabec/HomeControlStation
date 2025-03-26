@@ -1,7 +1,7 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
 
 #define ONOFF_ADV_CONTROLS_SIZE 100
-#define LEDSTRIP_ADV_CONTROLS_SIZE 200
+#define LEDSTRIP_ADV_CONTROLS_SIZE (NUMBER_OF_DIODES*sizeof(LedColor))
 #define TEMPSENSOR_ADV_CONTROLS_SIZE 50
 
 uint8_t* AdvancedControlsLoader::currentAdvancedControls = nullptr;
@@ -177,6 +177,13 @@ String AdvancedControlsLoader::createJsForOnOff(){
 }
 
 String AdvancedControlsLoader::createJsForLedStrip(){
+    LedColor* ledColors = (LedColor*) currentAdvancedControls; // array[NUMBER_OF_DIODES]
+    for(int i = 0 ; i < NUMBER_OF_DIODES; i ++){
+        Serial.println("-- LED --");
+        Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
+    }
+
+
     String popupContentJavaScript = "";
 
     popupContentJavaScript += "var popup = document.getElementById('advanced-ctrl-popup-msg');";

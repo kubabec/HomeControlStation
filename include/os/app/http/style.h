@@ -483,7 +483,7 @@ overflow: hidden;\
 \
 .led {\
 height: 20px;\
-width:2px;\
+width:3px;\
 background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
@@ -495,7 +495,8 @@ background-color: rgba(0, 0, 0, 0.1);\
 }\
 \
 .ledContainer {\
-padding: 2px;\
+padding-top: 5px;\
+padding-bottom: 5px;\
 background-color:rgb(255, 255, 255);\
 }\
 .ledContainer.marked {\

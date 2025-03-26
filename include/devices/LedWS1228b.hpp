@@ -7,6 +7,7 @@
 
 class LedWS1228bDeviceType : public Device {
 
+    LedColor stripContent[NUMBER_OF_DIODES];
     bool isOn = false; //stan urzadzenia
     int pinNumber;
     uint8_t brightness = 0;
@@ -23,6 +24,11 @@ class LedWS1228bDeviceType : public Device {
     virtual uint8_t getDeviceType();
     virtual DeviceDescription getDeviceDescription();
     virtual uint16_t getExtendedMemoryLength();
+    bool isStripInitialized();
+
+    void setColors(LedColor* ledsArray, uint16_t count);
+    void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
+    void applyColors();
 
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);

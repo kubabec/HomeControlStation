@@ -79,7 +79,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "lclSetupJson",
   "dwlddevcfg",
   "loaddeicvcfg",
-  "getExtendedControls"
+  "getExtendedControls",
+  "setStripColor"
 };
 
 
@@ -113,6 +114,14 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE}
 };
 
+
+void escapeSpecialCharsInJson(String& json)
+{
+  json.replace("%7B", "{");
+  json.replace("%22", "\"");
+  json.replace("%7D", "}");
+  json.replace("%20", " ");
+}
 
 void HomeLightHttpServer::cyclic()
 {
@@ -1548,10 +1557,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 {
   Serial.println("Loading configuration from file request ...");
 
-  request.replace("%7B", "{");
-  request.replace("%22", "\"");
-  request.replace("%7D", "}");
-  request.replace("%20", " ");
+  escapeSpecialCharsInJson(request);
   request.replace("loaddeicvcfg&", "");
 
 
@@ -1595,12 +1601,31 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 }
 
 
+void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, WiFiClient& client){
+  escapeSpecialCharsInJson(request);
+  request.replace("setStripColor", "");
+
+
+  uint8_t* memory = (uint8_t*)malloc(320);
+  memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
+  memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
+  memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = 5;
+  memory[DYNAMIC_REQUEST_MEMORY_LENGTH_IDX] = 300;
+  memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
+  memory[DYNAMIC_REQUEST_START_OF_DATA_IDX] = 0xFF;
+
+  HTTPAsyncRequestHandler::createRequest(
+    ASYNC_TYPE_DEVICE_SERVICE_CALL,
+    memory,
+    320
+  );  
+
+  free(memory);
+}
+
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){
     Serial.println("Extended controls requested");
-    request.replace("%7B", "{");
-    request.replace("%22", "\"");
-    request.replace("%7D", "}");
-    request.replace("%20", " ");
+    escapeSpecialCharsInJson(request);
     request.replace("/getExtendedControls&", "");
 
     Serial.println(request);
@@ -1676,10 +1701,7 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
 
     /* Check if device is unlocked that config can be modified */
     if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
-        request.replace("%7B", "{");
-        request.replace("%22", "\"");
-        request.replace("%7D", "}");
-        request.replace("%20", " ");
+        escapeSpecialCharsInJson(request);
         request.replace("roomMappingApply&", "");
 
         // Serial.println("Json request:" + request);
