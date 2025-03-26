@@ -275,6 +275,9 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         if(targetElem && targetElem.classList.contains('ledContainer')){\
             ledOnMouseMove.call(targetElem, e);\
         }\
+        else if(targetElem && targetElem.classList.contains('led')){\
+            ledOnMouseMove.call(targetElem.parentNode, e);\
+        }\
     });";
 
     popupContentJavaScript += "popup.appendChild(ledStrip);";

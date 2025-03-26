@@ -483,7 +483,7 @@ overflow: hidden;\
 \
 .led {\
 height: 20px;\
-width:3px;\
+width: 3px;\
 background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
