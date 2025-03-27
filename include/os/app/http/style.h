@@ -272,7 +272,7 @@ background: rgba(0, 0, 0, 0.6);\
 display: none;\
 justify-content: center;\
 align-items: center;\
-z-index: 1000;\
+z-index: 15;\
 transition: opacity 0.3s ease;\
 }\
 \
@@ -504,10 +504,8 @@ background-color:rgba(93, 190, 255, 0.9);\
 }\
 .color-picker-popup {\
 position: fixed;\
-top: 10%;\
-left: 50%;\
-transform: translate(-50%, -10%);\
-background: #ffffff;\
+top: 25%;\
+background: #fffff7;\
 border: 1px solid #b0c8d8;\
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);\
 padding: 20px;\
@@ -515,7 +513,7 @@ border-radius: 8px;\
 display: none;\
 flex-direction: column;\
 align-items: center;\
-z-index: 10;\
+z-index: 16;\
 }\
 .popup-backdrop {\
 position: fixed;\

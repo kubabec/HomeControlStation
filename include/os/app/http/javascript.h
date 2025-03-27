@@ -361,12 +361,11 @@ let isNotificationPollingActive = 1;\
             colorPickerPopup.style.display = \"none\";\
             backdrop.style.display = \"none\";\
         }\
-        function openCompositions() {\
+        function openLedStripMemorySlots() {\
             const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
             const composClose = document.getElementById(\"composClose\");\
             const backdrop = document.querySelector(\".popup-backdrop\");\
             composClose.addEventListener(\"click\", closeCompositions);\
-            colorInput.value = 0xFF00FA;\
             FavouritesPopup.style.display = \"flex\";\
             backdrop.style.display = \"block\";\
         }\

@@ -327,10 +327,15 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "popup.appendChild(colorPickerDiv);";
     popupContentJavaScript += "popup.appendChild(colorPicker);";
 
+
+    popupContentJavaScript += "var memoryBtn = document.createElement('button');";
+    popupContentJavaScript += "memoryBtn.innerHTML = 'Memory';";
+    popupContentJavaScript += "memoryBtn.className = 'popup-button';";
+    popupContentJavaScript += "memoryBtn.onclick = openLedStripMemorySlots;";
+
     popupContentJavaScript += "var saveBtn = document.createElement('button');";
     popupContentJavaScript += "saveBtn.innerHTML = 'Apply';";
     popupContentJavaScript += "saveBtn.className = 'popup-button';";
-    popupContentJavaScript += "saveBtn.style.marginTop = '10px';";
 
     popupContentJavaScript += "saveBtn.onclick = function () { \
     let jsonString = JSON.stringify(ledGetStateJson());\
@@ -349,8 +354,11 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     xhr.send();\
     hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
     };";
-    popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
-    popupContentJavaScript += "popup.appendChild(saveBtn);";
+    popupContentJavaScript += "var btnContainer = document.createElement('div');";
+    popupContentJavaScript += "btnContainer.className = 'button-container';";
+    popupContentJavaScript += "btnContainer.appendChild(memoryBtn);";
+    popupContentJavaScript += "btnContainer.appendChild(saveBtn);";
+    popupContentJavaScript += "popup.appendChild(btnContainer);";
 
     popupContentJavaScript += "\
     function nameToRgb(name) {\

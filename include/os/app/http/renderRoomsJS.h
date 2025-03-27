@@ -138,19 +138,6 @@ function renderRooms(data) {\
                 btnContainer.appendChild(button);\
                 deviceContainer.appendChild(btnContainer);\
 \
-                const sliderLabel = document.createElement('div');\
-                sliderLabel.className = 'header2';\
-                sliderLabel.textContent = 'Brightness';\
-                deviceContainer.appendChild(sliderLabel);\
-\
-                const slider = document.createElement('input');\
-                slider.type = 'range';\
-                slider.min = 0;\
-                slider.max = 100;\
-                slider.value = device.brightness;\
-                slider.onchange = () => onRangeChanged(slider.value, device.id);\
-                slider.id = `brightnessSlider${device.id}`;\
-                deviceContainer.appendChild(slider);\
             \
             }else if(device.devType == 45){\
                 const loadingOverlay = document.createElement('div');\

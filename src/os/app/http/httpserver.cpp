@@ -1124,15 +1124,7 @@ void printTestLedStrip(WiFiClient& client)
     </div>");
 
   
-  client.println("<div class=\"popup-backdrop\"></div>\
-    <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
-        <div class=\"header2\">Select composition</div>\
-          <button class=\"button\" id=\"compos1\">Composition 1</button>\
-          <button class=\"button\" id=\"compos2\">Composition 2</button>\
-          <button class=\"button\" id=\"compos3\">Composition 3</button>\
-          <br>\
-          <button class=\"button\" id=\"composClose\">Close</button>\
-    </div>");
+  
 
   client.println("<div class=\"popup-backdrop\"></div>\
     <div class=\"color-picker-popup\" id=\"SaveFavouritesPopup\">\
@@ -1192,7 +1184,7 @@ void printTestLedStrip(WiFiClient& client)
 "+firstLedBlue+"\"> \
                 </div>\
                 <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
-                <button class=\"button\" onclick=\"openCompositions()\">Compositions</button>\
+                <button class=\"button\" onclick=\"openLedStripMemorySlots()\">Compositions</button>\
                 <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
   client.println("<a class=\"button\" href=\"/test\">ON</a>\
                 ");
@@ -1295,6 +1287,20 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
         <div class=\"popup-message\" id=\"advanced-ctrl-popup-msg\"></div>\
     </div>\
 </div>");
+
+client.println("<div class=\"popup-backdrop\"></div>\
+  <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
+      <div class=\"header2\">Saved compositions</div><hr>\
+        <div id=\"ledStripExt1\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx1\">Overwrite</button><button class=\"button\" id=\"loadEx1\">Load</button></div>\
+        <hr><br>\
+        <div id=\"ledStripExt2\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx2\">Overwrite</button><button class=\"button\" id=\"loadEx2\">Load</button></div>\
+        <hr><br>\
+        <div id=\"ledStripExt3\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx3\">Overwrite</button><button class=\"button\" id=\"loadEx3\">Load</button></div>\
+        <button class=\"button\" id=\"composClose\">Close</button>\
+  </div>");
 
   client.println("<script>document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
   if (event.key === \"Enter\") {\
