@@ -297,6 +297,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "var colorPicker = document.createElement('input');";
     popupContentJavaScript += "colorPicker.className = 'color-input';";
     popupContentJavaScript += "colorPicker.type = 'color';";
+    popupContentJavaScript += "colorPicker.value = '#ffffff';";
     popupContentJavaScript += "colorPicker.onchange = function (){\
         const r = parseInt(this.value.substr(1,2), 16);\
         const g = parseInt(this.value.substr(3,2), 16);\
@@ -346,6 +347,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         }\
     };\
     xhr.send();\
+    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
     };";
     popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
     popupContentJavaScript += "popup.appendChild(saveBtn);";
