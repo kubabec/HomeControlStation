@@ -1,0 +1,7 @@
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/rebuild_cache.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/edit_cache.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/variant_as_char.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/write_long_long.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/assign_char.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/read_long_long.dir
+/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build/CMakeFiles/Issue978.dir

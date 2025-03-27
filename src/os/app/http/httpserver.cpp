@@ -111,7 +111,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_newSetupJson, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE}
 };
 
 
@@ -1603,22 +1604,62 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 
 void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, WiFiClient& client){
   escapeSpecialCharsInJson(request);
-  request.replace("setStripColor", "");
+  request.replace("/setStripColor&", "");
 
+  uint16_t numberOfLeds = NUMBER_OF_DIODES;
 
-  uint8_t* memory = (uint8_t*)malloc(320);
+  uint8_t* memory = (uint8_t*)malloc(340);
   memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
   memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
-  memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = 5;
-  memory[DYNAMIC_REQUEST_MEMORY_LENGTH_IDX] = 300;
-  memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
-  memory[DYNAMIC_REQUEST_START_OF_DATA_IDX] = 0xFF;
 
-  HTTPAsyncRequestHandler::createRequest(
-    ASYNC_TYPE_DEVICE_SERVICE_CALL,
-    memory,
-    320
-  );  
+  *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor));
+  
+
+  memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
+  LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX];
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if(success == DeserializationError::Code::Ok){
+    String deviceId = String(doc["devId"]);
+    /* Process JSON to extrac each device slot*/
+    for(uint16_t i = 0; i < numberOfLeds; i++)
+    {
+        /*this exist for every slot*/
+        String r = String(doc["color"][i][0]);
+        String g = String(doc["color"][i][1]);
+        String b = String(doc["color"][i][2]);
+
+        
+
+        if(r != "null" && g != "null" && b != "null"){
+          ledValueAddr->r = r.toInt() <= 255 ? r.toInt() : 255;
+          ledValueAddr->g = g.toInt() <= 255 ? g.toInt() : 255;
+          ledValueAddr->b = b.toInt() <= 255 ? b.toInt() : 255;
+
+          Serial.println(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
+        }else {
+          break;
+        }
+
+        /* go to next diode */
+        ledValueAddr++;
+    }
+
+    if(deviceId != "null"){
+      memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
+
+
+      // Serial.println(request);
+      HTTPAsyncRequestHandler::createRequest(
+        ASYNC_TYPE_DEVICE_SERVICE_CALL,
+        memory,
+        340
+      );  
+
+    }
+
+  }
 
   free(memory);
 }

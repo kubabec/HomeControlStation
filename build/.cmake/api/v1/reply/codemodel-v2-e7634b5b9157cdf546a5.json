@@ -1,0 +1,92 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Issue978::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Issue978-Debug-fccc398ba8d08e93d8fc.json",
+					"name" : "Issue978",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "assign_char::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-assign_char-Debug-980275fdb08ad97e8e9b.json",
+					"name" : "assign_char",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "read_long_long::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-read_long_long-Debug-5f64667f99da2ca9e001.json",
+					"name" : "read_long_long",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "variant_as_char::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-variant_as_char-Debug-ee97c94bd4b5e5e3b050.json",
+					"name" : "variant_as_char",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "write_long_long::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-write_long_long-Debug-161340d34735df5ade67.json",
+					"name" : "write_long_long",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+		"source" : "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

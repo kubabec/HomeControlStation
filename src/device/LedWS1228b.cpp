@@ -20,7 +20,28 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
     roomId = nvmData.roomId;
 
     adafruit_ws2812b->begin();
-    adafruit_ws2812b->setBrightness(200);
+
+    /*brightness limitation to do not exceed board current limiter */
+    const float maxCurrentAllowed = 2.6f; /* 2.6 A*/
+    const float maxCurrentPerDiode = 0.060f; /* 60mA */
+    const float maxBrightnessVal = 255.f;
+    const float numberOfDiodesF = (float)NUMBER_OF_DIODES;
+
+    float requiredCurrentForDiodes = maxCurrentPerDiode * numberOfDiodesF;
+    if(requiredCurrentForDiodes <= maxCurrentAllowed)
+    {
+        /* not limited */
+        adafruit_ws2812b->setBrightness(255);
+    }else {
+        // float overLimit = (requiredCurrentForDiodes - maxCurrentAllowed);
+        // float percentageOverLimit = (overLimit/maxCurrentAllowed);
+        // float pwmValueToReduce = 255.f * percentageOverLimit;
+        // int finalPwmValue = 255 - (int)pwmValueToReduce;
+        adafruit_ws2812b->setBrightness(60);
+    }
+
+
+    
 
     for(int i = 0; i < count; i++)
     {
@@ -82,13 +103,9 @@ void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
     if(count == NUMBER_OF_DIODES){
         memcpy(stripContent, ledsArray, (count*sizeof(LedColor)));
         // LedColor* currentDiode = ledsArray;
-        // for(uint16_t i = 0; i < count; i++){
-        //     stripContent[i].r = currentDiode->r;
-        //     stripContent[i].g = currentDiode->g;
-        //     stripContent[i].b = currentDiode->b;
-
-        //     currentDiode++;
-        // }
+        for(uint16_t i = 0; i < count; i++){
+            Serial.println("R:"+ String((int)ledsArray[i].r)+" G:"+String((int)ledsArray[i].g)+" B:"+String((int)ledsArray[i].b));
+        }
         applyColors();
     }
 }
@@ -155,8 +172,10 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
                 return SERV_EXECUTION_FAILURE;
             }
         case DEVSERVICE_SET_DETAILED_COLORS:
+            Serial.println("param.size: " + String((int)param.size) + ", must be : " + String((int)NUMBER_OF_DIODES*sizeof(LedColor)));
             if(isStripInitialized() && param.size == (NUMBER_OF_DIODES*sizeof(LedColor)))
             {
+                Serial.println("Color change requested");
                 setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
                 return SERV_SUCCESS;
             }else {

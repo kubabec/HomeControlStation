@@ -23,7 +23,7 @@ void HTTPAsyncRequestHandler::init(
 HttpErrorCode HTTPAsyncRequestHandler::createRequest(
     AsyncRequestType requestType,
     uint8_t* requestParamsPtr,
-    uint8_t paramsLength)
+    uint16_t paramsLength)
 {
     /* no active request */
     if(currentRequest.state == ASYNC_NO_REQUEST){
@@ -99,7 +99,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
             set3.buff = &(currentRequest.requestData[DYNAMIC_REQUEST_START_OF_DATA_IDX]);
             set3.direction = currentRequest.requestData[DYNAMIC_REQUEST_DIRECTION_IDX];
             set3.additionalParam = currentRequest.requestData[DYNAMIC_REQUEST_ADDITIONAL_PARAM_IDX];
-            set3.size = currentRequest.requestData[DYNAMIC_REQUEST_MEMORY_LENGTH_IDX];
+            memcpy(&set3.size, &currentRequest.requestData[DYNAMIC_REQUEST_MEMORY_LENGTH_IDX], sizeof(set3.size));
             
             serviceCallStatus = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))).serviceCall_set3(
                 currentRequest.requestData[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL],

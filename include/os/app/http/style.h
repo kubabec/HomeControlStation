@@ -500,7 +500,7 @@ padding-bottom: 5px;\
 background-color:rgb(255, 255, 255);\
 }\
 .ledContainer.marked {\
-background-color:rgb(200, 222, 237);\
+background-color:rgba(93, 190, 255, 0.9);\
 }\
 .color-picker-popup {\
 position: fixed;\

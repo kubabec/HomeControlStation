@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/variant_as_char.dir/variant_as_char.o -c /Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/variant_as_char.cpp",
+  "file": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/variant_as_char.cpp"
+},
+{
+  "directory": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/write_long_long.dir/write_long_long.o -c /Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/write_long_long.cpp",
+  "file": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/write_long_long.cpp"
+},
+{
+  "directory": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/assign_char.dir/assign_char.o -c /Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/assign_char.cpp",
+  "file": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/assign_char.cpp"
+},
+{
+  "directory": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/read_long_long.dir/read_long_long.o -c /Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/read_long_long.cpp",
+  "file": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/read_long_long.cpp"
+},
+{
+  "directory": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/Issue978.dir/Issue978.o -c /Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/Issue978.cpp",
+  "file": "/Users/jakubbecmer/Projekty/Microcontrollers/esp32Board/HomeControlStation/lib/ArduinoJson-7.2.0/extras/tests/FailingBuilds/Issue978.cpp"
+}
+]

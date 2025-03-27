@@ -82,7 +82,7 @@ class HTTPAsyncRequestHandler{
     static void init(std::map<uint8_t, String>*  roomMapping, std::map<uint8_t, std::vector<DeviceDescription*>>* deviceToRoomMappingList);
     static HttpErrorCode createRequest(AsyncRequestType requestType,
                                        uint8_t* requestParamsPtr,
-                                       uint8_t paramsLength);
+                                       uint16_t paramsLength);
 
     static void mainFunction();
     static AsyncRequestState getProcessingState();

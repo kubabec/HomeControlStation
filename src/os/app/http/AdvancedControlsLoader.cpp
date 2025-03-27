@@ -264,7 +264,13 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         var led = document.createElement('div');\
         led.classList.add('led');\
         led.id = 'led'+i;\
-        led.style.backgroundColor = 'rgb(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ')';\
+        if(ledColors[i][0] != 0 || ledColors[i][1] != 0 || ledColors[i][2] != 0){\
+            led.style.backgroundColor = 'rgb(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ')';\
+            led.style.boxShadow = '0 0 0px 6px rgba(0, 205, 0, 0.007), 0 0 6px 8px rgba(0, 205, 0, 0.04)';\
+        }else {\
+            led.style.backgroundColor = 'rgba(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ', 0.1)';\
+        }\
+        led.style.borderRadius = '3px';\
         \
         ledContainer.appendChild(led);\
         ledStrip.appendChild(ledContainer);\
@@ -305,7 +311,13 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         }\
         for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
             if(!isAnyLedMarked || ledsTab[i].classList.contains('marked')){\
-                ledsTab[i].childNodes[0].style.backgroundColor = 'rgb('+r+', '+g+', '+b+')';\
+                if(r != 0 || g != 0 || b != 0){\
+                    ledsTab[i].childNodes[0].style.backgroundColor = 'rgb('+r+', '+g+', '+b+')';\
+                    ledsTab[i].childNodes[0].style.boxShadow = '0 0 0px 6px rgba(0, 205, 0, 0.007), 0 0 6px 8px rgba(0, 205, 0, 0.04)';\
+                }else {\
+                    ledsTab[i].childNodes[0].style.backgroundColor = 'rgb(0, 0, 0, 0.1)';\
+                    ledsTab[i].childNodes[0].style.boxShadow = 'none';\
+                }\
                 ledsTab[i].classList.remove('marked');\
             }\
         }\
@@ -318,6 +330,23 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "saveBtn.innerHTML = 'Apply';";
     popupContentJavaScript += "saveBtn.className = 'popup-button';";
     popupContentJavaScript += "saveBtn.style.marginTop = '10px';";
+
+    popupContentJavaScript += "saveBtn.onclick = function () { \
+    let jsonString = JSON.stringify(ledGetStateJson());\
+    var url = '/setStripColor&' + jsonString;\
+    const xhr = new XMLHttpRequest();\
+    xhr.open(\"POST\", url, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                console.log('led color changed!');\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+    };\
+    xhr.send();\
+    };";
     popupContentJavaScript += "popup.appendChild(document.createElement('br'));";
     popupContentJavaScript += "popup.appendChild(saveBtn);";
 
