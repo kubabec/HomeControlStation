@@ -1303,7 +1303,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
   });</script>");
 
 
-  printTestLedStrip(client);
+  // printTestLedStrip(client);
 
   /* Display configuration button */
   uint8_t nodeType = 
