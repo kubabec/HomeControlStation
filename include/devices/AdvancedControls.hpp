@@ -17,7 +17,6 @@ struct AdvancedControlsOnOff{
 
 };
 
-#define NUMBER_OF_DIODES 100
 struct LedColor{
     uint8_t r = 0;
     uint8_t g = 0;

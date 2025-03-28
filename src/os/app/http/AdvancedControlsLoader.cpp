@@ -1,21 +1,20 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
 
 #define ONOFF_ADV_CONTROLS_SIZE 100
-#define LEDSTRIP_ADV_CONTROLS_SIZE (NUMBER_OF_DIODES*sizeof(LedColor))
 #define TEMPSENSOR_ADV_CONTROLS_SIZE 50
 
 uint8_t* AdvancedControlsLoader::currentAdvancedControls = nullptr;
 DeviceDescription AdvancedControlsLoader::currentlyRequestedDeviceDescription = {};
 String AdvancedControlsLoader::currentRequestJS = "";
 
-uint16_t getControlsSizeBasedOnDevType(uint8_t deviceType){
+uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceType){
     switch(deviceType){
         case type_ONOFFDEVICE:
             return sizeof(AdvancedControlsOnOff);
         break;
 
         case type_LED_STRIP:
-            return LEDSTRIP_ADV_CONTROLS_SIZE;
+            return currentlyRequestedDeviceDescription.customBytes[0] * sizeof(LedColor);
         break;
 
         case type_TEMP_SENSOR:
@@ -178,10 +177,12 @@ String AdvancedControlsLoader::createJsForOnOff(){
 
 String AdvancedControlsLoader::createJsForLedStrip(){
     String popupContentJavaScript = "";
-    LedColor* ledColors = (LedColor*) currentAdvancedControls; // array[NUMBER_OF_DIODES]
+    LedColor* ledColors = (LedColor*) currentAdvancedControls; 
 
+    uint8_t diodeCount = currentlyRequestedDeviceDescription.customBytes[0];
+    
     popupContentJavaScript += "var ledColors = [";
-    for(int i = 0 ; i < NUMBER_OF_DIODES; i ++){
+    for(int i = 0 ; i < diodeCount; i ++){
         // Serial.println("-- LED --");
         // Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
         popupContentJavaScript += "['"+String((int)ledColors[i].r)+"', '"+String((int)ledColors[i].g)+"', '"+String((int)ledColors[i].b)+"'],";
@@ -193,7 +194,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "var advCtrlHead = document.getElementById('adv-ctrl-head');";
     popupContentJavaScript += "advCtrlHead.innerHTML = '"+currentlyRequestedDeviceDescription.deviceName+"';";
 
-    uint16_t ledsCount = 100;
+    uint16_t ledsCount = currentlyRequestedDeviceDescription.customBytes[0]; /* virtual diodes count 0 - 100*/
 
     popupContentJavaScript += "var ledStrip = document.createElement('div');";
     popupContentJavaScript += "ledStrip.className = 'led-strip';";

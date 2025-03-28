@@ -20,6 +20,8 @@ class LedWS1228bDeviceType : public Device {
     bool isContentInitialized = false;
     bool isOn = false; //stan urzadzenia
     uint16_t diodesCount = 0;
+    uint8_t virtualDiodesCount = 255;
+    uint8_t physicalLedsPerVirtualLed = 1;
     int pinNumber;
     uint8_t brightness = 0;
     uint8_t deviceId;
@@ -45,7 +47,10 @@ class LedWS1228bDeviceType : public Device {
 
     void setColors(LedColor* ledsArray, uint16_t count);
     void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
+
     void applyColors();
+    void setHwLedStripColor(uint8_t virtualLedIndex);
+
     void updateAveragedColor(LedStripContentIndex content);
 
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);

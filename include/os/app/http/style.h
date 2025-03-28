@@ -479,11 +479,12 @@ padding: 10px 0px;\
 justify-content: center;\
 align-items: center;\
 overflow: hidden;\
+min-width:300px;\
 }\
 \
 .led {\
 height: 20px;\
-width: 3px;\
+width: 100%;\
 background-color:rgb(21, 177, 244);\
 }\
 .led.on {\
@@ -497,6 +498,7 @@ background-color: rgba(0, 0, 0, 0.1);\
 .ledContainer {\
 padding-top: 5px;\
 padding-bottom: 5px;\
+width:100%;\
 background-color:rgb(255, 255, 255);\
 }\
 .ledContainer.marked {\

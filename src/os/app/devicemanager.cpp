@@ -555,8 +555,10 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 }
                 configSlot.pinNumber = pin.toInt();
                 configSlot.roomId = room.toInt();
-                configSlot.customBytes[0] = numberOfLeds.toInt();
-                configSlot.customBytes[1] = sideFlp.toInt();
+                // configSlot.customBytes[0] = numberOfLeds.toInt();
+                uint16_t numberOfLedsUint = numberOfLeds.toInt();
+                memcpy(&configSlot.customBytes[0], &(numberOfLedsUint), sizeof(uint16_t));
+                configSlot.customBytes[2] = sideFlp.toInt();
 
             }else if(type == "TempSensor"){
 

@@ -1,14 +1,24 @@
 #include "devices/LedWS1228b.hpp"
 
+const uint8_t maxVirtualLeds = 100;
 
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
 {
-    diodesCount = NUMBER_OF_DIODES;
+    memcpy(&diodesCount, &(nvmData.customBytes[0]), sizeof(uint16_t));
 
-    // for(uint8_t i = eACTIVE_CURRENT_CONTENT; i < eDIFFERENT_CONTENTS_COUNT; i++){
-    //     /* Initialize each content with 0 for every color */
-    //     memset(stripContent[i], 0x00, (diodesCount * sizeof(LedColor)));
-    // }
+    /* calculate number of virtual diodes based on real count */
+    if(diodesCount > maxVirtualLeds){
+        // virtualDiodesCount = 100;
+        
+        while((diodesCount / physicalLedsPerVirtualLed) > maxVirtualLeds){
+            physicalLedsPerVirtualLed++;
+        }
+
+        virtualDiodesCount = (diodesCount / physicalLedsPerVirtualLed);
+        Serial.println("VirtualDiodesCount : " + String((int)virtualDiodesCount));
+    }else {
+        virtualDiodesCount = diodesCount;
+    }
 
     adafruit_ws2812b = new Adafruit_NeoPixel(
         // nvmData.customBytes[0], /* leds count */
@@ -30,7 +40,7 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
     const float maxCurrentAllowed = 2.6f; /* 2.6 A*/
     const float maxCurrentPerDiode = 0.060f; /* 60mA */
     const float maxBrightnessVal = 255.f;
-    const float numberOfDiodesF = (float)NUMBER_OF_DIODES;
+    const float numberOfDiodesF = (float)diodesCount;
 
     float requiredCurrentForDiodes = maxCurrentPerDiode * numberOfDiodesF;
     if(requiredCurrentForDiodes <= maxCurrentAllowed)
@@ -58,9 +68,9 @@ ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* p
         extendedMemoryPointer = ptr;
 
         stripContent[eACTIVE_CURRENT_CONTENT] = (LedColor*) extendedMemoryPointer;
-        stripContent[eSAVED_CONTENT_SLOT1] = (LedColor*) ((uint8_t*)stripContent[eACTIVE_CURRENT_CONTENT]  + (diodesCount * sizeof(LedColor)));
-        stripContent[eSAVED_CONTENT_SLOT2] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT1]  + (diodesCount * sizeof(LedColor)));
-        stripContent[eSAVED_CONTENT_SLOT3] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT2]  + (diodesCount * sizeof(LedColor)));
+        stripContent[eSAVED_CONTENT_SLOT1] = (LedColor*) ((uint8_t*)stripContent[eACTIVE_CURRENT_CONTENT]  + (virtualDiodesCount * sizeof(LedColor)));
+        stripContent[eSAVED_CONTENT_SLOT2] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT1]  + (virtualDiodesCount * sizeof(LedColor)));
+        stripContent[eSAVED_CONTENT_SLOT3] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT2]  + (virtualDiodesCount * sizeof(LedColor)));
 
         Serial.println("LedWS1228bDeviceType:// Successfully initialized");
 
@@ -92,16 +102,21 @@ bool LedWS1228bDeviceType::isStripInitialized()
 
 void LedWS1228bDeviceType::applyColors(){
     if(isContentInitialized){
-        for(uint16_t i = 0 ; i < diodesCount ; i ++){
-            adafruit_ws2812b->setPixelColor(
-                i,
-                adafruit_ws2812b->Color(
-                    stripContent[eACTIVE_CURRENT_CONTENT][i].r,
-                    stripContent[eACTIVE_CURRENT_CONTENT][i].g,
-                    stripContent[eACTIVE_CURRENT_CONTENT][i].b
-                )
-            );
+        // for(uint16_t i = 0 ; i < diodesCount ; i ++){
+        //     adafruit_ws2812b->setPixelColor(
+        //         i,
+        //         adafruit_ws2812b->Color(
+        //             stripContent[eACTIVE_CURRENT_CONTENT][i].r,
+        //             stripContent[eACTIVE_CURRENT_CONTENT][i].g,
+        //             stripContent[eACTIVE_CURRENT_CONTENT][i].b
+        //         )
+        //     );
+        // }
+
+        for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
+            setHwLedStripColor(i);
         }
+
         adafruit_ws2812b->show();
         isOn = true;
 
@@ -112,17 +127,10 @@ void LedWS1228bDeviceType::applyColors(){
 void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
 {
     if(isContentInitialized){
-        if(count == diodesCount){
+        if(count == virtualDiodesCount){
             memcpy(stripContent[eACTIVE_CURRENT_CONTENT], ledsArray, (count*sizeof(LedColor)));
             applyColors();
 
-            for(uint16_t i = 0 ; i < diodesCount; i++){
-                Serial.println(String((int)stripContent[eACTIVE_CURRENT_CONTENT][i].r) + 
-                " " + 
-                String((int)stripContent[eACTIVE_CURRENT_CONTENT][i].g) +
-                 " " + 
-                String((int)stripContent[eACTIVE_CURRENT_CONTENT][i].b));
-            }
         }
     }
 }
@@ -130,7 +138,7 @@ void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
 void LedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t count)
 {
     if(isContentInitialized){
-        if(count == diodesCount){
+        if(count == virtualDiodesCount){
             memcpy(memoryBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (count*sizeof(LedColor)));
         }  
     }
@@ -146,7 +154,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::applyContent(LedStripContentIndex 
         memcpy( /* copy data from requested content to active content */
             stripContent[eACTIVE_CURRENT_CONTENT], 
             stripContent[contentIndex],
-            (diodesCount*sizeof(LedColor))
+            (virtualDiodesCount*sizeof(LedColor))
         );
 
         applyColors();
@@ -168,7 +176,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::saveContentAs(LedStripContentIndex
         memcpy( /* copy data from active content to choosen content slot */ 
             stripContent[contentIndex],
             stripContent[eACTIVE_CURRENT_CONTENT],
-            (diodesCount*sizeof(LedColor))
+            (virtualDiodesCount*sizeof(LedColor))
         );
 
         Serial.println("Slot saved");
@@ -215,7 +223,7 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
 
     int skipped = 0;
 
-    for(uint16_t i = 0 ; i < diodesCount ; i ++)
+    for(uint16_t i = 0 ; i < virtualDiodesCount ; i ++)
     {
         if(isNotBlack(stripContent[content][i])){
             avgRed += stripContent[content][i].r;
@@ -226,9 +234,9 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
         }
     }
 
-    avgRed = (int)((float)avgRed/(float)(diodesCount - skipped));
-    avgGreen = (int)((float)avgGreen/(float)(diodesCount - skipped));
-    avgBlue = (int)((float)avgBlue/(float)(diodesCount - skipped));
+    avgRed = (int)((float)avgRed/(float)(virtualDiodesCount - skipped));
+    avgGreen = (int)((float)avgGreen/(float)(virtualDiodesCount - skipped));
+    avgBlue = (int)((float)avgBlue/(float)(virtualDiodesCount - skipped));
 
     averagedColors[content].r =  (uint8_t)avgRed;
     averagedColors[content].g =  (uint8_t)avgGreen;
@@ -238,7 +246,7 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
 
 
 uint16_t LedWS1228bDeviceType::getExtendedMemoryLength(){
-    return ((diodesCount * eDIFFERENT_CONTENTS_COUNT)*sizeof(LedColor));
+    return ((virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor));
 }
 
 uint8_t LedWS1228bDeviceType::getDeviceIdentifier(){
@@ -289,7 +297,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
         case DEVSERVICE_GET_DETAILED_COLORS:
-            if(isStripInitialized() && param.size == (diodesCount*sizeof(LedColor)))
+            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
             {
                 getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
                 return SERV_SUCCESS;
@@ -297,8 +305,8 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
                 return SERV_EXECUTION_FAILURE;
             }
         case DEVSERVICE_SET_DETAILED_COLORS:
-            Serial.println("param.size: " + String((int)param.size) + ", must be : " + String((int)diodesCount*sizeof(LedColor)));
-            if(isStripInitialized() && param.size == (diodesCount*sizeof(LedColor)))
+            Serial.println("param.size: " + String((int)param.size) + ", must be : " + String((int)virtualDiodesCount*sizeof(LedColor)));
+            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
             {
                 Serial.println("Color change requested");
                 setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
@@ -314,6 +322,50 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     };
 }
 
+void LedWS1228bDeviceType::setHwLedStripColor(uint8_t virtualLedIndex)
+{
+    if(virtualDiodesCount == diodesCount){
+        adafruit_ws2812b->setPixelColor(
+            virtualLedIndex,
+            adafruit_ws2812b->Color(
+                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
+                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
+                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+            )
+        );
+    }else {
+        uint8_t reminderAdjustment = 0;
+        if(virtualLedIndex > (virtualDiodesCount/2)){
+            reminderAdjustment = diodesCount % physicalLedsPerVirtualLed;
+        }else if(virtualLedIndex == (virtualDiodesCount/2)){
+            reminderAdjustment = diodesCount % physicalLedsPerVirtualLed;
+            for(uint8_t j = 0; j < reminderAdjustment; j++){
+                adafruit_ws2812b->setPixelColor(
+                    (virtualLedIndex * physicalLedsPerVirtualLed + j),
+                    adafruit_ws2812b->Color(
+                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
+                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
+                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+                    )
+                );
+            }
+        }
+
+        for(uint8_t j = 0; j < physicalLedsPerVirtualLed; j++){
+            adafruit_ws2812b->setPixelColor(
+                (virtualLedIndex * physicalLedsPerVirtualLed + reminderAdjustment + j),
+                adafruit_ws2812b->Color(
+                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
+                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
+                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+                )
+            );
+        }
+    }
+    
+
+}
+
 DeviceDescription LedWS1228bDeviceType::getDeviceDescription(){
     DeviceDescription desc;
     desc.deviceType = getDeviceType();
@@ -323,6 +375,7 @@ DeviceDescription LedWS1228bDeviceType::getDeviceDescription(){
     desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
+    desc.customBytes[0] = virtualDiodesCount;
 
     desc.customBytes[2] = averagedColors[eACTIVE_CURRENT_CONTENT].r; // average color R
     desc.customBytes[3] = averagedColors[eACTIVE_CURRENT_CONTENT].g; // average color G

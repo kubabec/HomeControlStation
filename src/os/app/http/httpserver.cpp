@@ -1615,21 +1615,23 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
   escapeSpecialCharsInJson(request);
   request.replace("/setStripColor&", "");
 
-  uint16_t numberOfLeds = NUMBER_OF_DIODES;
-
-  uint8_t* memory = (uint8_t*)malloc(340);
-  memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
-  memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
-
-  *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor));
-  
-
-  memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
-  LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX];
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
   if(success == DeserializationError::Code::Ok){
+    uint16_t numberOfLeds = doc["color"].size();;
+
+    uint8_t* memory = (uint8_t*)malloc(numberOfLeds * 3 + 40);
+    memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
+    memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
+
+    *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor));
+    
+
+    memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
+    LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX];
+
+
     String deviceId = String(doc["devId"]);
     /* Process JSON to extrac each device slot*/
     for(uint16_t i = 0; i < numberOfLeds; i++)
@@ -1663,14 +1665,12 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
       HTTPAsyncRequestHandler::createRequest(
         ASYNC_TYPE_DEVICE_SERVICE_CALL,
         memory,
-        340
+        (numberOfLeds * 3 + 40)
       );  
 
     }
-
+    free(memory);
   }
-
-  free(memory);
 }
 
 

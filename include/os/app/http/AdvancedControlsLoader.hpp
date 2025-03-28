@@ -12,6 +12,7 @@ class AdvancedControlsLoader{
 
     static String currentRequestJS;
 
+    static uint16_t getControlsSizeBasedOnDevType(uint8_t deviceType);
     static uint8_t* allocateMemoryForControlsBasedOnDeviceType(uint8_t deviceType);
     static void prepareJsStringWithAdvancedControls();
 
