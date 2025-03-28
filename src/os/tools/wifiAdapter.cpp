@@ -1,5 +1,6 @@
 #include <os/tools/WifiAdapter.hpp>
 #include <os/datacontainer/DataContainer.hpp>
+#include <ESPmDNS.h>
 
 
 bool WiFiAdapter::isConnectedFlag = false;
@@ -50,7 +51,15 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password, boo
         memcpy((uint8_t*)&ip+3, &WiFi.localIP()[3], 1);
 
         DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
-    
+
+        // Enable mDNS responder if the current device is an RC server
+        NodeConfiguration currentConfig = 
+        std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+        if(currentConfig.isRcServer)
+        {
+            enableMDNSResponder();
+        }
+        
     }
     else
     {
@@ -99,6 +108,15 @@ void WiFiAdapter::task()
                 memcpy((uint8_t*)&ip+3, &WiFi.localIP()[3], 1);
 
                 DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
+
+                // TODO: Should we enable MDNS responder here as well??
+                // Enable mDNS responder if the current device is an RC server
+                NodeConfiguration currentConfig = 
+                std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+                if(currentConfig.isRcServer)
+                {
+                    enableMDNSResponder();
+                }
             }
 
             isConnectedFlag = true;
@@ -139,6 +157,17 @@ void WiFiAdapter::createAccessPoint()
     memcpy((uint8_t*)&ip+3, &WiFi.softAPIP()[3], 1);
 
     DataContainer::setSignalValue(SIG_IP_ADDRESS, static_cast<uint32_t>(ip));
+
+    enableMDNSResponder();
     
     delay(1000);
+}
+
+void WiFiAdapter::enableMDNSResponder(){
+    String hostName = "HomeStation";
+    if (!MDNS.begin(hostName.c_str())) {
+        Serial.println("Error setting up MDNS responder!");
+    } else {
+        Serial.println("mDNS responder started with hostname: " + hostName + ".local");
+    }
 }

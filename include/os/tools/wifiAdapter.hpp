@@ -15,6 +15,7 @@ public:
     static void createAccessPoint();
     static String getIpString();
 
+    static void enableMDNSResponder();
 
     static void task();
 };
