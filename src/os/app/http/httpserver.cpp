@@ -80,7 +80,9 @@ std::vector<String> parameterizedAsyncRequests = {
   "dwlddevcfg",
   "loaddeicvcfg",
   "getExtendedControls",
-  "setStripColor"
+  "setStripColor",
+  "stripLoadFromMemory",
+  "stripOverwriteSlot",
 };
 
 
@@ -112,9 +114,10 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE}
 };
-
 
 void escapeSpecialCharsInJson(String& json)
 {
@@ -1288,17 +1291,17 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
     </div>\
 </div>");
 
-client.println("<div class=\"popup-backdrop\"></div>\
+client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlId = 255;</script>\
   <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
       <div class=\"header2\">Saved compositions</div><hr>\
         <div id=\"ledStripExt1\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx1\">Overwrite</button><button class=\"button\" id=\"loadEx1\">Load</button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx1\">Overwrite</button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx1\">Load</button></div>\
         <hr><br>\
         <div id=\"ledStripExt2\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx2\">Overwrite</button><button class=\"button\" id=\"loadEx2\">Load</button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx2\">Overwrite</button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx2\">Load</button></div>\
         <hr><br>\
         <div id=\"ledStripExt3\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button class=\"button\" id=\"overWrEx3\">Overwrite</button><button class=\"button\" id=\"loadEx3\">Load</button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx3\">Overwrite</button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx3\">Load</button></div>\
         <button class=\"button\" id=\"composClose\">Close</button>\
   </div>");
 
@@ -1643,7 +1646,7 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
           ledValueAddr->g = g.toInt() <= 255 ? g.toInt() : 255;
           ledValueAddr->b = b.toInt() <= 255 ? b.toInt() : 255;
 
-          Serial.println(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
+          // Serial.println(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
         }else {
           break;
         }
@@ -1668,6 +1671,70 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
   }
 
   free(memory);
+}
+
+
+void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String& request, WiFiClient& client)
+{
+
+  escapeSpecialCharsInJson(request);
+  request.replace("/stripLoadFromMemory&", "");
+
+  Serial.println(request);
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if(success == DeserializationError::Code::Ok){
+    String devIdStr = doc["devId"];
+    String memorySlotStr = doc["slot"];
+
+    if(devIdStr != "null" && memorySlotStr != "null"){
+      Serial.println("Load strip from memory ...");
+      uint8_t parameters[4];
+      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
+      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
+      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SWITCH_CONTENT;       /* idx 2 */
+      parameters[3] = memorySlotStr.toInt();                                    /* idx 3 */
+
+      HTTPAsyncRequestHandler::createRequest(
+        ASYNC_TYPE_DEVICE_SERVICE_CALL,
+        parameters,
+        4
+      );
+    }
+  }
+
+}
+
+void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client)
+{
+  escapeSpecialCharsInJson(request);
+  request.replace("/stripOverwriteSlot&", "");
+
+  Serial.println(request);
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if(success == DeserializationError::Code::Ok){
+    String devId = doc["devId"];
+    String slot = doc["slot"];
+
+    if(devId != "null" && slot != "null"){
+
+      Serial.println("Request: stripOverwriteSlot {devId, slot}");
+      uint8_t parameters[4];
+      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devId.toInt(); /* idx 0 */
+      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
+      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SAVE_CONTENT;       /* idx 2 */
+      parameters[3] = slot.toInt();                                    /* idx 3 */
+
+      HTTPAsyncRequestHandler::createRequest(
+        ASYNC_TYPE_DEVICE_SERVICE_CALL,
+        parameters,
+        4
+      );
+    }
+
+  }
 }
 
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){

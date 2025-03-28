@@ -182,8 +182,8 @@ String AdvancedControlsLoader::createJsForLedStrip(){
 
     popupContentJavaScript += "var ledColors = [";
     for(int i = 0 ; i < NUMBER_OF_DIODES; i ++){
-        Serial.println("-- LED --");
-        Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
+        // Serial.println("-- LED --");
+        // Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
         popupContentJavaScript += "['"+String((int)ledColors[i].r)+"', '"+String((int)ledColors[i].g)+"', '"+String((int)ledColors[i].b)+"'],";
     }
     popupContentJavaScript.remove(popupContentJavaScript.length()-1);
@@ -298,7 +298,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "colorPicker.className = 'color-input';";
     popupContentJavaScript += "colorPicker.type = 'color';";
     popupContentJavaScript += "colorPicker.value = '#ffffff';";
-    popupContentJavaScript += "colorPicker.onchange = function (){\
+    popupContentJavaScript += "colorPicker.onblur = function (){\
         const r = parseInt(this.value.substr(1,2), 16);\
         const g = parseInt(this.value.substr(3,2), 16);\
         const b = parseInt(this.value.substr(5,2), 16);\
@@ -345,7 +345,11 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                console.log('led color changed!');\
+                const newData = JSON.parse(xhr.responseText);\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                }\
             } else { \
                 console.log('Error with AJAX request');\
             }\
@@ -379,6 +383,14 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         return ledState;\
     }";
 
+    popupContentJavaScript += "var ledExt1 = document.getElementById('ledStripExt1');";
+    popupContentJavaScript += "var ledExt2 = document.getElementById('ledStripExt2');";
+    popupContentJavaScript += "var ledExt3 = document.getElementById('ledStripExt3');";
+    popupContentJavaScript += "ledExt1.style.backgroundColor = 'rgb("+String((int)currentlyRequestedDeviceDescription.customBytes[5])+", "+String((int)currentlyRequestedDeviceDescription.customBytes[6])+","+String((int)currentlyRequestedDeviceDescription.customBytes[7])+")';";
+    popupContentJavaScript += "ledExt2.style.backgroundColor = 'rgb("+String((int)currentlyRequestedDeviceDescription.customBytes[8])+", "+String((int)currentlyRequestedDeviceDescription.customBytes[9])+","+String((int)currentlyRequestedDeviceDescription.customBytes[10])+")';";
+    popupContentJavaScript += "ledExt3.style.backgroundColor = 'rgb("+String((int)currentlyRequestedDeviceDescription.customBytes[11])+", "+String((int)currentlyRequestedDeviceDescription.customBytes[12])+","+String((int)currentlyRequestedDeviceDescription.customBytes[13])+")';";
+    popupContentJavaScript += "ledStripExtCtrlId = "+String((int)currentlyRequestedDeviceDescription.deviceId)+";";
+    
     return popupContentJavaScript;
 }
 

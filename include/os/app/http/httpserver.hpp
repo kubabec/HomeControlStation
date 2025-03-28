@@ -95,6 +95,8 @@ public:
     static void parameterizedHandler_loadDeviceConfiguration(String& request, WiFiClient& client);
     static void parameterizedHandler_getExtendedControls(String& request, WiFiClient& client);
     static void parameterizedHandler_setStripColor(String& request, WiFiClient& client);
+    static void parameterizedHandler_stripLoadFromMemory(String& request, WiFiClient& client);
+    static void parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client);
     
 };
 

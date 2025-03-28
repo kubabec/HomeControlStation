@@ -434,7 +434,6 @@ let isNotificationPollingActive = 1;\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
                     renderRooms(currentData);\
-                    console.log(currentData);\
                 }\
             } else { \
                 console.log('Error with AJAX request');\
@@ -632,6 +631,52 @@ function getExtendedControlsRequest(id, devContainer){\
         hideLoading(devContainer);\
     };\
     xhr.send();\
+}\
+function overWriteMemSlot(memSlotId, ledStripDevId){\
+    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
+    let jsonString = JSON.stringify(json);\
+    var url = '/stripOverwriteSlot&' + jsonString;\
+    const xhr = new XMLHttpRequest();\
+    xhr.open(\"POST\", url, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                const newData = JSON.parse(xhr.responseText);\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                }\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+    };\
+    xhr.send();\
+    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+    closeCompositions();\
+}\
+function loadMemSlot(memSlotId, ledStripDevId){\
+    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
+    let jsonString = JSON.stringify(json);\
+    var url = '/stripLoadFromMemory&' + jsonString;\
+    const xhr = new XMLHttpRequest();\
+    xhr.open(\"POST\", url, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                const newData = JSON.parse(xhr.responseText);\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                }\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+    };\
+    xhr.send();\
+    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+    closeCompositions();\
 }\
 </script>";
 

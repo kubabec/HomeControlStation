@@ -59,11 +59,13 @@ function renderRooms(data) {\
                 statusLight.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
                 button.id = `switchBtn${device.id}`;\
 \
+if(device.hasBrightness == 1){\
                 const buttonMore = document.createElement('a');\
                 buttonMore.className = 'button';\
                 buttonMore.textContent = '. . .';\
                 buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
                 btnContainer.appendChild(buttonMore);\
+}\
                 btnContainer.appendChild(button);\
                 deviceContainer.appendChild(btnContainer);\
     \

@@ -14,9 +14,10 @@ class LedWS1228bDeviceType : public Device {
         eDIFFERENT_CONTENTS_COUNT
     };
 
-    LedColor stripContent[eDIFFERENT_CONTENTS_COUNT][NUMBER_OF_DIODES];
-    LedColor averagedColor = {0, 0, 0};
-    LedColor memoryAveragedColors[3] = {0};
+    uint8_t* extendedMemoryPointer = nullptr;
+    LedColor* stripContent[4];
+    LedColor averagedColors[4] = {0};
+    bool isContentInitialized = false;
     bool isOn = false; //stan urzadzenia
     uint16_t diodesCount = 0;
     int pinNumber;
@@ -36,6 +37,7 @@ class LedWS1228bDeviceType : public Device {
     virtual uint16_t getExtendedMemoryLength();
     bool isStripInitialized();
 
+    ServiceRequestErrorCode updateExtendedMemoryPtr(uint8_t* ptr, uint16_t size);
     void stripOn();
     void stripOff();
     ServiceRequestErrorCode applyContent(LedStripContentIndex contentIndex);
@@ -44,7 +46,7 @@ class LedWS1228bDeviceType : public Device {
     void setColors(LedColor* ledsArray, uint16_t count);
     void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
     void applyColors();
-    void updateAveragedColor();
+    void updateAveragedColor(LedStripContentIndex content);
 
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
