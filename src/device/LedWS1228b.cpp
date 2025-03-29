@@ -20,19 +20,20 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
         virtualDiodesCount = diodesCount;
     }
 
-    adafruit_ws2812b = new Adafruit_NeoPixel(
-        // nvmData.customBytes[0], /* leds count */
-        // nvmData.pinNumber,
-        diodesCount,
-        40,
-        NEO_GRB + NEO_KHZ800
-    );
-
+    
     isOn = false;
     pinNumber = nvmData.pinNumber;
     deviceId = nvmData.deviceId;
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
+
+    adafruit_ws2812b = new Adafruit_NeoPixel(
+        // nvmData.customBytes[0], /* leds count */
+        // nvmData.pinNumber,
+        diodesCount,
+        pinNumber,
+        NEO_GRB + NEO_KHZ800
+    );
 
     adafruit_ws2812b->begin();
 
@@ -52,7 +53,7 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
         // float percentageOverLimit = (overLimit/maxCurrentAllowed);
         // float pwmValueToReduce = 255.f * percentageOverLimit;
         // int finalPwmValue = 255 - (int)pwmValueToReduce;
-        adafruit_ws2812b->setBrightness(60);
+        adafruit_ws2812b->setBrightness(65);
     }
 
 

@@ -811,7 +811,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
-  const std::array<int, 12> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,41,42};
+  const std::array<int, 29> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,12,13,14,27,26,25,33,32,35,34,15,18,19,21,39,40,41,42};
 
   for(auto& val : pinsAllowed){
     String pinStr = "";
