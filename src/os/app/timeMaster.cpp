@@ -1,34 +1,50 @@
 #include <os/app/timeMaster.hpp>
 
-TimeMaster TimeMaster::timeMaster;
 
-// Konstruktor
-TimeMaster::TimeMaster()
-    : timeClient(ntpUDP, "pool.ntp.org", 3600), updateInterval(60000) {
-}
+unsigned long TimeMaster::lastUpdateTime = 0;
+unsigned long TimeMaster::lastNTPTime = 0;
+unsigned long TimeMaster::lastMillis = 0;
+bool TimeMaster::ntpAvailable = false;
+unsigned long TimeMaster::updateInterval = 60000;
+unsigned long TimeMaster::remainder = 0;
+
+WiFiUDP TimeMaster::ntpUDP;
+NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
 
 
 void TimeMaster::init() {
     Serial.println("DeviceProvider init ...");
-    timeMaster.timeClient.begin();
-    timeMaster.timeClient.setTimeOffset(3600); // Ustawienie strefy czasowej na GMT+1
 
+
+    
+    TimeMaster::timeClient.begin();
+    TimeMaster::timeClient.setTimeOffset(3600); // Ustawienie strefy czasowej na GMT+1
+    
     // Próba synchronizacji z NTP
-    if (timeMaster.timeClient.update()) {
+    if (TimeMaster::timeClient.update()) {
         // Udało się pobrać nowy czas z NTP
-        timeMaster.lastNTPTime = timeMaster.timeClient.getEpochTime();
-        timeMaster.lastMillis = millis();
-        timeMaster.ntpAvailable = true;
+        TimeMaster::lastNTPTime = TimeMaster::timeClient.getEpochTime();
+        TimeMaster::lastMillis = millis();
+        TimeMaster::ntpAvailable = true;
         Serial.println("Synchronized with NTP!");
-
         // Wyślij czas do DataContainer
-        timeMaster.sendTimeToDataContainer();
+        TimeMaster::sendTimeToDataContainer();
     } else {
         // NTP nie działa - przechodzimy na freerunning
-        timeMaster.ntpAvailable = false;
+        TimeMaster::ntpAvailable = false;
         Serial.println("NTP unavailable, using freerunning mode.");
     }
 
+    //Rejestracja callbacka dla CBK_GET_CURRENT_TIME
+    // DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, std::any_cast {
+    //     return TimeMaster::getFormattedDateTime(); // Zwraca sformatowany czas jako String    
+    // });
+
+    DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<String()>>(TimeMaster::getFormattedDateTime));
+
+    
+
+     
     Serial.println("... done");
 }
 
@@ -36,85 +52,78 @@ void TimeMaster::deinit() {
     
 }
 
-
+// Funkcja do cyklicznego wywoływania aktualizacji czasu
 void TimeMaster::cyclic() {
     unsigned long now = millis();
 
-    // Co 60 sekund próbujemy zsynchronizować się z NTP
-    if (now - timeMaster.lastUpdateTime >= timeMaster.updateInterval) {
-        if (timeMaster.timeClient.update()) {
-            // Udało się pobrać nowy czas z NTP
-            timeMaster.lastNTPTime = timeMaster.timeClient.getEpochTime();
-            timeMaster.lastMillis = millis();
-            timeMaster.ntpAvailable = true;  // Ustaw flagę na true, bo NTP działa
-            timeMaster.updateInterval = 60000; // Przywróć interwał do 60 sekund
-            //Serial.println("Synchronized with NTP!");
+    if (now - lastUpdateTime >= updateInterval) {
+        if (timeClient.update()) {
+            // Sukces synchronizacji NTP
+            lastNTPTime = timeClient.getEpochTime();
+            lastMillis = now;
+            remainder = 0; // Reset reszty
+            ntpAvailable = true;
+            updateInterval = 60000; 
+            sendTimeToDataContainer();
         } else {
-            // NTP nie działa - przechodzimy na freerunning
-            if (timeMaster.ntpAvailable) {
-                // Tylko jeśli wcześniej NTP było dostępne, wyświetl komunikat
-                timeMaster.ntpAvailable = false;
-                timeMaster.updateInterval = 10000; // Skróć interwał do 10 sekund
-                timeMaster.lastUpdateTime = now;   // Zresetuj czas ostatniej aktualizacji
-                Serial.println("NTP unavailable, using freerunning mode.");
-            } else {
-                // NTP nadal niedostępne - wyświetl komunikat debugowy
-                Serial.println("NTP still unavailable, retrying in 10 seconds...");
+            // Błąd synchronizacji NTP - tryb freerunning
+            if (ntpAvailable) {
+                ntpAvailable = false;
+                updateInterval = 10000; 
+                Serial.println("NTP unavailable, using freerunning.");
             }
+
+            // Oblicz upływający czas z uwzględnieniem reszty
+            unsigned long elapsed = now - lastMillis;
+            unsigned long totalElapsed = elapsed + remainder;
+            unsigned long seconds = totalElapsed / 1000;
+            remainder = totalElapsed % 1000; // Zapamiętaj resztę
+
+            // Aktualizuj czas i zapobiegaj przekłamaniu
+            lastNTPTime += seconds;
+            lastMillis = now - remainder; // Korekta o resztę
         }
 
-        // Korekta czasu w trybie freerunning
-        if (!timeMaster.ntpAvailable) {
-            unsigned long elapsed = millis() - timeMaster.lastMillis;
-            timeMaster.lastNTPTime += elapsed / 1000; // Dodaj upływający czas w sekundach
-            timeMaster.lastMillis = millis();
-        }
-
-        timeMaster.sendTimeToDataContainer(); // Aktualizacja DataContainer
-        timeMaster.lastUpdateTime = now;
+        lastUpdateTime = now;
     }
 }
 
-
-
 // Pobranie sformatowanego czasu (HH:MM:SS)
 String TimeMaster::getFormattedTime() {
-    return timeMaster.timeClient.getFormattedTime();
+    return TimeMaster::timeClient.getFormattedTime();
 }
 
 // Pobranie sformatowanej daty i czasu (yyyy.mm.dd hh:mm:ss)
 String TimeMaster::getFormattedDateTime() {
-    time_t rawTime = timeMaster.timeClient.getEpochTime(); // Pobranie czasu Unix
-    struct tm *timeInfo = gmtime(&rawTime);    // Konwersja na czas UTC
 
-    char buffer[20]; 
+    time_t rawTime = TimeMaster::getEpochTime(); // Pobranie czasu Unix
+    struct tm *timeInfo = localtime(&rawTime);    // Konwersja na czas UTC
+
+    char buffer[20];
     snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
              timeInfo->tm_year + 1900, timeInfo->tm_mon + 1, timeInfo->tm_mday,
              timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec);
 
-    return String(buffer);
+    return String(buffer); // Zwracamy Arduino String
+   
 }
 
-// Pobranie czasu w formacie Unix timestamp
-unsigned long TimeMaster::getEpochTime() {
-    if (timeMaster.ntpAvailable) {
-        return timeMaster.timeClient.getEpochTime(); // Jeśli NTP działa, zwracamy aktualny czas
-    } else {
-        // Jeśli brak NTP, dodajemy różnicę czasu od ostatniej synchronizacji
-        return timeMaster.lastNTPTime + (millis() - timeMaster.lastMillis) / 1000;
-    }
-}
 
 // Ustawienie przesunięcia strefy czasowej (w godzinach)
 void TimeMaster::setTimeZone(int timeZoneOffset) {
-    timeMaster.timeClient.setTimeOffset(timeZoneOffset * 3600);
+    TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 3600);
 }
 
-
+unsigned long TimeMaster::getEpochTime() {
+    unsigned long elapsedMillis = millis() - lastMillis;
+    return lastNTPTime + (elapsedMillis / 1000);
+}
+ 
 
 void TimeMaster::sendTimeToDataContainer() {
+
     time_t rawTime = getEpochTime(); // Pobranie czasu z NTP lub freerunning
-    struct tm *timeInfo = gmtime(&rawTime);
+    struct tm *timeInfo = localtime(&rawTime);
 
     DataAndTime currentTime;
     currentTime.year = timeInfo->tm_year + 1900;
@@ -124,9 +133,9 @@ void TimeMaster::sendTimeToDataContainer() {
     currentTime.minute = timeInfo->tm_min;
     currentTime.second = timeInfo->tm_sec;
 
-    // Serial.printf("Time sent to DataContainer: %04d.%02d.%02d %02d:%02d:%02d\n",
-    //               currentTime.year, currentTime.month, currentTime.day,
-    //               currentTime.hour, currentTime.minute, currentTime.second);
+    Serial.printf("Time sent to DataContainer: %04d.%02d.%02d %02d:%02d:%02d\n",
+                  currentTime.year, currentTime.month, currentTime.day,
+                  currentTime.hour, currentTime.minute, currentTime.second);
 
     DataContainer::setSignalValue(SIG_CURRENT_TIME, currentTime); // Przekazanie czasu do DataContainer
 }

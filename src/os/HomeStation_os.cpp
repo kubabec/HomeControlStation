@@ -135,7 +135,28 @@ void OperatingSystem::task50ms()
 
 void OperatingSystem::task1s()
 {
-    Serial.print(".");
+    Serial.print("OperatingSystem::task1s()");
+
+
+
+    try {
+        // Pobierz callback z DataContainer
+        std::function<String()> getTimeCallback = std::any_cast<std::function<String()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));
+
+        String currentTime = getTimeCallback();
+
+        Serial.println("Aktualny czas: " + currentTime);
+
+    } 
+    catch (const std::bad_any_cast& e) {
+        Serial.printf("Błąd odczytu czasu: %s\n", e.what());
+    }
+
+
+
+
+
+
     handleSecurityAccessLevelExpiration();        
     TimeMaster::cyclic();
 
@@ -318,10 +339,10 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
 
         // currentTime = std::any_cast<DataAndTime>(DataContainer::getSignalValue(SIG_CURRENT_TIME));
 
-        char timeBuffer[20]; // Bufor na czas (np. "2023-10-05 12:34:56")
-        snprintf(timeBuffer, sizeof(timeBuffer), "%04d-%02d-%02d %02d:%02d:%02d",
-                 currentTime.year, currentTime.month, currentTime.day,
-                 currentTime.hour, currentTime.minute, currentTime.second);
+        // char timeBuffer[20]; // Bufor na czas (np. "2023-10-05 12:34:56")
+        // snprintf(timeBuffer, sizeof(timeBuffer), "%04d-%02d-%02d %02d:%02d:%02d",
+        //          currentTime.year, currentTime.month, currentTime.day,
+        //          currentTime.hour, currentTime.minute, currentTime.second);
         
 
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");

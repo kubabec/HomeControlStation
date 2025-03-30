@@ -906,7 +906,22 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
   client.println("<div class=\"header\">General configuration</div>");
-  //client.println("<div class=\"current-time\">Aktualny czas: " + timeMaster.getFormattedTime() + "</div>");
+
+  try {
+      auto getTimeCallback = std::any_cast<std::function<String()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
+      String currentTime = getTimeCallback();
+
+      //std::string currentTime = std::any_cast<std::string>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));
+
+
+    client.printf("<div class=\"current-time\">Aktualny czas: %s</div>", currentTime.c_str());
+  } 
+  catch(const std::bad_any_cast& e) {
+    Serial.printf("Błąd typu: %s. Oczekiwano: std::string\n", e.what());
+    client.println("<div class=\"error\">Błąd odczytu czasu</div>");
+  }
+
+  
 
   client.println("\
     <div class=\"container\">\
