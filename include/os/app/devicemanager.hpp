@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <devices/OnOffDevice.hpp>
 #include <devices/TestDeviceType.hpp>
-#include <devices/LedWS1228b.hpp>
+#include <devices/LedStrip/LedWS1228b.hpp>
 #include <devices/tempSensorDHT11.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>

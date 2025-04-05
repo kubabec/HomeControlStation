@@ -131,6 +131,7 @@ typedef struct
         json += "{";
         json += "\"title\": \""+ title +"\",";
         json += "\"body\": \""+ body +"\",";
+        json += "\"time\": \"19:34\",";
         json += "\"type\": "+ String((int)type);
         json += "}";
         return json;

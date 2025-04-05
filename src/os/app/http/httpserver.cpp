@@ -868,14 +868,16 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   /*<!-- Extra fields for LED Strip -->*/
   client.println("<div class=\"extra-fields extra-44\">");
   client.println("<label>LEDs num.:");
+  int ledsCount = 0;
+  memcpy(&ledsCount, &slot.customBytes[0], sizeof(uint16_t));
   client.println("<input id=\"ledsCount-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\" value=\""+ 
-  String((int)slot.customBytes[0]) +"\">");
+  String((int)ledsCount) +"\">");
 
   client.println("</label>");
 
   client.println("<label>Sides flip:");
   client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[1]){
+  if(slot.customBytes[2]){
     client.println("<option value=\"0\" >No flip</option>");
     client.println("<option value=\"1\" selected>Last diode is strip begin</option>");
   }else {
@@ -884,6 +886,13 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   }
   client.println("</select>");
 
+  client.println("</label>");
+
+
+  client.println("<label>Current limiter</label>");
+  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\"10\">% ");
+  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value='");
+  client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   client.println("</label>");
 
   client.println("</div>");
@@ -899,6 +908,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 {
   NodeConfiguration currentConfig = 
     std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+
+
+
 
   const String yesNotSelected = "<option value=\"yes\">Yes</option>";
   const String noNotSelected = "<option value=\"no\">No</option>";

@@ -545,6 +545,7 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 String room =              String(doc["devices"][i]["room"]);
                 String numberOfLeds =      String(doc["devices"][i]["ledCount"]);
                 String sideFlp =      String(doc["devices"][i]["sideFlp"]);
+                String currentLimiter = String(doc["devices"][i]["currLim"]);
 
                 /* Put data to config slot memory*/
                 configSlot.deviceType = (uint8_t)type_LED_STRIP;
@@ -559,6 +560,7 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 uint16_t numberOfLedsUint = numberOfLeds.toInt();
                 memcpy(&configSlot.customBytes[0], &(numberOfLedsUint), sizeof(uint16_t));
                 configSlot.customBytes[2] = sideFlp.toInt();
+                configSlot.customBytes[3] = currentLimiter.toInt();
 
             }else if(type == "TempSensor"){
 

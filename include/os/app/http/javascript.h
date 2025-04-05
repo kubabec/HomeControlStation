@@ -127,6 +127,7 @@ let isNotificationPollingActive = 1;\
         var dataRoom = document.getElementById('room' + id).value;\
         var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
         var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
+        var curLim =  document.getElementById('curLimVal-' + id).realValue;\ 
         return {\
         type:\"LedStrip\",\
         id:id,\
@@ -135,7 +136,8 @@ let isNotificationPollingActive = 1;\
         pin:dataPin,\
         room:dataRoom,\
         ledCount:ledsCnt,\
-        sideFlp:sideFlip\
+        sideFlp:sideFlip,\
+        currLim:curLim\
         };\
     }\
     function getTempSensorConfigurationJson(id){\
@@ -677,6 +679,11 @@ function loadMemSlot(memSlotId, ledStripDevId){\
     xhr.send();\
     hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
     closeCompositions();\
+}\
+function updateCurLimVal(id, val) {\
+    var value = Math.round((val/255)*100);\
+    document.getElementById(id).value=value;\
+    document.getElementById(id).realValue=val;\
 }\
 </script>";
 

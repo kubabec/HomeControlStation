@@ -1,8 +1,11 @@
 #ifndef LED_WS1282B_TYPE_H
 #define LED_WS1282B_TYPE_H
 #include "devices/Device.hpp"
-#include "Arduino.h"
+#include "devices/LedStrip/LedAnimationHandler.hpp"
 #include "Adafruit_NeoPixel.h"
+
+#include "Arduino.h"
+
 
 
 class LedWS1228bDeviceType : public Device {
