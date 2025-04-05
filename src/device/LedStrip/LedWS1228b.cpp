@@ -1,4 +1,4 @@
-#include "devices/LedWS1228b.hpp"
+#include "devices/LedStrip/LedWS1228b.hpp"
 
 const uint8_t maxVirtualLeds = 100;
 
@@ -37,25 +37,26 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
 
     adafruit_ws2812b->begin();
 
-    /*brightness limitation to do not exceed board current limiter */
-    const float maxCurrentAllowed = 2.6f; /* 2.6 A*/
-    const float maxCurrentPerDiode = 0.060f; /* 60mA */
-    const float maxBrightnessVal = 255.f;
-    const float numberOfDiodesF = (float)diodesCount;
+    // /*brightness limitation to do not exceed board current limiter */
+    // const float maxCurrentAllowed = 2.6f; /* 2.6 A*/
+    // const float maxCurrentPerDiode = 0.060f; /* 60mA */
+    // const float maxBrightnessVal = 255.f;
+    // const float numberOfDiodesF = (float)diodesCount;
 
-    float requiredCurrentForDiodes = maxCurrentPerDiode * numberOfDiodesF;
-    if(requiredCurrentForDiodes <= maxCurrentAllowed)
-    {
-        /* not limited */
-        adafruit_ws2812b->setBrightness(255);
-    }else {
-        // float overLimit = (requiredCurrentForDiodes - maxCurrentAllowed);
-        // float percentageOverLimit = (overLimit/maxCurrentAllowed);
-        // float pwmValueToReduce = 255.f * percentageOverLimit;
-        // int finalPwmValue = 255 - (int)pwmValueToReduce;
-        adafruit_ws2812b->setBrightness(65);
-    }
-
+    // float requiredCurrentForDiodes = maxCurrentPerDiode * numberOfDiodesF;
+    // if(requiredCurrentForDiodes <= maxCurrentAllowed)
+    // {
+    //     /* not limited */
+    //     adafruit_ws2812b->setBrightness(255);
+    // }else {
+    //     // float overLimit = (requiredCurrentForDiodes - maxCurrentAllowed);
+    //     // float percentageOverLimit = (overLimit/maxCurrentAllowed);
+    //     // float pwmValueToReduce = 255.f * percentageOverLimit;
+    //     // int finalPwmValue = 255 - (int)pwmValueToReduce;
+    //     adafruit_ws2812b->setBrightness(65);
+    // }
+    Serial.println("LedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
+    adafruit_ws2812b->setBrightness(nvmData.customBytes[3]); /* current limiter usage */
 
 
     // applyColors();
