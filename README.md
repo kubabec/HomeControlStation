@@ -1,3 +1,8 @@
+<img src="https://github.com/kubabec/HomeControlStation/blob/main/demo/img1.jpeg" width=50% height=50%>
+
+
+<img src="https://github.com/kubabec/HomeControlStation/blob/main/demo/img2.jpeg" width=50% height=50%>
+
 ***Project under development . . . *
 **
 ### Description
