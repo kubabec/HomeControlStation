@@ -517,10 +517,15 @@ function displayNotifications(data){\
             titleDiv.className = 'notification-title';\
             titleDiv.textContent = notification.title;\
 \
+            const timeDiv = document.createElement('div');\
+            timeDiv.className = 'notification-body';\
+            timeDiv.textContent = notification.time;\
+\
             const bodyDiv = document.createElement('div');\
             bodyDiv.textContent = notification.body;\
 \
             notificationDiv.appendChild(titleDiv);\
+            notificationDiv.appendChild(timeDiv);\
             notificationDiv.appendChild(bodyDiv);\
 \
             notificationsList.appendChild(notificationDiv);\
@@ -685,6 +690,56 @@ function updateCurLimVal(id, val) {\
     document.getElementById(id).value=value;\
     document.getElementById(id).realValue=val;\
 }\
+\
+\
+function updateLocalDateTime(initialDateTime, elementId = 'currentDateTime') {\
+    const dateTimeElement = document.getElementById(elementId);\
+    if (!dateTimeElement) {\
+        console.error(`Element o ID \"${elementId}\" nie istnieje`);\
+        return null;\
+    }\
+    \
+    let currentDate;\
+    try {\
+        const dateParts = initialDateTime.split(' ')[0].split('.');\
+        const timeParts = initialDateTime.split(' ')[1].split(':');\
+        \
+        const year = parseInt(dateParts[0], 10);\
+        const month = parseInt(dateParts[1], 10) - 1;\
+        const day = parseInt(dateParts[2], 10);\
+        const hours = parseInt(timeParts[0], 10);\
+        const minutes = parseInt(timeParts[1], 10);\
+        const seconds = parseInt(timeParts[2], 10);\
+        \
+        currentDate = new Date(year, month, day, hours, minutes, seconds);\
+        \
+        if (isNaN(currentDate.getTime())) {\
+            throw new Error('Nieprawidłowa data');\
+        }\
+    } catch (error) {\
+        console.warn('Błąd parsowania daty:', error);\
+        currentDate = new Date();\
+    }\
+    \
+    function updateDateTime() {\
+        currentDate.setSeconds(currentDate.getSeconds() + 1);\
+        \
+        const year = currentDate.getFullYear();\
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');\
+        const day = currentDate.getDate().toString().padStart(2, '0');\
+        const hours = currentDate.getHours().toString().padStart(2, '0');\
+        const minutes = currentDate.getMinutes().toString().padStart(2, '0');\
+        const seconds = currentDate.getSeconds().toString().padStart(2, '0');\
+        \
+        const formattedDateTime = `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;\
+        dateTimeElement.textContent = formattedDateTime;\
+    }\
+    \
+    updateDateTime();\
+    return setInterval(updateDateTime, 1000);\
+}\
+\
+\
 </script>";
 
 #endif
