@@ -124,6 +124,7 @@ typedef struct
 
     String title;
     String body;
+    String time;
     Type type = INFO;
 
     String toJson(){
@@ -131,7 +132,7 @@ typedef struct
         json += "{";
         json += "\"title\": \""+ title +"\",";
         json += "\"body\": \""+ body +"\",";
-        json += "\"time\": \"19:34\",";
+        json += "\"time\": \""+ time +"\",";
         json += "\"type\": "+ String((int)type);
         json += "}";
         return json;
@@ -153,13 +154,27 @@ typedef struct
 }DeviceConfigManipulationAPI;
 
 
-typedef struct{
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-}DataAndTime;
+struct RtcTime
+{
+  int	sec;
+  int	min;
+  int	hour;
+  int	mday;
+  int	mon;
+  int	year;
+  int	wday;
+  int	yday;
+  int	isdst;
+
+  String toString()
+  {
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
+             year, mon, mday,
+             hour, min, sec);
+    return String(buffer);
+  }
+
+};
 
 #endif 

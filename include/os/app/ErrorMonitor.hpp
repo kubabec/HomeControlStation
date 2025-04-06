@@ -14,7 +14,7 @@ class ErrorMonitor
     static void errorClear(ERR_MON_ERROR_TYPE errorCode);
 
     static void updateSystemErrorSignal();
-    static String formatTimeToString(const DataAndTime& time);
+    
 
 public:
     static void init();

@@ -64,14 +64,13 @@ void ErrorMonitor::errorReport(ERR_MON_ERROR_TYPE errorCode, String comment)
         String commentWithConstLength = comment.length() <= 32 ? comment : comment.substring(0, 31);
         errorRef.comment = commentWithConstLength;
 
-        // Pobierz aktualny czas z DataContainer
-        std::any timeValue = DataContainer::getSignalValue(SIG_CURRENT_TIME);
-        if (timeValue.has_value()) {
-            DataAndTime currentTime = std::any_cast<DataAndTime>(timeValue);
-            errorRef.timeOfOccurrence = formatTimeToString(currentTime); // Konwersja na String
-        } else {
-            errorRef.timeOfOccurrence = "Unknown time"; // Jeśli czas nie jest dostępny
+        try {
+            auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
+            errorRef.timeOfOccurrence = getTimeCallback().toString();
+        } catch (std::bad_any_cast& e) {
+            errorRef.timeOfOccurrence = "1970-01-01 00:00:00"; // Default value if callback fails
         }
+
 
         /* Push error notification */
         UserInterfaceNotification notif{
@@ -119,11 +118,3 @@ void ErrorMonitor::updateSystemErrorSignal()
     );
 }
 
-
-String ErrorMonitor::formatTimeToString(const DataAndTime& time) {
-    char buffer[20]; // Bufor na sformatowany czas
-    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
-             time.year, time.month, time.day,
-             time.hour, time.minute, time.second);
-    return String(buffer);
-}

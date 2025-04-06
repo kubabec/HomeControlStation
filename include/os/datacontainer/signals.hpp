@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 42
+#define NUMBER_OF_SIGNALS 41
 enum Signal
 {
     /* Type: bool , somme description */
@@ -80,8 +80,7 @@ enum Signal
     SIG_SET_DEVICES_CONFIG_VIA_JSON,
 
 
-    /* Type: std::struct "DataAndTime" with current time   */
-    SIG_CURRENT_TIME,
+    
     /* Type: std::function<string()>*/
     CBK_GET_CURRENT_TIME,
 

@@ -920,13 +920,21 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("<div class=\"header\">General configuration</div>");
 
   try {
-      auto getTimeCallback = std::any_cast<std::function<String()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
-      String currentTime = getTimeCallback();
+      auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
+      String currentTime = getTimeCallback().toString(); // Get the current time as a string
 
-      //std::string currentTime = std::any_cast<std::string>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));
+    //client.printf("<div class=\"current-time\">Aktualny czas: %s</div>", currentTime.c_str());
+    client.printf("<div class=\"current-time\">Aktualny czas: <span id=\"currentDateTime\">%s</span></div>\n", currentTime.c_str());
 
-
-    client.printf("<div class=\"current-time\">Aktualny czas: %s</div>", currentTime.c_str());
+    // skrypt inicjalizujący
+    client.println("<script>");
+    client.println("document.addEventListener('DOMContentLoaded', function() {");
+    // Przekazanie początkowego czasu z serwera jako argument
+    client.println("  const initialTime = '" + currentTime + "';");
+    // Wywołanie funkcji aktualizującej zegar
+    client.println("  updateLocalDateTime(initialTime, 'currentDateTime');");
+    client.println("});");
+    client.println("</script>");
   } 
   catch(const std::bad_any_cast& e) {
     Serial.printf("Błąd typu: %s. Oczekiwano: std::string\n", e.what());
