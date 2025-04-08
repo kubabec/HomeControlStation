@@ -6,7 +6,9 @@
 
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
+#ifdef LED_STRIP_SUPPORTED
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
+#endif
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
 
 
@@ -111,10 +113,12 @@ void DeviceManager::init()
             devices.push_back(&device); //wrzucam pointer na device onOffDevice         
         }
 
+#ifdef LED_STRIP_SUPPORTED
         /* Add LED strips to common devices vector*/
         for(LedWS1228bDeviceType& device: ledws2812bDevices){
             devices.push_back(&device);
         }
+#endif
 
         /* Add temperature sensors to common devices vector*/
         for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
@@ -315,9 +319,11 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 break;
 
                 case e_LED_STRIP :
+#ifdef LED_STRIP_SUPPORTED
                     /* create WS2812b instance by forwarding NVM data to it */
                     ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
                     isValidDeviceGiven = true;
+#endif
                 break;
 
                 case e_TEMP_SENSOR:

@@ -1,5 +1,6 @@
 #ifndef RENDER_ROOMS_JS_H
 #define RENDER_ROOMS_JS_H
+#include <SystemDefinition.hpp>
 
 const char* renderRoomsJS = "\
 <script>\

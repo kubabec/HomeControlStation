@@ -25,7 +25,9 @@ class DeviceManager
     // static TestDeviceType testDev;
     /*TESTCODE*/
     static std::vector<OnOffDevice> vecOnOffDevices;
+#ifdef LED_STRIP_SUPPORTED
     static std::vector<LedWS1228bDeviceType> ledws2812bDevices;
+#endif
     static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
 
     static ConfigSlotsDataType pinConfigSlotsRamMirror;

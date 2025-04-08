@@ -1,4 +1,5 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
+#include <SystemDefinition.hpp>
 
 #define ONOFF_ADV_CONTROLS_SIZE 100
 #define TEMPSENSOR_ADV_CONTROLS_SIZE 50
@@ -177,6 +178,7 @@ String AdvancedControlsLoader::createJsForOnOff(){
 
 String AdvancedControlsLoader::createJsForLedStrip(){
     String popupContentJavaScript = "";
+#ifdef LED_STRIP_SUPPORTED
     LedColor* ledColors = (LedColor*) currentAdvancedControls; 
 
     uint8_t diodeCount = currentlyRequestedDeviceDescription.customBytes[0];
@@ -392,6 +394,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "ledExt3.style.backgroundColor = 'rgb("+String((int)currentlyRequestedDeviceDescription.customBytes[11])+", "+String((int)currentlyRequestedDeviceDescription.customBytes[12])+","+String((int)currentlyRequestedDeviceDescription.customBytes[13])+")';";
     popupContentJavaScript += "ledStripExtCtrlId = "+String((int)currentlyRequestedDeviceDescription.deviceId)+";";
     
+#endif
     return popupContentJavaScript;
 }
 

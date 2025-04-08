@@ -1,5 +1,8 @@
 #ifndef LED_WS1282B_TYPE_H
 #define LED_WS1282B_TYPE_H
+#include <SystemDefinition.hpp>
+#ifdef LED_STRIP_SUPPORTED
+
 #include "devices/Device.hpp"
 #include "devices/LedStrip/LedAnimationHandler.hpp"
 #include "Adafruit_NeoPixel.h"
@@ -63,6 +66,10 @@ class LedWS1228bDeviceType : public Device {
 
 };
 
+
+#else /* LED STRIP NOT SUPPORTED */
+
+#endif
 
 
 #endif

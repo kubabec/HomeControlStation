@@ -1,5 +1,5 @@
 #include "devices/LedStrip/LedWS1228b.hpp"
-
+#ifdef LED_STRIP_SUPPORTED
 const uint8_t maxVirtualLeds = 100;
 
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
@@ -397,3 +397,5 @@ DeviceDescription LedWS1228bDeviceType::getDeviceDescription(){
 
     return desc;
 }
+
+#endif
