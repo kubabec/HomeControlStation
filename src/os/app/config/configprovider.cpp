@@ -285,12 +285,6 @@ bool ConfigProvider::setConfigViaString(String& configString)
                 /* return success */
                 retVal = true;
 
-                String newWiFiSSID = String(configRamMirror.networkSSID); /* IP detection workaround need */
-                if(oldWiFiSSID != newWiFiSSID){ /* Network configuration has changed */
-                    /* run workaround, to try connect, then save valid IP address and push as notification back in the AccessPoint mode */
-                    std::any_cast<std::function<void(String, String)>>(DataContainer::getSignalValue(CBK_RUN_IP_DETECTION_TRICK_ON_NETWORK_CHANGE))(newWiFiSSID, networkPassword);
-                }
-
             }else {
                 /* Some of JSON fields was not fulfilled */
                 notification.body = "Some configuration parameters are missing";

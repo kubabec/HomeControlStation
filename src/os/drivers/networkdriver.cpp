@@ -20,8 +20,6 @@ void NetworkDriver::init()
 {
     Serial.println("NetworkDriver init ...");
 
-    DataContainer::setSignalValue(CBK_RUN_IP_DETECTION_TRICK_ON_NETWORK_CHANGE, static_cast<std::function<void(String, String)>>(NetworkDriver::runIpDetectionTrick));
-
     /* Try to access device configuration to extract WiFi credentials */
     try {
         std::any nodeConfiguration = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
@@ -111,30 +109,6 @@ void NetworkDriver::cyclic()
     // Update UDP task to be able to receive UDP packets
     UDPAdapter::task();
 
-}
-
-
-void NetworkDriver::runIpDetectionTrick(String ssid, String pwd)
-{
-    String assumedIp = "";
-    WiFiAdapter::disconnect();
-    for(int i = 0 ; i < 10; i++){
-        if(!WiFiAdapter::isConnected()){
-            WiFiAdapter::connectToNetwork(ssid, pwd, true);
-        }else {
-            assumedIp = WiFiAdapter::getIpString();
-            break;
-        }
-    }
-    WiFiAdapter::disconnect();
-    WiFiAdapter::createAccessPoint();
-
-    UserInterfaceNotification notif{
-        .title = "Network credentials valid",
-        .body = "Connection with IP: " + assumedIp + " ongoing.",
-        .type = UserInterfaceNotification::INFO
-    };
-    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
 }
 
 
