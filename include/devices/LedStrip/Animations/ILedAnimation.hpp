@@ -18,6 +18,8 @@ public:
     ) = 0;
     virtual void start() = 0;
     virtual void process() = 0;
+    virtual bool isInProgress() = 0;
+    virtual void restoreColors() = 0;
 
     virtual ~ILedAnimation();
 };

@@ -1,10 +1,10 @@
-#ifndef FADE_IN_H
-#define FADE_IN_H
+#ifndef FADE_OUT_H
+#define FADE_OUT_H
 #include "ILedAnimation.hpp"
 
-class FadeInAnimation : public ILedAnimation
+class FadeOutAnimation : public ILedAnimation
 {
-    enum FadeInColor{
+    enum FadeOutColor{
         Red,
         Green,
         Blue
@@ -13,11 +13,11 @@ class FadeInAnimation : public ILedAnimation
     bool inProgress = false;
 
     bool processDiode(uint16_t diodeIdx);
-    bool processColor(FadeInColor color, uint16_t diodeIndex);
+    bool processColor(FadeOutColor color, uint16_t diodeIndex);
 
 public:
-    FadeInAnimation() = default;
-    FadeInAnimation(
+    FadeOutAnimation() = default;
+    FadeOutAnimation(
         LedColor* colorsPtr,
         uint16_t ledsCount)
     ;

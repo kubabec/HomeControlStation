@@ -46,6 +46,8 @@ public:
     static bool setLocalSetupViaJson(String& json);
     static String getLocalSetupJson();
 
+    static void getRtcTimeWrapper();
+
     /* TESTCODE */
     static ServiceRequestErrorCode service(
         uint8_t deviceId, 

@@ -607,7 +607,6 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
 }
 
 
-/* TESTCODE */
 ServiceRequestErrorCode DeviceManager::service(
         uint8_t deviceId, 
         DeviceServicesType serviceType
@@ -731,4 +730,20 @@ ServiceRequestErrorCode DeviceManager::service(
     return retVal;  
 }
 
-/* TESTCODE */
+void DeviceManager::getRtcTimeWrapper()
+{
+    /* this function is a wrapper for lower level devices, which do not have access 
+    DataContainer directly, but they can read RTC value via this function when pointer to it 
+    will be passed to specific device type as a constructor parameter */
+
+    try{
+        auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
+        RtcTime currentTime = getTimeCallback();
+
+        /* TODO: map currentTime to device-friendly type and change this function to return this value */
+
+    }catch(std::bad_any_cast ex){
+
+    }
+}
+

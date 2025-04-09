@@ -4,8 +4,9 @@
 #ifdef LED_STRIP_SUPPORTED
 
 #include "devices/Device.hpp"
-#include "devices/LedStrip/LedAnimationHandler.hpp"
 #include "Adafruit_NeoPixel.h"
+#include "Animations/FadeIn.hpp"
+#include "Animations/FadeOut.hpp"
 
 #include "Arduino.h"
 
@@ -34,6 +35,11 @@ class LedWS1228bDeviceType : public Device {
     String deviceName;
     uint8_t roomId;
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
+    ILedAnimation* ongoingAnimation = nullptr;
+    ILedAnimation* switchOffAnimation = nullptr;
+
+    void applyVirtualToRealDiodes();
+    void setHwLedStripColor(uint8_t virtualLedIndex);
     public:
     LedWS1228bDeviceType(DeviceConfigSlotType nvmData);
 
@@ -55,7 +61,7 @@ class LedWS1228bDeviceType : public Device {
     void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
 
     void applyColors();
-    void setHwLedStripColor(uint8_t virtualLedIndex);
+    
 
     void updateAveragedColor(LedStripContentIndex content);
 

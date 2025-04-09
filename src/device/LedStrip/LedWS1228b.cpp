@@ -37,29 +37,10 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
 
     adafruit_ws2812b->begin();
 
-    // /*brightness limitation to do not exceed board current limiter */
-    // const float maxCurrentAllowed = 2.6f; /* 2.6 A*/
-    // const float maxCurrentPerDiode = 0.060f; /* 60mA */
-    // const float maxBrightnessVal = 255.f;
-    // const float numberOfDiodesF = (float)diodesCount;
-
-    // float requiredCurrentForDiodes = maxCurrentPerDiode * numberOfDiodesF;
-    // if(requiredCurrentForDiodes <= maxCurrentAllowed)
-    // {
-    //     /* not limited */
-    //     adafruit_ws2812b->setBrightness(255);
-    // }else {
-    //     // float overLimit = (requiredCurrentForDiodes - maxCurrentAllowed);
-    //     // float percentageOverLimit = (overLimit/maxCurrentAllowed);
-    //     // float pwmValueToReduce = 255.f * percentageOverLimit;
-    //     // int finalPwmValue = 255 - (int)pwmValueToReduce;
-    //     adafruit_ws2812b->setBrightness(65);
-    // }
     Serial.println("LedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
     adafruit_ws2812b->setBrightness(nvmData.customBytes[3]); /* current limiter usage */
 
 
-    // applyColors();
 }
 
 ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* ptr, uint16_t size)
@@ -94,7 +75,42 @@ void LedWS1228bDeviceType::init(){
 }
 
 void LedWS1228bDeviceType::cyclic(){
+    static long long animationProcessTime = 0;
 
+    if(switchOffAnimation != nullptr){
+        if(millis() - animationProcessTime > 60){
+            if(switchOffAnimation->isInProgress()){
+                Serial.println("Processing off animation");
+                switchOffAnimation->process();
+                applyVirtualToRealDiodes();
+            }else {
+                Serial.println("OFF animation completed");
+                switchOffAnimation->restoreColors();
+                delete switchOffAnimation;
+                switchOffAnimation = nullptr;
+
+                if(isOn && ongoingAnimation){
+                    ongoingAnimation->start();
+                }
+            }
+
+            animationProcessTime = millis();
+        }
+    }else if(ongoingAnimation != nullptr){
+        if(millis() - animationProcessTime > 60){
+            if(ongoingAnimation->isInProgress()){
+                Serial.println("Processing ON animation");
+                ongoingAnimation->process();
+                applyVirtualToRealDiodes();
+            }else{
+                Serial.println("ON animation completed");
+                delete ongoingAnimation;
+                ongoingAnimation = nullptr;
+            }
+
+            animationProcessTime = millis();
+        }
+    }
 }
 
 bool LedWS1228bDeviceType::isStripInitialized()
@@ -104,25 +120,34 @@ bool LedWS1228bDeviceType::isStripInitialized()
 
 void LedWS1228bDeviceType::applyColors(){
     if(isContentInitialized){
-        // for(uint16_t i = 0 ; i < diodesCount ; i ++){
-        //     adafruit_ws2812b->setPixelColor(
-        //         i,
-        //         adafruit_ws2812b->Color(
-        //             stripContent[eACTIVE_CURRENT_CONTENT][i].r,
-        //             stripContent[eACTIVE_CURRENT_CONTENT][i].g,
-        //             stripContent[eACTIVE_CURRENT_CONTENT][i].b
-        //         )
-        //     );
-        // }
-
-        for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
-            setHwLedStripColor(i);
+        updateAveragedColor(eACTIVE_CURRENT_CONTENT);
+        if(isOn){
+            if(switchOffAnimation != nullptr){
+                delete switchOffAnimation;
+            }
+            Serial.println("Starting OFF animation when color changed");
+            switchOffAnimation = new FadeOutAnimation(
+                stripContent[eACTIVE_CURRENT_CONTENT],
+                virtualDiodesCount
+            );
+            switchOffAnimation->start();
         }
 
-        adafruit_ws2812b->show();
+        if(ongoingAnimation != nullptr){
+            delete ongoingAnimation;
+        }
+        Serial.println("Starting fade in animation");
+        ongoingAnimation = new FadeInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount
+        );
+
+        if(!isOn){
+            ongoingAnimation->start();
+        }
+
         isOn = true;
 
-        updateAveragedColor(eACTIVE_CURRENT_CONTENT);
     }
 }
 
@@ -200,17 +225,14 @@ void LedWS1228bDeviceType::stripOn()
 
 void LedWS1228bDeviceType::stripOff()
 {
-    for(uint16_t i = 0 ; i < diodesCount ; i ++){
-        adafruit_ws2812b->setPixelColor(
-            i,
-            adafruit_ws2812b->Color( /* black => disabled */
-                0x00,
-                0x00,
-                0x00
-            )
-        );
+    if(switchOffAnimation != nullptr){
+        delete switchOffAnimation;
     }
-    adafruit_ws2812b->show();
+    switchOffAnimation = new FadeOutAnimation(
+        stripContent[eACTIVE_CURRENT_CONTENT],
+        virtualDiodesCount
+    );
+    switchOffAnimation->start();
 }
 
 bool isNotBlack(LedColor color){
@@ -268,12 +290,12 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     switch(serviceType){
         case DEVSERVICE_STATE_SWITCH:
             if(param.a == 1) {
-                isOn = true;
                 stripOn();
+                isOn = true;
             }
             else {
-                isOn = false;
                 stripOff();
+                isOn = false;
             }   
             return SERV_SUCCESS;
 
@@ -323,6 +345,16 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             return SERV_NOT_SUPPORTED;
     };
 }
+
+void LedWS1228bDeviceType::applyVirtualToRealDiodes()
+{
+    for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
+        setHwLedStripColor(i);
+    }
+
+    adafruit_ws2812b->show();
+}
+
 
 void LedWS1228bDeviceType::setHwLedStripColor(uint8_t virtualLedIndex)
 {
