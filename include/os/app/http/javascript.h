@@ -108,6 +108,8 @@ let isNotificationPollingActive = 1;\
         var dataRoom = document.getElementById('room' + id).value;\
         var brightnessSupport =  document.getElementById('brightnessSupported-' + id).value;\
         var activeSt = document.getElementById('activationState-' + id).value;\
+        var pwmMin = document.getElementById('pwmMin-' + id).value;\
+        var pwmMax = document.getElementById('pwmMax-' + id).value;\
         return {\
         type:\"OnOff\",\
         id:id,\
@@ -116,7 +118,9 @@ let isNotificationPollingActive = 1;\
         pin:dataPin,\
         room:dataRoom,\
         briSup:brightnessSupport,\
-        activeState:activeSt\
+        activeState:activeSt,\
+        PwmMin:pwmMin,\
+        PwmMax:pwmMax\
       };\
     }\
     function getLedStripConfigurationJson(id){\

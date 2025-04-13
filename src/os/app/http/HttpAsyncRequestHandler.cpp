@@ -272,7 +272,7 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
         jsonResponse +="\"humid\":"+ String((int)deviceInThisRoom->customBytes[2])+",";
       }
       
-      jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]);
+      jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[2]);
       
       
 

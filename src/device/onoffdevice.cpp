@@ -5,43 +5,81 @@ OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_
     deviceName = devName;
     deviceId = a_deviceId;
     roomId = a_roomId;
-
-    //brightnessLevel = 50;
 }
 
 
 OnOffDevice::OnOffDevice(DeviceDescription& description, uint8_t pin){
     deviceName = description.deviceName;
     deviceId = description.deviceId;
-    roomId = description.deviceId;
-
+    roomId = description.roomId;
     pinNumber = pin;
+        
+    }
+
+OnOffDevice::OnOffDevice(DeviceConfigSlotType nvmData){
+    deviceName = String(nvmData.deviceName);
+    deviceId = nvmData.deviceId;
+    roomId = nvmData.roomId;
+    pinNumber = nvmData.pinNumber;
+    activeLow = (!nvmData.customBytes[1]);
+    
+    if(nvmData.customBytes[0] == 1) {
+        brightnessLevelSupport = true;
+    } else {
+        brightnessLevelSupport = false; 
+    }
+    
+    minPwmValue = nvmData.customBytes[2];
+    maxPwmValue = nvmData.customBytes[3];
+
+    Serial.println("minPwmValue: " + String((int)minPwmValue));
+    Serial.println("maxPwmValue: " + String((int)maxPwmValue));
+    
 }
 
 void OnOffDevice::on() {
+
+    Serial.println("OnOffDevice::on() called");
+    Serial.println("brigtnessLevelTarget: " + String(brightnessLevelTarget));
+    Serial.println("brightnessLevel: " + String(brightnessLevel));
+
     isOn = true;
-    digitalWrite(pinNumber,LOW);
-    //Serial.println("Enabling device " + deviceName +" on pin " + String(pinNumber));
+    if(brightnessLevelSupport) {
+        brightnessLevel = brightnessLevelTarget;
+        analogWrite(pinNumber, mapBrightness(brightnessLevel));
+    } else {
+        digitalWrite(pinNumber, (activeLow ? LOW : HIGH));
+    }   
 }
+
 
 void OnOffDevice::off() {
+
+    Serial.println("OnOffDevice::off() called");
+    Serial.println("brigtnessLevelTarget: " + String(brightnessLevelTarget));
+    Serial.println("brightnessLevel: " + String(brightnessLevel));
+    
+
     isOn = false;
-    digitalWrite(pinNumber,HIGH);
-    //Serial.println("Disabling device " + deviceName +" on pin " + String(pinNumber));
+    if(brightnessLevelSupport) {
+        //brightnessLevelTarget = brightnessLevel; // Zapisujemy aktualną jasność
+        analogWrite(pinNumber, activeLow ? 255 : 0);
+    } else {
+        digitalWrite(pinNumber, activeLow ? HIGH : LOW);
+    }
 }
 
-bool OnOffDevice::getState() {
-    Serial.println("@@@@@@@@@@@@@@@@@@@@ onOffDevice - get state : " + String(isOn));
-    return isOn;
-       
+
+bool OnOffDevice::getState() {    
+    return isOn;       
 }
 
 void OnOffDevice::setBrightnessLevelSupport(bool p_brightnessLevelSupport) {
     brightnessLevelSupport = p_brightnessLevelSupport;
 }
 
-int OnOffDevice::getBrighnessStep() {
-    return brighnessStep;
+int OnOffDevice::getBrightnessStep() {
+    return brightnessStep;
 }
 int OnOffDevice::getBrightnessStepDuration() {
     return brightnessStepDurationMS;
@@ -53,33 +91,33 @@ void OnOffDevice::brightnessChangeHandler() {
         if ((millis() - timePrevious1) >= brightnessStepDurationMS) {
             //Serial.print("Zmiana jasności : ");
             if(brightnessLevel < brightnessLevelTarget) {
-                brightnessLevel ++;
-                
-            } 
-            
+                brightnessLevel ++;                
+            }             
             if(brightnessLevel > brightnessLevelTarget) {
                 brightnessLevel --;
-            } 
-            //Serial.println(brightnessLevel);
-            timePrevious1 = millis(); 
+            }
+
+            if(isOn && brightnessLevelSupport) {
+                analogWrite(pinNumber, mapBrightness(brightnessLevel));             
+         
+            }
+            
+            timePrevious1 = millis();             
         }        
-    }  
-    
+    }      
 }
 
 void OnOffDevice::timerHandler() {
-    if(lightDurationTimerMS > 0) {
+    // if(lightDurationTimerMS > 0) {
         
-        if ((millis() - timePrevious2) > lightDurationTimerMS) {
-            
-                //Serial.println("!!!!!!!!!!!!!!!Light OFF !!!!!!!!!!!!! ");
-                timePrevious2 = millis();
-                off();
-                setLightDurationTimerMS(0);
+    //     if ((millis() - timePrevious2) > lightDurationTimerMS) {
+    //             timePrevious2 = millis();
+    //             off();
+    //             setLightDurationTimerMS(0);
                 
-            }        
+    //         }        
              
-        }     
+    //     }     
     }  
 
 void OnOffDevice::changeBrightness(int requestedBrightness) {
@@ -87,7 +125,6 @@ void OnOffDevice::changeBrightness(int requestedBrightness) {
     brightnessLevelTarget = requestedBrightness;
     float brightnessDelta = abs(brightnessLevelTarget - brightnessLevel);
     brightnessStepDurationMS = brightnessChangeTime / brightnessDelta;    
-    //Serial.println("Brightness Step Duration : " + String(brightnessStepDurationMS));
     timePrevious1 = millis();
 }
 
@@ -156,14 +193,14 @@ uint8_t OnOffDevice::getDeviceType(){
 }
 
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType){
-    switch(serviceType){
-        
+    switch(serviceType){        
 
         default: 
             Serial.println("Device_"+String((int)deviceId)+":Service {"+ String((int)serviceType) + "} is not supported (noParam)");
             return SERV_NOT_SUPPORTED;
     };
 }
+
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
     switch(serviceType){
         case DEVSERVICE_STATE_SWITCH:
@@ -187,6 +224,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             return SERV_NOT_SUPPORTED;
     };
 }
+
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
     switch(serviceType){
         default: 
@@ -194,6 +232,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             return SERV_NOT_SUPPORTED;
     };
 }
+
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
@@ -220,8 +259,24 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
     desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     desc.customBytes[0] = brightnessLevelSupport;
-    desc.customBytes[1] = brightnessLevelTarget;
-    desc.customBytes[2] = brightnessLevel;
+    desc.customBytes[1] = activeLow ? 0 : 1;
+    desc.customBytes[2] = brightnessLevelTarget;
+    
 
     return desc;
 }
+
+
+int OnOffDevice::mapBrightness(int brightness) {
+    if(activeLow) {
+        // Dla urządzeń aktywowanych LOW (0V = włączone)
+        return map(brightness, 0, 100, 255, 0);
+        
+    } else {
+        // Dla urządzeń aktywowanych HIGH (3.3V/5V = włączone)
+        return map(brightness, 0, 100, 180, 250);
+    }
+}
+
+
+

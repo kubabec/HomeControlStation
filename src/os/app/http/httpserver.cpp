@@ -863,6 +863,23 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("</label>");
   /* some more extra fields for 43*/
 
+
+  
+
+  client.println("<label>Min PWM value (0-255):");
+  client.println("<input type=\"number\" id=\"pwmMin-"+String((int)slotNumber)+"\" min=\"0\" max=\"255\" value=\""+
+    String((int)slot.customBytes[4])+"\">");
+  client.println("</label>");
+
+  client.println("<label>Max PWM value (0-255):");
+  client.println("<input type=\"number\" id=\"pwmMax-"+String((int)slotNumber)+"\" min=\"0\" max=\"255\" value=\""+
+    String((int)slot.customBytes[5])+"\">");
+  client.println("</label>");
+
+
+
+
+
   client.println("</div>");
 
   /*<!-- Extra fields for LED Strip -->*/

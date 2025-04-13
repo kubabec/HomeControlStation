@@ -96,7 +96,7 @@ RtcTime TimeMaster::getRtcTime() {
 
 // Ustawienie przesunięcia strefy czasowej (w godzinach)
 void TimeMaster::setTimeZone(int timeZoneOffset) {
-    TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 3600);
+    TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 7200);
 }
 
 unsigned long TimeMaster::getEpochTime() {
