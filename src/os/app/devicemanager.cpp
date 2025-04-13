@@ -300,21 +300,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             switch(nvmData.deviceType)
             {
                 case e_ON_OFF_DEVICE :
-                    vecOnOffDevices.push_back(OnOffDevice(
-                        nvmData.pinNumber,          /* Pin number */
-                        String(nvmData.deviceName), /* Device name */
-                        nvmData.deviceId,           /* Device unique identifier */
-                        nvmData.roomId              /* Room unique identifier */
-                    ));
-
-                    if(nvmData.customBytes[0] == 1)
-                    {
-                        vecOnOffDevices.back().setBrightnessLevelSupport(true);
-                    }else 
-                    {
-                        vecOnOffDevices.back().setBrightnessLevelSupport(false); 
-                    }
-
+                    vecOnOffDevices.push_back(OnOffDevice(nvmData));
                     isValidDeviceGiven = true;
                 break;
 
@@ -528,6 +514,8 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 String room =              String(doc["devices"][i]["room"]);
                 String brightnessSupport = String(doc["devices"][i]["briSup"]);
                 String activationState =   String(doc["devices"][i]["activeState"]);
+                String minPwm =            String(doc["devices"][i]["PwmMin"]);
+                String maxPwm =            String(doc["devices"][i]["PwmMax"]);
                 
                 /* Put data to config slot memory*/
                 configSlot.deviceType = (uint8_t)type_ONOFFDEVICE;
@@ -540,6 +528,8 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 configSlot.roomId = room.toInt();
                 configSlot.customBytes[0] = brightnessSupport.toInt();
                 configSlot.customBytes[1] = activationState.toInt();
+                configSlot.customBytes[2] = minPwm.toInt();  
+                configSlot.customBytes[3] = maxPwm.toInt();
                 
 
 

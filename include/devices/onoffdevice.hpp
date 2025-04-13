@@ -15,13 +15,17 @@ private:
     uint8_t deviceId;
     String deviceName;
     uint8_t roomId;
+    bool activeLow = true; // Urządzenia aktywowane przy stanie LOW lub HIGH
     bool brightnessLevelSupport = true; //czy obslugiwana jest zmiana jasnosci
     int brightnessLevel = 30;
     int brightnessLevelTarget = 30;
     const int brightnessChangeTime = 3000;
     int lightDurationTimerMS = 8000;
 
-    unsigned long brighnessStep ;
+    uint8_t minPwmValue = 0;
+    uint8_t maxPwmValue = 255;
+
+    unsigned long brightnessStep ;
     unsigned long brightnessStepDurationMS ;
     unsigned long timePrevious1 ;
     unsigned long timePrevious2 ;
@@ -30,6 +34,7 @@ private:
 public:
     OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId);
     OnOffDevice(DeviceDescription& description, uint8_t pin);
+    OnOffDevice(DeviceConfigSlotType nvmData);
 
     void on();
     void off();
@@ -38,7 +43,7 @@ public:
     void setBrightnessLevelSupport(bool p_brightnessLevelSupport); //ustawienie czy obslugiwana jest zmiana jasnosci
     void brightnessChangeHandler();
     int getBrightnessLevel();
-    int getBrighnessStep();
+    int getBrightnessStep();
     int getBrightnessStepDuration();
     void changeBrightness(int requestedBrightness);
     int getBrightnessLevelTarget();
@@ -49,6 +54,8 @@ public:
     uint8_t getDeviceId();
     uint8_t getRoomId();
     bool getBrightnessIsAdjustable();
+
+    int mapBrightness(int brightness); //przemapowanie wartosci jasnosci na wartosc PWM
 
     virtual void init();//funkcje ktore nazucaja potomka koniecznosc ich implementacji
     virtual void cyclic();
