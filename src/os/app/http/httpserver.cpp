@@ -878,11 +878,11 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("<label>Sides flip:");
   client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
   if(slot.customBytes[2]){
-    client.println("<option value=\"0\" >No flip</option>");
-    client.println("<option value=\"1\" selected>Last diode is strip begin</option>");
+    client.println("<option value=\"0\" >Not inversed</option>");
+    client.println("<option value=\"1\" selected>Inversed</option>");
   }else {
-    client.println("<option value=\"0\" selected>No flip</option>");
-    client.println("<option value=\"1\">Last diode is strip begin</option>");
+    client.println("<option value=\"0\" selected>Not inversed</option>");
+    client.println("<option value=\"1\">Inversed</option>");
   }
   client.println("</select>");
 

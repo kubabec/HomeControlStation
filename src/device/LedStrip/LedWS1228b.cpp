@@ -20,12 +20,14 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
         virtualDiodesCount = diodesCount;
     }
 
+
     
     isOn = false;
     pinNumber = nvmData.pinNumber;
     deviceId = nvmData.deviceId;
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
+    isInversedOrder = nvmData.customBytes[2];
 
     adafruit_ws2812b = new Adafruit_NeoPixel(
         // nvmData.customBytes[0], /* leds count */
@@ -349,22 +351,32 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 void LedWS1228bDeviceType::applyVirtualToRealDiodes()
 {
     for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
-        setHwLedStripColor(i);
+        uint8_t adjustedIdx = isInversedOrder ? (virtualDiodesCount-(i+1)) : i;
+        setHwLedStripColor(
+            i,
+            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].r,
+            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].g,
+            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].b
+        );
     }
 
     adafruit_ws2812b->show();
 }
 
 
-void LedWS1228bDeviceType::setHwLedStripColor(uint8_t virtualLedIndex)
-{
+void LedWS1228bDeviceType::setHwLedStripColor(
+    uint8_t virtualLedIndex,
+    uint8_t r,
+    uint8_t g,
+    uint8_t b
+){
     if(virtualDiodesCount == diodesCount){
         adafruit_ws2812b->setPixelColor(
             virtualLedIndex,
             adafruit_ws2812b->Color(
-                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
-                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
-                stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+                r,
+                g,
+                b
             )
         );
     }else {
@@ -377,9 +389,9 @@ void LedWS1228bDeviceType::setHwLedStripColor(uint8_t virtualLedIndex)
                 adafruit_ws2812b->setPixelColor(
                     (virtualLedIndex * physicalLedsPerVirtualLed + j),
                     adafruit_ws2812b->Color(
-                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
-                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
-                        stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+                        r,
+                        g,
+                        b
                     )
                 );
             }
@@ -389,9 +401,9 @@ void LedWS1228bDeviceType::setHwLedStripColor(uint8_t virtualLedIndex)
             adafruit_ws2812b->setPixelColor(
                 (virtualLedIndex * physicalLedsPerVirtualLed + reminderAdjustment + j),
                 adafruit_ws2812b->Color(
-                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].r,
-                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].g,
-                    stripContent[eACTIVE_CURRENT_CONTENT][virtualLedIndex].b
+                    r,
+                    g,
+                    b
                 )
             );
         }

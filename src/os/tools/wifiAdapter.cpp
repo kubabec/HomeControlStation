@@ -164,7 +164,7 @@ void WiFiAdapter::createAccessPoint()
 }
 
 void WiFiAdapter::enableMDNSResponder(){
-    String hostName = "HomeStation";
+    String hostName = "homestation";
     if (!MDNS.begin(hostName.c_str())) {
         Serial.println("Error setting up MDNS responder!");
     } else {
