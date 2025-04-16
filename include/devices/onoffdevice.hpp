@@ -28,8 +28,7 @@ private:
     unsigned long brightnessStep ;
     unsigned long brightnessStepDurationMS ;
     unsigned long timePrevious1 ;
-    unsigned long timePrevious2 ;
-    
+    unsigned long timePrevious2 ; 
     
 public:
     OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId);
