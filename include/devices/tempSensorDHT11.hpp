@@ -2,11 +2,12 @@
 #define TEMP_SENSOR_DHT11_TYPE_H
 #include "devices/Device.hpp"
 #include "Arduino.h"
+#include <DHT.h>
 
+class TempSensorDHT11DeviceType : public Device
+{
 
-class TempSensorDHT11DeviceType : public Device {
-
-    bool isOn = true; //stan urzadzenia
+    bool isOn = true; // stan urzadzenia
     int pinNumber;
     uint8_t deviceId;
     String deviceName;
@@ -15,7 +16,10 @@ class TempSensorDHT11DeviceType : public Device {
     uint8_t currentHumid = 0.f;
 
     long lastDataUpdateTime = 0;
-    public:
+
+    DHT *dht = nullptr;
+
+public:
     TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData);
 
     virtual void init();
@@ -30,7 +34,5 @@ class TempSensorDHT11DeviceType : public Device {
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set3 param);
 };
-
-
 
 #endif
