@@ -86,14 +86,9 @@ void LedWS1228bDeviceType::cyclic(){
                 switchOffAnimation->process();
                 applyVirtualToRealDiodes();
             }else {
-                Serial.println("OFF animation completed");
                 switchOffAnimation->restoreColors();
                 delete switchOffAnimation;
                 switchOffAnimation = nullptr;
-
-                if(isOn && ongoingAnimation){
-                    ongoingAnimation->start();
-                }
             }
 
             animationProcessTime = millis();
@@ -123,17 +118,6 @@ bool LedWS1228bDeviceType::isStripInitialized()
 void LedWS1228bDeviceType::applyColors(){
     if(isContentInitialized){
         updateAveragedColor(eACTIVE_CURRENT_CONTENT);
-        if(isOn){
-            if(switchOffAnimation != nullptr){
-                delete switchOffAnimation;
-            }
-            Serial.println("Starting OFF animation when color changed");
-            switchOffAnimation = new FadeOutAnimation(
-                stripContent[eACTIVE_CURRENT_CONTENT],
-                virtualDiodesCount
-            );
-            switchOffAnimation->start();
-        }
 
         if(ongoingAnimation != nullptr){
             delete ongoingAnimation;
@@ -145,8 +129,11 @@ void LedWS1228bDeviceType::applyColors(){
         );
 
         if(!isOn){
-            ongoingAnimation->start();
+            ongoingAnimation->start(true); // start from beginning
+        }else {
+            ongoingAnimation->start(false); // start from beginning
         }
+        
 
         isOn = true;
 
@@ -234,7 +221,7 @@ void LedWS1228bDeviceType::stripOff()
         stripContent[eACTIVE_CURRENT_CONTENT],
         virtualDiodesCount
     );
-    switchOffAnimation->start();
+    switchOffAnimation->start(false);
 }
 
 bool isNotBlack(LedColor color){

@@ -26,7 +26,7 @@ public:
         LedColor* colorsPtr,
         uint16_t ledsCount
     );
-    virtual void start();
+    virtual void start(bool startFromZero = false);
     virtual void process();
     virtual bool isInProgress();
     virtual void restoreColors();

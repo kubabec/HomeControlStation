@@ -16,7 +16,7 @@ public:
         LedColor* mainStripPtr,
         uint16_t ledsCount
     ) = 0;
-    virtual void start() = 0;
+    virtual void start(bool startFromZero) = 0;
     virtual void process() = 0;
     virtual bool isInProgress() = 0;
     virtual void restoreColors() = 0;
