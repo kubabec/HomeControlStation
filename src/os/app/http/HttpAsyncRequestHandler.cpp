@@ -154,7 +154,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls(){
     /* Copy device ID from request parameters */
     memcpy(&deviceId, currentRequest.requestData, sizeof(deviceId));
 
-    Serial.println("Requesting controls for id " + String((int)deviceId));
+    // Serial.println("Requesting controls for id " + String((int)deviceId));
     /* call loading processing function */
     ServiceRequestErrorCode errorCode = 
         AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);

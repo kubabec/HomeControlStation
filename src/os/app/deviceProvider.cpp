@@ -1,5 +1,8 @@
 #include <os/app/DeviceProvider.hpp>
+#include "esp_heap_caps.h"
 
+
+#define MINIMAL_PAYLOAD_SIZE  2
 //#include "deviceProvider.hpp"
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
@@ -173,14 +176,83 @@ void DeviceProvider::deviceReset() {
 }
 
 
+ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest& request, RcResponse& response, ServiceParameters_set3& param, uint16_t payloadSize)
+{
+    ServiceRequestErrorCode result = SERV_GENERAL_FAILURE;
+    DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.getRequestDeviceId());
+    response.setResponseType((uint8_t) POSITIVE_RESP);
+                
+    if(payloadSize < (sizeof(ServiceParameters_set3) + MINIMAL_PAYLOAD_SIZE)) {
+        Serial.println("Payload size too small for set1");
+        response.setResponseType((uint8_t) INVALID_REQ_RESP);
+        sendResponse(response);
+        return SERV_GENERAL_FAILURE;
+    }
+
+    memcpy(&param, &request.getData().at(2), sizeof(ServiceParameters_set3));
+
+    param.print();
+
+    if(param.direction == e_OUT_from_DEVICE){
+        /* replace remote address of the memory with local RAM */
+        uint8_t* memoryAbstraction = (uint8_t*) malloc(param.size);
+
+
+        if(memoryAbstraction == nullptr) {
+            Serial.println("Unable to allocate memory for set3");
+            response.setResponseType((uint8_t) INVALID_REQ_RESP);
+            sendResponse(response);
+            return SERV_GENERAL_FAILURE;
+        }
+
+        /* change value of the pointer in the request */
+        param.buff = memoryAbstraction;
+
+            /* call the service */
+        result = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set3(
+            devicedetails.originalID,
+            (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
+            param
+        );
+
+        if(result == SERV_SUCCESS) {
+            response.setResponseType((uint8_t) POSITIVE_RESP);
+            addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
+
+            /* we must also add device manipulated information to the response */
+            response.pushData(memoryAbstraction, param.size);
+            // response.print();
+            // Serial.println("Response total size: " + String(response.getData().size()));
+
+            sendResponse(response);
+            free(memoryAbstraction);
+
+            return SERV_SUCCESS;
+        }else {
+            free(memoryAbstraction);
+
+            Serial.println("Problem with service call");
+            response.setResponseType((uint8_t) INVALID_REQ_RESP);
+            sendResponse(response);
+            return SERV_GENERAL_FAILURE;
+        }
+
+    }
+
+    return result;
+}
+
+
 bool DeviceProvider::receiveRequest(RcRequest& request) {
     // request.print();
 
     RcResponse response(request.getRequestId(), request.getRequestNodeMAC(),request.getRequestType(), INVALID_REQ_RESP);
-    ServiceParameters_set1 params;
+    ServiceParameters_set1 params1;
+    ServiceParameters_set3 params3;
+
+    uint8_t* memoryAbstraction = nullptr;
 
     uint16_t payloadSize = request.getData().size();
-    const uint16_t MINIMAL_PAYLOAD_SIZE = 2;
 
     if(payloadSize < MINIMAL_PAYLOAD_SIZE) {
         Serial.println("Payload size too small");        
@@ -190,11 +262,11 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     }
 
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(request.getRequestDeviceId());
-    
+    ServiceRequestErrorCode result = SERV_GENERAL_FAILURE;
+
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {
           
-            ServiceRequestErrorCode result = SERV_GENERAL_FAILURE;
             /* Which function service overloading is received? */
             switch (request.getData().at(SERVICE_OVERLOADING_FUNCTION_INDEX))
             {
@@ -221,20 +293,28 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     return false;
                 }
 
-                memcpy(&params, &request.getData().at(2), sizeof(ServiceParameters_set1));
+                memcpy(&params1, &request.getData().at(2), sizeof(ServiceParameters_set1));
 
                 
                 /* call the service */
                 result = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set1(
                     devicedetails.originalID,
                     (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
-                    params
+                    params1
                 );
                 if(result == SERV_SUCCESS) {
                     response.setResponseType((uint8_t) POSITIVE_RESP);
                     addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
                 }
                 
+                break;
+            
+            
+            /*TODO  case serviceCall_2: missing  */
+
+            case serviceCall_3:
+                /* Copy function parameter values from the request */
+                result = handelService3Request(request, response, params3, payloadSize);
                 break;
             
             default:
@@ -248,10 +328,11 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
     {
        Serial.println("No mapping found for received DeviceID (" + String((int)request.getRequestDeviceId())+ ") in request " + String((int) request.getRequestId()));
     }
-
-    Serial.println("sending a response ...");
-    sendResponse(response);    
-    return true;
+    if(result == SERV_SUCCESS) {
+        return true;
+    }else {
+        return false;
+    }
     //
 }
 
@@ -403,6 +484,7 @@ void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse& response,
                 device.toByteArray(serializedDescription, device.getSize());
                 /*Add memory buffer to response payload*/
                 response.pushData(serializedDescription, device.getSize());
+                Serial.println("serializedDescription size: " + String(device.getSize()));
 
                 free(serializedDescription);
             }else {

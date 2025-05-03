@@ -476,7 +476,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
         parameters.direction = (uint8_t)e_OUT_from_DEVICE;
 
         /* call service on the device, to fulfill the controls memory */
-        Serial.println("AdvancedControlsLoader:// Waiting for the device...");
+        // Serial.println("AdvancedControlsLoader:// Waiting for the device...");
         ServiceRequestErrorCode serviceErrorCode = 
             std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set3(
                 currentlyRequestedDeviceDescription.deviceId,
@@ -502,6 +502,14 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
             default:
                 /* error with service execution */
                 /* GENERAL_FAILURE will be returned */
+                currentRequestJS = "hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');";
+                /* act like nothing bad happened to the UI */
+                retVal = SERV_SUCCESS;
+                UserInterfaceNotification notif;
+                notif.title = "Request processing failure";
+                notif.body = "Could not load advanced controls from " + currentlyRequestedDeviceDescription.deviceName+ ". Please try again.";
+                notif.type = UserInterfaceNotification::WARNING;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
                 Serial.println("Service failed with error: " + String((int)serviceErrorCode));
                 break;
         }

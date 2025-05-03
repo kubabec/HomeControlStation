@@ -124,6 +124,7 @@ void NetworkDriver::udpReceive(MessageUDP data)
 bool NetworkDriver::send(MessageUDP& data)
 {
     if(WiFiAdapter::isConnected()){
+        // Serial.println("Sending data via UDP");
         UDPAdapter::send(data);
         return true;
     }
@@ -173,13 +174,13 @@ bool NetworkDriver::sendBroadcast(MessageUDP& data)
 
 void NetworkDriver::mapReceivedPacketToInternalReceiver(MessageUDP& packet)
 {
-    int packetId = packet.getId(); //Pobiera id odebranego pakietu
+    int packetId = packet.getId();
 
-    //Przechodzi przez wektor packetRanges, który zawiera zakresy identyfikatorów pakietów dla różnych odbiorców wewnętrznych.
+    /* Find the range of packetId */
     for(uint8_t i=1; i<packetRanges.size(); i++){
         uint8_t nextRangeStart = packetRanges.at(i);
         if(packetId < nextRangeStart){
-            //pakiet nalezy do zakresu spod indeksu i -1
+            /* Call the receiver function */
             packetReceivers.at(i-1)(packet);
             return ;
         }

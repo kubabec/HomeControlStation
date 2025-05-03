@@ -31,6 +31,7 @@ class RemoteDevicesManager
     enum RDM_RequestProcessingState{
         RDM_NO_REQUEST,
         RDM_REQUEST_IN_PROGRESS,
+        RDM_REQUEST_FAILED,
         RDM_REQUEST_COMPLETED
     };
 
@@ -38,12 +39,15 @@ class RemoteDevicesManager
         uint8_t deviceId = 255;
         DeviceServicesType serviceName = DEVSERVICE_INVALID;
         ServiceOverloadingFunction overloading = serviceCall_INVALID;
+        uint8_t memoryRequestDirection = e_UNKNOWN_PARAM_DIRECTION;
 
 
     bool operator==(ServiceCallFingerprint& other){
             return (this->deviceId == other.deviceId && this->serviceName == other.serviceName && this->overloading == other.overloading);
         }
     };
+
+    static void handleService3Response(RcResponse& response, DeviceDescription& responseDeviceDescription);
 
     /* This vector is tunneled from RCServer when handshake is over via SIG_RC_DEVICES_INTERNAL_TUNEL signal */
     static std::vector<DeviceDescription> remoteDevicesCollection;

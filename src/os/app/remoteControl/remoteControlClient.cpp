@@ -1,6 +1,7 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/datacontainer/SigMessages.hpp>
+#include "esp_heap_caps.h"
 
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
@@ -231,8 +232,8 @@ bool RemoteControlClient::registerRequestReceiver(RequestType request, std::func
 }
 
 bool RemoteControlClient::sendResponse(RcResponse& response) {
-    //Serial.println("!!! RemoteControlClient - sendResponse do vektora - ");
-    vecResponseMessage.push(response);
+    Serial.println("!!! RemoteControlClient - sendResponse do vektora - ");
+    vecResponseMessage.push(std::move(response));
 
     return true;
    
@@ -241,23 +242,37 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 // checking if the vector containing the response to the request has an entry 
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
-        RcResponse remoteControlResponse = vecResponseMessage.front();
+        // Serial.println("!!! RemoteControlClient - processResponse - ");
+        RcResponse& remoteControlResponse = vecResponseMessage.front();
+        std::any_cast <std::function<void()>>(
+            DataContainer::getSignalValue(CBK_DISPLAY_RAM_USAGE)
+        )();
+
         uint8_t* serializedResponse = (uint8_t*)malloc(remoteControlResponse.getSize());
+
         if(serializedResponse != nullptr){
+            // Serial.println("!!! RemoteControlClient - processResponse - serializedResponse != nullptr - ");
             remoteControlResponse.toByteArray(serializedResponse, remoteControlResponse.getSize());
 
-            vecResponseMessage.pop();
-
             MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
+            // Serial.println("!!! RemoteControlClient - processResponse - msg - ");
+            // Serial.println("Size of serializedResponse: " + String(remoteControlResponse.getSize()));
             msg.pushData((byte*)serializedResponse, remoteControlResponse.getSize());
-            
+            // Serial.println("!!! RemoteControlClient - processResponse - msg.pushData - ");
 
             /* TX transmission will be handled in the available time from cyclic() context */
-            pendingTxQueue.push(msg);
+            pendingTxQueue.push(std::move(msg));
+
+            // Serial.println("!!! RemoteControlClient - processResponse - pendingTxQueue.push - ");
 
             free(serializedResponse);
-
+            // Serial.println("!!! RemoteControlClient - processResponse - free(serializedResponse) - ");
+            
+            vecResponseMessage.pop();
             return true;
+        }else {
+            vecResponseMessage.pop();
+            return false;
         }
     } else {        
 

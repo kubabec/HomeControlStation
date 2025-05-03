@@ -37,7 +37,7 @@ void RcRequest::setID(uint8_t id) {
     requestId = id;
 }
 
-uint8_t RcRequest::getSize() {
+uint16_t RcRequest::getSize() {
     size_t fixedSize = sizeof(requestId) + sizeof(targetNodeMAC) + sizeof(targetDeviceId) + sizeof(requestType) + sizeof(requestSendCount) + sizeof(crc);
     // Rozmiar pola data (dynamiczny)
     size_t dataSize = data.size() ; // Zakładamy, że data jest wektorem uint8_t
@@ -55,9 +55,7 @@ void RcRequest::pushData(uint8_t byte) {
 //wstawiamy wektor do wektora data
 void RcRequest::pushData(uint8_t* data, uint16_t size) {
     if(data != nullptr && size > 0 ){
-        for(uint16_t i = 0; i < size; ++i){
-            this->data.push_back(data[i]);
-        }
+        this->data.insert(this->data.end(), data, data + size);
     }
 }
 

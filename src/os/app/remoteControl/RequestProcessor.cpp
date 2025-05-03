@@ -22,7 +22,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         /* Prepare UDP message with RC_REQUEST identifier */
         MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
 
-        uint8_t reqestSize = currentRequest.getSize();
+        uint16_t reqestSize = currentRequest.getSize();
         // deklarujemy zmienną dataBuffer która jest pointerem typu uint8, malloc alokuje pamiec na stercie o rozmiarze requestSize i kastujemy na uint8 tzn informujemy kompilator ze bedziemy pod tym adresem przechowywać wartisci uint8
         
         currentRequest.setRequestSendCount(1);
@@ -35,9 +35,12 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         /* Push fully prepared request to previously created empty UDP message  */
 
         if(message.pushData((byte*)(dataBuffer),reqestSize)){
-            Serial.println("Sending new request with ID "+String((int)currentRequest.getRequestId()));
+            // Serial.println("Sending new request with ID "+String((int)currentRequest.getRequestId()));
+            currentRequest.print();
             /* Send UDP data */
             NetworkDriver::sendBroadcast(message);
+
+            // Serial.println("Message sent");
             /* Increment request send counter for further entries of this function */
             lastSendTime = millis();
         }

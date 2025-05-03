@@ -31,7 +31,7 @@ public:
 
     RcRequest& operator=(RcRequest& other);
 
-    uint8_t getSize();
+    uint16_t getSize();
     uint8_t getRequestId();
     uint64_t getRequestNodeMAC();
     uint8_t getRequestType();

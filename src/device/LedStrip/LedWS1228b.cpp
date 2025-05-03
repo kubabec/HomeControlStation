@@ -82,7 +82,6 @@ void LedWS1228bDeviceType::cyclic(){
     if(switchOffAnimation != nullptr){
         if(millis() - animationProcessTime > 60){
             if(switchOffAnimation->isInProgress()){
-                Serial.println("Processing off animation");
                 switchOffAnimation->process();
                 applyVirtualToRealDiodes();
             }else {
@@ -96,7 +95,6 @@ void LedWS1228bDeviceType::cyclic(){
     }else if(ongoingAnimation != nullptr){
         if(millis() - animationProcessTime > 60){
             if(ongoingAnimation->isInProgress()){
-                Serial.println("Processing ON animation");
                 ongoingAnimation->process();
                 applyVirtualToRealDiodes();
             }else{
@@ -310,6 +308,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
         case DEVSERVICE_GET_DETAILED_COLORS:
+            Serial.println("Advanced controls requested");
             if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
             {
                 getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));

@@ -27,6 +27,30 @@ void RemoteControlServer::deinit() {
 }
 
 void RemoteControlServer::init(){
+    /* Stub test code START */
+    // DeviceDescription fakeDescription;
+    // fakeDescription.deviceType = type_LED_STRIP;
+    // fakeDescription.macAddress = 765432;
+    // fakeDescription.deviceId = 1;
+    // fakeDescription.roomId = 2;
+    // fakeDescription.isEnabled = true;
+    // fakeDescription.deviceName = "FakeDevice";
+    // fakeDescription.customBytes[0] = 50; // Leds count 
+    // fakeDescription.customBytes[2] = 43; // average color R
+    // fakeDescription.customBytes[3] = 150; // average color G
+    // fakeDescription.customBytes[4] = 180; // average color B
+    
+    // RemoteNodeInformation fakeNode;
+    // fakeNode.numberOfDevices = 1;
+    // fakeNode.devicesCollection.push_back(fakeDescription);
+    // fakeNode.isDeviceCollectionCompleted = true;
+    // fakeNode.lastKeepAliveReceivedTime = millis();
+    // fakeNode.lastKnownNodeHash = 1000;
+
+    // remoteNodes.insert({765432, fakeNode});
+
+    /* Stub test code END */
+
     Serial.println("RemoteControlServer init ...");
     DataContainer::setSignalValue(
         CBK_REGISTER_RESPONSE_RECEIVER,
@@ -56,8 +80,15 @@ void RemoteControlServer::init(){
 }
 
 void RemoteControlServer::cyclic(){   
+    /* stub test code */
+    // auto pos = remoteNodes.find(765432);
+    // pos->second.lastKeepAliveReceivedTime = millis();
+    /*stub test code */
+
     /* did we receive any UDP ? */
+    
     if(!receivedBuffer.empty()){
+        // Serial.println("Starting processing of udp message");
         processUDPMessage(receivedBuffer.front());
         receivedBuffer.pop();
     }
@@ -91,6 +122,8 @@ void RemoteControlServer::cyclic(){
             /* it must be removed from pendign requests queue */
             pendingRequestsQueue.pop();
         }
+
+        // Serial.println("Pending request processing ongoing");
         
     }else {
         slaveMonitoringBlockedDueToRequestProcessing = false;
@@ -217,7 +250,7 @@ void RemoteControlServer::handleKeepAliveState() {
 
     std::vector <uint64_t> nodesToBeRemoved;
     for(auto& node: remoteNodes) {
-        if(millis() - node.second.lastKeepAliveReceivedTime > (10*TIME_TO_REPEAT_KEEP_ALIVE_REQEST)) {
+        if(millis() - node.second.lastKeepAliveReceivedTime > (3*TIME_TO_REPEAT_KEEP_ALIVE_REQEST)) {
             nodesToBeRemoved.push_back(node.first);
         }
         
@@ -283,8 +316,8 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector <uint64_t>& 
 }
 
 void RemoteControlServer::receiveUDP(MessageUDP& msg){
-    //Serial.println(" ->RCS Push to buffer receive UDP Message Id: " + String(msg.getId()));
-    receivedBuffer.push(msg);
+    /* Received UDP Message */
+    receivedBuffer.push(std::move(msg));
 }
 
 void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
@@ -313,6 +346,7 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
     if(msg.getId() == RC_RESPONSE)
     {
         /* Process RcResponse */
+        Serial.println("->Device Provider received response Id: " + String((int)msg.getId()));
         processReceivedRcResponse(msg);
         //Serial.println("<-RC_RESPONSE");
     }

@@ -17,7 +17,7 @@ uint8_t RcResponse::getResponseType()  { return responseType; }
 std::vector<uint8_t>& RcResponse::getData()  { return data; }
 
 
-uint8_t RcResponse::getSize() { 
+uint16_t RcResponse::getSize() { 
     size_t fixedSize = sizeof(responseId) + sizeof(responseNodeMAC) + sizeof(requestType) + sizeof(responseType) + sizeof(crc);
     // Rozmiar pola data (dynamiczny)
     size_t dataSize = data.size() ; // Zakładamy, że data jest wektorem uint8_t
@@ -31,8 +31,10 @@ void RcResponse::print() {
     Serial.println("macAddress: " + String((int)responseNodeMAC));
     Serial.println("requestType: " + String((int)requestType));
     Serial.println("responseType: " + String((int)responseType));
+    int i = 0;  
     for(auto& byte : data) {
         Serial.print((int)byte);
+        i++;
     }
     Serial.println("");
 
@@ -57,9 +59,7 @@ void RcResponse::pushData(uint8_t byte) {
 //wstawiamy wektor do wektora data
 void RcResponse::pushData(uint8_t* data, uint16_t size) {
     if(data != nullptr && size > 0 ){
-        for(uint16_t i = 0; i < size; ++i){
-            this->data.push_back(data[i]);
-        }
+        this->data.insert(this->data.end(), data, data + size);
     }
 }
 
@@ -87,10 +87,12 @@ bool RcResponse::fromByteArray(uint8_t* buffer, uint16_t size) {
     /* copy payload data if any */
     uint16_t payloadLength = size - (dataLengthBeforeDynamicPart + dataLengthAfterDynamicPart); 
     data.clear(); 
+    // Serial.println("Adding payload to Response ");
     for (uint16_t i = 0; i < payloadLength; i++) {
         data.push_back(buffer[offset + i]); 
     }
     offset += data.size();
+    // Serial.println("Added payload to Response ");
 
     /* copy last part */
     memcpy(&crc, &buffer[offset], sizeof(crc));   
@@ -103,7 +105,6 @@ bool RcResponse::toByteArray(uint8_t* buffer, uint16_t size) {
         return false; 
     }  
     crc = calculateCrc();
-    print();
 
     /* copy first part */
     uint16_t offset = 0;
@@ -120,6 +121,7 @@ bool RcResponse::toByteArray(uint8_t* buffer, uint16_t size) {
     offset += data.size();
     memcpy(&buffer[offset], &crc, sizeof(crc));    
 
+    // Serial.println("### Response toByteArray ###");
     return true;
 }
 
