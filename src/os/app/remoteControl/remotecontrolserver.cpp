@@ -96,6 +96,7 @@ void RemoteControlServer::cyclic(){
 
     /* is there anything we can send ? */
     if(!pendingRequestsQueue.empty()){
+        // Serial.println("Pending request processing ongoing");
         /* This call will return true as long as message is being processed, otherwise it will return false */
         if(processPendingRequest(pendingRequestsQueue.front()) == false){
             /* In this case processing returned true due to timeouted request */
@@ -250,7 +251,7 @@ void RemoteControlServer::handleKeepAliveState() {
 
     std::vector <uint64_t> nodesToBeRemoved;
     for(auto& node: remoteNodes) {
-        if(millis() - node.second.lastKeepAliveReceivedTime > (3*TIME_TO_REPEAT_KEEP_ALIVE_REQEST)) {
+        if(millis() - node.second.lastKeepAliveReceivedTime > (6*TIME_TO_REPEAT_KEEP_ALIVE_REQEST)) {
             nodesToBeRemoved.push_back(node.first);
         }
         
@@ -267,7 +268,7 @@ void RemoteControlServer::handleKeepAliveState() {
             notif.title = "Node disconnected";
             notif.body = "Node with MAC" + String(MAC) + " disconnected.";
             notif.type = UserInterfaceNotification::WARNING;
-            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+            // std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
 
         updateDeviceDescriptionSignal();
@@ -346,7 +347,7 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
     if(msg.getId() == RC_RESPONSE)
     {
         /* Process RcResponse */
-        Serial.println("->Device Provider received response Id: " + String((int)msg.getId()));
+        Serial.println("->Device Provider received Message with ID: " + String((int)msg.getId()));
         processReceivedRcResponse(msg);
         //Serial.println("<-RC_RESPONSE");
     }
@@ -565,6 +566,7 @@ bool RemoteControlServer::processPendingRequest(RcRequest& request){
 
 
     slaveMonitoringBlockedDueToRequestProcessing = true;
+    // Serial.println("RCServer| Processing request with ID "+ String((int)request.getRequestId()));
     return requestProcessor.processReqest(request);
 }
 
@@ -639,7 +641,8 @@ uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 
     /* Creating new request */
     Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));
-    pendingRequestsQueue.push(newRequest);
+    pendingRequestsQueue.push(std::move(newRequest));
+    // Serial.println("RCServer| Request with ID "+ String((int)newRequest.getRequestId()) + " added to the queue");
 
     return newRequest.getRequestId();
 }

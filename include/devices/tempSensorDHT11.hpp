@@ -1,5 +1,9 @@
 #ifndef TEMP_SENSOR_DHT11_TYPE_H
 #define TEMP_SENSOR_DHT11_TYPE_H
+#include <SystemDefinition.hpp>
+#ifdef TEMP_SENSOR_SUPPORTED
+
+
 #include "devices/Device.hpp"
 #include "Arduino.h"
 #include <DHT.h>
@@ -34,5 +38,7 @@ public:
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set3 param);
 };
+
+#endif
 
 #endif

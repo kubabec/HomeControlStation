@@ -143,8 +143,8 @@ uint16_t RcResponse::calculateCrc()
 
 bool RcResponse::isValid()
 {
-    Serial.println("CRC:| "+ String((int)crc));
-    Serial.println("CRC:| "+ String((int)calculateCrc()));
+    // Serial.println("CRC:| "+ String((int)crc));
+    // Serial.println("CRC:| "+ String((int)calculateCrc()));
     return (crc == calculateCrc());
 }
 

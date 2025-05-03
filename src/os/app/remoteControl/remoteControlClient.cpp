@@ -62,13 +62,13 @@ void RemoteControlClient::processPendingTxData()
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     switch(msg.getId()) {
         case RC_REQUEST:
-            Serial.println("-> Dostałem UDP type RC_REQUEST");
+            // Serial.println("-> Dostałem UDP type RC_REQUEST");
             processGenericRequest(msg);
             
             break;
 
         case REQUEST_NODE_INITIAL_DATA:
-            Serial.println("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
+            // Serial.println("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
             sendInitialDataResponse();
 
 

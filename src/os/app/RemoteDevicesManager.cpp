@@ -213,8 +213,8 @@ void RemoteDevicesManager::handleService3Response(RcResponse& response, DeviceDe
 
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
-    Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
-    response.print();
+    // Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
+    // response.print();
 
     /* TODO : 
     - unpack the response success code ,
@@ -236,7 +236,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
             responseDeviceDescription.macAddress = response.getResponseNodeMAC();
  
             /* We need explicit handling for serviceCall_3 where memory is exchanged */
-            if(localCopyOfLastOverloading == serviceCall_3){
+            if(localCopyOfLastOverloading == serviceCall_3 && localCopyOfLastActiveRequestParamSet3.direction == e_OUT_from_DEVICE){
                 handleService3Response(response, responseDeviceDescription);
             }
 
@@ -499,15 +499,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
             {
                 /* Data provided under service memory must be sent to the device*/
                 request.pushData((byte*) param.buff, param.size);
-
-                
-            }else if (param.direction == e_IN_to_DEVICE){
-                /* we must now expect memory space in response */
             }
-
-            request.print();
-
-            param.print();
 
             try{
                 /* Pass request for processing to RCServer */
@@ -528,6 +520,8 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 /* Change request processing state to IN PROGRESS, this state will be 
                 set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
                 requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+
+                Serial.println("RDM : //// Request with serviceCall_3 sent, waiting for the response");
 
                 /* RDM starts to wait for the response */
                 return SERV_PENDING;

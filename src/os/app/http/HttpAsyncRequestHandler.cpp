@@ -122,6 +122,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
             break;
         case SERV_PENDING:
             /* We are waiting for the response, service must be polled */
+            // Serial.println("HTTPAsyncRequestHandler: Request call returned PENDING");
             currentRequest.state = ASYNC_REQUEST_PROCESSING;
             break;
         case SERV_BUSY:

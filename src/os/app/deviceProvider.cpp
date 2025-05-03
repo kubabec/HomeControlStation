@@ -191,9 +191,8 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest& request
 
     memcpy(&param, &request.getData().at(2), sizeof(ServiceParameters_set3));
 
-    param.print();
+    if(param.direction == e_OUT_from_DEVICE){ /* we are expecting some data from the device to be provided in the response */
 
-    if(param.direction == e_OUT_from_DEVICE){
         /* replace remote address of the memory with local RAM */
         uint8_t* memoryAbstraction = (uint8_t*) malloc(param.size);
 
@@ -237,6 +236,44 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest& request
             return SERV_GENERAL_FAILURE;
         }
 
+    }else if (param.direction == e_IN_to_DEVICE) { /* we are expecting some data inside of the request to be sent to the device */
+        
+        /* we must copy data from the request to the param structure */
+        if(payloadSize < (sizeof(ServiceParameters_set3) + param.size + MINIMAL_PAYLOAD_SIZE)) {
+            Serial.println("Payload size too small for set1");
+            response.setResponseType((uint8_t) INVALID_REQ_RESP);
+            sendResponse(response);
+            return SERV_GENERAL_FAILURE;
+        }
+        
+        param.buff = (uint8_t*) malloc(param.size); 
+        if(param.buff == nullptr) {
+            Serial.println("Unable to allocate memory for set3");
+            response.setResponseType((uint8_t) INVALID_REQ_RESP);
+            sendResponse(response);
+            return SERV_GENERAL_FAILURE;
+        }
+        memcpy(param.buff, &request.getData().at(2 + sizeof(ServiceParameters_set3)), param.size);
+        /* call the service */
+        result = (std::any_cast <DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set3(
+            devicedetails.originalID,
+            (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
+            param
+        );
+
+        free(param.buff);
+
+        if(result == SERV_SUCCESS) {
+            response.setResponseType((uint8_t) POSITIVE_RESP);
+            addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
+            sendResponse(response);
+            return SERV_SUCCESS;
+        }else {
+            Serial.println("Problem with service call");
+            response.setResponseType((uint8_t) INVALID_REQ_RESP);
+            sendResponse(response);
+            return SERV_GENERAL_FAILURE;
+        }
     }
 
     return result;
@@ -307,6 +344,7 @@ bool DeviceProvider::receiveRequest(RcRequest& request) {
                     addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
                 }
                 
+                sendResponse(response);
                 break;
             
             

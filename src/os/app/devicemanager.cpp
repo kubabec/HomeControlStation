@@ -9,7 +9,9 @@ std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 #ifdef LED_STRIP_SUPPORTED
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
 #endif
+#ifdef TEMP_SENSOR_SUPPORTED
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
+#endif
 
 
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
@@ -120,10 +122,12 @@ void DeviceManager::init()
         }
 #endif
 
+#ifdef TEMP_SENSOR_SUPPORTED
         /* Add temperature sensors to common devices vector*/
         for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
             devices.push_back(&device);
         }
+#endif
     }
 
     if(devices.size() > 0){
@@ -313,8 +317,10 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 break;
 
                 case e_TEMP_SENSOR:
+#ifdef TEMP_SENSOR_SUPPORTED
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                     isValidDeviceGiven = true;
+#endif
                 break;
 
                 default:break;

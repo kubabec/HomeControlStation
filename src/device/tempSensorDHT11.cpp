@@ -1,5 +1,7 @@
 #include "devices/tempSensorDHT11.hpp"
 
+#ifdef TEMP_SENSOR_SUPPORTED
+
 TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData)
 {
     isOn = false;
@@ -100,3 +102,5 @@ DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription()
     // desc.customBytes[3] = 73; // average color G
     return desc;
 }
+
+#endif

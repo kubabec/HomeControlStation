@@ -168,6 +168,10 @@ void WiFiAdapter::enableMDNSResponder(){
     if (!MDNS.begin(hostName.c_str())) {
         Serial.println("Error setting up MDNS responder!");
     } else {
+        DataContainer::setSignalValue(
+            SIG_IP_ADDRESS_STRING,
+            static_cast<String>(hostName + String(".local"))
+        );
         Serial.println("mDNS responder started with hostname: " + hostName + ".local");
     }
 }

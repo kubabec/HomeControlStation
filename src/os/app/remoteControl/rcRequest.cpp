@@ -127,7 +127,7 @@ bool RcRequest::toByteArray(uint8_t* buffer, uint16_t size) {
 
 void RcRequest::calculateCrc() {
     crc = requestId + targetNodeMAC + targetDeviceId + requestType + requestSendCount;
-    for (uint8_t i = 0; i < data.size(); i++) {
+    for (uint16_t i = 0; i < data.size(); i++) {
         crc += data[i];
     }
     
@@ -139,7 +139,7 @@ void RcRequest::print() {
     Serial.println("Target Device ID: " + String((int)targetDeviceId));
     Serial.println("Request Type: " + String((int)requestType));
     Serial.println("Data: ");
-    for (uint8_t i = 0; i < data.size(); i++) {
+    for (uint16_t i = 0; i < data.size(); i++) {
         Serial.print((int)data[i]);
         Serial.print(" ");
     }
