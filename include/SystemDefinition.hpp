@@ -4,7 +4,7 @@
 
 #define LED_STRIP_SUPPORTED
 #define ON_OFF_SUPPORTED
-// #define TEMP_SENSOR_SUPPORTED
+#define TEMP_SENSOR_SUPPORTED
 
 
 #endif

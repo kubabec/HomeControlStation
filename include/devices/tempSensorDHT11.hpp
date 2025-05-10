@@ -16,8 +16,8 @@ class TempSensorDHT11DeviceType : public Device
     uint8_t deviceId;
     String deviceName;
     uint8_t roomId;
-    float currentTemp = -10.f;
-    uint8_t currentHumid = 0.f;
+    float currentTemp = 255.f;
+    uint8_t currentHumid = 255;
 
     long lastDataUpdateTime = 0;
 

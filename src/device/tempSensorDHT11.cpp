@@ -11,11 +11,22 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     roomId = nvmData.roomId;
 
     dht = new DHT(pinNumber, DHT11);
+    Serial.println("DHT11 device id: " + String((int)deviceId) + ", pin: " + String(pinNumber));
 
+    
     dht->begin();
 
-    currentHumid = dht->readHumidity();
-    currentTemp = dht->readTemperature();
+    float h = dht->readHumidity();
+    float t = dht->readTemperature();
+    if(!isnan(t))
+    {
+        currentTemp = t;
+        Serial.println("Temp: " + String(currentTemp));
+    }
+    if(!isnan(h)){
+        currentHumid = (int)h;
+        Serial.println("Humidity: " + String(currentHumid));
+    }
 }
 
 void TempSensorDHT11DeviceType::init()
@@ -27,16 +38,25 @@ void TempSensorDHT11DeviceType::cyclic()
 
     if (millis() - lastDataUpdateTime > 4000)
     {
-        currentHumid = dht->readHumidity();
+        float h = dht->readHumidity();
         float t = dht->readTemperature();
         if(!isnan(t))
         {
             currentTemp = t;
+            Serial.println("Temp: " + String(currentTemp));
+        }else {
+            Serial.println("Failed to read temperature");
+        }
+        if(!isnan(h)){
+            currentHumid = (int)h;
+            Serial.println("Humidity: " + String(currentHumid));
+        }else {
+            Serial.println("Failed to read humidity");
         }
 
         lastDataUpdateTime = millis();
 
-        Serial.println("Temp: " + String(currentTemp));
+        // Serial.println("Temp: " + String(currentTemp));
     }
 }
 
