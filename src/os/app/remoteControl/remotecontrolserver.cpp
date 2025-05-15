@@ -538,11 +538,9 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
 void RemoteControlServer::updateDeviceDescriptionSignal() {
     std::vector<DeviceDescription> mergedTunneledDevices;
     for(auto& remoteNode : remoteNodes) {
-        for(auto remoteNode : remoteNodes) {
-            for(auto device : remoteNode.second.devicesCollection) {
-                mergedTunneledDevices.push_back(device);
-            }
-        }   
+        for(auto device : remoteNode.second.devicesCollection) {
+            mergedTunneledDevices.push_back(device);
+        }
     }
     DataContainer::setSignalValue(
         SIG_RC_DEVICES_INTERNAL_TUNNEL, 
