@@ -600,13 +600,14 @@ void HomeLightHttpServer::handleClientRequest()
               Serial.println("Processing link...");
               processLinkRequestData(client);
             
-
-              client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
               client.println("<script>\
                 setInterval(getNotifications, 10000);\
               </script>");
 
-              client.println("</div></body></html>");            
+              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.0</p></footer>");
+
+              client.println("</div>");
+              client.println("</body></html>");            
               client.println();
               break;
 
