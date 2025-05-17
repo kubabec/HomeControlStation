@@ -6,6 +6,7 @@ const char* renderRoomsJS = "\
 <script>\
 function renderRooms(data) {\
     const roomsContainer = document.getElementById('rooms');\
+    const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
 \
     roomsContainer.innerHTML = '';\
 \
@@ -34,6 +35,13 @@ function renderRooms(data) {\
                 loadingOverlay.appendChild(spinner);\
                 loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
+                const faviconImageMain = document.createElement('div');\
+                faviconImageMain.className = 'device-left';\
+                const faviconImg = document.createElement('img');\
+                faviconImg.className = 'device-icon';\
+                faviconImg.src = faviconUrl + '1.png?raw=true';\
+                faviconImageMain.appendChild(faviconImg);\
+                deviceContainer.appendChild(faviconImageMain);\
                 \
                 const header = document.createElement('div');\
                 header.className = 'header';\
@@ -97,6 +105,13 @@ if(device.hasBrightness == 1){\
                 loadingOverlay.appendChild(spinner);\
                 loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
+                const faviconImageMain = document.createElement('div');\
+                faviconImageMain.className = 'device-left';\
+                const faviconImg = document.createElement('img');\
+                faviconImg.className = 'device-icon';\
+                faviconImg.src = faviconUrl + '2.png?raw=true';\
+                faviconImageMain.appendChild(faviconImg);\
+                deviceContainer.appendChild(faviconImageMain);\
                 \
                 const header = document.createElement('div');\
                 header.className = 'header';\
@@ -110,7 +125,6 @@ if(device.hasBrightness == 1){\
 \
                 const colorPicker = document.createElement('div');\
                 colorPicker.className = 'color-picker';\
-                loadingText.textContent = 'Loading...';\
 \
                 const colorDisplay = document.createElement('div');\
                 colorDisplay.className = `color-display ${device.status}`;\
@@ -154,6 +168,13 @@ if(device.hasBrightness == 1){\
                 loadingOverlay.appendChild(spinner);\
                 loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
+                const faviconImageMain = document.createElement('div');\
+                faviconImageMain.className = 'device-left';\
+                const faviconImg = document.createElement('img');\
+                faviconImg.className = 'device-icon';\
+                faviconImg.src = faviconUrl + '3.png?raw=true';\
+                faviconImageMain.appendChild(faviconImg);\
+                deviceContainer.appendChild(faviconImageMain);\
                 \
                 const header = document.createElement('div');\
                 header.className = 'header';\
