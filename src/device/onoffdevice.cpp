@@ -270,11 +270,10 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
 int OnOffDevice::mapBrightness(int brightness) {
     if(activeLow) {
         // Dla urządzeń aktywowanych LOW (0V = włączone)
-        return map(brightness, 0, 100, 255, 0);
-        
+        return 255 - (brightness * 255) / 100;
     } else {
         // Dla urządzeń aktywowanych HIGH (3.3V/5V = włączone)
-        return map(brightness, 0, 100, 180, 250);
+        return (brightness * 255) / 100;
     }
 }
 
