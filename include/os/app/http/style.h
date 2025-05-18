@@ -153,7 +153,7 @@ transform: translateY(20px);\
 animation: fadeInSlide 2s forwards;\
 transition: background-color 0.3s, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;\
 overflow: hidden;\
-max-height: 500px;\
+max-height: 600px;\
 }\
 .device-container.disabled {\
 background-color: #f2f2f2;\

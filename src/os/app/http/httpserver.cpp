@@ -867,15 +867,23 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 
   
 
-  client.println("<label>Min PWM value (0-255):");
-  client.println("<input type=\"number\" id=\"pwmMin-"+String((int)slotNumber)+"\" min=\"0\" max=\"255\" value=\""+
-    String((int)slot.customBytes[4])+"\">");
-  client.println("</label>");
+  client.println("<label>Min PWM:");
+  //client.println("<input type=\"text\" id=\"pwmMin-"+String((int)slotNumber)+"\" value=\""+ String((int)slot.customBytes[2])+"\">");
 
-  client.println("<label>Max PWM value (0-255):");
-  client.println("<input type=\"number\" id=\"pwmMax-"+String((int)slotNumber)+"\" min=\"0\" max=\"255\" value=\""+
-    String((int)slot.customBytes[5])+"\">");
+  client.println("<input id=\"pwmMin-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[2]) +"\" >");
+
   client.println("</label>");
+ 
+
+  client.println("<label>Max PWM:");
+  //client.println("<input type=\"text\" id=\"pwmMax-"+String((int)slotNumber)+"\" value=\""+
+  //  String((int)slot.customBytes[3])+"\">");
+
+    client.println("<input id=\"pwmMax-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[3]) +"\" >");
+    
+  client.println("</label>");
+  
+  
 
 
 
@@ -909,8 +917,8 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 
   client.println("<label>Current limiter</label>");
   client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\"10\">% ");
-  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value='");
-  client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
+  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
+  //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   client.println("</label>");
 
   client.println("</div>");
