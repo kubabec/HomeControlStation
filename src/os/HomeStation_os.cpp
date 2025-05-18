@@ -14,10 +14,31 @@ SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NON
 
 long long uiBlockTime = 0;
 
+static void displayRamUsage()
+{
+    size_t free_total = esp_get_free_heap_size();
+    Serial.printf("Free heap total: %u bytes\n", free_total);
+
+    // 2. Wolna pamięć o określonych właściwościach (np. DRAM/IRAM/SPIRAM):
+    size_t free_dram = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+    size_t free_spiram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    Serial.printf("Free DRAM: %u bytes\n", free_dram);
+    Serial.printf("Free SPIRAM: %u bytes\n", free_spiram);
+
+    // 3. Największy możliwy blok do zaalokowania w DRAM:
+    size_t max_block = heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT);
+    Serial.printf("Max single DRAM block: %u bytes\n", max_block);
+
+    // 4. Dla porównania: minimalny stan wolnego heap od resetu
+    size_t min_free_ever = heap_caps_get_minimum_free_size(MALLOC_CAP_DEFAULT);
+    Serial.printf("Minimum ever free DRAM: %u bytes\n", min_free_ever);
+}
+
 void OperatingSystem::init()
 {
     pinMode(0, INPUT_PULLUP);
     uniqueLifecycleId = (uint16_t)random(10, 10000);
+    DataContainer::setSignalValue(CBK_DISPLAY_RAM_USAGE, static_cast<std::function<void()>>(displayRamUsage));
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void(uint16_t)>>(OperatingSystem::reset));
     DataContainer::setSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH, static_cast<std::function<uint16_t()>>(OperatingSystem::calculateRuntimeNodeHash));

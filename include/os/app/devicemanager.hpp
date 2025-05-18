@@ -28,7 +28,9 @@ class DeviceManager
 #ifdef LED_STRIP_SUPPORTED
     static std::vector<LedWS1228bDeviceType> ledws2812bDevices;
 #endif
+#ifdef TEMP_SENSOR_SUPPORTED
     static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
+#endif
 
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
     static ExtendedDataAllocator extDataAllocator;

@@ -1,5 +1,6 @@
 #include "devices/tempSensorDHT11.hpp"
 
+#ifdef TEMP_SENSOR_SUPPORTED
 
 TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData)
 {
@@ -9,71 +10,105 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
 
-    currentHumid = nvmData.deviceId + 23;
-    currentTemp = nvmData.deviceId - 7;
+    dht = new DHT(pinNumber, DHT11);
+    Serial.println("DHT11 device id: " + String((int)deviceId) + ", pin: " + String(pinNumber));
+
+    
+    dht->begin();
+
+    float h = dht->readHumidity();
+    float t = dht->readTemperature();
+    if(!isnan(t))
+    {
+        currentTemp = t;
+        Serial.println("Temp: " + String(currentTemp));
+    }
+    if(!isnan(h)){
+        currentHumid = (int)h;
+        Serial.println("Humidity: " + String(currentHumid));
+    }
 }
 
-void TempSensorDHT11DeviceType::init(){
-
+void TempSensorDHT11DeviceType::init()
+{
 }
 
-void TempSensorDHT11DeviceType::cyclic(){
+void TempSensorDHT11DeviceType::cyclic()
+{
 
-    if(millis() - lastDataUpdateTime > 4000){
-        if(currentHumid < 100){
-            currentHumid++;
+    if (millis() - lastDataUpdateTime > 4000)
+    {
+        float h = dht->readHumidity();
+        float t = dht->readTemperature();
+        if(!isnan(t))
+        {
+            currentTemp = t;
+            Serial.println("Temp: " + String(currentTemp));
         }else {
-            currentHumid = 0;
+            Serial.println("Failed to read temperature");
         }
-
-        if(currentTemp < 40.f){
-            currentTemp += 0.5f;
+        if(!isnan(h)){
+            currentHumid = (int)h;
+            Serial.println("Humidity: " + String(currentHumid));
         }else {
-            currentTemp = -10.f;
+            Serial.println("Failed to read humidity");
         }
 
         lastDataUpdateTime = millis();
-    }
 
+        // Serial.println("Temp: " + String(currentTemp));
+    }
 }
 
-uint16_t TempSensorDHT11DeviceType::getExtendedMemoryLength(){
+uint16_t TempSensorDHT11DeviceType::getExtendedMemoryLength()
+{
     return 0;
 }
 
-uint8_t TempSensorDHT11DeviceType::getDeviceIdentifier(){
+uint8_t TempSensorDHT11DeviceType::getDeviceIdentifier()
+{
     return deviceId;
 }
-uint8_t TempSensorDHT11DeviceType::getDeviceType(){
+uint8_t TempSensorDHT11DeviceType::getDeviceType()
+{
     return type_TEMP_SENSOR;
 }
 
-ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType){
-    switch(serviceType){
-        default: 
-            return SERV_NOT_SUPPORTED;
+ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType)
+{
+    switch (serviceType)
+    {
+    default:
+        return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
-    switch(serviceType){
-        default: 
-            return SERV_NOT_SUPPORTED;
+ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param)
+{
+    switch (serviceType)
+    {
+    default:
+        return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
-    switch(serviceType){
-        default: 
-            return SERV_NOT_SUPPORTED;
+ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set2 param)
+{
+    switch (serviceType)
+    {
+    default:
+        return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
-    switch(serviceType){
-        default: 
-            return SERV_NOT_SUPPORTED;
+ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param)
+{
+    switch (serviceType)
+    {
+    default:
+        return SERV_NOT_SUPPORTED;
     };
 }
 
-DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription(){
+DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription()
+{
     DeviceDescription desc;
     desc.deviceType = getDeviceType();
     desc.deviceId = getDeviceIdentifier();
@@ -84,6 +119,8 @@ DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription(){
 
     desc.customBytes[2] = currentHumid; // humidity
     memcpy(&desc.customBytes[3], &currentTemp, sizeof(currentTemp));
-    //desc.customBytes[3] = 73; // average color G
+    // desc.customBytes[3] = 73; // average color G
     return desc;
 }
+
+#endif

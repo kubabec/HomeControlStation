@@ -25,6 +25,7 @@ class LedWS1228bDeviceType : public Device {
     LedColor* stripContent[4];
     LedColor averagedColors[4] = {0};
     bool isContentInitialized = false;
+    bool isInversedOrder = false;
     bool isOn = false; //stan urzadzenia
     uint16_t diodesCount = 0;
     uint8_t virtualDiodesCount = 255;
@@ -39,7 +40,7 @@ class LedWS1228bDeviceType : public Device {
     ILedAnimation* switchOffAnimation = nullptr;
 
     void applyVirtualToRealDiodes();
-    void setHwLedStripColor(uint8_t virtualLedIndex);
+    void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
     public:
     LedWS1228bDeviceType(DeviceConfigSlotType nvmData);
 

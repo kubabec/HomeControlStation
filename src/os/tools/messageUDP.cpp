@@ -118,12 +118,10 @@ bool MessageUDP::pushData(byte* arr, size_t size)
 {
     if(arr != nullptr)
     {
-        /* Go through passed buffer */
-        for(int i = 0; i < size; ++i)
-        {
-            /* Push each byte to the buffer */
-            dataBuffer.push_back(arr[i]);
-        }
+
+        //dataBuffer.reserve(dataBuffer.size() + size);
+        dataBuffer.insert(dataBuffer.end(), arr, arr + size);
+        // Serial.println("MessageSize : " + String((int)dataBuffer.size()) + " bytes");
 
         /* Update total size */
         updateTotalSize();
@@ -230,12 +228,12 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
             returnedMessage.ipAddress = tmpAddr;
             returnedMessage.udpPort = tmpPort;
             
-            uint8_t dataOnlySize = tmpSize - (getMinimumSize() * sizeof(uint8_t));
+            uint16_t dataOnlySize = tmpSize - (getMinimumSize() * sizeof(uint8_t));
 
             if(dataOnlySize > 0){
                 returnedMessage.dataBuffer.reserve(dataOnlySize);
 
-                for(uint8_t i = 14; i < vec.size() - 1; i ++)
+                for(uint16_t i = 14; i < vec.size() - 1; i ++)
                 {
                     returnedMessage.dataBuffer.push_back(vec.at(i));
                 }

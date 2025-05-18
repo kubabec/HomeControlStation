@@ -600,13 +600,14 @@ void HomeLightHttpServer::handleClientRequest()
               Serial.println("Processing link...");
               processLinkRequestData(client);
             
-
-              client.println("<div class=\"project-name\">Home Control Station<br>v1.0</div>");
               client.println("<script>\
                 setInterval(getNotifications, 10000);\
               </script>");
 
-              client.println("</div></body></html>");            
+              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.0</p></footer>");
+
+              client.println("</div>");
+              client.println("</body></html>");            
               client.println();
               break;
 
@@ -811,7 +812,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelStart);
   client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
   value=\""+ String((int)slot.pinNumber) +"\">");
-  const std::array<int, 29> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,12,13,14,27,26,25,33,32,35,34,15,18,19,21,39,40,41,42};
+  const std::array<int, 32> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,12,13,14,22,23,24,27,26,25,33,32,35,34,15,18,19,21,39,40,41,42};
 
   for(auto& val : pinsAllowed){
     String pinStr = "";
@@ -895,11 +896,11 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("<label>Sides flip:");
   client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
   if(slot.customBytes[2]){
-    client.println("<option value=\"0\" >No flip</option>");
-    client.println("<option value=\"1\" selected>Last diode is strip begin</option>");
+    client.println("<option value=\"0\" >Not inversed</option>");
+    client.println("<option value=\"1\" selected>Inversed</option>");
   }else {
-    client.println("<option value=\"0\" selected>No flip</option>");
-    client.println("<option value=\"1\">Last diode is strip begin</option>");
+    client.println("<option value=\"0\" selected>Not inversed</option>");
+    client.println("<option value=\"1\">Inversed</option>");
   }
   client.println("</select>");
 

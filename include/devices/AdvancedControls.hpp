@@ -10,7 +10,6 @@ struct AdvancedControlsOnOff{
         ONOFF_BLINK
     };
 
-
     uint8_t switchOnAnimation = OnOffAnimations::ONOFF_SWITCH;
     uint8_t switchOffAnimation = OnOffAnimations::ONOFF_SWITCH;
     uint16_t switchAnimationTime = 0;

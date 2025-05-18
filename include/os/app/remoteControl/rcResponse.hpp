@@ -34,7 +34,7 @@ public:
     uint8_t getRequestType() ;
     uint8_t getResponseType() ;
     std::vector<uint8_t>& getData() ;
-    uint8_t getSize();
+    uint16_t getSize();
     void print() ;
 
     void pushData(uint8_t byte);

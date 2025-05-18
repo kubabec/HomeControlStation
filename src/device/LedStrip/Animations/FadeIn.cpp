@@ -24,12 +24,14 @@ void FadeInAnimation::initialize(
     }
 }
 
-void FadeInAnimation::start(){
+void FadeInAnimation::start(bool startFromZero = false){
     if(isInitialized()){
         //memset(animationBuffer, 0, sizeof(LedColor)*ledsCount);
         /* save target values in the buffer */
         memcpy(animationBuffer, colorValues, ledsCount*sizeof(LedColor)); 
-        memset(colorValues, 0, sizeof(LedColor) * ledsCount);
+        if(startFromZero){
+            memset(colorValues, 0, sizeof(LedColor) * ledsCount);
+        }
         inProgress = true;
     }
 }
@@ -65,8 +67,12 @@ bool FadeInAnimation::processColor(FadeInColor color, uint16_t diodeIndex){
         default: break;
     }
 
+    /* increment or decrement color ? */
+    const int increment = (*targetLedColor < *bufferColor) ? COLOR_INCR_STEP : -COLOR_INCR_STEP;
+    
+
     if(bufferColor != nullptr && targetLedColor != nullptr){
-        int target = (*targetLedColor + COLOR_INCR_STEP) < *bufferColor ? (*targetLedColor + COLOR_INCR_STEP) : *bufferColor;
+        int target = abs(*targetLedColor - *bufferColor) > abs(increment) ? (*targetLedColor + increment) : *bufferColor;
         if(target == *bufferColor){
             retVal = true; /* color change completed */
         }

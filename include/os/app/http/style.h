@@ -642,6 +642,29 @@ transform: rotate(360deg);\
   pointer-events: none; \
   user-select: none; \
 }\
+.device-left {\
+display: flex;\
+align-items: center;\
+}\
+.device-icon {\
+width: 32px;\
+height: 32px;\
+margin-left:-10px;\
+margin-top:5px;\
+margin-right: 12px;\
+position:absolute;\
+}\
+footer {\
+	text-align: center;\
+	font-size: 9px;\
+	color:rgb(12, 119, 152);\
+	padding: 8px 0;\
+}\
+footer a {\
+	color: rgb(11, 94, 119);\
+	text-decoration: none;\
+	margin: 0 4px;\
+}\
 </style>\
 ";
 

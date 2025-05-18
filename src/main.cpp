@@ -37,5 +37,4 @@ void loop() {
     OperatingSystem::task1s();
     task1sCounter = millis();
   }  
-  delay(1);
 }

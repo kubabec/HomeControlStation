@@ -122,6 +122,7 @@ void HTTPAsyncRequestHandler::createServiceCall()
             break;
         case SERV_PENDING:
             /* We are waiting for the response, service must be polled */
+            // Serial.println("HTTPAsyncRequestHandler: Request call returned PENDING");
             currentRequest.state = ASYNC_REQUEST_PROCESSING;
             break;
         case SERV_BUSY:
@@ -154,7 +155,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls(){
     /* Copy device ID from request parameters */
     memcpy(&deviceId, currentRequest.requestData, sizeof(deviceId));
 
-    Serial.println("Requesting controls for id " + String((int)deviceId));
+    // Serial.println("Requesting controls for id " + String((int)deviceId));
     /* call loading processing function */
     ServiceRequestErrorCode errorCode = 
         AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);

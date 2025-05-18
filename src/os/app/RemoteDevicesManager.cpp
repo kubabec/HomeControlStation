@@ -8,6 +8,10 @@ RemoteDevicesManager::ServiceCallFingerprint RemoteDevicesManager::currentReques
 ServiceRequestErrorCode RemoteDevicesManager::currentRequestRespErrorCode;
 uint8_t RemoteDevicesManager::awaitingResponseId = 255;
 
+
+ServiceParameters_set3 localCopyOfLastActiveRequestParamSet3;
+ServiceOverloadingFunction localCopyOfLastOverloading = serviceCall_INVALID;
+
 void RemoteDevicesManager::init()
 {
     Serial.println("RemoteDevicesManager init ...");
@@ -173,9 +177,44 @@ void RemoteDevicesManager::printTranslationMap() {
 }
 
 
+void RemoteDevicesManager::handleService3Response(RcResponse& response, DeviceDescription& responseDeviceDescription)
+{
+    /* we are expecting some data from the device */
+    if(localCopyOfLastActiveRequestParamSet3.direction == e_OUT_from_DEVICE){
+        /* Ensure that we received enough information from the slave in response , 
+        which means there are bytes expected in request.size */
+        if(response.getData().size() >= 
+            (responseDeviceDescription.getSize() + 
+            sizeof(uint16_t) + 
+            localCopyOfLastActiveRequestParamSet3.size)){ 
+
+
+                auto pointerToDynamicMemory = &(response.getData().at(responseDeviceDescription.getSize() + sizeof(uint16_t)));
+
+                memcpy(
+                    localCopyOfLastActiveRequestParamSet3.buff,
+                    pointerToDynamicMemory,
+                    localCopyOfLastActiveRequestParamSet3.size
+                );
+
+
+                localCopyOfLastActiveRequestParamSet3.size = 0;
+                localCopyOfLastActiveRequestParamSet3.direction = e_UNKNOWN_PARAM_DIRECTION;
+                localCopyOfLastOverloading = serviceCall_INVALID;
+        }else {
+            Serial.println("RDM : //// Received serviceCall_3 response, OUT from device, not enough data");
+            Serial.println("received data size: " + String(response.getData().size()));
+            Serial.println("expected data size: " + String(responseDeviceDescription.getSize() + sizeof(uint16_t) + localCopyOfLastActiveRequestParamSet3.size));
+        }
+    }
+
+}
+
+
 bool RemoteDevicesManager::receiveResponse(RcResponse& response)
 {
-    Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
+    // Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
+    // response.print();
 
     /* TODO : 
     - unpack the response success code ,
@@ -183,7 +222,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
     - Update node hash
     */
    /* did we receive response for which we are waiting? */
-    if(awaitingResponseId == response.getResponseId()){
+    if(awaitingResponseId == response.getResponseId() && (response.getResponseType() != INVALID_REQ_RESP)){
         
         DeviceDescription responseDeviceDescription;
         if(response.getData().size() >= (responseDeviceDescription.getSize() + sizeof(uint16_t))){
@@ -195,11 +234,11 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
             responseDeviceDescription.fromByteArray(response.getData().data(), responseDeviceDescription.getSize());
             memcpy(&responseNodeHash, (response.getData().data() + responseDeviceDescription.getSize() ), sizeof(uint16_t));
             responseDeviceDescription.macAddress = response.getResponseNodeMAC();
-
-            Serial.println("RDM : //// Received following description and hash");
-            responseDeviceDescription.print();
-            Serial.println("Hash: " +String((int)responseNodeHash));
-            /* inform RcServer, that slave's device description and nodeHash changed */
+ 
+            /* We need explicit handling for serviceCall_3 where memory is exchanged */
+            if(localCopyOfLastOverloading == serviceCall_3 && localCopyOfLastActiveRequestParamSet3.direction == e_OUT_from_DEVICE){
+                handleService3Response(response, responseDeviceDescription);
+            }
 
             std::any_cast<std::function<void(DeviceDescription&, uint16_t)>>(
                 DataContainer::getSignalValue(CBK_UPDATE_RC_SLAVE_INFORMATION)) (
@@ -208,6 +247,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
                 );
 
             currentRequestRespErrorCode = (response.getResponseType() == POSITIVE_RESP) ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+            Serial.println("RDM : //// Received response with error code: " + String((int)currentRequestRespErrorCode));
 
         }else {
             Serial.println("Invalid data lenght received from remote slave, returning GENERAL_FAILURE");
@@ -216,6 +256,10 @@ bool RemoteDevicesManager::receiveResponse(RcResponse& response)
         }
 
         requestProcessingState = RDM_REQUEST_COMPLETED;
+    }
+    else if(response.getResponseType() == INVALID_REQ_RESP){
+        Serial.println("Invalid request received, returning GENERAL_FAILURE");
+        requestProcessingState = RDM_REQUEST_FAILED;
     }
 
     return true;
@@ -277,9 +321,12 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         }
 
         /* Here we are sure that we are working on this request ... */
-        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+        if(requestProcessingState > RDM_REQUEST_IN_PROGRESS){
             requestProcessingState = RDM_NO_REQUEST;
-            return currentRequestRespErrorCode;
+            /* We already took care for the buffer copying inside of receiveResponse function */
+            ServiceRequestErrorCode retVal = 
+                requestProcessingState == RDM_REQUEST_COMPLETED ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+            return retVal;
         }
 
         /* RDM is waiting for the response to this request */
@@ -345,9 +392,12 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         }
 
         /* Here we are sure that we are working on this request ... */
-        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+        if(requestProcessingState > RDM_REQUEST_IN_PROGRESS){
             requestProcessingState = RDM_NO_REQUEST;
-            return SERV_SUCCESS;
+            /* We already took care for the buffer copying inside of receiveResponse function */
+            ServiceRequestErrorCode retVal = 
+                requestProcessingState == RDM_REQUEST_COMPLETED ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+            return retVal;
         }
 
         /* RDM is waiting for the response to this request */
@@ -412,9 +462,12 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
         }
 
         /* Here we are sure that we are working on this request ... */
-        if(requestProcessingState == RDM_REQUEST_COMPLETED){
+        if(requestProcessingState > RDM_REQUEST_IN_PROGRESS){
             requestProcessingState = RDM_NO_REQUEST;
-            return SERV_SUCCESS;
+            /* We already took care for the buffer copying inside of receiveResponse function */
+            ServiceRequestErrorCode retVal = 
+                requestProcessingState == RDM_REQUEST_COMPLETED ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+            return retVal;
         }
 
         /* RDM is waiting for the response to this request */
@@ -429,6 +482,78 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     DeviceServicesType serviceType,
     ServiceParameters_set3 param
 ){
+
+    /* Check if RDM is capable to receive new request */
+    if(requestProcessingState == RDM_NO_REQUEST){
+        Serial.println("Starting new request with param3...");
+        RCTranslation val = getTranslationFromUnique(deviceId);
+        if(val.isValid()){
+            RcRequest request (val.onSourceNodeLocalId, val.mac, SERVICE_CALL_REQ);
+
+
+            request.pushData(serviceType);        
+            request.pushData(3); //0 - no params, 1 - set1 ...
+            request.pushData((uint8_t*)&param, sizeof(param));
+
+            if(param.direction == e_IN_to_DEVICE)
+            {
+                /* Data provided under service memory must be sent to the device*/
+                request.pushData((byte*) param.buff, param.size);
+            }
+
+            try{
+                /* Pass request for processing to RCServer */
+                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest&)>>(
+                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+
+                /* Update current new request fingerprint */
+                currentRequestFingerprint = {
+                    .deviceId = deviceId,
+                    .serviceName = serviceType,
+                    .overloading = serviceCall_3,
+                    .memoryRequestDirection = param.direction
+                };
+
+                localCopyOfLastActiveRequestParamSet3 = param;
+                localCopyOfLastOverloading = serviceCall_3;
+
+                /* Change request processing state to IN PROGRESS, this state will be 
+                set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
+                requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+
+                Serial.println("RDM : //// Request with serviceCall_3 sent, waiting for the response");
+
+                /* RDM starts to wait for the response */
+                return SERV_PENDING;
+            }catch(std::bad_any_cast ex){}
+        }
+    }else {
+        /* check if we really received the same request for which response we are waiting for */
+        ServiceCallFingerprint receivedRequestFingerprint = {
+            .deviceId = deviceId,
+            .serviceName = serviceType,
+            .overloading = serviceCall_3
+        };
+        if(!(receivedRequestFingerprint == currentRequestFingerprint)){
+            /* When we received another request, when currently something else 
+            is waiting for the response, we must reject the new caller by returning BUSY */
+            return SERV_BUSY;
+        }
+
+        /* Here we are sure that we are working on this request ... */
+        if(requestProcessingState > RDM_REQUEST_IN_PROGRESS){
+            /* We already took care for the buffer copying inside of receiveResponse function */
+            ServiceRequestErrorCode retVal = 
+                requestProcessingState == RDM_REQUEST_COMPLETED ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
+
+
+            requestProcessingState = RDM_NO_REQUEST;
+            return retVal;
+        }
+
+        /* RDM is waiting for the response to this request */
+        return SERV_PENDING;
+    }
     
     return SERV_GENERAL_FAILURE;
 }

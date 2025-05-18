@@ -71,7 +71,7 @@ typedef struct
 }ServiceParameters_set2;
 
 typedef enum{
-    e_OUT_from_DEVICE = 0,
+    e_OUT_from_DEVICE = 15,
     e_IN_to_DEVICE,
     e_UNKNOWN_PARAM_DIRECTION
 }ServiceDirectionType;
@@ -82,6 +82,25 @@ typedef struct
     uint16_t size = 0xff;
     uint16_t additionalParam = 0xFF;
     uint8_t direction = (uint8_t)e_UNKNOWN_PARAM_DIRECTION;
+
+    void print(){
+        Serial.println("ServiceParameters_set3");
+        Serial.println("buff: " + String((int)buff));
+        Serial.println("size: " + String((int)size));
+        Serial.println("additionalParam: " + String((int)additionalParam));
+        switch(direction){
+            case e_UNKNOWN_PARAM_DIRECTION:
+            Serial.println("direction : e_UNKNOWN_PARAM_DIRECTION" );
+            break;
+            case e_OUT_from_DEVICE:
+            Serial.println("direction : e_OUT_from_DEVICE" );
+            break;
+            case e_IN_to_DEVICE:
+            Serial.println("direction : e_IN_to_DEVICE" );
+            break;
+        }
+        
+    }
 }ServiceParameters_set3;
 
 struct DeviceDescription

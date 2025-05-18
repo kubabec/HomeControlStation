@@ -34,6 +34,8 @@ class DeviceProvider
 
     
 
+    /*Complex handlers for service RcRequests*/
+    static ServiceRequestErrorCode handelService3Request(RcRequest& request, RcResponse& response, ServiceParameters_set3& param, uint16_t payloadSize);
 
 public:
     static void init();

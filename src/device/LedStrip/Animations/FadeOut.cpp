@@ -24,7 +24,7 @@ void FadeOutAnimation::initialize(
     }
 }
 
-void FadeOutAnimation::start(){
+void FadeOutAnimation::start(bool startFromZero){
     if(isInitialized()){
         //memset(animationBuffer, 0, sizeof(LedColor)*ledsCount);
         /* save target values in the buffer */
