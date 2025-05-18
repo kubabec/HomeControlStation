@@ -32,8 +32,7 @@ OnOffDevice::OnOffDevice(DeviceConfigSlotType nvmData){
     minPwmValue = nvmData.customBytes[2];
     maxPwmValue = nvmData.customBytes[3];
 
-    Serial.println("minPwmValue: " + String((int)minPwmValue));
-    Serial.println("maxPwmValue: " + String((int)maxPwmValue));
+   
     
 }
 
@@ -262,6 +261,7 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
     desc.customBytes[1] = activeLow ? 0 : 1;
     desc.customBytes[2] = brightnessLevelTarget;
     
+    
 
     return desc;
 }
@@ -270,10 +270,10 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
 int OnOffDevice::mapBrightness(int brightness) {
     if(activeLow) {
         // Dla urządzeń aktywowanych LOW (0V = włączone)
-        return 255 - (brightness * 255) / 100;
+        return maxPwmValue - (brightness * (maxPwmValue - minPwmValue)) / 100;
     } else {
         // Dla urządzeń aktywowanych HIGH (3.3V/5V = włączone)
-        return (brightness * 255) / 100;
+        return (brightness * (maxPwmValue - minPwmValue)) / 100;
     }
 }
 

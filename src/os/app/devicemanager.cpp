@@ -522,6 +522,8 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 String activationState =   String(doc["devices"][i]["activeState"]);
                 String minPwm =            String(doc["devices"][i]["PwmMin"]);
                 String maxPwm =            String(doc["devices"][i]["PwmMax"]);
+                Serial.println("DeviceManager: minPwm  " + String(minPwm));
+                Serial.println("DeviceManager: maxPwm  " + String(maxPwm));
                 
                 /* Put data to config slot memory*/
                 configSlot.deviceType = (uint8_t)type_ONOFFDEVICE;
