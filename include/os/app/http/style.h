@@ -4,13 +4,31 @@
 
 const char* style_css = " \
 <style>\
+.theme-urban {\
+      --bg-card:      #2A2E35;\
+      --underline:    #5A8DEE;\
+      --text:         #ECEFF4;\
+      --knob-bg:      #3C4148;\
+      --knob-shadow:  0 4px 12px rgba(0,0,0,0.6);\
+    }\
+    .theme-urban {\
+      background: var(--bg-card);\
+      color: var(--text);\
+    }\
+    .theme-urban .underline {\
+      background: var(--underline);\
+    }\
+    .theme-urban .knob {\
+      background: var(--knob-bg);\
+      box-shadow: var(--knob-shadow);\
+    }\
 body {\
 display: flex;\
 justify-content: center;\
 align-items: flex-start;\
 height: 100vh;\
 margin: 0;\
-background: #f0f8ff;\
+background: #12151A;\
 font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\
 overflow-y: auto;\
 padding-top: 20px;\
@@ -27,9 +45,9 @@ width: 100%;\
 display: flex;\
 flex-direction: column;\
 padding: 20px;\
-background: #fff;\
+background: #3C4148;\
 border-radius: 15px;\
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\
+box-shadow: 0 4px 12px rgba(0,0,0,0.6);\
 margin-bottom: 20px;\
 width: 300px;\
 opacity: 1;\
@@ -38,8 +56,10 @@ transform: translateY(20px);\
 .header {\
 font-size: 18px;\
 font-weight: 500;\
-margin-bottom: 5px;\
+margin-top: -7px;\
+margin-bottom: 15px;\
 text-align: center;\
+color: #ECEFF4;\
 }\
 .header2{\
 font-size: 15px;\
@@ -71,10 +91,10 @@ outline: none;\
 }\
 .button-link, .button {\
 flex: 1;\
-margin-top: 7px;\
+margin-top: 8px;\
 margin-bottom: 7px;\
 padding: 10px 20px;\
-background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
+background: #5A8DEE;\
 border: none;\
 border-radius: 25px;\
 color: white;\
@@ -82,8 +102,8 @@ text-align: center;\
 text-decoration: none;\
 font-size: 16px;\
 cursor: pointer;\
-transition: background 0.3s;\
 font-family: inherit;\
+box-shadow:inset 0 0 0 1px #3C4148, 0 8px 24px rgba(0, 0, 0, 0.3);\
 }\
 .button-container {\
             display: flex;\
@@ -98,9 +118,10 @@ background: linear-gradient(135deg, #5aa9d4, #337bbf);\
 input[type=\"range\"] {\
 -webkit-appearance: none;\
 width: 100%;\
-height: 15px;\
+height: 3px;\
+margin-top:15px;\
 border-radius: 25px;\
-background: linear-gradient(135deg, #f0faff, #d0eaff);\
+background: #5A8DEE;\
 outline: none;\
 transition: background 0.3s;\
 }\
@@ -110,7 +131,8 @@ appearance: none;\
 width: 25px;\
 height: 25px;\
 border-radius: 50%;\
-background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
+background:radial-gradient(circle at 30% 30%, #eee, #888);\
+box-shadow:0 3px 12px rgba(0,0,0,0.7);\
 cursor: pointer;\
 transition: background 0.3s;\
 }\
@@ -118,12 +140,10 @@ input[type=\"range\"]::-moz-range-thumb {\
 width: 25px;\
 height: 25px;\
 border-radius: 50%;\
-background: linear-gradient(135deg, #6ec1e4, #3a8bd6);\
+background: radial-gradient(circle at 30% 30%, #eee, #888);\
+box-shadow:0 4px 12px rgba(0,0,0,0.8);\
 cursor: pointer;\
 transition: background 0.3s;\
-}\
-input[type=\"range\"]:focus {\
-background: linear-gradient(135deg, #e0f7ff, #c0e3ff);\
 }\
 @keyframes fadeInBody {\
 from { opacity: 0; }\
@@ -396,26 +416,24 @@ box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);\
 .room-container {\
 width: 340px;\
 margin-bottom: 10px;\
-background: linear-gradient(135deg, #ddeff7, #c3dcec);\
-border: 1px solid #b0c8d8;\
+background: #2A2E35;\
 border-radius: 10px;\
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\
+box-shadow:inset 0 0 0 1px #3C4148, 0 8px 24px rgba(0, 0, 0, 0.3);\
 padding: 15px;\
 transition: transform 0.2s ease;\
 }\
 \
 .room-container:hover {\
-transform: translateY(-2px);\
-box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);\
+box-shadow: 0 8px 15px rgba(99, 97, 144, 0.1);\
 }\
 \
 .room-header {\
 font-size: 18px;\
 font-weight: bold;\
-color: #2b3a47;\
+color: #97b0e0;\
 text-transform: uppercase;\
 letter-spacing: 1px;\
-border-bottom: 2px solid #7aaedb;\
+border-bottom:2px solid #5A8DEE;\
 padding-bottom: 5px;\
 }\
 .color-picker {\
@@ -553,7 +571,7 @@ top: 0;\
 left: 0;\
 width: 100%;\
 height: 100%;\
-background-color: rgba(255, 255, 255, 0.8);\
+background-color: #3C4148;\
 display: flex;\
 align-items: center;\
 justify-content: center;\
@@ -656,7 +674,7 @@ position:absolute;\
 }\
 footer {\
 	text-align: center;\
-	font-size: 9px;\
+	font-size: 11px;\
 	color:rgb(12, 119, 152);\
 	padding: 8px 0;\
 }\
@@ -664,6 +682,39 @@ footer a {\
 	color: rgb(11, 94, 119);\
 	text-decoration: none;\
 	margin: 0 4px;\
+}\
+.switch {\
+    position: absolute;\
+    top:-38px;\
+    right:0px;\
+    width: 56px;\
+    height: 32px;\
+    background: #484646;\
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);\
+    border-radius: 16px;\
+    cursor: pointer;\
+    transition: background 0.3s;\
+}\
+.switch .thumb {\
+    position: absolute;\
+    top: 2px;\
+    left: 2px;\
+    width: 28px;\
+    height: 28px;\
+    border-radius: 50%;\
+    background: radial-gradient(circle at 30% 30%, #eee, #888);\
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\
+    transition: left 0.3s, box-shadow 0.3s;\
+}\
+.switch.on {\
+    background: #4caf50;\
+}\
+.switch.on .thumb {\
+    left: calc(100% - 30px);\
+    box-shadow: 0 2px 8px rgba(76,175,80,0.6);\
+}\
+.toggler-container {\
+  position: relative;\ 
 }\
 </style>\
 ";

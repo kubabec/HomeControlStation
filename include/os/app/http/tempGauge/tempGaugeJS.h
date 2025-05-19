@@ -64,36 +64,29 @@ const char* tempGaugeJS = "\
                 ctx.beginPath();\
                 ctx.moveTo(0, 0);\
                 ctx.lineTo(0, -arrowLength);\
-                ctx.strokeStyle = '#e74c3c';\
+                ctx.strokeStyle = '#5A8DEE';\
                 ctx.lineWidth = 3;\
                 ctx.stroke();\
-\
-                ctx.beginPath();\
-                ctx.moveTo(-3, -arrowLength + 10);\
-                ctx.lineTo(0, -arrowLength);\
-                ctx.lineTo(3, -arrowLength + 10);\
-                ctx.fillStyle = '#e74c3c';\
-                ctx.fill();\
 \
                 ctx.restore();\
 \
                 ctx.beginPath();\
                 ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);\
-                ctx.fillStyle = '#333';\
+                ctx.fillStyle = '#5A8DEE';\
                 ctx.fill();\
 \
                 this.drawLabels(ctx, centerX, centerY, radius);\
             }\
 \
             drawLabels(ctx, centerX, centerY, radius) {\
-                ctx.fillStyle = '#333';\
-                ctx.font = '12px Arial';\
+                ctx.fillStyle = '#678cd2';\
+                ctx.font = '13px Arial';\
                 ctx.textAlign = 'center';\
                 ctx.textBaseline = 'middle';\
 \
-                ctx.fillText('-10°', centerX - radius, centerY + 37);\
-                ctx.fillText('40°', centerX + radius -2, centerY + 37);\
-                ctx.fillText('15°', centerX+2, centerY - radius - 8);\
+                ctx.fillText('-10°', centerX - radius-3, centerY + 37);\
+                ctx.fillText('40°', centerX + radius +1, centerY + 37);\
+                ctx.fillText('15°', centerX+2, centerY - radius - 9);\
             }\
 \
             update(temp) {\
@@ -130,6 +123,8 @@ const char* tempGaugeJS = "\
 \
                 ctx.strokeStyle = '#ccc';\
                 ctx.lineWidth = 1;\
+                ctx.fillStyle = '#678cd2';\
+                ctx.font = '11px Arial';\
                 for (let i = 0; i <= 4; i++) {\
                     let y = height - (i * height / 4);\
                     ctx.beginPath();\

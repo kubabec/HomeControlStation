@@ -15,7 +15,7 @@ const char* tempGaugeCSS = "\
         }\
         .temperature-widget, .humidity-widget  {\
             text-align: center;\
-            margin: 15px;\
+            color:#5A8DEE;\
             position: relative;\
         }\
         .temperature-widget canvas, .humidity-widget canvas {\
@@ -25,14 +25,14 @@ const char* tempGaugeCSS = "\
         .temperature-value, .value-display{\
             font-size: 24px;\
             font-family: Arial, sans-serif;\
-            color: #e74c3c;\
+            color: #ECEFF4;\
             margin-top: -15px;\
             font-weight: bold;\
         }\
         .value-display{\
             font-size: 24px;\
             font-family: Arial, sans-serif;\
-            color:rgb(32, 184, 226);\
+            color:#ECEFF4;\
             margin-top: 5px;\
             font-weight: bold;\
         }\

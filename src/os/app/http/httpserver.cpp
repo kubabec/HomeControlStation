@@ -1374,7 +1374,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
 
   if(secAccessLevel == e_ACCESS_LEVEL_NONE){
     String configButtonLink = "\
-    <br><button class=\"button\" onclick=\"showPasswordPopup()\">"+configPageButtonText+"</button><br>";
+    <button class=\"button\" onclick=\"showPasswordPopup()\">"+configPageButtonText+"</button>";
     client.println(configButtonLink);
   }else 
   {
