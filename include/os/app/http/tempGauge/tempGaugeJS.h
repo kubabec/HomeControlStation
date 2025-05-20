@@ -33,18 +33,24 @@ const char* tempGaugeJS = "\
 \
             draw() {\
                 const ctx = this.ctx;\
-                const width = this.canvas.width / (window.devicePixelRatio || 1);\
-                const height = this.canvas.height / (window.devicePixelRatio || 1);\
+                const width = (this.canvas.width - 15) / (window.devicePixelRatio || 1);\
+                const height = (this.canvas.height - 5) / (window.devicePixelRatio || 1);\
                 const centerX = width / 2;\
                 const centerY = height / 2;\
                 const radius = Math.min(width, height) * 0.4;\
 \
                 ctx.clearRect(0, 0, width, height);\
 \
+    ctx.beginPath();\
+    ctx.arc(centerX, centerY, radius + 6, 0, Math.PI * 2);\
+    ctx.strokeStyle = 'darkgrey';\
+    ctx.lineWidth = 1;\
+    ctx.stroke();\
+\
                 let gradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);\
-                gradient.addColorStop(0, 'blue');\
-                gradient.addColorStop(0.35, 'orange');\
-                gradient.addColorStop(1, 'red');\
+                gradient.addColorStop(0, '#5A8DEE');\
+                gradient.addColorStop(0.30, '#faf838');\
+                gradient.addColorStop(1, '#d62d00');\
 \
                 ctx.beginPath();\
                 ctx.arc(centerX, centerY, radius, -Math.PI * 1.25, Math.PI * 0.25);\
@@ -75,18 +81,22 @@ const char* tempGaugeJS = "\
                 ctx.fillStyle = '#5A8DEE';\
                 ctx.fill();\
 \
-                this.drawLabels(ctx, centerX, centerY, radius);\
+                this.drawLabels(ctx, centerX+5, centerY+5, radius);\
             }\
 \
             drawLabels(ctx, centerX, centerY, radius) {\
                 ctx.fillStyle = '#678cd2';\
-                ctx.font = '13px Arial';\
+                ctx.font = '12px Arial';\
+                ctx.shadowColor   = 'rgba(0, 0, 0, 0.7)';\
+                ctx.shadowBlur    = 8;\
+                ctx.shadowOffsetX = 2;\
+                ctx.shadowOffsetY = 2;\
                 ctx.textAlign = 'center';\
                 ctx.textBaseline = 'middle';\
 \
-                ctx.fillText('-10°', centerX - radius-3, centerY + 37);\
-                ctx.fillText('40°', centerX + radius +1, centerY + 37);\
-                ctx.fillText('15°', centerX+2, centerY - radius - 9);\
+                ctx.fillText('-10°', centerX - radius-5, centerY + 37);\
+                ctx.fillText('40°', centerX + radius -1, centerY + 36);\
+                ctx.fillText('15°', centerX-3, centerY - radius - 16);\
             }\
 \
             update(temp) {\
@@ -121,10 +131,20 @@ const char* tempGaugeJS = "\
                 const height = this.canvas.height / (window.devicePixelRatio || 1);\
                 ctx.clearRect(0, 0, width, height);\
 \
+    ctx.save();\
+    ctx.strokeStyle = 'darkgrey';\
+    ctx.lineWidth = 1;\
+    ctx.strokeRect(width / 3, 0, width / 3, height);\
+    ctx.restore();\
+\
                 ctx.strokeStyle = '#ccc';\
                 ctx.lineWidth = 1;\
                 ctx.fillStyle = '#678cd2';\
                 ctx.font = '11px Arial';\
+                ctx.shadowColor   = 'rgba(0, 0, 0, 0.7)';\
+                ctx.shadowBlur    = 8;\
+                ctx.shadowOffsetX = 2;\
+                ctx.shadowOffsetY = 2;\
                 for (let i = 0; i <= 4; i++) {\
                     let y = height - (i * height / 4);\
                     ctx.beginPath();\
@@ -137,7 +157,7 @@ const char* tempGaugeJS = "\
                     }else if(i == 4){\
                         y += 5;\
                     }\
-                    ctx.fillText(`${i * 25}%`, (3 * width) / 4 + 5, y + 3);\
+                    ctx.fillText(`${i * 25}%`, (3 * width) / 4 + 3, y + 3);\
                 }\
 \
                 const barHeight = (this.humidity / 100) * height;\

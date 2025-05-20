@@ -54,12 +54,15 @@ opacity: 1;\
 transform: translateY(20px);\
 }\
 .header {\
-font-size: 18px;\
-font-weight: 500;\
+font-size: 16px;\
 margin-top: -7px;\
 margin-bottom: 15px;\
 text-align: center;\
 color: #ECEFF4;\
+font-family: 'Inter', sans-serif;\
+font-weight: 300;\
+letter-spacing: 1.0px;\
+text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\
 }\
 .header2{\
 font-size: 15px;\
@@ -73,20 +76,27 @@ font-size: 14px;\
 display: flex;\
 justify-content: space-between;\
 align-items: center;\
+color: #5A8DEE;\
+text-shadow: 0 2px 9px rgba(0, 0, 0, 0.5);\
+}\
+.current-time{\
+color: #5A8DEE;\
+text-shadow: 0 2px 9px rgba(0, 0, 0, 0.5);\
 }\
 input[type=\"text\"], select {\
 padding: 10px;\
 margin-top: 5px;\
-border: 1px solid #ccc;\
 border-radius: 25px;\
-background: linear-gradient(135deg, #f0faff, #d0eaff);\
+border:1px;\
 font-size: 14px;\
 transition: background 0.3s;\
 font-family: inherit;\
 width: 200px;\
+color: #5A8DEE;\
+background: #2A2E35;\
 }\
 input[type=\"text\"]:focus, select:focus {\
-background: linear-gradient(135deg, #e0f7ff, #c0e3ff);\
+background:rgb(53, 59, 68);\
 outline: none;\
 }\
 .button-link, .button {\
@@ -163,7 +173,7 @@ transform: translateY(0);\
 display: flex;\
 flex-direction: column;\
 padding: 20px;\
-background: #fff;\
+background: #3C4148;\
 border-radius: 15px;\
 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\
 margin-bottom: 20px;\
@@ -176,7 +186,7 @@ overflow: hidden;\
 max-height: 500px;\
 }\
 .device-container.disabled {\
-background-color: #f2f2f2;\
+background-color: #1d2530;\
 max-height: 40px;\
 padding: 10px 20px;\
 }\
@@ -297,7 +307,7 @@ transition: opacity 0.3s ease;\
 }\
 \
 .popup-content {\
-background: #ffffff;\
+background: #2A2E35;\
 width: 400px;\
 padding: 20px;\
 border-radius: 10px;\
@@ -319,12 +329,12 @@ transform: scale(1);\
 .popup-header {\
 font-size: 20px;\
 margin-bottom: 15px;\
-color: #333;\
+color: #5A8DEE;\
 }\
 \
 .popup-message {\
 font-size: 16px;\
-color: #666;\
+color: #95baff;\
 margin-bottom: 25px;\
 }\
 \
@@ -370,9 +380,11 @@ background: #ff4d4d;\
 width: 80%;\
 padding: 10px;\
 margin-bottom: 20px;\
-border: 1px solid #ddd;\
 border-radius: 5px;\
 font-size: 16px;\
+color: #5A8DEE;\
+background: #2A2E35;\
+box-shadow:0 4px 12px rgba(0,0,0,0.3);\
 }\
 \
 .visible-popup {\
@@ -434,6 +446,7 @@ color: #97b0e0;\
 text-transform: uppercase;\
 letter-spacing: 1px;\
 border-bottom:2px solid #5A8DEE;\
+text-shadow:0 4px 12px rgba(0,0,0,0.5);\
 padding-bottom: 5px;\
 }\
 .color-picker {\
@@ -448,14 +461,14 @@ width: 70px;\
 height:40px;\
 padding: 0px 0px;\
 border: none;\
-background-color: 0xffffff\
-border-radius: 4px;\
-color: white;\
+background-color: #2A2E35;\
 text-align: center;\
 text-decoration: none;\
 font-size: 16px;\
 cursor: pointer;\
 font-family: inherit;\
+margin-bottom: 5px;\
+border-radius:50px;\
 }\
 \
 .color-display {\
@@ -464,7 +477,6 @@ height: 8px;\
 border-radius: 8px;\
 background-color:0xffffff;\
 margin-bottom: 5px;\
-border: 1px solid #ccc;\
 box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);\
 transition: all 0.3s ease;\
 overflow: auto;\
@@ -517,7 +529,7 @@ background-color: rgba(0, 0, 0, 0.1);\
 padding-top: 5px;\
 padding-bottom: 5px;\
 width:100%;\
-background-color:rgb(255, 255, 255);\
+background-color:#2A2E35;\
 }\
 .ledContainer.marked {\
 background-color:rgba(93, 190, 255, 0.9);\
@@ -623,7 +635,7 @@ transform: rotate(360deg);\
     display: flex;\
     flex-direction: column;\
     align: left;\
-    box-shadow:1px 2px 6px lightgrey;\
+    box-shadow:0 4px 12px rgba(0,0,0,0.6);\
 }\
 \
 .notification-title {\
@@ -632,21 +644,21 @@ transform: rotate(360deg);\
 }\
 \
 .notification.error {\
-    background-color: #ffe5e5;\
+    background-color: #3C4148;\
     border-color: #ff5c5c;\
-    color: #991f1f;\
+    color: #ff8383;\
 }\
 \
 .notification.warning {\
-    background-color: #fff4cc;\
+    background-color: #3C4148;\
     border-color: #ffc107;\
-    color: #997a00;\
+    color:rgb(239, 193, 10);\
 }\
 \
 .notification.info {\
-    background-color: #e5f7ff;\
+    background-color: #3C4148;\
     border-color: #17a2b8;\
-    color: #0a495c;\
+    color:rgb(29, 199, 251);\
 }\
 .project-name {\
   position: fixed;\

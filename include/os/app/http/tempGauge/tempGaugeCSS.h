@@ -23,18 +23,16 @@ const char* tempGaugeCSS = "\
             height: 110px;\
         }\
         .temperature-value, .value-display{\
-            font-size: 24px;\
+            font-size: 21px;\
             font-family: Arial, sans-serif;\
-            color: #ECEFF4;\
-            margin-top: -15px;\
-            font-weight: bold;\
+            color: #b2cdff;\
+            text-shadow:0 4px 12px rgba(0,0,0,0.3);\
         }\
         .value-display{\
-            font-size: 24px;\
+            font-size: 21px;\
             font-family: Arial, sans-serif;\
-            color:#ECEFF4;\
-            margin-top: 5px;\
-            font-weight: bold;\
+            color:#b2cdff;\
+            text-shadow:0 4px 12px rgba(0,0,0,0.3);\
         }\
     </style>\
 ";
