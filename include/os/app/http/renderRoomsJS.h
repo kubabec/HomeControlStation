@@ -18,6 +18,19 @@ function renderRooms(data) {\
         roomHeader.className = 'room-header';\
         roomHeader.textContent = `${roomId}`;\
         roomContainer.appendChild(roomHeader);\
+        const toglContainer = document.createElement('div');\
+        toglContainer.className = 'toggler-container';\
+        const roomtoggle = document.createElement('div');\
+        roomtoggle.classList.add('switch');\
+        const thumb = document.createElement('div');\
+        thumb.classList.add('thumb');\
+        roomtoggle.appendChild(thumb);\
+        roomtoggle.addEventListener('click', () => {\
+         roomtoggle.classList.toggle('on');\
+         const isOn = roomtoggle.classList.contains('on');\
+        });\
+        toglContainer.appendChild(roomtoggle);\
+        roomContainer.appendChild(toglContainer);\
         devices.forEach(device => {\
             const deviceContainer = document.createElement('div');\
             deviceContainer.className = 'container';\
@@ -29,11 +42,7 @@ function renderRooms(data) {\
                 loadingOverlay.style.display = 'none';\
                 const spinner = document.createElement('div');\
                 spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
                 loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
                 const faviconImageMain = document.createElement('div');\
                 faviconImageMain.className = 'device-left';\
@@ -79,10 +88,6 @@ if(device.hasBrightness == 1){\
                 deviceContainer.appendChild(btnContainer);\
     \
                 if(device.hasBrightness == 1){\
-                    const sliderLabel = document.createElement('div');\
-                    sliderLabel.className = 'header2';\
-                    sliderLabel.textContent = 'Brightness';\
-                    deviceContainer.appendChild(sliderLabel);\
     \
                     const slider = document.createElement('input');\
                     slider.type = 'range';\
@@ -99,11 +104,7 @@ if(device.hasBrightness == 1){\
                 loadingOverlay.style.display = 'none';\
                 const spinner = document.createElement('div');\
                 spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
                 loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
                 const faviconImageMain = document.createElement('div');\
                 faviconImageMain.className = 'device-left';\
@@ -162,11 +163,7 @@ if(device.hasBrightness == 1){\
                 loadingOverlay.style.display = 'none';\
                 const spinner = document.createElement('div');\
                 spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
                 loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
                 deviceContainer.appendChild(loadingOverlay);\
                 const faviconImageMain = document.createElement('div');\
                 faviconImageMain.className = 'device-left';\

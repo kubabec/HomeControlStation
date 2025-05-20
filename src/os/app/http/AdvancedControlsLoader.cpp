@@ -271,7 +271,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
             led.style.backgroundColor = 'rgb(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ')';\
             led.style.boxShadow = '0 0 0px 6px rgba(0, 205, 0, 0.007), 0 0 6px 8px rgba(0, 205, 0, 0.08)';\
         }else {\
-            led.style.backgroundColor = 'rgba(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ', 0.1)';\
+            led.style.backgroundColor = 'rgba(' + ledColors[i][0] + ', ' + ledColors[i][1] + ', ' + ledColors[i][2] + ', 0.5)';\
         }\
         led.style.borderRadius = '3px';\
         \

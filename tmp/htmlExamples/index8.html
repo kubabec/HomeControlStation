@@ -1,97 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Device Containers with Icons</title>
+  <title>Switch bez ::before</title>
   <style>
-    body {
-      background: #f0f8ff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      padding: 20px;
+    .switch {
+      position: relative;
+      width: 56px;
+      height: 32px;
+      background: #333;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    .container {
-      max-width: 400px;
-      margin: auto;
-    }
-    .device-container {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 15px;
-      margin-bottom: 20px;
-      /* Stare animacje, itp. */
-    }
-    /* nowy header wrapper */
-    .device-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    .device-left {
-      display: flex;
-      align-items: center;
-    }
-    .device-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-      margin-right: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .device-title {
-      font-size: 18px;
-      font-weight: 500;
-      color: #333;
-    }
-    .status-indicator {
-      width: 16px;
-      height: 16px;
+    .switch .thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: #4CAF50; /* zielony = on */
-      box-shadow: 0 0 6px rgba(76,175,80,0.6);
+      background: radial-gradient(circle at 30% 30%, #eee, #888);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      transition: left 0.3s, box-shadow 0.3s;
     }
-    .status-indicator.off {
-      background: #ccc;            /* szary = off */
-      box-shadow: none;
+    .switch.on {
+      background: #4caf50;
+    }
+    .switch.on .thumb {
+      left: calc(100% - 30px);
+      box-shadow: 0 2px 8px rgba(76,175,80,0.6);
     }
   </style>
 </head>
 <body>
-  <div class="container">
 
-    <div class="device-container">
-      <div class="device-header">
-        <div class="device-left">
-          <!-- tu podaj URL do ikony -->
-          <img class="device-icon" src="https://example.com/icons/lightbulb.png" alt="Light">
-          <div class="device-title">Living Room Lamp</div>
-        </div>
-        <!-- dodaj klasę .off, jeśli urządzenie jest wyłączone -->
-        <div class="status-indicator"></div>
-      </div>
+  <div id="container"></div>
 
-      <!-- reszta Twojego kontenera -->
-      <div class="brightness-control">
-        <label>Brightness:</label>
-        <input type="range" min="0" max="100" value="75">
-      </div>
-    </div>
+  <script>
+    // Funkcja tworząca przełącznik
+    function createSwitch(initialState = false, onToggle) {
+      const sw = document.createElement('div');
+      sw.classList.add('switch');
+      if (initialState) sw.classList.add('on');
 
-    <!-- kolejny przykładowy container -->
-    <div class="device-container">
-      <div class="device-header">
-        <div class="device-left">
-          <img class="device-icon" src="https://example.com/icons/fan.png" alt="Fan">
-          <div class="device-title">Bedroom Fan</div>
-        </div>
-        <div class="status-indicator off"></div>
-      </div>
-      <!-- ... -->
-    </div>
+      // dodajemy rzeczywisty element "thumb"
+      const thumb = document.createElement('div');
+      thumb.classList.add('thumb');
+      sw.appendChild(thumb);
 
-  </div>
+      // kliknięcie zmienia stan
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('on');
+        const isOn = sw.classList.contains('on');
+        onToggle(isOn);
+      });
+
+      return sw;
+    }
+
+    // przykładowe użycie
+    const container = document.getElementById('container');
+    const mySwitch = createSwitch(false, (state) => {
+      console.log('Przełącznik to teraz', state ? 'ON' : 'OFF');
+    });
+    container.appendChild(mySwitch);
+  </script>
+
 </body>
 </html>
