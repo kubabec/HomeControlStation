@@ -92,7 +92,7 @@ font-size: 14px;\
 transition: background 0.3s;\
 font-family: inherit;\
 width: 200px;\
-color: #5A8DEE;\
+color: white;\
 background: #2A2E35;\
 }\
 input[type=\"text\"]:focus, select:focus {\
