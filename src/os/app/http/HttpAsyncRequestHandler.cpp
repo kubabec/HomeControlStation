@@ -250,8 +250,10 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
       jsonResponse +="\"id\":" + String((int)deviceInThisRoom->deviceId) + ",";
       jsonResponse +="\"devType\":" + String((int)deviceInThisRoom->deviceType) + ",";
       jsonResponse +="\"name\":\"" + deviceInThisRoom->deviceName + "\",";
-      if(deviceInThisRoom->isEnabled){
+      if(deviceInThisRoom->isEnabled == 1){
         jsonResponse +="\"status\":\"on\",";
+      }else if (deviceInThisRoom->isEnabled > 1){
+        jsonResponse +="\"status\":\"alwaysOn\",";
       }else {
         jsonResponse +="\"status\":\"off\",";
       }
@@ -294,6 +296,7 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
     roomIteratorCount++;
   }
   jsonResponse +="}";
+
 }
 
 void HTTPAsyncRequestHandler::createNotificationListContentJson()

@@ -11,6 +11,7 @@ function renderRooms(data) {\
     roomsContainer.innerHTML = '';\
 \
     for (const [roomId, devices] of Object.entries(data)) {\
+        var anyOn = false;\
         const roomContainer = document.createElement('div');\
         roomContainer.className = 'room-container';\
 \
@@ -28,6 +29,7 @@ function renderRooms(data) {\
         roomtoggle.addEventListener('click', () => {\
          roomtoggle.classList.toggle('on');\
          const isOn = roomtoggle.classList.contains('on');\
+         asyncRoomStateSwitch(roomId, isOn);\
         });\
         toglContainer.appendChild(roomtoggle);\
         roomContainer.appendChild(toglContainer);\
@@ -179,7 +181,7 @@ if(device.hasBrightness == 1){\
                 deviceContainer.appendChild(header);\
     \
                 const statusLight = document.createElement('div');\
-                statusLight.className = `status-light ${device.status}`;\
+                statusLight.className = `status-light on`;\
                 statusLight.id = `statusLight${device.id}`;\
                 deviceContainer.appendChild(statusLight);\
 \
@@ -200,10 +202,15 @@ if(device.hasBrightness == 1){\
                 header.textContent = 'UnknownDeviceType';\
                 deviceContainer.appendChild(header);\
             }\
-\
+\           if(device.status == 'on'){\
+                anyOn = true;\
+            }\
             roomContainer.appendChild(deviceContainer);\
         });\
 \
+        if(anyOn){\
+            roomtoggle.classList.add('on');\
+        }\
         roomsContainer.appendChild(roomContainer);\
     }\
     for (var i = 0, l = listOfTempWidgets.length; i < l; ++i) {\

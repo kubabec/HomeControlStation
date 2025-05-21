@@ -83,6 +83,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "setStripColor",
   "stripLoadFromMemory",
   "stripOverwriteSlot",
+  "stRmChng"
 };
 
 
@@ -116,7 +117,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE}
 };
 
 void escapeSpecialCharsInJson(String& json)
@@ -1795,6 +1797,52 @@ void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String& request,
       );
     }
 
+  }
+}
+
+void HomeLightHttpServer::parameterizedHandler_roomStateChange(String& request, WiFiClient& client)
+{
+  escapeSpecialCharsInJson(request);
+  request.replace("stRmChng&", "");
+
+  Serial.println(request);
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if(success == DeserializationError::Code::Ok){
+    String roomIdStr = doc["roomId"];
+    String stateStr = doc["state"];
+
+    if(roomIdStr != "null" && stateStr != "null"){
+      uint8_t roomId = 255;
+      // Try to find roomId in the mapping;
+      for(auto& room : roomNamesMapping){
+        if(room.second == roomIdStr){
+          roomId = room.first;
+          break;
+        }
+      }
+
+      // Name not found in mapping - use the string as roomId
+      if(roomId == 255){
+        roomId = roomIdStr.toInt();
+      }
+
+      // Serial.println("Room state change requested.");
+      uint8_t parameters[4];
+      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = roomId; /* idx 0 */
+      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
+      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_ROOM_STATE_CHANGE;       /* idx 2 */
+      parameters[3] = stateStr == "true" ? 1 : 0;                                    /* idx 3 */
+
+      HTTPAsyncRequestHandler::createRequest(
+        ASYNC_TYPE_DEVICE_SERVICE_CALL,
+        parameters,
+        4
+      );
+    }
+  }else {
+    Serial.println("Error with JSON parsing");
   }
 }
 

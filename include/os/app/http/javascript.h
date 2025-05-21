@@ -420,21 +420,19 @@ let isNotificationPollingActive = 1;\
             cancelButton.addEventListener(\"click\", closePopup);\
         }\
 \
-  function asyncDeviceStateSwitch(device, state){\
+function getRoomChangeUrl(room, state) {\
+    let json = {roomId: room, state: state};\
+    let jsonString = JSON.stringify(json);\
+    let url = '/stRmChng&' + jsonString;\
+    return url;\
+}\
+function asyncRoomStateSwitch(room, state){\
     const xhr = new XMLHttpRequest();\
     xhr.timeout = 10000;\
-    var url = '/stDvstte' + device.toString() + 'state';\
-    const container = document.getElementById('container' + device);\
-    showLoading(container);\
-    if(state === 1){\
-        url = url + '1&';\
-    }else {\
-        url = url + '0&';\
-    }\
+    var url = getRoomChangeUrl(room, state);\
     xhr.open(\"GET\", url, true);\
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
-            const statusElement = document.getElementById(\"status\");\
             if (xhr.status === 200) { \
                 const newData = JSON.parse(xhr.responseText);\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
@@ -445,10 +443,38 @@ let isNotificationPollingActive = 1;\
                 console.log('Error with AJAX request');\
             }\
         }\
-        hideLoading(container);\
     };\
     xhr.send();\
-  }\
+}\
+function asyncDeviceStateSwitch(device, state){\
+const xhr = new XMLHttpRequest();\
+xhr.timeout = 10000;\
+var url = '/stDvstte' + device.toString() + 'state';\
+const container = document.getElementById('container' + device);\
+showLoading(container);\
+if(state === 1){\
+    url = url + '1&';\
+}else {\
+    url = url + '0&';\
+}\
+xhr.open(\"GET\", url, true);\
+xhr.onreadystatechange = function() {\
+    if (xhr.readyState === 4) { \
+        const statusElement = document.getElementById(\"status\");\
+        if (xhr.status === 200) { \
+            const newData = JSON.parse(xhr.responseText);\
+            if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                currentData = newData;\
+                renderRooms(currentData);\
+            }\
+        } else { \
+            console.log('Error with AJAX request');\
+        }\
+    }\
+    hideLoading(container);\
+};\
+xhr.send();\
+}\
   function handleJsonResponse(responseText = \"\"){\
     const response = JSON.parse(responseText);\
     if(response.status === \"succ\"){\

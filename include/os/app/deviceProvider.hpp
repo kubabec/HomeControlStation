@@ -18,6 +18,8 @@ class DeviceProvider
     static std::function<bool(RcResponse&)> sendResponse;
     static std::function<bool(RcResponseLong&)> requestResponseLong;
 
+    static std::queue<uint8_t> roomStateChangeDeviceIdQueue;
+    static bool requestedRoomState;
 
     static bool isRCServer;
 
