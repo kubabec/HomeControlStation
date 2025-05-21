@@ -17,6 +17,7 @@
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct {
     uint8_t numberOfDevices = 255;          /* Count of on-Node devices */
+    MessageUDP::IPAddr nodeIpAddress{0, 0, 0, 0}; /* Node IP address */
     std::vector<DeviceDescription> devicesCollection;
     bool isDeviceCollectionCompleted = false;
     uint64_t lastKeepAliveReceivedTime =0;
@@ -26,6 +27,7 @@ typedef struct {
     void printLn(){
         Serial.println("------- Remote Node Information --------------");
         Serial.println("numberOfDevices : " + String(numberOfDevices));
+        Serial.println("IP Address : " + String(nodeIpAddress.octet1) + "." + String(nodeIpAddress.octet2) + "." + String(nodeIpAddress.octet3) + "." + String(nodeIpAddress.octet4));
         for(auto& device: devicesCollection) {
             device.print();
         }
@@ -77,6 +79,8 @@ class RemoteControlServer
     static void handleDetailedDataRefreshMech(std::vector <uint64_t>& nodesToBeRemoved);
 
     static uint8_t generateRequestId(); // funkcja do generowania Request Id
+
+    static void updateNetworkNodesInformationSignal();
 
 public:
 

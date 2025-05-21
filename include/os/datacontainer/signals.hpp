@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 41
+#define NUMBER_OF_SIGNALS 42
 enum Signal
 {
     /* Type: bool , somme description */
@@ -88,6 +88,9 @@ enum Signal
     /* Type: DeviceConfigManipulationAPI - new pin setup creation via JSON callback */
     CBK_GET_ROOMS_CFG_JSON,
 
-    CBK_DISPLAY_RAM_USAGE
+    CBK_DISPLAY_RAM_USAGE,
+
+    /* std::vector<NetworkNodeInfo> - info about other network nodes proviceded by master */
+    SIG_NETWORK_NODES_INFO
 };
 #endif

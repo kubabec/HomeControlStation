@@ -5,6 +5,7 @@
 #include "os/app/remoteControl/RC_publicDataTypes.hpp"
 #include "devices/Device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include "os/tools/messageUDP.hpp"
 #include <ArduinoJson.h>
 
 #define PERSISTENT_DATABLOCK_SIZE 50
@@ -175,6 +176,15 @@ struct RtcTime
     return String(buffer);
   }
 
+};
+
+struct NetworkNodeInfo{
+    enum NodeType{
+        Master,
+        Slave,
+        Unknown
+    } nodeType;
+    MessageUDP::IPAddr nodeIP;
 };
 
 #endif 
