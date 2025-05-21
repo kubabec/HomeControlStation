@@ -42,6 +42,7 @@ typedef enum
     DEVSERVICE_GET_ADVANCED_CONTROLS,
     DEVSERVICE_GET_DETAILED_COLORS,
     DEVSERVICE_SET_DETAILED_COLORS,
+    DEVSERVICE_ROOM_STATE_CHANGE,
     DEVSERVICE_INVALID
 }DeviceServicesType;
 
@@ -109,7 +110,7 @@ struct DeviceDescription
     uint64_t macAddress = 0LL;
     uint8_t deviceId = -1;
     uint8_t roomId = 255;
-    bool isEnabled;
+    uint8_t isEnabled;
     uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = { 0x00};
     
     String deviceName;

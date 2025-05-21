@@ -113,7 +113,7 @@ DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription()
     desc.deviceType = getDeviceType();
     desc.deviceId = getDeviceIdentifier();
     desc.roomId = roomId;
-    desc.isEnabled = true;
+    desc.isEnabled = 3; // always enabled, does not count to room state
     desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
