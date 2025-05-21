@@ -37,6 +37,10 @@ let isNotificationPollingActive = 1;\
         var url = `/roomAssignment`;\
         window.location.href = url;\
     }\
+    function goToNetIns() {\
+        var url = `/networkInspection`;\
+        window.location.href = url;\
+    }\
     function massErase(){\
         var url = `/masseraseviahttp`;\
         window.location.href = url;\

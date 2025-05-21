@@ -78,6 +78,7 @@ public:
     static void constantHandler_devicesSetup(WiFiClient& client);
     static void constantHandler_roomAssignment(WiFiClient& client);
     static void constantHandler_massErase(WiFiClient& client);
+    static void constantHandler_networkInspecion(WiFiClient& client);
     static void constantHandler_asyncTest(WiFiClient& client);
     static void constantHandler_asyncGetPageContent(String& request, WiFiClient& client);
     static void constantHandler_asyncGetNotifications(String& request, WiFiClient& client);

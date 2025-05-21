@@ -224,7 +224,7 @@ flex-direction: column;\
 align-items: center;\
 width: 700px;\
 padding: 20px;\
-background: #ffe6e6;\
+background: #3C4148;\
 border-radius: 15px;\
 box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);\
 margin: 10px 0;\
@@ -233,29 +233,29 @@ transition: all 0.5s ease;\
 }\
 \
 .error-table {\
-width: 100%;\
+width: 50%;\
 border-collapse: collapse;\
 }\
 \
 .error-table thead {\
-background: #ff9999;\
+background:rgb(53, 61, 70);\
 font-weight: bold;\
-color: #990000;\
+color: #3C4148;\
 }\
 \
 .error-table th,\
 .error-table td {\
 padding: 10px;\
 text-align: center;\
-border: 1px solid #ffcccc;\
+border: 1px solidrgb(79, 70, 70);\
 }\
 \
 .error-table tbody tr {\
-background: #ffcccc;\
+background:rgb(79, 57, 57);\
 }\
 \
 .error-table tbody tr:nth-child(even) {\
-background: #ffb3b3;\
+background:rgb(69, 54, 54);\
 }\
 \
 .error-header {\
@@ -727,6 +727,45 @@ footer a {\
 }\
 .toggler-container {\
   position: relative;\ 
+}\
+:root {\
+  --g-dark: #2a2d34;\
+  --g-mid:  #3a3f4a;\
+  --blue:   #5a74e2;\
+  --fg:     #d0d0d0;\
+}\
+.table-graphite {\
+  width:100%; border-collapse:collapse;\
+  background:var(--g-dark); color:var(--fg);\
+  font-family:sans-serif;\
+  width:70%;\
+  border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.5);\
+  overflow:hidden;\
+}\
+.table-graphite th,\
+.table-graphite td {\
+  text-align:center;\
+  padding:10px 16px; border-bottom:1px solid var(--g-mid);\
+}\
+.table-graphite thead {\
+  background:var(--g-mid);\
+}\
+.table-graphite thead th {\
+  border-bottom:2px solid var(--blue);\
+  text-transform:uppercase; font-size:.9em;\
+}\
+.table-graphite tbody tr:nth-child(even) {\
+  background: #2f323b;\
+}\
+.table-graphite tbody tr:hover {\
+  background: #363a45;\
+}\
+.table-graphite .badge {\
+  display:inline-block; padding:2px 8px; border-radius:12px;\
+  background:var(--blue); color:#fff; font-size:.75em;\
+}\
+.table-graphite .badge.inactive {\
+  background:#555b6e;\
 }\
 </style>\
 ";

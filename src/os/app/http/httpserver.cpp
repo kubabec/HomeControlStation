@@ -60,7 +60,8 @@ std::vector<String> constantRequests = {
   "localDevices",
   "roomAssignment",
   "masseraseviahttp",
-  "asyncRequestTest"
+  "asyncRequestTest",
+  "networkInspection"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -96,6 +97,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -1074,6 +1076,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     /* Room mapping button */
     client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
   }
+
+  if(currentConfig.isRcServer){
+    client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+  }
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
@@ -2038,4 +2044,33 @@ void HomeLightHttpServer::constantHandler_asyncGetPageContent(String& request, W
 void HomeLightHttpServer::constantHandler_asyncGetNotifications(String& request, WiFiClient& client)
 {
   HTTPAsyncRequestHandler::createRequest(ASYNC_GET_NOTIFICATION_LIST, nullptr, 0);
+}
+
+void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient& client)
+{
+  client.println("<div class=\"wrapper\">\
+        <div class=\"header\">Network inspection view</div>");
+
+
+  try{
+    std::vector<NetworkNodeInfo> networkNodes = std::any_cast<std::vector<NetworkNodeInfo> >(DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO));
+    client.println("<table class=\"table-graphite\">");
+    client.println("<thead><tr><th>Type</th><th>IP</th></tr></thead>");
+    client.println("<tbody>");
+    for(auto& node : networkNodes){
+      String nodeType = node.nodeType == NetworkNodeInfo::NodeType::Master ? "Master" : "Slave";
+      client.println("<tr><td>"+nodeType+"</td><td>"+String((int)node.nodeIP.octet1)+"."+String((int)node.nodeIP.octet2)+"."+String((int)node.nodeIP.octet3)+"."+String((int)node.nodeIP.octet4)+"</td></tr>");
+    }
+    client.println("</tbody>");
+
+    client.println("</table>");
+  } catch (std::bad_any_cast ex)
+  {
+    client.println("<div>Data not available.</div>");
+  }
+
+  client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
+
+  client.println("</div>");
+
 }
