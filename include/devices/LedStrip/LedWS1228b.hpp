@@ -35,6 +35,7 @@ class LedWS1228bDeviceType : public Device {
     uint8_t deviceId;
     String deviceName;
     uint8_t roomId;
+    std::function<void(void)> m_reportNvmDataChangedCbk;
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
     ILedAnimation* ongoingAnimation = nullptr;
     ILedAnimation* switchOffAnimation = nullptr;
@@ -42,7 +43,7 @@ class LedWS1228bDeviceType : public Device {
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
     public:
-    LedWS1228bDeviceType(DeviceConfigSlotType nvmData);
+    LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
 
     virtual void init();
     virtual void cyclic();

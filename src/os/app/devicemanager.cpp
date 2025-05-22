@@ -23,6 +23,17 @@ std::vector<Device*> DeviceManager::devices;
 /*TESTCODE*/
 
 void DeviceManager::deinit() {
+    flushNvmData();
+}
+
+void DeviceManager::persistentDataChanged()
+{
+    /* Trigger NVM save to store devices persistent data safely */
+    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+}
+
+void DeviceManager::flushNvmData()
+{
     for(uint8_t i = e_BLOCK_DEVICE_1; i <= e_BLOCK_DEVICE_6; i++)
     {
         /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
@@ -311,7 +322,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 case e_LED_STRIP :
 #ifdef LED_STRIP_SUPPORTED
                     /* create WS2812b instance by forwarding NVM data to it */
-                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
+                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
                     isValidDeviceGiven = true;
 #endif
                 break;

@@ -43,6 +43,7 @@ public:
     static void init();
     static void deinit();
     static void cyclic();
+    static void flushNvmData();
 
     static bool requestNewExtendedMemorySpace(uint8_t deviceId, uint16_t spaceSize);
     static void releaseExtendedMemorySpace(uint8_t deviceId);

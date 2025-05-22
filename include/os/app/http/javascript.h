@@ -571,25 +571,6 @@ function displayNotifications(data){\
     }\
 }\
 \
-        \
-function fetchDataxxx() {\
-                const xhr = new XMLHttpRequest();\
-                var url = '/getPageContent';\
-                xhr.open(\"GET\", url, true);\
-                xhr.onreadystatechange = function() {\
-                    if (xhr.readyState === 4) { \
-                        if (xhr.status === 200) { \
-                            console.log(xhr.responseText);\
-                            const response = JSON.parse(xhr.responseText);\
-                            console.log(response);\
-                        } else { \
-                            console.log('Error with AJAX request');\
-                        }\
-                    }\
-                };\
-                xhr.send();\
-            }\
-\
 async function getNotifications() {\
     if (isNotificationPollingActive) {\
         try {\

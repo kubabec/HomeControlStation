@@ -2,8 +2,9 @@
 #ifdef LED_STRIP_SUPPORTED
 const uint8_t maxVirtualLeds = 100;
 
-LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData)
+LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
 {
+    m_reportNvmDataChangedCbk = reportNvmDataChangedCbk;
     memcpy(&diodesCount, &(nvmData.customBytes[0]), sizeof(uint16_t));
 
     /* calculate number of virtual diodes based on real count */
@@ -200,6 +201,11 @@ ServiceRequestErrorCode LedWS1228bDeviceType::saveContentAs(LedStripContentIndex
         Serial.println("memoryAveragedColors saved");
 
         retVal = SERV_SUCCESS;
+
+        /* this action will affect NVM data */
+        if(m_reportNvmDataChangedCbk){
+            m_reportNvmDataChangedCbk();
+        }
     }
 
     return retVal;
@@ -322,6 +328,11 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             {
                 Serial.println("Color change requested");
                 setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+
+                /* this action will affect NVM data */
+                if(m_reportNvmDataChangedCbk){
+                    m_reportNvmDataChangedCbk();
+                }
                 return SERV_SUCCESS;
             }else {
                 return SERV_EXECUTION_FAILURE;

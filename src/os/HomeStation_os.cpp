@@ -8,6 +8,9 @@ int OperatingSystem::resetCountdown = 50;
 uint16_t OperatingSystem::runtimeNodeHash = 0;
 uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
+bool OperatingSystem::isNvmSaveTimerActive = false;
+long long OperatingSystem::nvmSaveTimerValue = 0;
+
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
@@ -42,6 +45,9 @@ void OperatingSystem::init()
 
     DataContainer::setSignalValue(CBK_RESET_DEVICE, static_cast<std::function<void(uint16_t)>>(OperatingSystem::reset));
     DataContainer::setSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH, static_cast<std::function<uint16_t()>>(OperatingSystem::calculateRuntimeNodeHash));
+    DataContainer::setSignalValue(CBK_START_NVM_SAVE_TIMER, static_cast<std::function<void()>>(OperatingSystem::activateNvmSaveTimer));
+
+
 
     DataContainer::setSignalValue(
         CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
@@ -152,6 +158,26 @@ void OperatingSystem::task50ms()
     
 }
 
+void OperatingSystem::activateNvmSaveTimer(){
+    Serial.println("NVM save timer activated.");
+    isNvmSaveTimerActive = true;
+    nvmSaveTimerValue = millis();
+}
+
+void OperatingSystem::handleNvmSaveMech()
+{
+    if(isNvmSaveTimerActive){
+        if(abs(millis() - nvmSaveTimerValue) > (1000 * 60 * 30)){ /* 30 minutes */
+            isNvmSaveTimerActive = false;
+            nvmSaveTimerValue = 0;
+            Serial.println("NVM save timer expired, saving NVM data.");
+            saveNvmData();
+        }else {
+            nvmSaveTimerValue -= 1; // - 1 sec
+        }
+    }
+}
+
 void OperatingSystem::task1s()
 {
     Serial.print(".");
@@ -160,6 +186,7 @@ void OperatingSystem::task1s()
     TimeMaster::cyclic();
 
     detectHwMassEraseRequest();
+    handleNvmSaveMech();
 }
 
 void OperatingSystem::reset(uint16_t delay) {
@@ -169,6 +196,16 @@ void OperatingSystem::reset(uint16_t delay) {
     }
 }
 
+
+void OperatingSystem::saveNvmData()
+{
+    DeviceManager::flushNvmData();
+    if(isHttpServerRunning){
+        HomeLightHttpServer::flushNvmData();
+    }
+    ExtendedMemoryManager::flushNvmData();
+    ConfigProvider::flushNvmData();
+}
 
 void OperatingSystem::performReset()
 {

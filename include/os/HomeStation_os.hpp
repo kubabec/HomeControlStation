@@ -28,6 +28,9 @@ private:
     static uint16_t runtimeNodeHash;
     static uint16_t uniqueLifecycleId;
 
+    static bool isNvmSaveTimerActive;
+    static long long nvmSaveTimerValue;
+
     static long long uIBlockTime;
 
     static bool resetPending;
@@ -44,12 +47,16 @@ private:
     static void handleUiBlockTimeExpiration();
     static void detectHwMassEraseRequest();
 
+    static void handleNvmSaveMech();
+
     
 
 public:
 
     static void init();
     static void reset(uint16_t delay);
+    static void saveNvmData();
+    static void activateNvmSaveTimer();
 
     static void requestSecurityAccessLevelChangeViaString(String password);
 

@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 40
+#define NUMBER_OF_SIGNALS 41
 enum Signal
 {
     /* Type: bool , somme description */
@@ -87,6 +87,9 @@ enum Signal
     CBK_DISPLAY_RAM_USAGE,
 
     /* std::vector<NetworkNodeInfo> - info about other network nodes proviceded by master */
-    SIG_NETWORK_NODES_INFO
+    SIG_NETWORK_NODES_INFO,
+
+    /*  std::function<void(void)> */
+    CBK_START_NVM_SAVE_TIMER
 };
 #endif

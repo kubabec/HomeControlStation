@@ -57,6 +57,7 @@ public:
     static void cyclic();
     static void init();
     static void deinit();
+    static void flushNvmData();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
 
     static void generateOnOffUi(DeviceDescription& description, WiFiClient& client);

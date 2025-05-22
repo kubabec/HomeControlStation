@@ -43,12 +43,14 @@ public:
     static void init();
     static void deinit();
     static void cyclic();
+    static void flushNvmData();
     
     static bool loadConfigFromFile(JsonDocument& doc);
     static bool setLocalSetupViaJson(String& json);
     static String getLocalSetupJson();
 
     static void getRtcTimeWrapper();
+    static void persistentDataChanged();
 
     /* TESTCODE */
     static ServiceRequestErrorCode service(

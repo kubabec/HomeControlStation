@@ -145,8 +145,8 @@ void HomeLightHttpServer::cyclic()
   }
 }
 
-void HomeLightHttpServer::deinit() {
-
+void HomeLightHttpServer::flushNvmData()
+{
   /* Write NVM data for HttpServer application */
   uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
   /* Allocate memory for NVM data */
@@ -170,7 +170,10 @@ void HomeLightHttpServer::deinit() {
   }
   /* release heap buffer */
   free(nvmData);
-    
+}
+
+void HomeLightHttpServer::deinit() {
+  flushNvmData();
 }
 
 bool HomeLightHttpServer::packNvmData(uint8_t* nvmData, uint16_t length)
@@ -1326,7 +1329,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
         fetchData();\
         getNotifications();\
 \
-        setInterval(fetchData, 2500);\
+        setInterval(fetchData, 1000);\
 \
 \
 \
@@ -1849,6 +1852,9 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& requ
             }
             client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"/roomAssignment'>");
             
+            /* Trigger NVM save to have persistant room name values */
+            std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+
         }else {
             Serial.println("ConfigProvider://Problem with JSON parsing.");
             notification.body = "Room names JSON content cannot be correctly evaluated";

@@ -443,9 +443,16 @@ void ConfigProvider::eraseDatablockMemory()
     Serial.println("Datablock erase done.");
 }
 
-void ConfigProvider::deinit() {
-    configRamMirror.safeShutdownFlag = 37;
+void ConfigProvider::flushNvmData()
+{
     saveRamMirrorToNvm();
+}
+
+
+
+void ConfigProvider::deinit() {
+   configRamMirror.safeShutdownFlag = 37;
+   flushNvmData();
 }
 
 
