@@ -148,6 +148,21 @@ let isNotificationPollingActive = 1;\
         currLim:curLim\
         };\
     }\
+    function getSegLedStripConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        return {\
+        type:\"SegLedStrip\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        };\
+    }\
     function getTempSensorConfigurationJson(id){\
         var enable = \"enabled\" + id;\
         var enableValue = document.getElementById(enable).checked;\
@@ -183,6 +198,8 @@ let isNotificationPollingActive = 1;\
                 devices.push(getLedStripConfigurationJson(i));\
             } else if(deviceTypeValue == 45) {\
                 devices.push(getTempSensorConfigurationJson(i));\
+            } else if(deviceTypeValue == 46) {\
+                devices.push(getSegLedStripConfigurationJson(i));\
             } else {\
                 devices.push(getEmptyConfigurationJson(i));\
             }\

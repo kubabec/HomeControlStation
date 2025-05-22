@@ -756,10 +756,18 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     client.println("<option value=\"45\">Temperature sensor</option>");
   }
 
+  if(slot.deviceType == type_LED_STRIP_SEGMENTED){
+    client.println("<option value=\"46\" selected>Segmented LED strip</option>");
+  }else
+  {
+    client.println("<option value=\"46\">Segmented LED strip</option>");
+  }
+
   if(
     slot.deviceType != type_ONOFFDEVICE &&
     slot.deviceType != type_LED_STRIP && 
-    slot.deviceType != type_TEMP_SENSOR){
+    slot.deviceType != type_TEMP_SENSOR &&
+    slot.deviceType != type_LED_STRIP_SEGMENTED){
     client.println("<option value=\"255\" selected>UNKNOWN</option>");
   }else {
     client.println("<option value=\"255\">UNKNOWN</option>");
@@ -841,14 +849,9 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     client.println("<input id=\"pwmMax-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[3]) +"\" >");
     
   client.println("</label>");
-  
-  
-
-
-
-
-
   client.println("</div>");
+
+
 
   /*<!-- Extra fields for LED Strip -->*/
   client.println("<div class=\"extra-fields extra-44\">");
@@ -881,6 +884,12 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("</label>");
 
   client.println("</div>");
+
+  /*<!-- Extra fields for Segmented LED Strip -->*/
+  client.println("<div class=\"extra-fields extra-46\">");
+  client.println("<label>LEDs num.: test </label>");
+  client.println("</div>"); 
+
 
 
   client.println("</div>");

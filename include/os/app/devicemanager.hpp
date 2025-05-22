@@ -4,19 +4,20 @@
 #include <devices/OnOffDevice.hpp>
 #include <devices/TestDeviceType.hpp>
 #include <devices/LedStrip/LedWS1228b.hpp>
+#include <devices/LedStrip/Segmented_LedWS1228b.hpp>
 #include <devices/tempSensorDHT11.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
 
-typedef enum
-{
-    e_DEVICE_TYPE_FIRST = 43,
-    e_ON_OFF_DEVICE = e_DEVICE_TYPE_FIRST,
-    e_LED_STRIP,
-    e_TEMP_SENSOR,
-    e_DEVICE_TYPE_LAST = e_TEMP_SENSOR
-}DeviceType;
+// typedef enum
+// {
+//     e_DEVICE_TYPE_FIRST = 43,
+//     e_ON_OFF_DEVICE = e_DEVICE_TYPE_FIRST,
+//     e_LED_STRIP,
+//     e_TEMP_SENSOR,
+//     e_DEVICE_TYPE_LAST = e_TEMP_SENSOR
+// }DeviceType;
 
 class DeviceManager 
 {
@@ -27,6 +28,7 @@ class DeviceManager
     static std::vector<OnOffDevice> vecOnOffDevices;
 #ifdef LED_STRIP_SUPPORTED
     static std::vector<LedWS1228bDeviceType> ledws2812bDevices;
+    static std::vector<SegLedWS1228bDeviceType> segmentedWs2812bDevices;
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
     static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
