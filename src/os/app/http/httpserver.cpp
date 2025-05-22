@@ -25,8 +25,6 @@ SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NON
 std::vector<DeviceDescription> HomeLightHttpServer::descriptionVector;
 std::map<uint8_t, std::vector<DeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
-std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
-uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 String HomeLightHttpServer::ipAddressString;
 
 
@@ -45,18 +43,11 @@ LedStripTestType leds;
 
 const char* labelStart = "<label>";
 const char* labelEnd = "</label>";
-// ERR_MON_UNEXPECTED_RESET = 1,
-// ERR_MON_INVALID_NVM_DATA,
-// ERR_MON_INVALID_LOCAL_CONFIG,
-// ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
-// ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
-// ERR_MON_INVALID_ERROR_REPORTED,
 
 std::vector<String> constantRequests = {
   "", /* Main page with no parameter */
   "config",
   "resetDevice",
-  "errclrbtn",
   "localDevices",
   "roomAssignment",
   "masseraseviahttp",
@@ -92,7 +83,6 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_resetDevice, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_clearErrors, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
@@ -232,20 +222,6 @@ void HomeLightHttpServer::init()
     CBK_GET_ROOMS_CFG_JSON, 
     static_cast<DeviceConfigManipulationAPI>(cfgControls));
 
-  DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
-    systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
-    activeErrorsCount = 0;    
-
-    /* Count errors with occurrence > 0 */
-    for(auto& error : systemErrorList)
-    {
-      if(error.occurrenceCount > 0)
-      {
-        activeErrorsCount ++;
-      }
-    }
-  }
-  );
 
   /* Read NVM data for HttpServer application */
   uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
@@ -270,25 +246,6 @@ void HomeLightHttpServer::init()
 
   /* release heap buffer */
   free(nvmData);
-
-
-  /* Explicit read of system error needed due to init order ->  ErrorMon -> ConfigProvider -> HttpServer */
-  std::any errorsAsAny = DataContainer::getSignalValue(SIG_SYSTEM_ERROR_LIST);
-  try {
-    systemErrorList = std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(errorsAsAny);
-    activeErrorsCount = 0;
-    /* Count errors with occurrence > 0 */
-    for(auto& error : systemErrorList)
-    {
-      if(error.occurrenceCount > 0)
-      {
-        activeErrorsCount ++;
-      }
-    }
-  }catch (std::bad_any_cast ex)
-  {
-    Serial.println("Unable to access SYSTEM ERRORS");
-  }
 
 
   DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
@@ -366,11 +323,6 @@ void HomeLightHttpServer::restoreNvmData(uint8_t* nvmData, uint16_t length)
       Serial.println("HttpServer://Failure during NVM data restore try");
     }
   }
-}
-
-void HomeLightHttpServer::requestErrorList()
-{
-  
 }
 
 bool HomeLightHttpServer::processLinkAsyncRequest(WiFiClient& client)
@@ -1099,8 +1051,6 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   /* Common HTML tags closure */
   client.println("</form></div>");
 
-  printErrorTable(client);
-
   /* Display return button */
   client.println("<br><a href=\"http://"+ipAddressString+"\" class=\"button\">Home page</a><br>");
 
@@ -1134,52 +1084,6 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
   client.println("</div>");
 }
 
-
-void HomeLightHttpServer::printErrorTable(WiFiClient& client)
-{
-  if(activeErrorsCount > 0){
-    client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
-    client.println("<thead>\
-                      <tr>\
-                          <th>Code</th>\
-                          <th>Count</th>\
-                          <th>Comment</th>\
-                          <th>Time</th>\
-                      </tr>\
-                  </thead><tbody>");
-        
-
-    for(uint i = 0 ; i < ERR_MONT_ERROR_COUNT; i++)
-    {
-      if(systemErrorList.at(i).occurrenceCount > 0) {
-        client.println("<tr>\
-                          <td>ERR-"+ String(i+1) +"</td>\
-                          <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
-                          <td>"+ systemErrorList.at(i).comment +"</td>\
-                          <td>" + systemErrorList.at(i).timeOfOccurrence + "</td>\
-                      </tr>");
-
-      }
-    }
-    client.println("</tbody></table>");
-
-    /* Display error clear button */
-    const char* errorClearBtn = "\
-    <button class=\"error-button\" \
-    onclick=\"showMessage('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
-
-    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
-      client.println("<div class=\"access-level-hidder\">");
-    }
-
-    client.println(errorClearBtn);
-    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
-      client.println("</div>");
-    }
-
-    client.println("</div>");
-  }
-}
 
 /*** CONSTANT HANDLERS */
 
@@ -1430,18 +1334,6 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
 
             // 
 
-}
-
-void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
-{
-  for(uint8_t i = 1; i <= ERR_MON_LAST_ERROR; i++)
-  {  
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(
-    DataContainer::getSignalValue(CBK_ERROR_CLEAR)
-    )((ERR_MON_ERROR_TYPE)i);
-  }
-
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
 
 void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)

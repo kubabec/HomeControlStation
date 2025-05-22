@@ -14,7 +14,6 @@
 #include <os/app/config/ConfigProvider.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DeviceProvider.hpp>
-#include <os/app/ErrorMonitor.hpp>
 #include <os/app/NotificationHandler.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/timeMaster.hpp>

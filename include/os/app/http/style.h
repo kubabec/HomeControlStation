@@ -218,53 +218,6 @@ transition: max-height 1.5s ease, opacity 1.5s ease;\
 max-height: 500px;\
 opacity: 1;\
 }\
-.error-table-container {\
-display: flex;\
-flex-direction: column;\
-align-items: center;\
-width: 700px;\
-padding: 20px;\
-background: #3C4148;\
-border-radius: 15px;\
-box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);\
-margin: 10px 0;\
-border: 2px solid #ffcccc;\
-transition: all 0.5s ease;\
-}\
-\
-.error-table {\
-width: 50%;\
-border-collapse: collapse;\
-}\
-\
-.error-table thead {\
-background:rgb(53, 61, 70);\
-font-weight: bold;\
-color: #3C4148;\
-}\
-\
-.error-table th,\
-.error-table td {\
-padding: 10px;\
-text-align: center;\
-border: 1px solidrgb(79, 70, 70);\
-}\
-\
-.error-table tbody tr {\
-background:rgb(79, 57, 57);\
-}\
-\
-.error-table tbody tr:nth-child(even) {\
-background:rgb(69, 54, 54);\
-}\
-\
-.error-header {\
-font-size: 18px;\
-font-weight: bold;\
-color: #b30000;\
-margin-bottom: 15px;\
-text-align: center;\
-}\
 hr.custom-hr {\
   border: none;\
   height: 1px;\

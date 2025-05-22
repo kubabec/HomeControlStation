@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 42
+#define NUMBER_OF_SIGNALS 40
 enum Signal
 {
     /* Type: bool , somme description */
@@ -34,10 +34,6 @@ enum Signal
     SIG_CONFIG_SLOTS,
     /* Type: std:function<void()> - callback to reboot */
     CBK_RESET_DEVICE,
-    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode, String)> - callback to reboot */
-    CBK_ERROR_REPORT,
-    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode)> - callback to reboot */
-    CBK_ERROR_CLEAR,
     /* TYpe: std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> - container with actual system error data */
     SIG_SYSTEM_ERROR_LIST,
     /* Type: std:function<void(void)> - callback to erase NVM data */

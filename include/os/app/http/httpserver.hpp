@@ -33,21 +33,16 @@ class HomeLightHttpServer
     static std::vector<DeviceDescription> descriptionVector;
     static std::map<uint8_t, std::vector<DeviceDescription*>> deviceToRoomMappingList;
     static std::map<uint8_t, String> roomNamesMapping;
-
-    static std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> systemErrorList;
-    static uint8_t activeErrorsCount;
     
     static String ipAddressString;
     static SecurityAccessLevelType secAccessLevel;
     static void handleClientRequest();
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
-    static void requestErrorList();
 
     static void generateAsyncPageContentJson(WiFiClient& client);
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
-    static void printErrorTable(WiFiClient& client);
 
     static void processLinkRequestData(WiFiClient& client);
     static bool processLinkAsyncRequest(WiFiClient& client);
@@ -72,7 +67,6 @@ public:
 
 
     static void constantHandler_mainPage(WiFiClient& client);
-    static void constantHandler_clearErrors(WiFiClient& client);
     static void constantHandler_configPage(WiFiClient& client);
     static void constantHandler_resetDevice(WiFiClient& client);
     static void constantHandler_devicesSetup(WiFiClient& client);

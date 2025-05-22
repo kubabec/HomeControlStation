@@ -57,7 +57,6 @@ void OperatingSystem::init()
     });
 
 
-    ErrorMonitor::init();
     NotificationHandler::init();
 
     changeSecurityAccessLevel(e_ACCESS_LEVEL_NONE);
@@ -116,7 +115,6 @@ void OperatingSystem::init()
 void OperatingSystem::task10ms()
 {
     NetworkDriver::cyclic();
-    ErrorMonitor::cyclic();
 
     if(isHttpServerRunning){
         HomeLightHttpServer::cyclic();
@@ -191,7 +189,6 @@ void OperatingSystem::performReset()
 
     NetworkDriver::deinit();
 
-    ErrorMonitor::deinit();
     NotificationHandler::deinit();
     TimeMaster::deinit();
 

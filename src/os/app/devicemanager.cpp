@@ -336,9 +336,6 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             }else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
                 Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
-                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String )>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(ERR_MON_INVALID_LOCAL_CONFIG, String("Invalid config slot ID: " + String((int)configSlotID)));
             }
         }
         else {
@@ -348,23 +345,9 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             /* Handle errors only when device is properly configured */
             if(currentConfig.networkSSID[0] != '\0'){
                 Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
-                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(
-                    ERR_MON_INVALID_LOCAL_CONFIG, 
-                    String("Invalid Device type ("+ String((int)nvmData.deviceType)+") on slot " + String((int)configSlotID))
-                );
             }
         }
     }
-    // else 
-    // { 
-
-    //     Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));
-    //     std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-    //         DataContainer::getSignalValue(CBK_ERROR_REPORT)
-    //         )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
-    // }
 
 
     return isValidDeviceGiven;
@@ -625,12 +608,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -655,13 +632,6 @@ ServiceRequestErrorCode DeviceManager::service(
             };
         }
     }
-
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -687,12 +657,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -718,12 +682,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
