@@ -188,7 +188,7 @@ uint8_t OnOffDevice::getDeviceIdentifier(){
     return deviceId;
 }
 uint8_t OnOffDevice::getDeviceType(){
-    return 5;
+    return type_ONOFFDEVICE;
 }
 
 ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType){

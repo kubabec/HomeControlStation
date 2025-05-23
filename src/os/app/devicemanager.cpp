@@ -121,10 +121,9 @@ void DeviceManager::init()
 
     /* devices merging after NVM restoration */
     {
-        /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
         for(OnOffDevice& device : vecOnOffDevices) 
         {
-            devices.push_back(&device); //wrzucam pointer na device onOffDevice         
+            devices.push_back(&device);    
         }
 
 #ifdef LED_STRIP_SUPPORTED
@@ -620,11 +619,9 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
     std::any_cast<std::function<void(uint16_t)>>
         (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
 
-
     //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}
 
     return true;
-
 }
 
 

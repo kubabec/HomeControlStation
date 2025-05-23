@@ -9,16 +9,6 @@
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
-
-// typedef enum
-// {
-//     e_DEVICE_TYPE_FIRST = 43,
-//     e_ON_OFF_DEVICE = e_DEVICE_TYPE_FIRST,
-//     e_LED_STRIP,
-//     e_TEMP_SENSOR,
-//     e_DEVICE_TYPE_LAST = e_TEMP_SENSOR
-// }DeviceType;
-
 class DeviceManager 
 {
     /*TESTCODE*/

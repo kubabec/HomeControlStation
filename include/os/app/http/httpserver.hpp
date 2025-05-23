@@ -40,6 +40,8 @@ class HomeLightHttpServer
     static std::function<bool(uint8_t, bool)> deviceEnableCallback;
     static std::function<bool(uint8_t, uint8_t)> deviceBrightnessChangeCallback;
 
+    static void escapeSpecialCharsInJson(String& request);
+
     static void generateAsyncPageContentJson(WiFiClient& client);
     static void printConfigPage(WiFiClient& client);
     static void printSlotsConfigPage(WiFiClient& client);
