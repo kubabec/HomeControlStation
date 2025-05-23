@@ -196,6 +196,97 @@ if(device.hasBrightness == 1){\
                 listOfHumidValues.push(device.humid);\
 \
                 \
+            } else if(device.devType == 46){\
+                const loadingOverlay = document.createElement('div');\
+                loadingOverlay.className = 'loading-overlay';\
+                loadingOverlay.style.display = 'none';\
+                const spinner = document.createElement('div');\
+                spinner.className = 'spinner';\
+                loadingOverlay.appendChild(spinner);\
+                deviceContainer.appendChild(loadingOverlay);\
+                const faviconImageMain = document.createElement('div');\
+                faviconImageMain.className = 'device-left';\
+                const faviconImg = document.createElement('img');\
+                faviconImg.className = 'device-icon';\
+                faviconImg.src = faviconUrl + '2.png?raw=true';\
+                faviconImageMain.appendChild(faviconImg);\
+                deviceContainer.appendChild(faviconImageMain);\
+                \
+                const header = document.createElement('div');\
+                header.className = 'header';\
+                header.textContent = device.name;\
+                deviceContainer.appendChild(header);\
+    \
+                const statusLight = document.createElement('div');\
+                statusLight.className = `status-light ${device.status}`;\
+                statusLight.id = `statusLight${device.id}`;\
+                deviceContainer.appendChild(statusLight);\
+\
+                const colorPicker1 = document.createElement('div');\
+                colorPicker1.className = 'color-picker';\
+                colorPicker1.classList.add('segColDisp');\
+                const colorDisplay1 = document.createElement('div');\
+                colorDisplay1.className = `color-display on`;\
+                colorDisplay1.style.backgroundColor = '#1af265';\
+                colorPicker1.appendChild(colorDisplay1);\
+                const tog1 = document.createElement('div');\
+                tog1.classList.add('switch');\
+                tog1.classList.add('segLedTog');\
+                const tmb1 = document.createElement('div');\
+                tmb1.classList.add('thumb');\
+                tog1.appendChild(tmb1);\
+\
+                const colorPicker2 = document.createElement('div');\
+                colorPicker2.className = 'color-picker';\
+                colorPicker2.classList.add('segColDisp');\
+                const colorDisplay2 = document.createElement('div');\
+                colorDisplay2.className = `color-display off`;\
+                colorDisplay2.style.backgroundColor = '#6305a5';\
+                colorPicker2.appendChild(colorDisplay2);\
+                const tog2 = document.createElement('div');\
+                tog2.classList.add('switch');\
+                tog2.classList.add('segLedTog');\
+                const tmb2 = document.createElement('div');\
+                tmb2.classList.add('thumb');\
+                tog2.appendChild(tmb2);\
+\
+                const colorPicker3 = document.createElement('div');\
+                colorPicker3.className = 'color-picker';\
+                colorPicker3.classList.add('segColDisp');\
+                const colorDisplay3 = document.createElement('div');\
+                colorDisplay3.className = `color-display off`;\
+                colorDisplay3.style.backgroundColor = '#ff0510';\
+                colorPicker3.appendChild(colorDisplay3);\
+                const tog3 = document.createElement('div');\
+                tog3.classList.add('switch');\
+                tog3.classList.add('segLedTog');\
+                const tmb3 = document.createElement('div');\
+                tmb3.classList.add('thumb');\
+                tog3.appendChild(tmb3);\
+\
+                const colorPicker4 = document.createElement('div');\
+                colorPicker4.className = 'color-picker';\
+                colorPicker4.classList.add('segColDisp');\
+                const colorDisplay4 = document.createElement('div');\
+                colorDisplay4.className = `color-display on`;\
+                colorDisplay4.style.backgroundColor = '#e3daf9';\
+                colorPicker4.appendChild(colorDisplay4);\
+                const tog4 = document.createElement('div');\
+                tog4.classList.add('switch');\
+                tog4.classList.add('segLedTog');\
+                const tmb4 = document.createElement('div');\
+                tmb4.classList.add('thumb');\
+                tog4.appendChild(tmb4);\
+\
+                deviceContainer.appendChild(colorPicker1);\
+                deviceContainer.appendChild(tog1);\
+                deviceContainer.appendChild(colorPicker2);\
+                deviceContainer.appendChild(tog2);\
+                deviceContainer.appendChild(colorPicker3);\
+                deviceContainer.appendChild(tog3);\
+                deviceContainer.appendChild(colorPicker4);\
+                deviceContainer.appendChild(tog4);\
+\
             }else{\
                 const header = document.createElement('div');\
                 header.className = 'header';\

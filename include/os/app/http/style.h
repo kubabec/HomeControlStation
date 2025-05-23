@@ -720,6 +720,17 @@ footer a {\
 .table-graphite .badge.inactive {\
   background:#555b6e;\
 }\
+.segLedTog{\
+position: relative;\
+left: 80%;\
+margin-left: 10px;\
+top:0%;\
+}\
+.segColDisp{\
+  position:relative;\
+  top:25px;\
+  margin-left: -22%;\
+}\
 </style>\
 ";
 

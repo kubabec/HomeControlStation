@@ -8,6 +8,7 @@
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 #ifdef LED_STRIP_SUPPORTED
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
+std::vector<SegLedWS1228bDeviceType> DeviceManager::segmentedWs2812bDevices = {};
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
@@ -129,6 +130,10 @@ void DeviceManager::init()
 #ifdef LED_STRIP_SUPPORTED
         /* Add LED strips to common devices vector*/
         for(LedWS1228bDeviceType& device: ledws2812bDevices){
+            devices.push_back(&device);
+        }
+
+        for(SegLedWS1228bDeviceType& device: segmentedWs2812bDevices){
             devices.push_back(&device);
         }
 #endif
@@ -314,12 +319,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             
             switch(nvmData.deviceType)
             {
-                case e_ON_OFF_DEVICE :
+                case type_ONOFFDEVICE :
                     vecOnOffDevices.push_back(OnOffDevice(nvmData));
                     isValidDeviceGiven = true;
                 break;
 
-                case e_LED_STRIP :
+                case type_LED_STRIP :
 #ifdef LED_STRIP_SUPPORTED
                     /* create WS2812b instance by forwarding NVM data to it */
                     ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
@@ -327,7 +332,15 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
 #endif
                 break;
 
-                case e_TEMP_SENSOR:
+                case type_LED_STRIP_SEGMENTED :
+#ifdef LED_STRIP_SUPPORTED
+                    /* create Segmented WS2812b instance by forwarding NVM data to it */
+                    segmentedWs2812bDevices.push_back(SegLedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
+                    isValidDeviceGiven = true;
+#endif
+                break;
+
+                case type_TEMP_SENSOR:
 #ifdef TEMP_SENSOR_SUPPORTED
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                     isValidDeviceGiven = true;
@@ -577,6 +590,22 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 configSlot.pinNumber = pin.toInt();
                 configSlot.roomId = room.toInt();
 
+            } else if(type == "SegLedStrip") {
+
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
+
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_LED_STRIP_SEGMENTED;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
+                }
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
             }
 
             configSlot.print();
