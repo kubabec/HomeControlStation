@@ -2,24 +2,6 @@
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
-  // for(auto& room : deviceToRoomMappingList){
-  //   if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
-  //     client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
-  //   }else
-  //   {
-  //     client.println("<div class=\"room-container\"><div class=\"room-header\">"+ roomNamesMapping.find(room.first)->second + "</div>");
-  //   }
-  //   /* Generate UI for every available device in this room */
-  //   for(auto& device : room.second)
-  //   {
-
-  //     if(device->deviceType == type_ONOFFDEVICE){
-  //       generateOnOffUi(*device, client);
-  //     }
-  //   }
-  //   client.println("</div>");
-  // }
-
   client.println("<div id=\"rooms\"></div>");
 
 

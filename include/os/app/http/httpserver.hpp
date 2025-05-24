@@ -62,7 +62,6 @@ public:
     static void flushNvmData();
     static void onDeviceDescriptionChange(std::any newDescriptionVector);
 
-    static void generateOnOffUi(DeviceDescription& description, WiFiClient& client);
     static void generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client);
 
     static String getRoomsCfgJson();

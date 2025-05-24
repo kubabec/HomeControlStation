@@ -655,40 +655,6 @@ void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
   // Serial.println("}");
 }
 
-//funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
-void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiClient& client) {
-  client.println("<div class=\"container\" id=\"container"+String(description.deviceId)+"\">"); // container
-  client.println("<div class=\"loading-overlay\" style=\"display: none;\">\
-            <div class=\"spinner\"></div>\
-            <div class=\"loading-text\">Loading...</div>\
-        </div>");
-
-  if(!description.isEnabled) {   
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light off\"></div>"); 
-  }
-  else {
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light on\"></div>"); 
-  }
-
-  /* Draw ON/OFF button depending on the current state */
-  if(!description.isEnabled) {   
-    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 1)\">ON</a>");
-  }
-  else {
-    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 0)\">OFF</a>");
-  }
-
-  /* Draw Brightness range bar if device allows brightness change */
-  /* is brigthness adjustable ? */
-  if(description.customBytes[0]) {
-    client.println("<br>");
-    const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-    const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, " + String(description.deviceId) + ")\" id=\"brightnessSlider"+String(description.deviceId)+"\">";
-    client.println(brightnessSlider1 + String(description.customBytes[1]) + brightnessSlider2);
-  }
-  client.println("</div>"); // container 
-}
-
 void generateExtraFieldsForOnOff(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
   client.println("<div class=\"extra-fields extra-43\">");
