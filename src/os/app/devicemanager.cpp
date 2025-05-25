@@ -12,6 +12,9 @@ std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
 #ifdef TEMP_SENSOR_SUPPORTED
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
 #endif
+#ifdef DISTANCE_SENSOR_SUPPORTED
+std::vector<DistanceSensor> DeviceManager::distanceSensorsDevices = {};
+#endif
 
 
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
@@ -125,6 +128,13 @@ void DeviceManager::init()
 #ifdef TEMP_SENSOR_SUPPORTED
         /* Add temperature sensors to common devices vector*/
         for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
+            devices.push_back(&device);
+        }
+#endif
+
+#ifdef DISTANCE_SENSOR_SUPPORTED
+        /* Add distance sensors to common devices vector*/
+        for(DistanceSensor& device: distanceSensorsDevices){
             devices.push_back(&device);
         }
 #endif
@@ -319,6 +329,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                 case e_TEMP_SENSOR:
 #ifdef TEMP_SENSOR_SUPPORTED
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
+                    isValidDeviceGiven = true;
+#endif
+                break;
+                case e_DISTANCE_SENSOR:
+#ifdef DISTANCE_SENSOR_SUPPORTED
+                    distanceSensorsDevices.push_back(DistanceSensor(nvmData));
                     isValidDeviceGiven = true;
 #endif
                 break;

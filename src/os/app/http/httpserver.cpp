@@ -797,10 +797,18 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     client.println("<option value=\"45\">Temperature sensor</option>");
   }
 
+  if(slot.deviceType == type_DISTANCE_SENSOR){
+    client.println("<option value=\"46\" selected>Distance sensor</option>");
+  }else
+  {
+    client.println("<option value=\"46\">Distance sensor</option>");
+  }
+
   if(
     slot.deviceType != type_ONOFFDEVICE &&
     slot.deviceType != type_LED_STRIP && 
-    slot.deviceType != type_TEMP_SENSOR){
+    slot.deviceType != type_TEMP_SENSOR &&
+    slot.deviceType != type_DISTANCE_SENSOR){
     client.println("<option value=\"255\" selected>UNKNOWN</option>");
   }else {
     client.println("<option value=\"255\">UNKNOWN</option>");
@@ -862,10 +870,7 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println("</select>");
 
   client.println("</label>");
-  /* some more extra fields for 43*/
-
-
-  
+  /* some more extra fields for 43*/  
 
   client.println("<label>Min PWM:");
   //client.println("<input type=\"text\" id=\"pwmMin-"+String((int)slotNumber)+"\" value=\""+ String((int)slot.customBytes[2])+"\">");
@@ -883,13 +888,39 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     
   client.println("</label>");
   
-  
-
-
-
-
-
+ 
   client.println("</div>");
+
+
+  /*<!-- Extra fields for Distance Sensor -->*/
+  client.println("<div class=\"extra-fields extra-46\">");
+  client.println("<label>Pin Tx:");
+  client.println("<select id=\"pinTx-"+String((int)slotNumber)+"\" >");
+  for (int i = 0; i < 32; i++) {
+    String pinStr = "";
+    if(slot.customBytes[4] == i)
+    {
+      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
+    } else {
+      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
+    }
+  }
+  client.println("</select>");
+  client.println("</label>");
+  //Pole wyboru dla pinu Rx
+  client.println("<label>Pin Rx:");
+  client.println("<select id=\"pinRx-"+String((int)slotNumber)+"\" >");
+  for (int i = 0; i < 32; i++) {
+    String pinStr = "";
+    if(slot.customBytes[5] == i)
+    {
+      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
+    } else {
+      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
+    }
+  }
+  client.println("</select>");
+  client.println("</label>");
 
   /*<!-- Extra fields for LED Strip -->*/
   client.println("<div class=\"extra-fields extra-44\">");
