@@ -5,7 +5,23 @@ const uint8_t maxVirtualLeds = 100;
 SegLedWS1228bDeviceType::SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
 {
     m_reportNvmDataChangedCbk = reportNvmDataChangedCbk;
-    memcpy(&diodesCount, &(nvmData.customBytes[0]), sizeof(uint16_t));
+    for(uint8_t i = 5; i < 10; i++){
+        Serial.println("SegLedWS1228bDeviceType:// customBytes[" + String(i) + "] : " + String(nvmData.customBytes[i]));
+        if(nvmData.customBytes[i] > 0){
+            segmentLedCount.push_back(nvmData.customBytes[i]);
+        }else {
+            break;
+        }
+    }
+    for(uint8_t i = 10; i < 10 + segmentLedCount.size(); i++){
+        segmentFlips.push_back(nvmData.customBytes[i]);
+    }
+
+
+    Serial.println("SegLedWS1228bDeviceType:// Segment count : " + String(segmentLedCount.size()));
+    Serial.println("SegLedWS1228bDeviceType:// Segment flips : " + String(segmentFlips.size()));
+
+
 
     /* calculate number of virtual diodes based on real count */
     if(diodesCount > maxVirtualLeds){
@@ -418,7 +434,8 @@ DeviceDescription SegLedWS1228bDeviceType::getDeviceDescription(){
     desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
-    desc.customBytes[0] = virtualDiodesCount;
+    /* number of segments */
+    desc.customBytes[0] = segmentLedCount.size();
 
     desc.customBytes[2] = averagedColors[eACTIVE_CURRENT_CONTENT].r; // average color R
     desc.customBytes[3] = averagedColors[eACTIVE_CURRENT_CONTENT].g; // average color G

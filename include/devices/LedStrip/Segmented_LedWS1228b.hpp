@@ -20,6 +20,11 @@ class SegLedWS1228bDeviceType : public Device {
         eSAVED_CONTENT_SLOT3,
         eDIFFERENT_CONTENTS_COUNT
     };
+    /*SEG properties*/
+    std::vector<uint8_t> segmentLedCount; //number of segments in each segment led strip 
+    std::vector<uint8_t> segmentFlips; //flip segments in each segment led strip
+    /*SEG properties*/
+
 
     uint8_t* extendedMemoryPointer = nullptr;
     LedColor* stripContent[4];

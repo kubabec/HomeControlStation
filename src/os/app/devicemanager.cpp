@@ -605,6 +605,51 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 }
                 configSlot.pinNumber = pin.toInt();
                 configSlot.roomId = room.toInt();
+
+                /* apply  segment led strip properties */
+                String currentLimiter = String(doc["devices"][i]["currLim"]);
+                configSlot.customBytes[0] = 0;
+                if(currentLimiter != "null"){
+                    if(currentLimiter.toInt() < 255){
+                        configSlot.customBytes[0] = currentLimiter.toInt();
+                    }
+                }
+
+                std::vector<uint8_t > segmentLedCount;
+                std::vector<uint8_t > segmentFlips;
+
+                if (doc["devices"][i]["ledCount"].is<JsonArray>()) {
+                    JsonArray segments = doc["devices"][i]["ledCount"];
+                    for (JsonVariant v : segments) {
+                        int count = v.as<String>() != "null" ? v.as<int>() : 0 ;
+                        segmentLedCount.push_back(count);
+                    }
+                }else {
+                    Serial.println("DeviceManager: Segmented LED strip does not have segments defined");
+                }
+
+                if (doc["devices"][i]["sideFlp"].is<JsonArray>()) {
+                    JsonArray flips = doc["devices"][i]["sideFlp"];
+                    for (JsonVariant v : flips) {
+                        int flip = v.as<String>() != "null" ? v.as<int>() : 0 ;
+                        segmentFlips.push_back(flip);
+                    }
+                }else {
+                    Serial.println("DeviceManager: Segmented LED strip does not have flips defined");
+                }
+
+                if(segmentLedCount.size() <= 5){ /* only 5 segments allowed*/
+                    for(uint8_t j = 0; j < segmentLedCount.size(); j++){
+                        configSlot.customBytes[5+j] = segmentLedCount.at(j);
+                    }
+                }
+
+                if(segmentFlips.size() <= 5){ /* only 5 segments allowed*/
+                    for(uint8_t j = 0; j < segmentFlips.size(); j++){
+                        configSlot.customBytes[10+j] = segmentFlips.at(j);
+                    }
+                }
+                
             }
 
             configSlot.print();

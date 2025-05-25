@@ -274,6 +274,10 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
         jsonResponse +="\"temp\":"+ String(temperature)+",";
         jsonResponse +="\"humid\":"+ String((int)deviceInThisRoom->customBytes[2])+",";
       }
+
+      if(deviceInThisRoom->deviceType == type_LED_STRIP_SEGMENTED){
+        jsonResponse +="\"segCount\":"+ String((int)deviceInThisRoom->customBytes[0])+",";
+      }
       
       jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[2]);
       

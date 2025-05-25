@@ -86,70 +86,45 @@ function generateTempWidget(deviceContainer, device) {\
     listOfHumidValues.push(device.humid);\
 }\
 function generateSegLedWidget(deviceContainer, device) {\
-    const colorPicker1 = document.createElement('div');\
-    colorPicker1.className = 'color-picker';\
-    colorPicker1.classList.add('segColDisp');\
-    const colorDisplay1 = document.createElement('div');\
-    colorDisplay1.className = `color-display on`;\
-    colorDisplay1.style.backgroundColor = '#1af265';\
-    colorPicker1.appendChild(colorDisplay1);\
-    const tog1 = document.createElement('div');\
-    tog1.classList.add('switch');\
-    tog1.classList.add('segLedTog');\
-    const tmb1 = document.createElement('div');\
-    tmb1.classList.add('thumb');\
-    tog1.appendChild(tmb1);\
+    const segCnt = device.segCount;\
+    for(let i = 0; i < segCnt; i++) {\
+        const colorPicker = document.createElement('div');\
+        colorPicker.className = 'color-picker';\
+        colorPicker.classList.add('segColDisp');\
+        const colorDisplay = document.createElement('div');\
+        colorDisplay.className = `color-display on`;\
+        colorDisplay.style.backgroundColor = '#1af265';\
+        colorPicker.appendChild(colorDisplay);\
+        const tog = document.createElement('div');\
+        tog.classList.add('switch');\
+        tog.classList.add('segLedTog');\
+        const tmb = document.createElement('div');\
+        tmb.classList.add('segThumb');\
+        tog.appendChild(tmb);\
+        \
+        deviceContainer.appendChild(colorPicker);\
+        deviceContainer.appendChild(tog);\
+    };\
+    const btnContainer = document.createElement('div');\
+    btnContainer.className = 'button-container';\
 \
-    const colorPicker2 = document.createElement('div');\
-    colorPicker2.className = 'color-picker';\
-    colorPicker2.classList.add('segColDisp');\
-    const colorDisplay2 = document.createElement('div');\
-    colorDisplay2.className = `color-display off`;\
-    colorDisplay2.style.backgroundColor = '#6305a5';\
-    colorPicker2.appendChild(colorDisplay2);\
-    const tog2 = document.createElement('div');\
-    tog2.classList.add('switch');\
-    tog2.classList.add('segLedTog');\
-    const tmb2 = document.createElement('div');\
-    tmb2.classList.add('thumb');\
-    tog2.appendChild(tmb2);\
+    const button = document.createElement('a');\
+    button.className = 'button';\
+    button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
 \
-    const colorPicker3 = document.createElement('div');\
-    colorPicker3.className = 'color-picker';\
-    colorPicker3.classList.add('segColDisp');\
-    const colorDisplay3 = document.createElement('div');\
-    colorDisplay3.className = `color-display off`;\
-    colorDisplay3.style.backgroundColor = '#ff0510';\
-    colorPicker3.appendChild(colorDisplay3);\
-    const tog3 = document.createElement('div');\
-    tog3.classList.add('switch');\
-    tog3.classList.add('segLedTog');\
-    const tmb3 = document.createElement('div');\
-    tmb3.classList.add('thumb');\
-    tog3.appendChild(tmb3);\
+    var switchValue = 0;\
+    if(device.status == 'off'){\
+        switchValue = 1;\
+    }\
+    button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
+    button.id = `switchBtn${device.id}`;\
 \
-    const colorPicker4 = document.createElement('div');\
-    colorPicker4.className = 'color-picker';\
-    colorPicker4.classList.add('segColDisp');\
-    const colorDisplay4 = document.createElement('div');\
-    colorDisplay4.className = `color-display on`;\
-    colorDisplay4.style.backgroundColor = '#e3daf9';\
-    colorPicker4.appendChild(colorDisplay4);\
-    const tog4 = document.createElement('div');\
-    tog4.classList.add('switch');\
-    tog4.classList.add('segLedTog');\
-    const tmb4 = document.createElement('div');\
-    tmb4.classList.add('thumb');\
-    tog4.appendChild(tmb4);\
-\
-    deviceContainer.appendChild(colorPicker1);\
-    deviceContainer.appendChild(tog1);\
-    deviceContainer.appendChild(colorPicker2);\
-    deviceContainer.appendChild(tog2);\
-    deviceContainer.appendChild(colorPicker3);\
-    deviceContainer.appendChild(tog3);\
-    deviceContainer.appendChild(colorPicker4);\
-    deviceContainer.appendChild(tog4);\
+    const buttonMore = document.createElement('a');\
+    buttonMore.className = 'button';\
+    buttonMore.textContent = '. . .';\
+    btnContainer.appendChild(buttonMore);\
+    btnContainer.appendChild(button);\
+    deviceContainer.appendChild(btnContainer);\
 }\
 \
 ";

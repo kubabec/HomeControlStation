@@ -140,7 +140,7 @@ let isNotificationPollingActive = 1;\
         var dataRoom = document.getElementById('room' + id).value;\
         var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
         var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
-        var curLim =  document.getElementById('curLimVal-' + id).realValue;\ 
+        var curLim =  document.getElementById('curLimVal-' + id).value;\ 
         return {\
         type:\"LedStrip\",\
         id:id,\
@@ -153,12 +153,26 @@ let isNotificationPollingActive = 1;\
         currLim:curLim\
         };\
     }\
-    function getSegLedStripConfigurationJson(id){\
+    function getSegStripConfigJson(id){\
+        const segments = [];\
+        const flips = [];\
         var enable = \"enabled\" + id;\
         var enableValue = document.getElementById(enable).checked;\
         var dataName = document.getElementById('name' + id).value;\
         var dataPin = document.getElementById('pin' + id).value;\
         var dataRoom = document.getElementById('room' + id).value;\
+        var curLim =  document.getElementById('SegcurLimVal-' + id).value;\ 
+        \
+        for (let i = 1; i <= 5; i++) {\
+          var segCnt =  document.getElementById('seg'+i+'Count-' + id).value;\ 
+          var segFlip =  document.getElementById('Seg'+i+'Flip-' + id).value;\
+          if (segCnt) {\
+            segments.push(segCnt);\
+          }\
+          if(segFlip) {\
+            flips.push(segFlip);\
+          }\
+        }\
         return {\
         type:\"SegLedStrip\",\
         id:id,\
@@ -166,6 +180,9 @@ let isNotificationPollingActive = 1;\
         name:dataName,\
         pin:dataPin,\
         room:dataRoom,\
+        ledCount:segments,\
+        sideFlp:flips,\
+        currLim:curLim\
         };\
     }\
     function getTempSensorConfigurationJson(id){\
@@ -204,7 +221,7 @@ let isNotificationPollingActive = 1;\
             } else if(deviceTypeValue == 45) {\
                 devices.push(getTempSensorConfigurationJson(i));\
             } else if(deviceTypeValue == 46) {\
-                devices.push(getSegLedStripConfigurationJson(i));\
+                devices.push(getSegStripConfigJson(i));\
             } else {\
                 devices.push(getEmptyConfigurationJson(i));\
             }\
@@ -219,8 +236,6 @@ let isNotificationPollingActive = 1;\
         var url = '/lclSetupJson&' + jsonString;\
 \
         const xhr = new XMLHttpRequest();\
-        const container = document.getElementById('popup-content');\
-        showLoading(container);\
         xhr.timeout = 10000;\
         xhr.open(\"POST\", url, true);\
         xhr.onreadystatechange = function() {\
@@ -231,7 +246,6 @@ let isNotificationPollingActive = 1;\
                     console.log('Error with AJAX request');\
                 }\
             }\
-            hideLoading(container);\
             url = '/';\
             window.location.href = url;\
         };\
