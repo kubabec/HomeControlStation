@@ -4,6 +4,31 @@
 
 const char* javascript = "\
 <script>\
+function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
+    const xhr = new XMLHttpRequest();\
+    xhr.timeout = 10000;\
+    if(container) {\
+        showLoading(container);\
+    }\
+    xhr.open(\"GET\", url, true);\
+    xhr.onreadystatechange = function() {\
+        if (xhr.readyState === 4) { \
+            if (xhr.status === 200) { \
+                const newData = JSON.parse(xhr.responseText);\
+                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
+                    currentData = newData;\
+                    renderRooms(currentData);\
+                }\
+            } else { \
+                console.log('Error with AJAX request');\
+            }\
+        }\
+        if(container) {\
+            hideLoading(container);\
+        }\
+    };\
+    xhr.send();\
+}\
 let isNotificationPollingActive = 1;\
     function applySettings() {\
         var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;\
@@ -37,6 +62,10 @@ let isNotificationPollingActive = 1;\
         var url = `/roomAssignment`;\
         window.location.href = url;\
     }\
+    function goToNetIns() {\
+        var url = `/networkInspection`;\
+        window.location.href = url;\
+    }\
     function massErase(){\
         var url = `/masseraseviahttp`;\
         window.location.href = url;\
@@ -52,28 +81,8 @@ let isNotificationPollingActive = 1;\
     function onRangeChanged(value, devId) {\
         value = parseInt(value);\
         var url = \"/chngdvbr\"+value+\"DEV\"+devId+\"&\";\
-        const xhr = new XMLHttpRequest();\
-        xhr.timeout = 10000;\
         const container = document.getElementById('container' + devId);\
-        showLoading(container);\
-        xhr.open(\"GET\", url, true);\
-        xhr.onreadystatechange = function() {\
-            if (xhr.readyState === 4) { \
-                const statusElement = document.getElementById(\"status\");\
-                if (xhr.status === 200) { \
-                    const newData = JSON.parse(xhr.responseText);\
-                    if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
-                        currentData = newData;\
-                        renderRooms(currentData);\
-                        console.log(currentData);\
-                    }\
-                } else { \
-                    console.log('Error with AJAX request');\
-                }\
-            }\
-            hideLoading(container);\
-        };\
-        xhr.send();\
+        createAsyncRequestWithRenderRoomsResponse(url, container);\
     }\
     function toggleDeviceConfig(checkbox) {\
         var container = checkbox.closest('.device-container');\
@@ -144,6 +153,21 @@ let isNotificationPollingActive = 1;\
         currLim:curLim\
         };\
     }\
+    function getSegLedStripConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        return {\
+        type:\"SegLedStrip\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        };\
+    }\
     function getTempSensorConfigurationJson(id){\
         var enable = \"enabled\" + id;\
         var enableValue = document.getElementById(enable).checked;\
@@ -179,6 +203,8 @@ let isNotificationPollingActive = 1;\
                 devices.push(getLedStripConfigurationJson(i));\
             } else if(deviceTypeValue == 45) {\
                 devices.push(getTempSensorConfigurationJson(i));\
+            } else if(deviceTypeValue == 46) {\
+                devices.push(getSegLedStripConfigurationJson(i));\
             } else {\
                 devices.push(getEmptyConfigurationJson(i));\
             }\
@@ -420,62 +446,27 @@ let isNotificationPollingActive = 1;\
             cancelButton.addEventListener(\"click\", closePopup);\
         }\
 \
-  function asyncDeviceStateSwitch(device, state){\
-    const xhr = new XMLHttpRequest();\
-    xhr.timeout = 10000;\
-    var url = '/stDvstte' + device.toString() + 'state';\
-    const container = document.getElementById('container' + device);\
-    showLoading(container);\
-    if(state === 1){\
-        url = url + '1&';\
-    }else {\
-        url = url + '0&';\
-    }\
-    xhr.open(\"GET\", url, true);\
-    xhr.onreadystatechange = function() {\
-        if (xhr.readyState === 4) { \
-            const statusElement = document.getElementById(\"status\");\
-            if (xhr.status === 200) { \
-                const newData = JSON.parse(xhr.responseText);\
-                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
-                    currentData = newData;\
-                    renderRooms(currentData);\
-                }\
-            } else { \
-                console.log('Error with AJAX request');\
-            }\
-        }\
-        hideLoading(container);\
-    };\
-    xhr.send();\
-  }\
-  function handleJsonResponse(responseText = \"\"){\
-    const response = JSON.parse(responseText);\
-    if(response.status === \"succ\"){\
-        if(response.type === \"switch\"){\
-            var switchBtn = document.getElementById('switchBtn' + response.id);\
-            var statusLight = document.getElementById('statusLight' + response.id);\
-            if(response.state === \"on\"){\
-                switchBtn.innerHTML = \"OFF\";\
-                switchBtn.removeAttribute(\"onclick\");\
-                switchBtn.onclick = function() { asyncDeviceStateSwitch(response.id, 0); };\
-                statusLight.classList.remove('off');\
-                statusLight.classList.add('on');\
-            }else {\
-                switchBtn.innerHTML = \"ON\";\
-                switchBtn.removeAttribute(\"onclick\");\
-                switchBtn.onclick = function() { asyncDeviceStateSwitch(response.id, 1); };\
-                statusLight.classList.remove('on');\
-                statusLight.classList.add('off');\
-            }\
-            console.log(\"Success\")\
-        }else if(response.type === \"brightnessChange\"){\
-            var slider = document.getElementById('brightnessSlider' + response.id);\
-            slider.value = response.level;\
-            console.log(\"Success\")\
-        }\
-    }\
-  }\
+function getRoomChangeUrl(room, state) {\
+    let json = {roomId: room, state: state};\
+    let jsonString = JSON.stringify(json);\
+    let url = '/stRmChng&' + jsonString;\
+    return url;\
+}\
+function asyncRoomStateSwitch(room, state){\
+    var url = getRoomChangeUrl(room, state);\
+    createAsyncRequestWithRenderRoomsResponse(url);\
+}\
+function asyncDeviceStateSwitch(device, state){\
+var url = '/stDvstte' + device.toString() + 'state';\
+const container = document.getElementById('container' + device);\
+showLoading(container);\
+if(state === 1){\
+    url = url + '1&';\
+}else {\
+    url = url + '0&';\
+}\
+createAsyncRequestWithRenderRoomsResponse(url, container);\
+}\
   function showLoading(container) {\
     container.classList.add(\"loading\");\
     const overlay = container.querySelector(\".loading-overlay\");\
@@ -540,25 +531,6 @@ function displayNotifications(data){\
         };\
     }\
 }\
-\
-        \
-function fetchDataxxx() {\
-                const xhr = new XMLHttpRequest();\
-                var url = '/getPageContent';\
-                xhr.open(\"GET\", url, true);\
-                xhr.onreadystatechange = function() {\
-                    if (xhr.readyState === 4) { \
-                        if (xhr.status === 200) { \
-                            console.log(xhr.responseText);\
-                            const response = JSON.parse(xhr.responseText);\
-                            console.log(response);\
-                        } else { \
-                            console.log('Error with AJAX request');\
-                        }\
-                    }\
-                };\
-                xhr.send();\
-            }\
 \
 async function getNotifications() {\
     if (isNotificationPollingActive) {\
@@ -647,22 +619,7 @@ function overWriteMemSlot(memSlotId, ledStripDevId){\
     let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
     let jsonString = JSON.stringify(json);\
     var url = '/stripOverwriteSlot&' + jsonString;\
-    const xhr = new XMLHttpRequest();\
-    xhr.open(\"POST\", url, true);\
-    xhr.onreadystatechange = function() {\
-        if (xhr.readyState === 4) { \
-            if (xhr.status === 200) { \
-                const newData = JSON.parse(xhr.responseText);\
-                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
-                    currentData = newData;\
-                    renderRooms(currentData);\
-                }\
-            } else { \
-                console.log('Error with AJAX request');\
-            }\
-        }\
-    };\
-    xhr.send();\
+    createAsyncRequestWithRenderRoomsResponse(url);\
     hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
     closeCompositions();\
 }\
@@ -670,22 +627,7 @@ function loadMemSlot(memSlotId, ledStripDevId){\
     let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
     let jsonString = JSON.stringify(json);\
     var url = '/stripLoadFromMemory&' + jsonString;\
-    const xhr = new XMLHttpRequest();\
-    xhr.open(\"POST\", url, true);\
-    xhr.onreadystatechange = function() {\
-        if (xhr.readyState === 4) { \
-            if (xhr.status === 200) { \
-                const newData = JSON.parse(xhr.responseText);\
-                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
-                    currentData = newData;\
-                    renderRooms(currentData);\
-                }\
-            } else { \
-                console.log('Error with AJAX request');\
-            }\
-        }\
-    };\
-    xhr.send();\
+    createAsyncRequestWithRenderRoomsResponse(url);\
     hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
     closeCompositions();\
 }\

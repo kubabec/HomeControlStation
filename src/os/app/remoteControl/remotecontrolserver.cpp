@@ -75,6 +75,7 @@ void RemoteControlServer::init(){
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
 
+    updateNetworkNodesInformationSignal();
 
     Serial.println("... done");
 }
@@ -385,11 +386,13 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
                 // not found - brak info o node, dodajemy info do mapy
                 RemoteNodeInformation nodeInfo {
                     .numberOfDevices = receivedInitialData.numberOfDevices,
+                    .nodeIpAddress = msg.getIPAddress(),
                     .lastKnownNodeHash = receivedInitialData.nodeHash
                 };
 
                 remoteNodes.insert({receivedInitialData.macAddress, nodeInfo});
                 nodeInfo.printLn();
+                updateNetworkNodesInformationSignal();
                 Serial.println("New Node Added, current remote nodes content:");                
                 for(auto& node:remoteNodes){ // pętla iterująca przez wszystkie elementy w mapie remoteNodes
                     node.second.printLn(); // node.second oznacza, że korzystamy z drugiego elementu pary z każdego wpisu.
@@ -667,5 +670,38 @@ void RemoteControlServer::updateSlaveInformation(DeviceDescription& deviceDescri
         /* Slave not found */
         Serial.println("Trying to update information about non existing slave");
     }
+
+}
+
+void RemoteControlServer::updateNetworkNodesInformationSignal()
+{
+    std::vector<NetworkNodeInfo> networkNodes;
+    try {
+        uint32_t localIpAddress = std::any_cast<uint32_t>(DataContainer::getSignalValue(SIG_IP_ADDRESS));
+
+        NetworkNodeInfo localNodeInfo;
+        localNodeInfo.nodeType = NetworkNodeInfo::NodeType::Master;
+        uint8_t* ip = (uint8_t*)&localIpAddress;
+        localNodeInfo.nodeIP = {
+            ip[0],
+            ip[1],
+            ip[2],
+            ip[3]
+        };
+        networkNodes.push_back(localNodeInfo);
+    }
+    catch (const std::bad_any_cast& e) {
+        Serial.println("Error: " + String(e.what()));
+        // return;
+    }
+    
+    for(auto& node: remoteNodes) {
+        NetworkNodeInfo nodeInfo;
+        nodeInfo.nodeType = NetworkNodeInfo::NodeType::Slave;
+        nodeInfo.nodeIP = node.second.nodeIpAddress;
+        networkNodes.push_back(nodeInfo);
+    }
+
+    DataContainer::setSignalValue(SIG_NETWORK_NODES_INFO, static_cast<std::vector<NetworkNodeInfo>>(networkNodes));
 
 }

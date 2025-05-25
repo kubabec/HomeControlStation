@@ -113,6 +113,7 @@ public:
     static void init();
     static void deinit();
     static void cyclic();
+    static void flushNvmData();
 
     static bool loadConfigFromFile(JsonDocument& doc);
     static bool setConfigViaString(String& configString);

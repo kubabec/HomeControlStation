@@ -14,7 +14,6 @@
 #include <os/app/config/ConfigProvider.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DeviceProvider.hpp>
-#include <os/app/ErrorMonitor.hpp>
 #include <os/app/NotificationHandler.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/timeMaster.hpp>
@@ -28,6 +27,9 @@ private:
     static bool isRCServerRunning;
     static uint16_t runtimeNodeHash;
     static uint16_t uniqueLifecycleId;
+
+    static bool isNvmSaveTimerActive;
+    static long long nvmSaveTimerValue;
 
     static long long uIBlockTime;
 
@@ -45,12 +47,16 @@ private:
     static void handleUiBlockTimeExpiration();
     static void detectHwMassEraseRequest();
 
+    static void handleNvmSaveMech();
+
     
 
 public:
 
     static void init();
     static void reset(uint16_t delay);
+    static void saveNvmData();
+    static void activateNvmSaveTimer();
 
     static void requestSecurityAccessLevelChangeViaString(String password);
 

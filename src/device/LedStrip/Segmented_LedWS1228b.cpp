@@ -1,8 +1,8 @@
-#include "devices/LedStrip/LedWS1228b.hpp"
+#include "devices/LedStrip/Segmented_LedWS1228b.hpp"
 #ifdef LED_STRIP_SUPPORTED
 const uint8_t maxVirtualLeds = 100;
 
-LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
+SegLedWS1228bDeviceType::SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
 {
     m_reportNvmDataChangedCbk = reportNvmDataChangedCbk;
     memcpy(&diodesCount, &(nvmData.customBytes[0]), sizeof(uint16_t));
@@ -40,13 +40,13 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::fu
 
     adafruit_ws2812b->begin();
 
-    Serial.println("LedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
+    Serial.println("SegLedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
     adafruit_ws2812b->setBrightness(nvmData.customBytes[3]); /* current limiter usage */
 
 
 }
 
-ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* ptr, uint16_t size)
+ServiceRequestErrorCode SegLedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* ptr, uint16_t size)
 {
     ServiceRequestErrorCode retVal = SERV_EXECUTION_FAILURE;
     if(ptr != nullptr && size == getExtendedMemoryLength()){
@@ -58,7 +58,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* p
         stripContent[eSAVED_CONTENT_SLOT2] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT1]  + (virtualDiodesCount * sizeof(LedColor)));
         stripContent[eSAVED_CONTENT_SLOT3] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT2]  + (virtualDiodesCount * sizeof(LedColor)));
 
-        Serial.println("LedWS1228bDeviceType:// Successfully initialized");
+        Serial.println("SegLedWS1228bDeviceType:// Successfully initialized");
 
         updateAveragedColor(eACTIVE_CURRENT_CONTENT);
         updateAveragedColor(eSAVED_CONTENT_SLOT1);
@@ -74,10 +74,10 @@ ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t* p
     return retVal;
 }
 
-void LedWS1228bDeviceType::init(){
+void SegLedWS1228bDeviceType::init(){
 }
 
-void LedWS1228bDeviceType::cyclic(){
+void SegLedWS1228bDeviceType::cyclic(){
     static long long animationProcessTime = 0;
 
     if(switchOffAnimation != nullptr){
@@ -109,12 +109,12 @@ void LedWS1228bDeviceType::cyclic(){
     }
 }
 
-bool LedWS1228bDeviceType::isStripInitialized()
+bool SegLedWS1228bDeviceType::isStripInitialized()
 {
     return (adafruit_ws2812b != nullptr);
 }
 
-void LedWS1228bDeviceType::applyColors(){
+void SegLedWS1228bDeviceType::applyColors(){
     if(isContentInitialized){
         updateAveragedColor(eACTIVE_CURRENT_CONTENT);
 
@@ -139,7 +139,7 @@ void LedWS1228bDeviceType::applyColors(){
     }
 }
 
-void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
+void SegLedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
 {
     if(isContentInitialized){
         if(count == virtualDiodesCount){
@@ -150,7 +150,7 @@ void LedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
     }
 }
 
-void LedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t count)
+void SegLedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t count)
 {
     if(isContentInitialized){
         if(count == virtualDiodesCount){
@@ -159,13 +159,13 @@ void LedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t co
     }
 }
 
-ServiceRequestErrorCode LedWS1228bDeviceType::applyContent(LedStripContentIndex contentIndex)
+ServiceRequestErrorCode SegLedWS1228bDeviceType::applyContent(LedStripContentIndex contentIndex)
 {
     ServiceRequestErrorCode retVal = SERV_EXECUTION_FAILURE;
 
     if(isContentInitialized && contentIndex > eACTIVE_CURRENT_CONTENT && contentIndex < eDIFFERENT_CONTENTS_COUNT)
     {
-        Serial.println("LedWS1228bDeviceType:// requested load content " + String((int)contentIndex));
+        Serial.println("SegLedWS1228bDeviceType:// requested load content " + String((int)contentIndex));
         memcpy( /* copy data from requested content to active content */
             stripContent[eACTIVE_CURRENT_CONTENT], 
             stripContent[contentIndex],
@@ -180,13 +180,13 @@ ServiceRequestErrorCode LedWS1228bDeviceType::applyContent(LedStripContentIndex 
 }
 
 
-ServiceRequestErrorCode LedWS1228bDeviceType::saveContentAs(LedStripContentIndex contentIndex)
+ServiceRequestErrorCode SegLedWS1228bDeviceType::saveContentAs(LedStripContentIndex contentIndex)
 {
     ServiceRequestErrorCode retVal = SERV_EXECUTION_FAILURE;
 
     if(isContentInitialized && contentIndex > eACTIVE_CURRENT_CONTENT && contentIndex < eDIFFERENT_CONTENTS_COUNT)
     {
-        Serial.println("LedWS1228bDeviceType:// requested overwrite content " + String((int)contentIndex));
+        Serial.println("SegLedWS1228bDeviceType:// requested overwrite content " + String((int)contentIndex));
         Serial.println("contentIndex : " + String((int)contentIndex));
         memcpy( /* copy data from active content to choosen content slot */ 
             stripContent[contentIndex],
@@ -211,12 +211,12 @@ ServiceRequestErrorCode LedWS1228bDeviceType::saveContentAs(LedStripContentIndex
     return retVal;
 }
 
-void LedWS1228bDeviceType::stripOn()
+void SegLedWS1228bDeviceType::stripOn()
 {
     applyColors();
 }
 
-void LedWS1228bDeviceType::stripOff()
+void SegLedWS1228bDeviceType::stripOff()
 {
     if(switchOffAnimation != nullptr){
         delete switchOffAnimation;
@@ -228,11 +228,11 @@ void LedWS1228bDeviceType::stripOff()
     switchOffAnimation->start(false);
 }
 
-bool isNotBlack(LedColor color){
+bool notBlack(LedColor color){
     return !(color.r == 0 && color.g == 0 && color.b == 0);
 }
 
-void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
+void SegLedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
 {
     int avgRed = 0;
     int avgGreen = 0;
@@ -242,7 +242,7 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
 
     for(uint16_t i = 0 ; i < virtualDiodesCount ; i ++)
     {
-        if(isNotBlack(stripContent[content][i])){
+        if(notBlack(stripContent[content][i])){
             avgRed += stripContent[content][i].r;
             avgGreen += stripContent[content][i].g;
             avgBlue += stripContent[content][i].b;
@@ -262,24 +262,24 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
 }
 
 
-uint16_t LedWS1228bDeviceType::getExtendedMemoryLength(){
+uint16_t SegLedWS1228bDeviceType::getExtendedMemoryLength(){
     return ((virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor));
 }
 
-uint8_t LedWS1228bDeviceType::getDeviceIdentifier(){
+uint8_t SegLedWS1228bDeviceType::getDeviceIdentifier(){
     return deviceId;
 }
-uint8_t LedWS1228bDeviceType::getDeviceType(){
-    return type_LED_STRIP;
+uint8_t SegLedWS1228bDeviceType::getDeviceType(){
+    return type_LED_STRIP_SEGMENTED;
 }
 
-ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType){
+ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serviceType){
     switch(serviceType){
         default: 
             return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
+ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
     switch(serviceType){
         case DEVSERVICE_STATE_SWITCH:
             if(param.a == 1) {
@@ -293,24 +293,24 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             return SERV_SUCCESS;
 
         case DEVSERVICE_LED_STRIP_SAVE_CONTENT:
-            Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
+            Serial.println("SegLedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
             return saveContentAs((LedStripContentIndex)param.a);
         
         case DEVSERVICE_LED_STRIP_SWITCH_CONTENT:
-            Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
+            Serial.println("SegLedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
             return applyContent((LedStripContentIndex)param.a);
 
         default: 
             return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
+ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set2 param){
     switch(serviceType){
         default: 
             return SERV_NOT_SUPPORTED;
     };
 }
-ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
+ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param){
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
         case DEVSERVICE_GET_DETAILED_COLORS:
@@ -345,7 +345,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     };
 }
 
-void LedWS1228bDeviceType::applyVirtualToRealDiodes()
+void SegLedWS1228bDeviceType::applyVirtualToRealDiodes()
 {
     for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
         uint8_t adjustedIdx = isInversedOrder ? (virtualDiodesCount-(i+1)) : i;
@@ -361,7 +361,7 @@ void LedWS1228bDeviceType::applyVirtualToRealDiodes()
 }
 
 
-void LedWS1228bDeviceType::setHwLedStripColor(
+void SegLedWS1228bDeviceType::setHwLedStripColor(
     uint8_t virtualLedIndex,
     uint8_t r,
     uint8_t g,
@@ -409,7 +409,7 @@ void LedWS1228bDeviceType::setHwLedStripColor(
 
 }
 
-DeviceDescription LedWS1228bDeviceType::getDeviceDescription(){
+DeviceDescription SegLedWS1228bDeviceType::getDeviceDescription(){
     DeviceDescription desc;
     desc.deviceType = getDeviceType();
     desc.deviceId = getDeviceIdentifier();

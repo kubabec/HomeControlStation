@@ -17,6 +17,7 @@ void UDPAdapter::task()
 
     if(packetSize > 0)
     {
+        IPAddress senderIP = udp.remoteIP();
     //    Serial.println("Received new package");
         
         std::vector<uint8_t> dataBuffer;
@@ -33,6 +34,8 @@ void UDPAdapter::task()
             // Check if on receive callback is assigned
             if(receivedMessage.isValid() && onReceiveCallback)
             {
+                receivedMessage.setIpAddress({senderIP[0], senderIP[1], senderIP[2], senderIP[3]});
+
                 // Pass received message to the callback
                 onReceiveCallback(receivedMessage);
             }

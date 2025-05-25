@@ -25,42 +25,22 @@ SecurityAccessLevelType HomeLightHttpServer::secAccessLevel = e_ACCESS_LEVEL_NON
 std::vector<DeviceDescription> HomeLightHttpServer::descriptionVector;
 std::map<uint8_t, std::vector<DeviceDescription*>> HomeLightHttpServer::deviceToRoomMappingList;
 std::map<uint8_t, String> HomeLightHttpServer::roomNamesMapping;
-std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> HomeLightHttpServer::systemErrorList;
-uint8_t HomeLightHttpServer::activeErrorsCount = 0;
 String HomeLightHttpServer::ipAddressString;
 
 
-/*TESTBLOCK */
-const uint8_t ledsCount = 50;
-typedef struct{
-  uint8_t status = 0;
-  uint8_t red[ledsCount] = {0};
-  uint8_t green[ledsCount] = {0};
-  uint8_t blue[ledsCount] = {0};
-}LedStripTestType;
-
-LedStripTestType leds;
-
-/*TESTBLOCK */
 
 const char* labelStart = "<label>";
 const char* labelEnd = "</label>";
-// ERR_MON_UNEXPECTED_RESET = 1,
-// ERR_MON_INVALID_NVM_DATA,
-// ERR_MON_INVALID_LOCAL_CONFIG,
-// ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
-// ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
-// ERR_MON_INVALID_ERROR_REPORTED,
 
 std::vector<String> constantRequests = {
   "", /* Main page with no parameter */
   "config",
   "resetDevice",
-  "errclrbtn",
   "localDevices",
   "roomAssignment",
   "masseraseviahttp",
-  "asyncRequestTest"
+  "asyncRequestTest",
+  "networkInspection"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -83,6 +63,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "setStripColor",
   "stripLoadFromMemory",
   "stripOverwriteSlot",
+  "stRmChng"
 };
 
 
@@ -90,11 +71,11 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_resetDevice, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_clearErrors, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -116,10 +97,11 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE}
 };
 
-void escapeSpecialCharsInJson(String& json)
+void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
 {
   json.replace("%7B", "{");
   json.replace("%22", "\"");
@@ -151,8 +133,8 @@ void HomeLightHttpServer::cyclic()
   }
 }
 
-void HomeLightHttpServer::deinit() {
-
+void HomeLightHttpServer::flushNvmData()
+{
   /* Write NVM data for HttpServer application */
   uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
   /* Allocate memory for NVM data */
@@ -176,7 +158,10 @@ void HomeLightHttpServer::deinit() {
   }
   /* release heap buffer */
   free(nvmData);
-    
+}
+
+void HomeLightHttpServer::deinit() {
+  flushNvmData();
 }
 
 bool HomeLightHttpServer::packNvmData(uint8_t* nvmData, uint16_t length)
@@ -228,20 +213,6 @@ void HomeLightHttpServer::init()
     CBK_GET_ROOMS_CFG_JSON, 
     static_cast<DeviceConfigManipulationAPI>(cfgControls));
 
-  DataContainer::subscribe(SIG_SYSTEM_ERROR_LIST, [](std::any signal) {
-    systemErrorList = (std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(signal));
-    activeErrorsCount = 0;    
-
-    /* Count errors with occurrence > 0 */
-    for(auto& error : systemErrorList)
-    {
-      if(error.occurrenceCount > 0)
-      {
-        activeErrorsCount ++;
-      }
-    }
-  }
-  );
 
   /* Read NVM data for HttpServer application */
   uint16_t sizeOfNvm = (e_BLOCK_HTTP_LAST - e_BLOCK_HTTP_FIRST + 1) * PERSISTENT_DATABLOCK_SIZE;
@@ -266,25 +237,6 @@ void HomeLightHttpServer::init()
 
   /* release heap buffer */
   free(nvmData);
-
-
-  /* Explicit read of system error needed due to init order ->  ErrorMon -> ConfigProvider -> HttpServer */
-  std::any errorsAsAny = DataContainer::getSignalValue(SIG_SYSTEM_ERROR_LIST);
-  try {
-    systemErrorList = std::any_cast<std::array<SystemErrorType, ERR_MONT_ERROR_COUNT>>(errorsAsAny);
-    activeErrorsCount = 0;
-    /* Count errors with occurrence > 0 */
-    for(auto& error : systemErrorList)
-    {
-      if(error.occurrenceCount > 0)
-      {
-        activeErrorsCount ++;
-      }
-    }
-  }catch (std::bad_any_cast ex)
-  {
-    Serial.println("Unable to access SYSTEM ERRORS");
-  }
 
 
   DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
@@ -362,11 +314,6 @@ void HomeLightHttpServer::restoreNvmData(uint8_t* nvmData, uint16_t length)
       Serial.println("HttpServer://Failure during NVM data restore try");
     }
   }
-}
-
-void HomeLightHttpServer::requestErrorList()
-{
-  
 }
 
 bool HomeLightHttpServer::processLinkAsyncRequest(WiFiClient& client)
@@ -708,45 +655,123 @@ void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
   // Serial.println("}");
 }
 
-//funkcja rysujaca UI do sterowania dla 1 urzadzenia onoff
-void HomeLightHttpServer::generateOnOffUi(DeviceDescription& description, WiFiClient& client) {
-  client.println("<div class=\"container\" id=\"container"+String(description.deviceId)+"\">"); // container
-  client.println("<div class=\"loading-overlay\" style=\"display: none;\">\
-            <div class=\"spinner\"></div>\
-            <div class=\"loading-text\">Loading...</div>\
-        </div>");
+void generateExtraFieldsForOnOff(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
+{
+  client.println("<div class=\"extra-fields extra-43\">");
+  client.println("<label>Brightness support:");
+  client.println("<select id=\"brightnessSupported-"+String((int)slotNumber)+"\">");
+  if(slot.customBytes[0]){
+    client.println("<option value=\"0\" >No</option>");
+    client.println("<option value=\"1\" selected>Yes</option>");
+  }else {
+    client.println("<option value=\"0\" selected>No</option>");
+    client.println("<option value=\"1\">Yes</option>");
+  }
+  client.println("</select>");
 
-  if(!description.isEnabled) {   
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light off\"></div>"); 
-  }
-  else {
-    client.println("<div class=\"header\">" + description.deviceName + "</div><div id=\"statusLight"+String(description.deviceId)+"\" class=\"status-light on\"></div>"); 
-  }
+  client.println("</label>");
 
-  /* Draw ON/OFF button depending on the current state */
-  if(!description.isEnabled) {   
-    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 1)\">ON</a>");
-  }
-  else {
-    client.println("<a class=\"button\" id=\"switchBtn"+String(description.deviceId)+"\" onclick=\"asyncDeviceStateSwitch("+String(description.deviceId)+", 0)\">OFF</a>");
-  }
 
-  /* Draw Brightness range bar if device allows brightness change */
-  /* is brigthness adjustable ? */
-  if(description.customBytes[0]) {
-    client.println("<br>");
-    const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-    const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, " + String(description.deviceId) + ")\" id=\"brightnessSlider"+String(description.deviceId)+"\">";
-    client.println(brightnessSlider1 + String(description.customBytes[1]) + brightnessSlider2);
+  client.println("<label>Activation state:");
+  client.println("<select id=\"activationState-"+String((int)slotNumber)+"\">");
+  if(slot.customBytes[1]){
+    client.println("<option value=\"0\" >LOW</option>");
+    client.println("<option value=\"1\" selected>HIGH</option>");
+  }else {
+    client.println("<option value=\"0\" selected>LOW</option>");
+    client.println("<option value=\"1\">HIGH</option>");
   }
-  client.println("</div>"); // container 
+  client.println("</select>");
+
+  client.println("</label>");
+  client.println("<label>Min PWM:");
+
+  client.println("<input id=\"pwmMin-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[2]) +"\" >");
+
+  client.println("</label>");
+ 
+
+  client.println("<label>Max PWM:");
+  client.println("<input id=\"pwmMax-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[3]) +"\" >");
+    
+  client.println("</label>");
+  client.println("</div>");
+}
+void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
+{
+  client.println("<div class=\"extra-fields extra-44\">");
+  client.println("<label>LEDs num.:");
+  int ledsCount = 0;
+  memcpy(&ledsCount, &slot.customBytes[0], sizeof(uint16_t));
+  client.println("<input id=\"ledsCount-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\" value=\""+ 
+  String((int)ledsCount) +"\">");
+
+  client.println("</label>");
+
+  client.println("<label>Sides flip:");
+  client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
+  if(slot.customBytes[2]){
+    client.println("<option value=\"0\" >Not inversed</option>");
+    client.println("<option value=\"1\" selected>Inversed</option>");
+  }else {
+    client.println("<option value=\"0\" selected>Not inversed</option>");
+    client.println("<option value=\"1\">Inversed</option>");
+  }
+  client.println("</select>");
+
+  client.println("</label>");
+
+
+  client.println("<label>Current limiter</label>");
+  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\"10\">% ");
+  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
+  //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
+  client.println("</label>");
+
+  client.println("</div>");
+}
+void generateExtraFieldsForSegmentedLedStrip(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
+{
+  client.println("<div class=\"extra-fields extra-46\">");
+  client.println("<label>LEDs num.: test </label>");
+  client.println("</div>"); 
 }
 
+void generateExtraFieldsForDistanceSensor(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
+{
+  client.println("<div class=\"extra-fields extra-46\">");
+  client.println("<label>Pin Tx:");
+  client.println("<select id=\"pinTx-"+String((int)slotNumber)+"\" >");
+  for (int i = 0; i < 32; i++) {
+    String pinStr = "";
+    if(slot.customBytes[4] == i)
+    {
+      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
+    } else {
+      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
+    }
+  }
+  client.println("</select>");
+  client.println("</label>");
+  //Pole wyboru dla pinu Rx
+  client.println("<label>Pin Rx:");
+  client.println("<select id=\"pinRx-"+String((int)slotNumber)+"\" >");
+  for (int i = 0; i < 32; i++) {
+    String pinStr = "";
+    if(slot.customBytes[5] == i)
+    {
+      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
+    } else {
+      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
+    }
+  }
+  client.println("</select>");
+  client.println("</label>");
+  client.println("</div>"); 
+}
 
 void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
-
-
   client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
   
   if(slot.isActive)
@@ -797,18 +822,29 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
     client.println("<option value=\"45\">Temperature sensor</option>");
   }
 
+
   if(slot.deviceType == type_DISTANCE_SENSOR){
-    client.println("<option value=\"46\" selected>Distance sensor</option>");
+    client.println("<option value=\"47\" selected>Distance sensor</option>");
   }else
   {
-    client.println("<option value=\"46\">Distance sensor</option>");
+    client.println("<option value=\"47\">Distance sensor</option>");
+  }
+
+  if(slot.deviceType == type_LED_STRIP_SEGMENTED){
+    client.println("<option value=\"46\" selected>Segmented LED strip</option>");
+  }else
+  {
+    client.println("<option value=\"46\">Segmented LED strip</option>");
+
   }
 
   if(
     slot.deviceType != type_ONOFFDEVICE &&
     slot.deviceType != type_LED_STRIP && 
     slot.deviceType != type_TEMP_SENSOR &&
-    slot.deviceType != type_DISTANCE_SENSOR){
+    slot.deviceType != type_DISTANCE_SENSOR &&
+    slot.deviceType != type_LED_STRIP_SEGMENTED){
+
     client.println("<option value=\"255\" selected>UNKNOWN</option>");
   }else {
     client.println("<option value=\"255\">UNKNOWN</option>");
@@ -843,116 +879,22 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
   client.println(labelEnd);
 
   /*<!-- Extra fields for ON/OFF -->*/
-  client.println("<div class=\"extra-fields extra-43\">");
-  client.println("<label>Brightness support:");
-  client.println("<select id=\"brightnessSupported-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[0]){
-    client.println("<option value=\"0\" >No</option>");
-    client.println("<option value=\"1\" selected>Yes</option>");
-  }else {
-    client.println("<option value=\"0\" selected>No</option>");
-    client.println("<option value=\"1\">Yes</option>");
-  }
-  client.println("</select>");
 
-  client.println("</label>");
-
-
-  client.println("<label>Activation state:");
-  client.println("<select id=\"activationState-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[1]){
-    client.println("<option value=\"0\" >LOW</option>");
-    client.println("<option value=\"1\" selected>HIGH</option>");
-  }else {
-    client.println("<option value=\"0\" selected>LOW</option>");
-    client.println("<option value=\"1\">HIGH</option>");
-  }
-  client.println("</select>");
-
-  client.println("</label>");
-  /* some more extra fields for 43*/  
-
-  client.println("<label>Min PWM:");
-  //client.println("<input type=\"text\" id=\"pwmMin-"+String((int)slotNumber)+"\" value=\""+ String((int)slot.customBytes[2])+"\">");
-
-  client.println("<input id=\"pwmMin-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[2]) +"\" >");
-
-  client.println("</label>");
- 
-
-  client.println("<label>Max PWM:");
-  //client.println("<input type=\"text\" id=\"pwmMax-"+String((int)slotNumber)+"\" value=\""+
-  //  String((int)slot.customBytes[3])+"\">");
-
-    client.println("<input id=\"pwmMax-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[3]) +"\" >");
-    
-  client.println("</label>");
-  
- 
-  client.println("</div>");
+  generateExtraFieldsForOnOff(slotNumber, slot, client);
 
 
   /*<!-- Extra fields for Distance Sensor -->*/
-  client.println("<div class=\"extra-fields extra-46\">");
-  client.println("<label>Pin Tx:");
-  client.println("<select id=\"pinTx-"+String((int)slotNumber)+"\" >");
-  for (int i = 0; i < 32; i++) {
-    String pinStr = "";
-    if(slot.customBytes[4] == i)
-    {
-      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
-    } else {
-      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
-    }
-  }
-  client.println("</select>");
-  client.println("</label>");
-  //Pole wyboru dla pinu Rx
-  client.println("<label>Pin Rx:");
-  client.println("<select id=\"pinRx-"+String((int)slotNumber)+"\" >");
-  for (int i = 0; i < 32; i++) {
-    String pinStr = "";
-    if(slot.customBytes[5] == i)
-    {
-      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
-    } else {
-      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
-    }
-  }
-  client.println("</select>");
-  client.println("</label>");
+  generateExtraFieldsForDistanceSensor(slotNumber, slot, client);
 
   /*<!-- Extra fields for LED Strip -->*/
-  client.println("<div class=\"extra-fields extra-44\">");
-  client.println("<label>LEDs num.:");
-  int ledsCount = 0;
-  memcpy(&ledsCount, &slot.customBytes[0], sizeof(uint16_t));
-  client.println("<input id=\"ledsCount-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\" value=\""+ 
-  String((int)ledsCount) +"\">");
+  generateExtraFieldsForLedStrip(slotNumber, slot, client);
 
-  client.println("</label>");
+  /*<!-- Extra fields for Temperature sensor -->*/
+  // No extra fields for temperature sensor
 
-  client.println("<label>Sides flip:");
-  client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[2]){
-    client.println("<option value=\"0\" >Not inversed</option>");
-    client.println("<option value=\"1\" selected>Inversed</option>");
-  }else {
-    client.println("<option value=\"0\" selected>Not inversed</option>");
-    client.println("<option value=\"1\">Inversed</option>");
-  }
-  client.println("</select>");
+  /*<!-- Extra fields for Segmented LED Strip -->*/
+  generateExtraFieldsForSegmentedLedStrip(slotNumber, slot, client);
 
-  client.println("</label>");
-
-
-  client.println("<label>Current limiter</label>");
-  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\"10\">% ");
-  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
-  //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
-  client.println("</label>");
-
-  client.println("</div>");
 
 
   client.println("</div>");
@@ -965,8 +907,6 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 {
   NodeConfiguration currentConfig = 
     std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-
-
 
 
   const String yesNotSelected = "<option value=\"yes\">Yes</option>";
@@ -1103,6 +1043,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     /* Room mapping button */
     client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
   }
+
+  if(currentConfig.isRcServer){
+    client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+  }
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
@@ -1121,8 +1065,6 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
   /* Common HTML tags closure */
   client.println("</form></div>");
-
-  printErrorTable(client);
 
   /* Display return button */
   client.println("<br><a href=\"http://"+ipAddressString+"\" class=\"button\">Home page</a><br>");
@@ -1158,867 +1100,11 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 }
 
 
-void HomeLightHttpServer::printErrorTable(WiFiClient& client)
-{
-  if(activeErrorsCount > 0){
-    client.println("<div class=\"error-table-container\"> <div class=\"error-header\">Error Log</div> <table class=\"error-table\">");
-    client.println("<thead>\
-                      <tr>\
-                          <th>Code</th>\
-                          <th>Count</th>\
-                          <th>Comment</th>\
-                          <th>Time</th>\
-                      </tr>\
-                  </thead><tbody>");
-        
-
-    for(uint i = 0 ; i < ERR_MONT_ERROR_COUNT; i++)
-    {
-      if(systemErrorList.at(i).occurrenceCount > 0) {
-        client.println("<tr>\
-                          <td>ERR-"+ String(i+1) +"</td>\
-                          <td>"+ String((int)systemErrorList.at(i).occurrenceCount) +"</td>\
-                          <td>"+ systemErrorList.at(i).comment +"</td>\
-                          <td>" + systemErrorList.at(i).timeOfOccurrence + "</td>\
-                      </tr>");
-
-      }
-    }
-    client.println("</tbody></table>");
-
-    /* Display error clear button */
-    const char* errorClearBtn = "\
-    <button class=\"error-button\" \
-    onclick=\"showMessage('Wanna clear device errors?', '/errclrbtn')\">Clear errors</button>";
-
-    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
-      client.println("<div class=\"access-level-hidder\">");
-    }
-
-    client.println(errorClearBtn);
-    if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
-      client.println("</div>");
-    }
-
-    client.println("</div>");
-  }
-}
-
 /*** CONSTANT HANDLERS */
-
-void printTestLedStrip(WiFiClient& client)
-{
-  client.println("<div class=\"popup-backdrop\"></div>\
-    <div class=\"color-picker-popup\" id=\"colorPickerPopup\">\
-        <div class=\"header2\">Set Diode Color</div>\
-        <input type=\"color\" id=\"colorInput\" class=\"color-input\" />\
-        <div class=\"popup-buttons\">\
-            <button id=\"confirmColorButton\">Confirm</button>\
-            <button id=\"cancelColorButton\">Cancel</button>\
-        </div>\
-    </div>");
-
-  
-  
-
-  client.println("<div class=\"popup-backdrop\"></div>\
-    <div class=\"color-picker-popup\" id=\"SaveFavouritesPopup\">\
-        <div class=\"header2\">Save composition</div>\
-          <button class=\"button\" id=\"compos1\">Slot 1</button>\
-          <button class=\"button\" id=\"compos2\">Slot 2</button>\
-          <button class=\"button\" id=\"compos3\">Slot 3</button>\
-          <br>\
-          <button class=\"button\" id=\"composSaveClose\">Close</button>\
-    </div>");
-
-
-  // const String brightnessSlider1  = "<div class=\"header2\">Brightness</div><input type='range' min='0' max='100' value='";
-  // const String brightnessSlider2 = "' onchange=\"onRangeChanged(this.value, 6)\">";
-  
-
-  // client.println("<div class=\"container\">"); 
-  // client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
-  // client.println("\
-  //               <div class=\"color-picker\"> \
-  //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-  //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
-  //               </div>\
-  //               <button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
-  // client.println("<a class=\"button\" href=\"/test\">OFF</a>\
-  //               ");
-  // client.println(brightnessSlider1 + 40 + brightnessSlider2);
-
-  // client.println("</div>");
-
-  String firstLedRed = leds.red[0] < 10 ? '0' + String((int)leds.red[0], HEX) : String((int)leds.red[0], HEX);
-  String firstLedGreen = leds.green[0] < 10 ? '0' + String((int)leds.green[0], HEX) : String((int)leds.green[0], HEX);
-  String firstLedBlue = leds.blue[0] < 10 ? '0' + String((int)leds.blue[0], HEX) : String((int)leds.green[0], HEX);
-
-
-  client.println("<div class=\"container\">"); 
-  client.println("<div class=\"header\">TEST_LED_OFF</div><div class=\"status-light off\"></div>");
-  client.println("<div id=\"ledStrip3\" class=\"led-strip\" style=\"width:300px;\">");
-  for(uint8_t i = 0; i < ledsCount; i++){
-    String enableStatus = (leds.red[i] > 0 || leds.green[i] > 0 || leds.blue[i] > 0) ? "on" : "off";
-
-    client.println("<div class=\"led "+enableStatus+"\" onClick=\"colorClickedAction("+String((int)i)+")\" style=\"width:6px;");
-    if(enableStatus == "on"){
-      client.println("background-color: rgb(\
-      "+String((int)leds.red[i])+", \
-      "+String((int)leds.green[i])+", \
-      "+String((int)leds.blue[i])+");");
-    }
-    client.println("\"> </div>");
-  }
-  client.println("</div>");
-  client.println("\
-                <div class=\"color-picker\"> \
-                    <input type=\"color\" id=\"colorInput2\" class=\"color-input\" value=\"#\
-"+firstLedRed+"\
-"+firstLedGreen+"\
-"+firstLedBlue+"\"> \
-                </div>\
-                <button class=\"button\" onclick=\"sendColor(2)\">Set Color</button>\
-                <button class=\"button\" onclick=\"openLedStripMemorySlots()\">Compositions</button>\
-                <button class=\"button\" onclick=\"openSaveCompositions()\">Save composition</button>");
-  client.println("<a class=\"button\" href=\"/test\">ON</a>\
-                ");
-
-  client.println("</div>");
-
-
-  // client.println("<div class=\"container\">"); 
-  // client.println("<div class=\"header\">TEST_LED_ON</div><div class=\"status-light on\"></div>");
-  // // client.println("\
-  // //               <div class=\"color-picker\"> \
-  // //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-  // //                   <input type=\"color\" id=\"colorInput1\" class=\"color-input\" value=\"#f3bb11\"> \
-  // //               </div>");
-
-  // client.println("\
-  //               <div class=\"color-picker\"> \
-  //                   <div class=\"color-display on\" id=\"colorDisplay1\" style=\"background-color:#f3bb11;\"></div> \
-  //               </div>");
-  // client.println("<div class=\"button-container\">\
-  //                 <button class=\"button\" href=\"/test\">. . . </button>\
-  //                 <button class=\"button\" href=\"/test\">OFF</button>\
-  //                 </div>");
-  // //client.println("<button class=\"button\" onclick=\"sendColor(1)\">Set Color</button>");
-
-  // client.println(brightnessSlider1 + 40 + brightnessSlider2);
-  // client.println("</div>");
-
-
-  // client.println("<div class=\"container\">"); 
-  // client.println("<div class=\"header\">TemperatureSensor</div><div class=\"status-light on\"></div>");
-  // client.println("<div class=\"temperature-container\">\
-  //       <div id=\"gauge2\" class=\"temperature-widget\">\
-  //           <canvas style=\"max-width: 100px;\"></canvas>\
-  //           <div class=\"temperature-value\">20°C</div>\
-  //       </div>\
-  //       <div id=\"humidity\" class=\"humidity-widget\">\
-  //           <canvas></canvas>\
-  //           <div class=\"value-display humidity-value\">50%</div>\
-  //       </div>\
-  //   </div>");
-
-  // client.println("<div class=\"button-container\"><button class=\"button\" href=\"/test\">. . . </button></div>");
-
-
-  // client.println("<script>\
-  //    window.addEventListener('DOMContentLoaded', () => {\
-  //           createGauge('gauge2');\
-  //           setTemperature('gauge2', 0);\
-  //           createHumidGauge('humidity');\
-  //           setHumidity('humidity', 20);\
-  //       });\
-  //   </script>");
-
-  // client.println("</div>");
-
-  
-
-}
-
-void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
-{
-  // for(auto& room : deviceToRoomMappingList){
-  //   if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
-  //     client.println("<div class=\"room-container\"><div class=\"room-header\">Room ID: " + String((int)room.first) + "</div>");
-  //   }else
-  //   {
-  //     client.println("<div class=\"room-container\"><div class=\"room-header\">"+ roomNamesMapping.find(room.first)->second + "</div>");
-  //   }
-  //   /* Generate UI for every available device in this room */
-  //   for(auto& device : room.second)
-  //   {
-
-  //     if(device->deviceType == type_ONOFFDEVICE){
-  //       generateOnOffUi(*device, client);
-  //     }
-  //   }
-  //   client.println("</div>");
-  // }
-
-  client.println("<div id=\"rooms\"></div>");
-
-
-  /* Password popup code */
-  client.println("<div class=\"popup-overlay hidden-popup\" id=\"password-popup-overlay\">\
-        <div class=\"popup-content\" id=\"password-popup-content\">\
-            <div class=\"popup-header\">Enter Password</div>\
-            <div class=\"popup-message\">Please provide your password to continue:</div>\
-            <input type=\"password\" id=\"password-input\" class=\"popup-password-input\" placeholder=\"Password\" />\
-            <button class=\"popup-button\" onclick=\"submitPassword()\">Submit</button>\
-            <div class=\"popup-close\" id=\"password-popup-close\">&times;</div>\
-        </div>\
-  </div>");
-
-  /* Advanced controls popup */
-  client.println("<div class=\"popup-overlay hidden-popup\" id=\"advanced-ctrl-overlay\">\
-    <div class=\"popup-content\" id=\"advanced-ctrl-popup\">\
-        <div class=\"popup-header\" id=\"adv-ctrl-head\"></div>\
-        <div class=\"popup-close\" id=\"advanced-ctrl-popup-close\">&times;</div>\
-        <div class=\"popup-message\" id=\"advanced-ctrl-popup-msg\"></div>\
-    </div>\
-</div>");
-
-client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlId = 255;</script>\
-  <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
-      <div class=\"header2\">Saved compositions</div><hr>\
-        <div id=\"ledStripExt1\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx1\">Overwrite</button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx1\">Load</button></div>\
-        <hr><br>\
-        <div id=\"ledStripExt2\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx2\">Overwrite</button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx2\">Load</button></div>\
-        <hr><br>\
-        <div id=\"ledStripExt3\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx3\">Overwrite</button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx3\">Load</button></div>\
-        <button class=\"button\" id=\"composClose\">Close</button>\
-  </div>");
-
-  client.println("<script>document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
-  if (event.key === \"Enter\") {\
-    submitPassword();\
-  }\
-  });</script>");
-
-
-  // printTestLedStrip(client);
-
-  /* Display configuration button */
-  uint8_t nodeType = 
-    std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeType;
-  const String configPageButtonText = nodeType != 255 ? "Settings" : "Configure";
-
-  if(secAccessLevel == e_ACCESS_LEVEL_NONE){
-    String configButtonLink = "\
-    <br><button class=\"button\" onclick=\"showPasswordPopup()\">"+configPageButtonText+"</button><br>";
-    client.println(configButtonLink);
-  }else 
-  {
-    client.println("<br><a href=\"/config\" class=\"button\">"+configPageButtonText+"</a><br>");
-  }
-
-
-
-  client.println("<script>\
-        let currentData = {};\
-\
-\
-        async function fetchData() {\
-            try {\
-                const response = await fetch('/getPageContent');\
-                const newData = await response.json();\
-\
-                if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
-                    currentData = newData;\
-                    renderRooms(currentData);\
-                    console.log(currentData);\
-                }\
-            } catch (error) {\
-                console.error('Error fetching data:', error);\
-            }\
-        }\
-\
-\
-        fetchData();\
-        getNotifications();\
-\
-        setInterval(fetchData, 2500);\
-\
-\
-\
-    </script>");
-
-            // 
-
-}
-
-void HomeLightHttpServer::constantHandler_clearErrors(WiFiClient& client)
-{
-  for(uint8_t i = 1; i <= ERR_MON_LAST_ERROR; i++)
-  {  
-    std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode)>>(
-    DataContainer::getSignalValue(CBK_ERROR_CLEAR)
-    )((ERR_MON_ERROR_TYPE)i);
-  }
-
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-}
-
-void HomeLightHttpServer::constantHandler_configPage(WiFiClient& client)
-{
-  client.println("<script>getNotifications();</script>");
-  // Print config page if it is requested
-  printConfigPage(client);
-  
-}
-
-void HomeLightHttpServer::constantHandler_resetDevice(WiFiClient& client)
-{
-  /* Reset device callback */
-  std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(100);
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-}
-
-  
-
-void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient& client)
-{
-  printSlotsConfigPage(client);
-}
-
-void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient& client)
-{
-  client.println("<div class=\"wrapper\">\
-        <div class=\"header\">Room name mapping</div>");
-  
-  uint8_t slotIndex = 1;
-  std::vector<uint8_t> alreadyPrintedMappings;
-  for(auto& room : deviceToRoomMappingList){
-    client.println("<div class=\"container\">");
-    client.println(labelStart);
-    client.println("Room ID:<input disabled type=\"text\" maxlength=\"2\" id=\"roomMappingID"+String((int)slotIndex)+"\"\
-    value=\""+ String((int)room.first) +"\">");
-    client.println(labelEnd);
-
-    String nameValue = "";
-    /* name existing */
-    if(roomNamesMapping.find(room.first) != roomNamesMapping.end())
-    {
-      nameValue = roomNamesMapping.find(room.first)->second;
-      alreadyPrintedMappings.push_back(room.first);
-    }
-
-    client.println(labelStart);
-    client.println("Name:<input type=\"text\" maxlength=\"24\" placeholder=\"Your custom name here\" id=\"roomMappingName"+String((int)slotIndex)+"\"\
-    value=\""+ nameValue +"\">");
-    client.println(labelEnd);
-
-    if(nameValue != ""){
-      client.println(labelStart);
-      client.println("ON link:<input type=\"text\" disabled value=\"roomON/"+ nameValue +"\">");
-      client.println(labelEnd);
-      client.println(labelStart);
-      client.println("OFF link:<input type=\"text\" disabled value=\"roomOFF/"+ nameValue +"\">");
-      client.println(labelEnd);
-    }
-
-    client.println("</div>");
-    slotIndex++;
-  }
-
-  /* There also can be room mappings of the roomIDs which are no longer present in deviceToRoomMappingList - device room was changed 
-      or device was removed */
-      /* This is why we must print also the rest of mappings which were not printed above */
-  for(auto& mapping : roomNamesMapping){
-    bool mappingAlreadyPrinted = false;
-    for(auto& alreadyPrinted : alreadyPrintedMappings){
-      if(mapping.first == alreadyPrinted){
-        mappingAlreadyPrinted = true;
-        break;
-      }
-    }
-    if(mappingAlreadyPrinted){
-      continue;
-    }
-
-    client.println("<div class=\"container\"><div class=\"header\">Empty (no devices)</div>");
-    client.println(labelStart);
-    client.println("Room ID:<input disabled type=\"text\" maxlength=\"2\" id=\"roomMappingID"+String((int)slotIndex)+"\"\
-    value=\""+ String((int)mapping.first) +"\">");
-    client.println(labelEnd);
-
-
-    client.println(labelStart);
-    client.println("Name:<input type=\"text\" maxlength=\"24\" placeholder=\"Your custom name here\" id=\"roomMappingName"+String((int)slotIndex)+"\"\
-    value=\""+ mapping.second +"\">");
-    client.println(labelEnd);
-
-    client.println("</div>");
-    slotIndex++;
-  }
-
-  client.println("<button class=\"button\" id=\"roomMappingApplyBtn\" onclick=\"roomMappingCreateString(" +String((int)deviceToRoomMappingList.size()) + ");\">Save</button>");
-  client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
-
-
-  client.println("</div>");
-}
-
-
-void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
-{
-  /* Erase flash callback */
-  try{
-    Serial.println("Erasing flash!");
-    /* erase flash */
-    std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
-    /* redirect */
-    client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-    /* restart */
-    std::any_cast<std::function<void(uint16_t)>>
-    (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
-  }catch (std::bad_any_cast ex)
-  {
-
-  }
-}
-
-
-void HomeLightHttpServer::constantHandler_asyncTest(WiFiClient& client)
-{
-  Serial.println("Asysnc request received!");
-}
-
-
 /** parameterized requests */ 
 
-void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, WiFiClient& client)
-{
-  // Configuration to be handled here
-
-  Serial.println("Applying new config!");
-  /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-  client.println("<meta http-equiv='refresh' content='0;  url=http://"+ ipAddressString +"'>");
-  client.println("</div></body></html>");
-  client.flush();
-  client.stop();
-  if(std::any_cast<DeviceConfigManipulationAPI>
-    (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).setDeviceCfgViaJson(request)) {
-
-        std::any_cast<std::function<void(uint16_t)>>
-          (DataContainer::getSignalValue(CBK_RESET_DEVICE))(7000);
-      }
-}
-
-void HomeLightHttpServer::parameterizedHandler_newSetupJson(String& request, WiFiClient& client)
-{
-  /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
-  std::any_cast<DeviceConfigManipulationAPI>
-    (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).setDeviceCfgViaJson(request);
-
-}
-
-
-void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String& request, WiFiClient& client)
-{
-  pos1 = request.indexOf("stDvstte"); 
-  pos2 = request.indexOf("state"); 
-  pos3 = request.indexOf("&");         
-  String devId = request.substring(pos1+8 , pos2);
-  String state = request.substring(pos2+5 , pos3);
-  uint8_t deviceId = devId.toInt();
-  uint8_t deviceState = state.toInt();
-
-  uint8_t parameters[4];
-  parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId; /* idx 0 */
-  parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
-  parameters[SERVICE_NAME_INDEX] = DEVSERVICE_STATE_SWITCH;       /* idx 2 */
-  parameters[3] = deviceState;                                    /* idx 3 */
-
-
-
-  HTTPAsyncRequestHandler::createRequest(
-    ASYNC_TYPE_DEVICE_SERVICE_CALL,
-    parameters,
-    4
-  );
-
-
-
-  Serial.println("Async request processing started ");
-  /* Request will be processed in next cycle of the HttpServer */
-
-
-}
-
-
-void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& request, WiFiClient& client)
-{
-  Serial.println("Loading configuration from file request ...");
-
-  escapeSpecialCharsInJson(request);
-  request.replace("loaddeicvcfg&", "");
-
-
-  // Serial.println(request);
-
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  UserInterfaceNotification notification;
-
-  if(success == DeserializationError::Code::Ok){
-    Serial.println("Json deserialized successfully");
-    bool loadingFailure = false;
-    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
-        (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).loadConfigFromFile(doc);
-
-    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
-        (DataContainer::getSignalValue(SIG_SET_DEVICES_CONFIG_VIA_JSON)).loadConfigFromFile(doc);
-
-    loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>
-        (DataContainer::getSignalValue(CBK_GET_ROOMS_CFG_JSON)).loadConfigFromFile(doc);
-
-    notification.title = "New configuration loaded";
-    notification.type = UserInterfaceNotification::INFO;
-    notification.body = "Config file loaded successfully. Device will be restarted.";
-    HTTPAsyncRequestHandler::createRequest(ASYNC_REDIRECT_TO_MAIN_PAGE, nullptr, 0);
-
-  }else {
-
-    Serial.println("Json file loading error");
-    notification.title = "Config file loading failure";
-    notification.type = UserInterfaceNotification::ERROR;
-    notification.body = "Problem occurred with configuration file loading.";
-  }
-
-  std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
-
-  /* successfully loaded */
-  if(notification.type == UserInterfaceNotification::INFO){
-    std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(5000);
-  }
-}
-
-
-void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, WiFiClient& client){
-  escapeSpecialCharsInJson(request);
-  request.replace("/setStripColor&", "");
-
-
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if(success == DeserializationError::Code::Ok){
-    uint16_t numberOfLeds = doc["color"].size();;
-
-    uint8_t* memory = (uint8_t*)malloc(numberOfLeds * 3 + 40);
-    memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
-    memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
-
-    *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor));
-    
-
-    memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
-    LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX];
-
-
-    String deviceId = String(doc["devId"]);
-    /* Process JSON to extrac each device slot*/
-    for(uint16_t i = 0; i < numberOfLeds; i++)
-    {
-        /*this exist for every slot*/
-        String r = String(doc["color"][i][0]);
-        String g = String(doc["color"][i][1]);
-        String b = String(doc["color"][i][2]);
-
-        
-
-        if(r != "null" && g != "null" && b != "null"){
-          ledValueAddr->r = r.toInt() <= 255 ? r.toInt() : 255;
-          ledValueAddr->g = g.toInt() <= 255 ? g.toInt() : 255;
-          ledValueAddr->b = b.toInt() <= 255 ? b.toInt() : 255;
-
-          // Serial.println(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
-        }else {
-          break;
-        }
-
-        /* go to next diode */
-        ledValueAddr++;
-    }
-
-    if(deviceId != "null"){
-      memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
-
-
-      // Serial.println(request);
-      HTTPAsyncRequestHandler::createRequest(
-        ASYNC_TYPE_DEVICE_SERVICE_CALL,
-        memory,
-        (numberOfLeds * 3 + 40)
-      );  
-
-    }
-    free(memory);
-  }
-}
-
-
-void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String& request, WiFiClient& client)
-{
-
-  escapeSpecialCharsInJson(request);
-  request.replace("/stripLoadFromMemory&", "");
-
-  Serial.println(request);
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if(success == DeserializationError::Code::Ok){
-    String devIdStr = doc["devId"];
-    String memorySlotStr = doc["slot"];
-
-    if(devIdStr != "null" && memorySlotStr != "null"){
-      Serial.println("Load strip from memory ...");
-      uint8_t parameters[4];
-      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
-      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
-      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SWITCH_CONTENT;       /* idx 2 */
-      parameters[3] = memorySlotStr.toInt();                                    /* idx 3 */
-
-      HTTPAsyncRequestHandler::createRequest(
-        ASYNC_TYPE_DEVICE_SERVICE_CALL,
-        parameters,
-        4
-      );
-    }
-  }
-
-}
-
-void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client)
-{
-  escapeSpecialCharsInJson(request);
-  request.replace("/stripOverwriteSlot&", "");
-
-  Serial.println(request);
-
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if(success == DeserializationError::Code::Ok){
-    String devId = doc["devId"];
-    String slot = doc["slot"];
-
-    if(devId != "null" && slot != "null"){
-
-      Serial.println("Request: stripOverwriteSlot {devId, slot}");
-      uint8_t parameters[4];
-      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devId.toInt(); /* idx 0 */
-      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
-      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SAVE_CONTENT;       /* idx 2 */
-      parameters[3] = slot.toInt();                                    /* idx 3 */
-
-      HTTPAsyncRequestHandler::createRequest(
-        ASYNC_TYPE_DEVICE_SERVICE_CALL,
-        parameters,
-        4
-      );
-    }
-
-  }
-}
-
-void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){
-    Serial.println("Extended controls requested");
-    escapeSpecialCharsInJson(request);
-    request.replace("/getExtendedControls&", "");
-
-    Serial.println(request);
-
-    JsonDocument doc;
-    DeserializationError success = deserializeJson(doc, request.c_str());
-    if(success == DeserializationError::Code::Ok){
-      String deviceIdStr = doc["devId"];
-      if(deviceIdStr != "null"){
-        uint16_t deviceId = deviceIdStr.toInt();
-        Serial.println("Advanced controls requested.");
-        HTTPAsyncRequestHandler::createRequest(
-            ASYNC_GET_ADVANCED_CONTROLS,
-            (uint8_t*)&deviceId,
-            sizeof(deviceId)
-          );
-      }
-    }
-}
-
-void HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration(String& request, WiFiClient& client)
-{
-
-  HTTPAsyncRequestHandler::createRequest(
-    ASYNC_DOWNLOAD_CONFIGURATION,
-    nullptr,
-    0
-  );
-
-  Serial.println("Device configuration download requested ...");
-  /* Request will be processed in next cycle of the HttpServer */
-
-}
-
-void HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange(String& request, WiFiClient& client)
-{
-  pos1 = request.indexOf("chngdvbr"); //Wyszukuje pozycję, na której występuje ciąg znaków 'bri' w nagłówku.
-  pos2 = request.indexOf("DEV"); //Wyszukuje pozycję, na której występuje ciąg znaków 'DEV' w nagłówku.
-  pos3 = request.indexOf("&"); //Wyszukuje pozycję, na której występuje ciąg znaków '&' w nagłówku.             
-  String brightnessString = request.substring(pos1+8, pos2); 
-  String idDeviceString = request.substring(pos2+3, pos3);
-  
-  uint8_t newbrightness = brightnessString.toInt(); 
-  uint8_t idString = idDeviceString.toInt();
-  
-  uint8_t parameters[4];
-  parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = idString; /* idx 0 */
-  parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
-  parameters[SERVICE_NAME_INDEX] = DEVSERVICE_BRIGHTNESS_CHANGE;  /* idx 2 */
-  parameters[3] = newbrightness;                                  /* idx 3 */
-
-  HTTPAsyncRequestHandler::createRequest(
-    ASYNC_TYPE_DEVICE_SERVICE_CALL,
-    parameters,
-    4
-  );
-
-}
 
 void HomeLightHttpServer::pending(WiFiClient& client){
   client.println("Loading, please wait . . . ");
   client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"'>");
-}
-
-void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String& request, WiFiClient& client)
-{
-    SecurityAccessLevelType currentAccessLevel = 
-        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
-
-    UserInterfaceNotification notification;
-    notification.title = "Room name management failure";
-    notification.type = UserInterfaceNotification::WARNING;
-
-    /* Check if device is unlocked that config can be modified */
-    if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
-        escapeSpecialCharsInJson(request);
-        request.replace("roomMappingApply&", "");
-
-        // Serial.println("Json request:" + request);
-
-        JsonDocument doc;
-        DeserializationError success = deserializeJson(doc, request.c_str());
-        if(success == DeserializationError::Code::Ok){
-            String mappingsCount = String(doc["mappingsCount"]);
-            uint8_t numberOfMappings = mappingsCount.toInt();
-
-            for(uint8_t i = 0 ; i < numberOfMappings; i++)
-            {
-              String roomId   = String(doc["roomMapping"][i]["roomId"]);
-              String roomName = String(doc["roomMapping"][i]["roomName"]);
-              int roomIdInt = roomId.toInt();
-
-              if(roomName.length() > 0 && roomNamesMapping.size() < MAX_NUMBER_OF_ROOM_NAME_TRANSLATIONS){
-                if (roomNamesMapping.find(roomIdInt) != roomNamesMapping.end()) {
-                  roomNamesMapping[roomIdInt] = roomName;
-                }else {
-                  roomNamesMapping.insert({roomIdInt, roomName});
-                }
-              }
-            }
-            client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"/roomAssignment'>");
-            
-        }else {
-            Serial.println("ConfigProvider://Problem with JSON parsing.");
-            notification.body = "Room names JSON content cannot be correctly evaluated";
-            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
-        }
-    } else 
-    {
-        /* No access level to apply */
-        notification.body = "Device cannot be locked to apply new configuration";
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
-    }
-
-}
-
-void HomeLightHttpServer::parameterizedHandler_passwordApply(String& request, WiFiClient& client)
-{
-
-  Serial.println("Password apply processing");
-  request = request.substring(String("passwordApply").length());
-  try{
-    /* Request Security access level change in OS via received password */
-    std::any_cast<std::function<void(String)>>(
-      DataContainer::getSignalValue(CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING))(request);
-  }catch (std::bad_any_cast ex){
-
-  }
-
-  client.println("<meta http-equiv='refresh' content='1; url=http://"+ ipAddressString +"/config'>");
-}
-
-void HomeLightHttpServer::parameterizedHandler_ledStripColor(String& request, WiFiClient& client){
-  int pos1 = request.indexOf("ledStripColor?id="); 
-  int pos2 = request.indexOf("&r="); 
-  int pos3 = request.indexOf("&g=");
-  int pos4 = request.indexOf("&b=");       
-  String devId = request.substring(pos1+17 , pos2);
-  String red = request.substring(pos2+3 , pos3);
-  String green = request.substring(pos3+3 , pos4);
-  String blue = request.substring(pos4+3);
-
-  for(uint8_t i = 0 ; i < ledsCount; i++)
-  {
-    leds.red[i] = red.toInt();
-    leds.green[i] = green.toInt();
-    leds.blue[i] = blue.toInt();
-  }
-
-  Serial.println(devId);
-  Serial.println(red + ", " + green + " , " + blue);
-
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-
-}
-void HomeLightHttpServer::parameterizedHandler_ledColor(String& request, WiFiClient& client){
-  int pos1 = request.indexOf("ledColor?id="); 
-  int pos2 = request.indexOf("&led="); 
-  int pos3 = request.indexOf("&r="); 
-  int pos4 = request.indexOf("&g=");
-  int pos5 = request.indexOf("&b=");       
-  String devId = request.substring(pos1+12 , pos2);
-  String ledIndex = request.substring(pos2+5 , pos3);
-  String red = request.substring(pos3+3 , pos4);
-  String green = request.substring(pos4+3 , pos5);
-  String blue = request.substring(pos5+3);
-
-  leds.red[ledIndex.toInt()] = red.toInt();
-  leds.green[ledIndex.toInt()] = green.toInt();
-  leds.blue[ledIndex.toInt()] = blue.toInt();
-  
-
-  Serial.println(devId);
-  Serial.println(red + ", " + green + " , " + blue);
-
-  client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
-
-}
-
-
-void HomeLightHttpServer::constantHandler_asyncGetPageContent(String& request, WiFiClient& client)
-{
-  HTTPAsyncRequestHandler::createRequest(ASYNC_GET_PAGE_CONTENT, nullptr, 0);
-}
-
-
-void HomeLightHttpServer::constantHandler_asyncGetNotifications(String& request, WiFiClient& client)
-{
-  HTTPAsyncRequestHandler::createRequest(ASYNC_GET_NOTIFICATION_LIST, nullptr, 0);
 }

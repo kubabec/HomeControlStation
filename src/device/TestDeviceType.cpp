@@ -1,11 +1,9 @@
 #include "devices/TestDeviceType.hpp"
 
 void TestDeviceType::init(){
-
 }
 
 void TestDeviceType::cyclic(){
-
 }
 
 uint16_t TestDeviceType::getExtendedMemoryLength(){

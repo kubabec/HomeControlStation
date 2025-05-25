@@ -5,6 +5,7 @@
 #include "os/app/remoteControl/RC_publicDataTypes.hpp"
 #include "devices/Device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include "os/tools/messageUDP.hpp"
 #include <ArduinoJson.h>
 
 #define PERSISTENT_DATABLOCK_SIZE 50
@@ -69,18 +70,6 @@ typedef struct
         return PERSISTENT_DATABLOCK_SIZE;
     }
 }PersistentDataBlock;
-
-typedef enum{
-    ERR_MON_UNEXPECTED_RESET = 1,
-    ERR_MON_INVALID_NVM_DATA,
-    ERR_MON_INVALID_LOCAL_CONFIG,
-    ERR_MON_WRONG_CONFIG_STRING_RECEIVED,
-    ERR_MON_WRONG_LOCAL_DEVICES_CONFIG_RECEIVED,
-    ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    ERR_MON_INVALID_ERROR_REPORTED,
-    ERR_MON_LAST_ERROR = ERR_MON_INVALID_ERROR_REPORTED,
-    ERR_MONT_ERROR_COUNT = ERR_MON_LAST_ERROR
-}ERR_MON_ERROR_TYPE;
 
 typedef struct
 {
@@ -175,6 +164,15 @@ struct RtcTime
     return String(buffer);
   }
 
+};
+
+struct NetworkNodeInfo{
+    enum NodeType{
+        Master,
+        Slave,
+        Unknown
+    } nodeType;
+    MessageUDP::IPAddr nodeIP;
 };
 
 #endif 

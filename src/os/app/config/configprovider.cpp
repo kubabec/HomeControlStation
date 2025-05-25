@@ -38,11 +38,12 @@ void ConfigProvider::init()
         if(configRamMirror.safeShutdownFlag != 37)
         {
             /* Unexpected reset detected! */
-            std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-                    ERR_MON_UNEXPECTED_RESET, 
-                    "Unexpected reset occured"
-                );
+            UserInterfaceNotification notif{
+            .title = "Unexpected reset",
+            .body = "Device was restarted unexpectedly.",
+            .type = UserInterfaceNotification::ERROR
+            };
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
 
         configRamMirror.safeShutdownFlag = 0;
@@ -59,14 +60,6 @@ void ConfigProvider::init()
 
     }else 
     {
-        /* error unused anymore */
-        // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-        //     DataContainer::getSignalValue(CBK_ERROR_REPORT)
-        //     )(
-        //         ERR_MON_INVALID_NVM_DATA,
-        //         "Unable to restore NVM data"
-        //     );
-
     
         Serial.println("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
         NodeConfiguration emptyConfiguration;
@@ -450,9 +443,16 @@ void ConfigProvider::eraseDatablockMemory()
     Serial.println("Datablock erase done.");
 }
 
-void ConfigProvider::deinit() {
-    configRamMirror.safeShutdownFlag = 37;
+void ConfigProvider::flushNvmData()
+{
     saveRamMirrorToNvm();
+}
+
+
+
+void ConfigProvider::deinit() {
+   configRamMirror.safeShutdownFlag = 37;
+   flushNvmData();
 }
 
 

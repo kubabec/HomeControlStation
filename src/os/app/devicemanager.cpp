@@ -8,6 +8,7 @@
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = { };
 #ifdef LED_STRIP_SUPPORTED
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
+std::vector<SegLedWS1228bDeviceType> DeviceManager::segmentedWs2812bDevices = {};
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
@@ -26,6 +27,17 @@ std::vector<Device*> DeviceManager::devices;
 /*TESTCODE*/
 
 void DeviceManager::deinit() {
+    flushNvmData();
+}
+
+void DeviceManager::persistentDataChanged()
+{
+    /* Trigger NVM save to store devices persistent data safely */
+    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+}
+
+void DeviceManager::flushNvmData()
+{
     for(uint8_t i = e_BLOCK_DEVICE_1; i <= e_BLOCK_DEVICE_6; i++)
     {
         /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
@@ -112,15 +124,18 @@ void DeviceManager::init()
 
     /* devices merging after NVM restoration */
     {
-        /* Do vektora devices wrzucam devices z vektora OnOffDevices*/
         for(OnOffDevice& device : vecOnOffDevices) 
         {
-            devices.push_back(&device); //wrzucam pointer na device onOffDevice         
+            devices.push_back(&device);    
         }
 
 #ifdef LED_STRIP_SUPPORTED
         /* Add LED strips to common devices vector*/
         for(LedWS1228bDeviceType& device: ledws2812bDevices){
+            devices.push_back(&device);
+        }
+
+        for(SegLedWS1228bDeviceType& device: segmentedWs2812bDevices){
             devices.push_back(&device);
         }
 #endif
@@ -313,20 +328,28 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             
             switch(nvmData.deviceType)
             {
-                case e_ON_OFF_DEVICE :
+                case type_ONOFFDEVICE :
                     vecOnOffDevices.push_back(OnOffDevice(nvmData));
                     isValidDeviceGiven = true;
                 break;
 
-                case e_LED_STRIP :
+                case type_LED_STRIP :
 #ifdef LED_STRIP_SUPPORTED
                     /* create WS2812b instance by forwarding NVM data to it */
-                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData));
+                    ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
                     isValidDeviceGiven = true;
 #endif
                 break;
 
-                case e_TEMP_SENSOR:
+                case type_LED_STRIP_SEGMENTED :
+#ifdef LED_STRIP_SUPPORTED
+                    /* create Segmented WS2812b instance by forwarding NVM data to it */
+                    segmentedWs2812bDevices.push_back(SegLedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
+                    isValidDeviceGiven = true;
+#endif
+                break;
+
+                case type_TEMP_SENSOR:
 #ifdef TEMP_SENSOR_SUPPORTED
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                     isValidDeviceGiven = true;
@@ -352,9 +375,6 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             }else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */ 
                 Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
-                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String )>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(ERR_MON_INVALID_LOCAL_CONFIG, String("Invalid config slot ID: " + String((int)configSlotID)));
             }
         }
         else {
@@ -364,23 +384,9 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
             /* Handle errors only when device is properly configured */
             if(currentConfig.networkSSID[0] != '\0'){
                 Serial.println("Invalid Device type for config slot : " + String((int)configSlotID)); 
-                std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, String)>>(
-                DataContainer::getSignalValue(CBK_ERROR_REPORT)
-                )(
-                    ERR_MON_INVALID_LOCAL_CONFIG, 
-                    String("Invalid Device type ("+ String((int)nvmData.deviceType)+") on slot " + String((int)configSlotID))
-                );
             }
         }
     }
-    // else 
-    // { 
-
-    //     Serial.println("Invalid NVM data for config slot : " + String((int)configSlotID));
-    //     std::any_cast<std::function<void(ERR_MON_ERROR_TYPE errorCode, uint16_t extendedData)>>(
-    //         DataContainer::getSignalValue(CBK_ERROR_REPORT)
-    //         )(ERR_MON_INVALID_LOCAL_CONFIG, configSlotID);
-    // }
 
 
     return isValidDeviceGiven;
@@ -599,6 +605,22 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 configSlot.pinNumber = pin.toInt();
                 configSlot.roomId = room.toInt();
 
+            } else if(type == "SegLedStrip") {
+
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
+
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_LED_STRIP_SEGMENTED;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
+                }
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
             }
 
             configSlot.print();
@@ -613,11 +635,9 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
     std::any_cast<std::function<void(uint16_t)>>
         (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
 
-
     //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}
 
     return true;
-
 }
 
 
@@ -641,12 +661,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -671,13 +685,6 @@ ServiceRequestErrorCode DeviceManager::service(
             };
         }
     }
-
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -703,12 +710,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }
@@ -734,12 +735,6 @@ ServiceRequestErrorCode DeviceManager::service(
         }
     }
 
-
-    // std::any_cast<std::function<void(ERR_MON_ERROR_TYPE, uint16_t)>>(
-    //     DataContainer::getSignalValue(CBK_ERROR_REPORT))(
-    //         ERR_MON_WRONG_DEVICE_ID_FOR_LOCAL_SERVICE_REQUEST,
-    //         deviceId
-    //     );
     /* Device with requested ID not found, return general failure */
     return retVal;  
 }

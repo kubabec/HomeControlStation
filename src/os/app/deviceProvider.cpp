@@ -6,6 +6,8 @@
 //#include "deviceProvider.hpp"
 // mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t,DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;
+std::queue<uint8_t> DeviceProvider::roomStateChangeDeviceIdQueue;
+bool DeviceProvider::requestedRoomState = false;
 
 
 std::function<bool(RcResponse&)> DeviceProvider::sendResponse;
@@ -85,7 +87,21 @@ void DeviceProvider::initRemoteDevicesSetup() {
 
 void DeviceProvider::cyclic()
 {
-    
+    // Handle room switch state change if requested
+    if(!roomStateChangeDeviceIdQueue.empty() ) {
+        ServiceParameters_set1 serviceParameters;
+        serviceParameters.a = (uint8_t) requestedRoomState;
+        uint8_t deviceId = roomStateChangeDeviceIdQueue.front();
+
+        if(
+            service(
+                deviceId,
+                DEVSERVICE_STATE_SWITCH,
+                serviceParameters
+            ) != SERV_PENDING) {
+            roomStateChangeDeviceIdQueue.pop();
+        }
+    }
 }
 
 DeviceTranslationDetails DeviceProvider::getOriginalIdFromUnique(uint8_t uniqueId) {
@@ -415,6 +431,29 @@ ServiceRequestErrorCode DeviceProvider::service(
     DeviceServicesType serviceType,
     ServiceParameters_set1 param
 ){
+    if(serviceType == DEVSERVICE_ROOM_STATE_CHANGE) {
+        Serial.println("DeviceProvider:// serviceType != DEVSERVICE_ROOM_STATE_CHANGE");
+        Serial.println("DeviceProvider:// param.a: " + String((int)param.a));
+        Serial.println("DeviceProvider:// deviceId: " + String((int)deviceId));
+
+        try{
+            std::vector<DeviceDescription> devicesVector = 
+                std::any_cast<std::vector<DeviceDescription>>(
+                    DataContainer::getSignalValue(SIG_DEVICE_COLLECTION)
+                );
+            for(auto& device : devicesVector){
+                if(device.roomId == deviceId){
+                    roomStateChangeDeviceIdQueue.push(device.deviceId);
+                }
+            }
+            requestedRoomState = (bool)param.a;
+        } catch (std::bad_any_cast ex){
+            Serial.println("DeviceProvider:// Error during device collection casting");
+        }
+
+        return SERV_SUCCESS;
+    }
+
     DeviceTranslationDetails devicedetails = getOriginalIdFromUnique(deviceId);
     if(devicedetails.originalID != 255) {
         if(devicedetails.isLocal) {

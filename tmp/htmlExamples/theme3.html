@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Podgląd motywów – Smart Home</title>
+  <style>
+    /* WSPÓLNE STYLE */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: #F7F8FA;
+      font-family: 'Inter', sans-serif;
+      color: #222;
+      padding: 24px;
+      display: grid;
+      row-gap: 24px;
+      justify-items: center;
+    }
+    .card {
+      width: 360px;
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .card .underline {
+      height: 2px;
+      width: 100%;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    .card .item {
+      font-size: 16px;
+    }
+    .card .knob {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: background .3s, box-shadow .3s;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+    }
+
+    /* 1. SKY BREEZE */
+    .theme-sky {
+      --bg-card:      #FFFFFF;
+      --underline:    #4BAFEF;
+      --text:         #1E2A3A;
+      --knob-bg:      #F0F8FF;
+      --knob-shadow:  0 4px 12px rgba(30,42,58,0.1);
+    }
+    .theme-sky {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    .theme-sky .underline {
+      background: var(--underline);
+    }
+    .theme-sky .knob {
+      background: var(--knob-bg);
+      box-shadow: var(--knob-shadow);
+    }
+
+    /* 2. URBAN GRAPHITE */
+    .theme-urban {
+      --bg-card:      #2A2E35;
+      --underline:    #5A8DEE;
+      --text:         #ECEFF4;
+      --knob-bg:      #3C4148;
+      --knob-shadow:  0 4px 12px rgba(0,0,0,0.6);
+    }
+    .theme-urban {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    .theme-urban .underline {
+      background: var(--underline);
+    }
+    .theme-urban .knob {
+      background: var(--knob-bg);
+      box-shadow: var(--knob-shadow);
+    }
+
+    /* 3. NEO PASTEL */
+    .theme-neo {
+      --bg-card:      #FFFFFF;
+      --underline:    #8F9EFF;
+      --text:         #2D3139;
+      --knob-bg:      #F1F4FF;
+      --knob-shadow:  0 6px 20px rgba(45,49,57,0.1);
+    }
+    .theme-neo {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    .theme-neo .underline {
+      background: var(--underline);
+    }
+    .theme-neo .knob {
+      background: var(--knob-bg);
+      box-shadow: var(--knob-shadow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card theme-sky">
+    <h2>Salon</h2>
+    <div class="underline"></div>
+    <div class="item">Lampka</div>
+    <div class="knob"></div>
+  </div>
+
+  <div class="card theme-urban">
+    <h2>Salon</h2>
+    <div class="underline"></div>
+    <div class="item">Lampka</div>
+    <div class="knob"></div>
+  </div>
+
+  <div class="card theme-neo">
+    <h2>Salon</h2>
+    <div class="underline"></div>
+    <div class="item">Lampka</div>
+    <div class="knob"></div>
+  </div>
+
+</body>
+</html>

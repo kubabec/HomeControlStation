@@ -42,6 +42,7 @@ typedef enum
     DEVSERVICE_GET_ADVANCED_CONTROLS,
     DEVSERVICE_GET_DETAILED_COLORS,
     DEVSERVICE_SET_DETAILED_COLORS,
+    DEVSERVICE_ROOM_STATE_CHANGE,
     DEVSERVICE_INVALID
 }DeviceServicesType;
 
@@ -49,8 +50,10 @@ typedef enum {
     type_ONOFFDEVICE = 43,
     type_LED_STRIP,
     type_TEMP_SENSOR,
+    type_LED_STRIP_SEGMENTED,
     type_DISTANCE_SENSOR,
-    type_DEVICE_TYPE_LAST = type_TEMP_SENSOR
+    type_DEVICE_TYPE_LAST = type_DISTANCE_SENSOR
+
 }DevType;
 
 typedef struct
@@ -110,7 +113,7 @@ struct DeviceDescription
     uint64_t macAddress = 0LL;
     uint8_t deviceId = -1;
     uint8_t roomId = 255;
-    bool isEnabled;
+    uint8_t isEnabled;
     uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = { 0x00};
     
     String deviceName;
@@ -215,7 +218,7 @@ private:
     uint8_t DeviceIdentifier = 0xFF;
     
 public:
-    virtual void init() = 0; //funkcje ktore nazucaja potomka koniecznosc ich implementacji
+    virtual void init() = 0;
     virtual void cyclic() = 0;
     virtual DeviceDescription getDeviceDescription() = 0;
     virtual uint8_t getDeviceIdentifier() = 0;

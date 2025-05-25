@@ -54,7 +54,7 @@ void ExtendedMemoryManager::cyclic(){
 
 }
 
-void ExtendedMemoryManager::deinit(){
+void ExtendedMemoryManager::flushNvmData(){
     /* Try to read metadata block from NVM */
     bool success = std::any_cast<std::function<bool(PersistentDatablockID, uint8_t*)>>(
         DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK)
@@ -87,7 +87,10 @@ void ExtendedMemoryManager::deinit(){
     }
 
     PersistentMemoryAccess::flushExtendedMemory();
+}
 
+void ExtendedMemoryManager::deinit(){
+    flushNvmData();
 }
 
 

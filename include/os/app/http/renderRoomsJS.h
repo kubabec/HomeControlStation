@@ -1,16 +1,49 @@
 #ifndef RENDER_ROOMS_JS_H
 #define RENDER_ROOMS_JS_H
-#include <SystemDefinition.hpp>
+#include <Arduino.h>
+#include "deviceWidgets.h"
 
-const char* renderRoomsJS = "\
-<script>\
-function renderRooms(data) {\
-    const roomsContainer = document.getElementById('rooms');\
-    const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
+const String renderRoomsJS = "\
+<script>" + deviceWidgetsJS +
+"const onOffType = 43;\
+const ledStripType = 44;\
+const tempSensorType = 45;\
+const segLedStripType = 46;\
 \
+function generateCommonDevInterface(deviceContainer, deviceId, deviceName, favIconNumber, status) {\
+    const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
+    const loadingOverlay = document.createElement('div');\
+    loadingOverlay.className = 'loading-overlay';\
+    loadingOverlay.style.display = 'none';\
+    const spinner = document.createElement('div');\
+    spinner.className = 'spinner';\
+    loadingOverlay.appendChild(spinner);\
+    deviceContainer.appendChild(loadingOverlay);\
+\
+    const faviconImageMain = document.createElement('div');\
+    faviconImageMain.className = 'device-left';\
+    const faviconImg = document.createElement('img');\
+    faviconImg.className = 'device-icon';\
+    faviconImg.src = faviconUrl + `${favIconNumber}.png?raw=true`;\
+    faviconImageMain.appendChild(faviconImg);\
+    deviceContainer.appendChild(faviconImageMain);\
+\
+    const header = document.createElement('div');\
+    header.className = 'header';\
+    header.textContent = `${deviceName}`;\
+    deviceContainer.appendChild(header);\
+\
+    const statusLight = document.createElement('div');\
+    statusLight.className = `status-light ${status}`;\
+    statusLight.id = `statusLight${deviceId}`;\
+    deviceContainer.appendChild(statusLight);\
+}\
+function renderRooms(data) {\
+    const roomsContainer = document.getElementById('rooms');\\
     roomsContainer.innerHTML = '';\
 \
     for (const [roomId, devices] of Object.entries(data)) {\
+        var anyOn = false;\
         const roomContainer = document.createElement('div');\
         roomContainer.className = 'room-container';\
 \
@@ -18,195 +51,52 @@ function renderRooms(data) {\
         roomHeader.className = 'room-header';\
         roomHeader.textContent = `${roomId}`;\
         roomContainer.appendChild(roomHeader);\
+        const toglContainer = document.createElement('div');\
+        toglContainer.className = 'toggler-container';\
+        const roomtoggle = document.createElement('div');\
+        roomtoggle.classList.add('switch');\
+        const thumb = document.createElement('div');\
+        thumb.classList.add('thumb');\
+        roomtoggle.appendChild(thumb);\
+        roomtoggle.addEventListener('click', () => {\
+         roomtoggle.classList.toggle('on');\
+         const isOn = roomtoggle.classList.contains('on');\
+         asyncRoomStateSwitch(roomId, isOn);\
+        });\
+        toglContainer.appendChild(roomtoggle);\
+        roomContainer.appendChild(toglContainer);\
         devices.forEach(device => {\
             const deviceContainer = document.createElement('div');\
             deviceContainer.className = 'container';\
             deviceContainer.id = `container${device.id}`;\
                 \
-            if(device.devType == 43){\
-                const loadingOverlay = document.createElement('div');\
-                loadingOverlay.className = 'loading-overlay';\
-                loadingOverlay.style.display = 'none';\
-                const spinner = document.createElement('div');\
-                spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
-                loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
-                deviceContainer.appendChild(loadingOverlay);\
-                const faviconImageMain = document.createElement('div');\
-                faviconImageMain.className = 'device-left';\
-                const faviconImg = document.createElement('img');\
-                faviconImg.className = 'device-icon';\
-                faviconImg.src = faviconUrl + '1.png?raw=true';\
-                faviconImageMain.appendChild(faviconImg);\
-                deviceContainer.appendChild(faviconImageMain);\
-                \
-                const header = document.createElement('div');\
-                header.className = 'header';\
-                header.textContent = device.name;\
-                deviceContainer.appendChild(header);\
-    \
-                const statusLight = document.createElement('div');\
-                statusLight.className = `status-light ${device.status}`;\
-                statusLight.id = `statusLight${device.id}`;\
-                deviceContainer.appendChild(statusLight);\
-    \
-                const btnContainer = document.createElement('div');\
-                btnContainer.className = 'button-container';\
-                \
-                const button = document.createElement('a');\
-                button.className = 'button';\
-                button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
-    \
-                var switchValue = 0;\
-                if(device.status == 'off'){\
-                    switchValue = 1;\
-                }\
-                button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
-                statusLight.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
-                button.id = `switchBtn${device.id}`;\
-\
-if(device.hasBrightness == 1){\
-                const buttonMore = document.createElement('a');\
-                buttonMore.className = 'button';\
-                buttonMore.textContent = '. . .';\
-                buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
-                btnContainer.appendChild(buttonMore);\
-}\
-                btnContainer.appendChild(button);\
-                deviceContainer.appendChild(btnContainer);\
-    \
-                if(device.hasBrightness == 1){\
-                    const sliderLabel = document.createElement('div');\
-                    sliderLabel.className = 'header2';\
-                    sliderLabel.textContent = 'Brightness';\
-                    deviceContainer.appendChild(sliderLabel);\
-    \
-                    const slider = document.createElement('input');\
-                    slider.type = 'range';\
-                    slider.min = 0;\
-                    slider.max = 100;\
-                    slider.value = device.brightness;\
-                    slider.onchange = () => onRangeChanged(slider.value, device.id);\
-                    slider.id = `brightnessSlider${device.id}`;\
-                    deviceContainer.appendChild(slider);\
-                }\
-            }else if(device.devType == 44){\
-                const loadingOverlay = document.createElement('div');\
-                loadingOverlay.className = 'loading-overlay';\
-                loadingOverlay.style.display = 'none';\
-                const spinner = document.createElement('div');\
-                spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
-                loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
-                deviceContainer.appendChild(loadingOverlay);\
-                const faviconImageMain = document.createElement('div');\
-                faviconImageMain.className = 'device-left';\
-                const faviconImg = document.createElement('img');\
-                faviconImg.className = 'device-icon';\
-                faviconImg.src = faviconUrl + '2.png?raw=true';\
-                faviconImageMain.appendChild(faviconImg);\
-                deviceContainer.appendChild(faviconImageMain);\
-                \
-                const header = document.createElement('div');\
-                header.className = 'header';\
-                header.textContent = device.name;\
-                deviceContainer.appendChild(header);\
-    \
-                const statusLight = document.createElement('div');\
-                statusLight.className = `status-light ${device.status}`;\
-                statusLight.id = `statusLight${device.id}`;\
-                deviceContainer.appendChild(statusLight);\
-\
-                const colorPicker = document.createElement('div');\
-                colorPicker.className = 'color-picker';\
-\
-                const colorDisplay = document.createElement('div');\
-                colorDisplay.className = `color-display ${device.status}`;\
-                colorDisplay.style.backgroundColor = device.avgColor;\
-                colorPicker.appendChild(colorDisplay);\
-                deviceContainer.appendChild(colorPicker);\
-\
-                const btnContainer = document.createElement('div');\
-                btnContainer.className = 'button-container';\
-\
-                const button = document.createElement('a');\
-                button.className = 'button';\
-                button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
-    \
-                var switchValue = 0;\
-                if(device.status == 'off'){\
-                    switchValue = 1;\
-                }\
-                button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
-                statusLight.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
-                button.id = `switchBtn${device.id}`;\
-\
-                const buttonMore = document.createElement('a');\
-                buttonMore.className = 'button';\
-                buttonMore.textContent = '. . .';\
-                buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
-                btnContainer.appendChild(buttonMore);\
-                btnContainer.appendChild(button);\
-                deviceContainer.appendChild(btnContainer);\
-\
-            \
-            }else if(device.devType == 45){\
-                const loadingOverlay = document.createElement('div');\
-                loadingOverlay.className = 'loading-overlay';\
-                loadingOverlay.style.display = 'none';\
-                const spinner = document.createElement('div');\
-                spinner.className = 'spinner';\
-                const loadingText = document.createElement('div');\
-                loadingText.className = 'loading-text';\
-                loadingText.textContent = 'Loading...';\
-                loadingOverlay.appendChild(spinner);\
-                loadingOverlay.appendChild(loadingText);\
-                deviceContainer.appendChild(loadingOverlay);\
-                const faviconImageMain = document.createElement('div');\
-                faviconImageMain.className = 'device-left';\
-                const faviconImg = document.createElement('img');\
-                faviconImg.className = 'device-icon';\
-                faviconImg.src = faviconUrl + '3.png?raw=true';\
-                faviconImageMain.appendChild(faviconImg);\
-                deviceContainer.appendChild(faviconImageMain);\
-                \
-                const header = document.createElement('div');\
-                header.className = 'header';\
-                header.textContent = device.name;\
-                deviceContainer.appendChild(header);\
-    \
-                const statusLight = document.createElement('div');\
-                statusLight.className = `status-light ${device.status}`;\
-                statusLight.id = `statusLight${device.id}`;\
-                deviceContainer.appendChild(statusLight);\
-\
-                const temperatureContainer = document.createElement('div');\
-                temperatureContainer.className = `temperature-container`;\
-                temperatureContainer.innerHTML = `<div id=\"gauge${device.id}\" class=\"temperature-widget\"><canvas style=\"max-width: 100px;\"></canvas><div class=\"temperature-value\">20°C</div></div><div id=\"humidity${device.id}\" class=\"humidity-widget\"><canvas></canvas><div class=\"value-display humidity-value\">50%</div></div>`;\
-                deviceContainer.appendChild(temperatureContainer);\
-\
-                listOfTempWidgets.push(`gauge${device.id}`);\
-                listOfTempValues.push(device.temp);\
-                listOfHumidWidgets.push(`humidity${device.id}`);\
-                listOfHumidValues.push(device.humid);\
-\
-                \
+            if(device.devType == onOffType){\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, 1, device.status);\
+                generateOnOffWidget(deviceContainer, device);\
+            }else if(device.devType == ledStripType){\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateLedStripWidget(deviceContainer, device);\
+            }else if(device.devType == tempSensorType){\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, 3, device.status);\
+                generateTempWidget(deviceContainer, device);\
+            } else if(device.devType == segLedStripType){\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateSegLedWidget(deviceContainer, device);\       
             }else{\
                 const header = document.createElement('div');\
                 header.className = 'header';\
                 header.textContent = 'UnknownDeviceType';\
                 deviceContainer.appendChild(header);\
             }\
-\
+\           if(device.status == 'on'){\
+                anyOn = true;\
+            }\
             roomContainer.appendChild(deviceContainer);\
         });\
 \
+        if(anyOn){\
+            roomtoggle.classList.add('on');\
+        }\
         roomsContainer.appendChild(roomContainer);\
     }\
     for (var i = 0, l = listOfTempWidgets.length; i < l; ++i) {\

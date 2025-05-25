@@ -34,10 +34,6 @@ enum Signal
     SIG_CONFIG_SLOTS,
     /* Type: std:function<void()> - callback to reboot */
     CBK_RESET_DEVICE,
-    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode, String)> - callback to reboot */
-    CBK_ERROR_REPORT,
-    /* Type: std:function<void(ERR_MON_ERROR_TYPE errorCode)> - callback to reboot */
-    CBK_ERROR_CLEAR,
     /* TYpe: std::array<SystemErrorType, ERR_MONT_ERROR_COUNT> - container with actual system error data */
     SIG_SYSTEM_ERROR_LIST,
     /* Type: std:function<void(void)> - callback to erase NVM data */
@@ -88,6 +84,12 @@ enum Signal
     /* Type: DeviceConfigManipulationAPI - new pin setup creation via JSON callback */
     CBK_GET_ROOMS_CFG_JSON,
 
-    CBK_DISPLAY_RAM_USAGE
+    CBK_DISPLAY_RAM_USAGE,
+
+    /* std::vector<NetworkNodeInfo> - info about other network nodes proviceded by master */
+    SIG_NETWORK_NODES_INFO,
+
+    /*  std::function<void(void)> */
+    CBK_START_NVM_SAVE_TIMER
 };
 #endif

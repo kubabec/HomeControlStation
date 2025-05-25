@@ -1,5 +1,5 @@
-#ifndef LED_WS1282B_TYPE_H
-#define LED_WS1282B_TYPE_H
+#ifndef LED_SEDWS1282B_TYPE_H
+#define LED_SEDWS1282B_TYPE_H
 #include <SystemDefinition.hpp>
 #ifdef LED_STRIP_SUPPORTED
 
@@ -12,7 +12,7 @@
 
 
 
-class LedWS1228bDeviceType : public Device {
+class SegLedWS1228bDeviceType : public Device {
     enum LedStripContentIndex{
         eACTIVE_CURRENT_CONTENT = 0,
         eSAVED_CONTENT_SLOT1,
@@ -43,7 +43,7 @@ class LedWS1228bDeviceType : public Device {
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
     public:
-    LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
+    SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
 
     virtual void init();
     virtual void cyclic();
