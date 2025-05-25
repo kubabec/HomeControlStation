@@ -74,6 +74,13 @@ function generateLedStripWidget(deviceContainer, device) {\
     deviceContainer.appendChild(btnContainer);\
 }\
 \
+function generateDistSensWidget(deviceContainer, device) {\
+    const distData = document.createElement('div');\    
+    distData.textContent = `Distance: ${device.dist} cm`; \
+    deviceContainer.appendChild(distData);\
+\    
+}\
+\
 function generateTempWidget(deviceContainer, device) {\
     const temperatureContainer = document.createElement('div');\
     temperatureContainer.className = `temperature-container`;\

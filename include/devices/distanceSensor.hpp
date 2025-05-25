@@ -1,13 +1,17 @@
 #ifndef DISTANCE_SENSOR_H
-#define DISTANCE_SENSOR__H
+#define DISTANCE_SENSOR_H
 #include "devices/Device.hpp"
 #include "Arduino.h"
 
 class DistanceSensor : public Device {
 
-
+    int pinNumber;
+    uint8_t deviceId;
+    String deviceName;
+    uint8_t roomId;
+    
     public:
-
+    DistanceSensor();
     DistanceSensor(DeviceConfigSlotType nvmData);
 
     virtual void init();//funkcje ktore nazucaja potomka koniecznosc ich implementacji

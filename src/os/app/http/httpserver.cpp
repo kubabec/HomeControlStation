@@ -739,7 +739,7 @@ void generateExtraFieldsForSegmentedLedStrip(uint8_t slotNumber, DeviceConfigSlo
 
 void generateExtraFieldsForDistanceSensor(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
-  client.println("<div class=\"extra-fields extra-46\">");
+  client.println("<div class=\"extra-fields extra-47\">");
   client.println("<label>Pin Tx:");
   client.println("<select id=\"pinTx-"+String((int)slotNumber)+"\" >");
   for (int i = 0; i < 32; i++) {

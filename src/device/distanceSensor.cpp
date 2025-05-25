@@ -1,17 +1,25 @@
 #include "devices/distanceSensor.hpp"
 
-
-DistanceSensor::DistanceSensor(DeviceConfigSlotType nvmData){
+DistanceSensor::DistanceSensor(){
    
     
 }
 
+DistanceSensor::DistanceSensor(DeviceConfigSlotType nvmData){
+    pinNumber = nvmData.pinNumber;
+    deviceId = nvmData.deviceId;
+    deviceName = String(nvmData.deviceName);
+    roomId = nvmData.roomId;
 
-void init(){
+    
+}
+
+
+void DistanceSensor::init(){
 
 }
 
-void cyclic(){
+void DistanceSensor::cyclic(){
 
 }
 
@@ -20,10 +28,10 @@ uint16_t DistanceSensor::getExtendedMemoryLength(){
 }
 
 uint8_t DistanceSensor::getDeviceIdentifier(){
-    return 11;
+    return deviceId;
 }
 uint8_t DistanceSensor::getDeviceType(){
-    return 5;
+    return type_DISTANCE_SENSOR;
 }
 
 ServiceRequestErrorCode DistanceSensor::service(DeviceServicesType serviceType){
@@ -63,11 +71,12 @@ ServiceRequestErrorCode DistanceSensor::service(DeviceServicesType serviceType, 
 
 DeviceDescription DistanceSensor::getDeviceDescription(){
     DeviceDescription desc;
-    desc.deviceType = 5;
-    desc.deviceId = 11;
-    desc.roomId = 1;
+    desc.deviceType = type_DISTANCE_SENSOR;
+    desc.deviceId = deviceId;
+    desc.roomId = roomId;
     desc.isEnabled = true;
-    desc.deviceName = "DistanceSensor";
+    desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
+    desc.customBytes[0] = 100;
     return desc;
 }
