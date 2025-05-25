@@ -9,6 +9,7 @@ const String renderRoomsJS = "\
 const ledStripType = 44;\
 const tempSensorType = 45;\
 const segLedStripType = 46;\
+const distSensType = 47;\
 \
 function generateCommonDevInterface(deviceContainer, deviceId, deviceName, favIconNumber, status) {\
     const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
@@ -76,6 +77,9 @@ function renderRooms(data) {\
             }else if(device.devType == ledStripType){\
                 generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
                 generateLedStripWidget(deviceContainer, device);\
+            }else if(device.devType == distSensType){\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateDistSensWidget(deviceContainer, device);\             
             }else if(device.devType == tempSensorType){\
                 generateCommonDevInterface( deviceContainer, device.id, device.name, 3, device.status);\
                 generateTempWidget(deviceContainer, device);\
