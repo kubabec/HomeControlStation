@@ -183,7 +183,7 @@ transform: translateY(20px);\
 animation: fadeInSlide 2s forwards;\
 transition: background-color 0.3s, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;\
 overflow: hidden;\
-max-height: 600px;\
+max-height: 650px;\
 }\
 .device-container.disabled {\
 background-color: #1d2530;\
@@ -671,10 +671,25 @@ footer a {\
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);\
     transition: left 0.3s, box-shadow 0.3s;\
 }\
+.segThumb{\
+  background:radial-gradient(circle at 30% 40%, #accefb, #12009d);\
+  position: absolute;\
+  top: 2px;\
+  left: 2px;\
+  width: 28px;\
+  height: 28px;\
+  border-radius: 50%;\
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);\
+  transition: left 0.3s, box-shadow 0.3s;\
+}\
 .switch.on {\
     background: #4caf50;\
 }\
 .switch.on .thumb {\
+    left: calc(100% - 30px);\
+    box-shadow: 0 2px 8px rgba(76,175,80,0.6);\
+}\
+.switch.on .segThumb {\
     left: calc(100% - 30px);\
     box-shadow: 0 2px 8px rgba(76,175,80,0.6);\
 }\

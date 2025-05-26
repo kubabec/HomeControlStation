@@ -259,6 +259,37 @@ void HomeLightHttpServer::parameterizedHandler_roomStateChange(String& request, 
   }
 }
 
+void HomeLightHttpServer::parameterizedHandler_segmentStateSwitch(String& request, WiFiClient& client)
+{
+  escapeSpecialCharsInJson(request);
+  request.replace("segSwtch&", "");
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if(success == DeserializationError::Code::Ok){
+    String devIdStr = doc["devId"];
+    String segmentIdStr = doc["seg"];
+    String stateStr = doc["state"];
+
+    if(devIdStr != "null" && segmentIdStr != "null" && stateStr != "null"){
+      uint8_t parameters[3 + sizeof(ServiceParameters_set1)];
+      ServiceParameters_set1 params;
+      params.a = segmentIdStr.toInt();
+      params.b = stateStr == "true" ? 1 : 0; // 1 for ON, 0 for OFF
+      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
+      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
+      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_SEGMENT_STATE_SWITCH;       /* idx 2 */
+      memcpy(&parameters[3], &params, sizeof(ServiceParameters_set1));
+
+      HTTPAsyncRequestHandler::createRequest(
+        ASYNC_TYPE_DEVICE_SERVICE_CALL,
+        parameters,
+        3 + sizeof(ServiceParameters_set1)
+      );
+    }
+  }
+}
+
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){
     Serial.println("Extended controls requested");
     escapeSpecialCharsInJson(request);

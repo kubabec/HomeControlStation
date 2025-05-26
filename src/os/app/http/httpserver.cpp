@@ -63,7 +63,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "setStripColor",
   "stripLoadFromMemory",
   "stripOverwriteSlot",
-  "stRmChng"
+  "stRmChng",
+  "segSwtch"
 };
 
 
@@ -98,7 +99,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
@@ -723,7 +725,8 @@ void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& sl
 
 
   client.println("<label>Current limiter</label>");
-  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\"10\">% ");
+  int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
+  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
   client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   client.println("</label>");
@@ -732,8 +735,42 @@ void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& sl
 }
 void generateExtraFieldsForSegmentedLedStrip(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
+  const String option1 = "<option value=\"0\" >Not inversed</option>";
+  const String option2 = "<option value=\"1\" selected>Inversed</option>";
+  const String option3 = "<option value=\"0\" selected>Not inversed</option>";
+  const String option4 = "<option value=\"1\">Inversed</option>";
+
+
+
   client.println("<div class=\"extra-fields extra-46\">");
-  client.println("<label>LEDs num.: test </label>");
+
+  for(uint8_t segmentIndex = 0; segmentIndex < 5; segmentIndex++)
+  {
+    client.println("<label>");
+    client.println("<input id=\"seg"+String((int)(segmentIndex+1))+"Count-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"Diodes count (seg. "+String((int)(segmentIndex+1))+")\"");
+    if(slot.customBytes[5 + segmentIndex] > 0){
+      client.println(" value=\""+ String((int)slot.customBytes[5 + segmentIndex]) +"\">");
+    }else {
+      client.println(">");
+    }
+    client.println(" <select id=\"Seg"+String((int)(segmentIndex +1))+"Flip-"+String((int)slotNumber)+"\">");
+    if(slot.customBytes[10 + segmentIndex]){
+      client.println(option1);
+      client.println(option2);
+    }else {
+      client.println(option3);
+      client.println(option4);
+    }
+      
+    client.println("</select></label>");
+  }
+
+  client.println("<label>Current limiter</label>");
+  int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
+  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"SegcurLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
+  client.println("<input id=\"SegcurLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('SegcurLimVal-"+String((int)slotNumber)+"',this.value);\">");
+  
+
   client.println("</div>"); 
 }
 

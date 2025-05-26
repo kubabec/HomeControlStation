@@ -95,6 +95,7 @@ public:
     static void parameterizedHandler_stripLoadFromMemory(String& request, WiFiClient& client);
     static void parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client);
     static void parameterizedHandler_roomStateChange(String& request, WiFiClient& client);
+    static void parameterizedHandler_segmentStateSwitch(String& request, WiFiClient& client);
     
 };
 
