@@ -87,7 +87,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
         fetchData();\
         getNotifications();\
 \
-        setInterval(fetchData, 1000);\
+        setInterval(fetchData, 500);\
 \
 \
 \

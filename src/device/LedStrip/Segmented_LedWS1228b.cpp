@@ -6,9 +6,10 @@ SegLedWS1228bDeviceType::SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, s
 {
     m_reportNvmDataChangedCbk = reportNvmDataChangedCbk;
     for(uint8_t i = 5; i < 10; i++){
-        Serial.println("SegLedWS1228bDeviceType:// customBytes[" + String(i) + "] : " + String(nvmData.customBytes[i]));
         if(nvmData.customBytes[i] > 0){
-            segmentLedCount.push_back(nvmData.customBytes[i]);
+            if(nvmData.customBytes[i] <= 100){
+                segmentLedCount.push_back(nvmData.customBytes[i]);
+            }
         }else {
             break;
         }
@@ -17,26 +18,22 @@ SegLedWS1228bDeviceType::SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, s
         segmentFlips.push_back(nvmData.customBytes[i]);
     }
 
-
-    Serial.println("SegLedWS1228bDeviceType:// Segment count : " + String(segmentLedCount.size()));
-    Serial.println("SegLedWS1228bDeviceType:// Segment flips : " + String(segmentFlips.size()));
-
-
-
-    /* calculate number of virtual diodes based on real count */
-    if(diodesCount > maxVirtualLeds){
-        // virtualDiodesCount = 100;
-        
-        while((diodesCount / physicalLedsPerVirtualLed) > maxVirtualLeds){
-            physicalLedsPerVirtualLed++;
-        }
-
-        virtualDiodesCount = (diodesCount / physicalLedsPerVirtualLed);
-        Serial.println("VirtualDiodesCount : " + String((int)virtualDiodesCount));
-    }else {
-        virtualDiodesCount = diodesCount;
+    for(uint8_t i = 0; i < segmentLedCount.size(); i++){
+        segmentStatus.push_back(0); /* all segments are off by default */
     }
 
+    for(uint8_t i = 0; i < segmentLedCount.size(); i++){
+        segmentColors.push_back(LedColor(0,0,0)); /* all segments are black by default */
+    }
+
+    for(uint8_t i = 0; i < segmentLedCount.size(); i++){
+        /* push empty structure to have strip content in lenght of how many segments is active*/
+        stripContents.push_back(SegmentData());
+    }
+
+    for(uint8_t i = 0; i < segmentLedCount.size(); i++){
+        totalLedsCount += segmentLedCount.at(i);
+    }
 
     
     isOn = false;
@@ -44,20 +41,17 @@ SegLedWS1228bDeviceType::SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, s
     deviceId = nvmData.deviceId;
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
-    isInversedOrder = nvmData.customBytes[2];
 
     adafruit_ws2812b = new Adafruit_NeoPixel(
-        // nvmData.customBytes[0], /* leds count */
-        // nvmData.pinNumber,
-        diodesCount,
+        totalLedsCount,
         pinNumber,
         NEO_GRB + NEO_KHZ800
     );
 
     adafruit_ws2812b->begin();
 
-    Serial.println("SegLedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
-    adafruit_ws2812b->setBrightness(nvmData.customBytes[3]); /* current limiter usage */
+    Serial.println("SegLedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[0]) + " for device id : " + String((int)deviceId));
+    adafruit_ws2812b->setBrightness(nvmData.customBytes[0]); /* current limiter usage */
 
 
 }
@@ -68,18 +62,29 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t
     if(ptr != nullptr && size == getExtendedMemoryLength()){
         /* Data with valid length is allocated, pointer can be used */
         extendedMemoryPointer = ptr;
+        LedColor* tempPtr = (LedColor*) extendedMemoryPointer; 
 
-        stripContent[eACTIVE_CURRENT_CONTENT] = (LedColor*) extendedMemoryPointer;
-        stripContent[eSAVED_CONTENT_SLOT1] = (LedColor*) ((uint8_t*)stripContent[eACTIVE_CURRENT_CONTENT]  + (virtualDiodesCount * sizeof(LedColor)));
-        stripContent[eSAVED_CONTENT_SLOT2] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT1]  + (virtualDiodesCount * sizeof(LedColor)));
-        stripContent[eSAVED_CONTENT_SLOT3] = (LedColor*) ((uint8_t*)stripContent[eSAVED_CONTENT_SLOT2]  + (virtualDiodesCount * sizeof(LedColor)));
+        uint16_t offset = 0;
+        for(uint8_t i = 0; i < stripContents.size(); i++){
+            Serial.println("SegLedWS1228bDeviceType:// Initializing segment " + String((int)i) + " with " + String((int)segmentLedCount.at(i)) + " leds");
+            stripContents.at(i).current = tempPtr;
+
+            tempPtr += segmentLedCount.at(i); /* move pointer to next segment */
+            stripContents.at(i).savedSlot1 = tempPtr;
+
+            tempPtr += segmentLedCount.at(i); /* move pointer to next segment */
+            stripContents.at(i).savedSlot2 = tempPtr;
+
+            if(i < stripContents.size()-1){
+                tempPtr += segmentLedCount.at(i); 
+            }
+        }
+
+        Serial.println("offset : " + String((uint8_t*)tempPtr - (uint8_t*)extendedMemoryPointer));
+        Serial.println("Extended memory size : " + String(getExtendedMemoryLength()));
+
 
         Serial.println("SegLedWS1228bDeviceType:// Successfully initialized");
-
-        updateAveragedColor(eACTIVE_CURRENT_CONTENT);
-        updateAveragedColor(eSAVED_CONTENT_SLOT1);
-        updateAveragedColor(eSAVED_CONTENT_SLOT2);
-        updateAveragedColor(eSAVED_CONTENT_SLOT3);
 
         isContentInitialized = true;
 
@@ -130,47 +135,23 @@ bool SegLedWS1228bDeviceType::isStripInitialized()
     return (adafruit_ws2812b != nullptr);
 }
 
-void SegLedWS1228bDeviceType::applyColors(){
-    if(isContentInitialized){
-        updateAveragedColor(eACTIVE_CURRENT_CONTENT);
-
-        if(ongoingAnimation != nullptr){
-            delete ongoingAnimation;
-        }
-        Serial.println("Starting fade in animation");
-        ongoingAnimation = new FadeInAnimation(
-            stripContent[eACTIVE_CURRENT_CONTENT],
-            virtualDiodesCount
-        );
-
-        if(!isOn){
-            ongoingAnimation->start(true); // start from beginning
-        }else {
-            ongoingAnimation->start(false); // start from beginning
-        }
-        
-
-        isOn = true;
-
-    }
-}
 
 void SegLedWS1228bDeviceType::setColors(LedColor* ledsArray, uint16_t count)
 {
-    if(isContentInitialized){
-        if(count == virtualDiodesCount){
-            memcpy(stripContent[eACTIVE_CURRENT_CONTENT], ledsArray, (count*sizeof(LedColor)));
-            applyColors();
+    // if(isContentInitialized){
+    //     if(count == virtualDiodesCount){
+    //         memcpy(stripContent[eACTIVE_CURRENT_CONTENT], ledsArray, (count*sizeof(LedColor)));
+    //         applyColors();
 
-        }
-    }
+    //     }
+    // }
 }
 
 void SegLedWS1228bDeviceType::getDetailedColors(LedColor* memoryBuffer, uint16_t count)
 {
     if(isContentInitialized){
         if(count == virtualDiodesCount){
-            memcpy(memoryBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (count*sizeof(LedColor)));
+            // memcpy(memoryBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (count*sizeof(LedColor)));
         }  
     }
 }
@@ -182,13 +163,13 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::applyContent(LedStripContentInd
     if(isContentInitialized && contentIndex > eACTIVE_CURRENT_CONTENT && contentIndex < eDIFFERENT_CONTENTS_COUNT)
     {
         Serial.println("SegLedWS1228bDeviceType:// requested load content " + String((int)contentIndex));
-        memcpy( /* copy data from requested content to active content */
-            stripContent[eACTIVE_CURRENT_CONTENT], 
-            stripContent[contentIndex],
-            (virtualDiodesCount*sizeof(LedColor))
-        );
+        // memcpy( /* copy data from requested content to active content */
+        //     stripContent[eACTIVE_CURRENT_CONTENT], 
+        //     stripContent[contentIndex],
+        //     (virtualDiodesCount*sizeof(LedColor))
+        // );
 
-        applyColors();
+        // applyColors();
         retVal = SERV_SUCCESS;
     }
 
@@ -204,15 +185,15 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::saveContentAs(LedStripContentIn
     {
         Serial.println("SegLedWS1228bDeviceType:// requested overwrite content " + String((int)contentIndex));
         Serial.println("contentIndex : " + String((int)contentIndex));
-        memcpy( /* copy data from active content to choosen content slot */ 
-            stripContent[contentIndex],
-            stripContent[eACTIVE_CURRENT_CONTENT],
-            (virtualDiodesCount*sizeof(LedColor))
-        );
+        // memcpy( /* copy data from active content to choosen content slot */ 
+        //     stripContent[contentIndex],
+        //     stripContent[eACTIVE_CURRENT_CONTENT],
+        //     (virtualDiodesCount*sizeof(LedColor))
+        // );
 
         Serial.println("Slot saved");
 
-        averagedColors[contentIndex] = averagedColors[eACTIVE_CURRENT_CONTENT];
+        // averagedColors[contentIndex] = averagedColors[eACTIVE_CURRENT_CONTENT];
 
         Serial.println("memoryAveragedColors saved");
 
@@ -229,7 +210,7 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::saveContentAs(LedStripContentIn
 
 void SegLedWS1228bDeviceType::stripOn()
 {
-    applyColors();
+    // applyColors();
 }
 
 void SegLedWS1228bDeviceType::stripOff()
@@ -237,10 +218,10 @@ void SegLedWS1228bDeviceType::stripOff()
     if(switchOffAnimation != nullptr){
         delete switchOffAnimation;
     }
-    switchOffAnimation = new FadeOutAnimation(
-        stripContent[eACTIVE_CURRENT_CONTENT],
-        virtualDiodesCount
-    );
+    // switchOffAnimation = new FadeOutAnimation(
+    //     stripContent[eACTIVE_CURRENT_CONTENT],
+    //     virtualDiodesCount
+    // );
     switchOffAnimation->start(false);
 }
 
@@ -248,38 +229,28 @@ bool notBlack(LedColor color){
     return !(color.r == 0 && color.g == 0 && color.b == 0);
 }
 
-void SegLedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
+
+void SegLedWS1228bDeviceType::setSegmentState(uint8_t segmentIndex, uint8_t state)
 {
-    int avgRed = 0;
-    int avgGreen = 0;
-    int avgBlue = 0;
-
-    int skipped = 0;
-
-    for(uint16_t i = 0 ; i < virtualDiodesCount ; i ++)
-    {
-        if(notBlack(stripContent[content][i])){
-            avgRed += stripContent[content][i].r;
-            avgGreen += stripContent[content][i].g;
-            avgBlue += stripContent[content][i].b;
+    if(segmentIndex < segmentStatus.size()){
+        segmentStatus[segmentIndex] = state;
+        if(state == 0){
+            Serial.println("SegLedWS1228bDeviceType:// Segment " + String((int)segmentIndex) + " turned off");
+            segmentColors[segmentIndex] = LedColor(0,0,0); /* turn off segment */
+            isOn = false; /* turn off whole strip */
+            //setColors(&LedColor(0,0,0), virtualDiodesCount);
         }else {
-            skipped++;
+            Serial.println("SegLedWS1228bDeviceType:// Segment " + String((int)segmentIndex) + " turned on");
+            segmentColors[segmentIndex] =  LedColor(0, 0,255); /* set segment color to averaged color */
+            isOn = true; /* turn on whole strip */
+            //setColors(&segmentColors[segmentIndex], virtualDiodesCount);
         }
     }
-
-    avgRed = (int)((float)avgRed/(float)(virtualDiodesCount - skipped));
-    avgGreen = (int)((float)avgGreen/(float)(virtualDiodesCount - skipped));
-    avgBlue = (int)((float)avgBlue/(float)(virtualDiodesCount - skipped));
-
-    averagedColors[content].r =  (uint8_t)avgRed;
-    averagedColors[content].g =  (uint8_t)avgGreen;
-    averagedColors[content].b =  (uint8_t)avgBlue;
-
 }
 
 
 uint16_t SegLedWS1228bDeviceType::getExtendedMemoryLength(){
-    return ((virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor));
+    return ((totalLedsCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor));
 }
 
 uint8_t SegLedWS1228bDeviceType::getDeviceIdentifier(){
@@ -297,24 +268,32 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serv
 }
 ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param){
     switch(serviceType){
+        case DEVSERVICE_SEGMENT_STATE_SWITCH:
+            /* Switch segment state */
+            setSegmentState(param.a, param.b);
+            return SERV_SUCCESS;
+
+        break;
+
         case DEVSERVICE_STATE_SWITCH:
+            for(uint8_t i = 0; i < segmentStatus.size(); i++){
+                setSegmentState(i, param.a);
+            }
             if(param.a == 1) {
-                stripOn();
                 isOn = true;
             }
             else {
-                stripOff();
                 isOn = false;
             }   
             return SERV_SUCCESS;
 
         case DEVSERVICE_LED_STRIP_SAVE_CONTENT:
             Serial.println("SegLedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
-            return saveContentAs((LedStripContentIndex)param.a);
+            return SERV_GENERAL_FAILURE; //saveContentAs((LedStripContentIndex)param.a);
         
         case DEVSERVICE_LED_STRIP_SWITCH_CONTENT:
             Serial.println("SegLedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
-            return applyContent((LedStripContentIndex)param.a);
+            return SERV_GENERAL_FAILURE; //applyContent((LedStripContentIndex)param.a);
 
         default: 
             return SERV_NOT_SUPPORTED;
@@ -330,29 +309,31 @@ ServiceRequestErrorCode SegLedWS1228bDeviceType::service(DeviceServicesType serv
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
         case DEVSERVICE_GET_DETAILED_COLORS:
-            Serial.println("Advanced controls requested");
-            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
-            {
-                getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
-                return SERV_SUCCESS;
-            }else {
-                return SERV_EXECUTION_FAILURE;
-            }
+            // Serial.println("Advanced controls requested");
+            // if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
+            // {
+            //     getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+            //     return SERV_SUCCESS;
+            // }else {
+            //     return SERV_EXECUTION_FAILURE;
+            // }
+            return SERV_GENERAL_FAILURE; //getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
         case DEVSERVICE_SET_DETAILED_COLORS:
             Serial.println("param.size: " + String((int)param.size) + ", must be : " + String((int)virtualDiodesCount*sizeof(LedColor)));
-            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
-            {
-                Serial.println("Color change requested");
-                setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+            // if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
+            // {
+            //     Serial.println("Color change requested");
+            //     setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
 
-                /* this action will affect NVM data */
-                if(m_reportNvmDataChangedCbk){
-                    m_reportNvmDataChangedCbk();
-                }
-                return SERV_SUCCESS;
-            }else {
-                return SERV_EXECUTION_FAILURE;
-            }
+            //     /* this action will affect NVM data */
+            //     if(m_reportNvmDataChangedCbk){
+            //         m_reportNvmDataChangedCbk();
+            //     }
+            //     return SERV_SUCCESS;
+            // }else {
+            //     return SERV_EXECUTION_FAILURE;
+            // }
+            return SERV_GENERAL_FAILURE; //setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
 
         case DEVSERVICE_SET_EXT_MEMORY_PTR:
             return updateExtendedMemoryPtr(param.buff, param.size);
@@ -365,12 +346,12 @@ void SegLedWS1228bDeviceType::applyVirtualToRealDiodes()
 {
     for(uint8_t i = 0; i < virtualDiodesCount ; i ++){
         uint8_t adjustedIdx = isInversedOrder ? (virtualDiodesCount-(i+1)) : i;
-        setHwLedStripColor(
-            i,
-            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].r,
-            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].g,
-            stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].b
-        );
+        // setHwLedStripColor(
+        //     i,
+        //     stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].r,
+        //     stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].g,
+        //     stripContent[eACTIVE_CURRENT_CONTENT][adjustedIdx].b
+        // );
     }
 
     adafruit_ws2812b->show();
@@ -434,24 +415,39 @@ DeviceDescription SegLedWS1228bDeviceType::getDeviceDescription(){
     desc.deviceName = deviceName;
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
-    /* number of segments */
-    desc.customBytes[0] = segmentLedCount.size();
+    
+    desc.customBytes[0] = segmentLedCount.size(); /* number of segments */
 
-    desc.customBytes[2] = averagedColors[eACTIVE_CURRENT_CONTENT].r; // average color R
-    desc.customBytes[3] = averagedColors[eACTIVE_CURRENT_CONTENT].g; // average color G
-    desc.customBytes[4] = averagedColors[eACTIVE_CURRENT_CONTENT].b; // average color B
+    /* byte 1 -6 : segments status*/
+    for(uint8_t status = 0; status < segmentStatus.size(); status++){
+        desc.customBytes[1+status] = segmentStatus[status];
+    }
 
-    desc.customBytes[5] = averagedColors[eSAVED_CONTENT_SLOT1].r; // average color R
-    desc.customBytes[6] = averagedColors[eSAVED_CONTENT_SLOT1].g; // average color G
-    desc.customBytes[7] = averagedColors[eSAVED_CONTENT_SLOT1].b; // average color B
+    /* byte 6 - 20 : segments colors */
+    for(uint8_t color = 0; color < segmentColors.size(); color++){
+        desc.customBytes[7 + (color * 3)] = segmentColors[color].r;
+        desc.customBytes[8 + (color * 3)] = segmentColors[color].g;
+        desc.customBytes[9 + (color * 3)] = segmentColors[color].b;
+    }
 
-    desc.customBytes[8] = averagedColors[eSAVED_CONTENT_SLOT2].r; // average color R
-    desc.customBytes[9] = averagedColors[eSAVED_CONTENT_SLOT2].g; // average color G
-    desc.customBytes[10] = averagedColors[eSAVED_CONTENT_SLOT2].b; // average color B
+    // /* number of segments */
+    // desc.customBytes[0] = segmentLedCount.size();
 
-    desc.customBytes[11] = averagedColors[eSAVED_CONTENT_SLOT3].r; // average color R
-    desc.customBytes[12] = averagedColors[eSAVED_CONTENT_SLOT3].g; // average color G
-    desc.customBytes[13] = averagedColors[eSAVED_CONTENT_SLOT3].b; // average color B
+    // desc.customBytes[2] = averagedColors[eACTIVE_CURRENT_CONTENT].r; // average color R
+    // desc.customBytes[3] = averagedColors[eACTIVE_CURRENT_CONTENT].g; // average color G
+    // desc.customBytes[4] = averagedColors[eACTIVE_CURRENT_CONTENT].b; // average color B
+
+    // desc.customBytes[5] = averagedColors[eSAVED_CONTENT_SLOT1].r; // average color R
+    // desc.customBytes[6] = averagedColors[eSAVED_CONTENT_SLOT1].g; // average color G
+    // desc.customBytes[7] = averagedColors[eSAVED_CONTENT_SLOT1].b; // average color B
+
+    // desc.customBytes[8] = averagedColors[eSAVED_CONTENT_SLOT2].r; // average color R
+    // desc.customBytes[9] = averagedColors[eSAVED_CONTENT_SLOT2].g; // average color G
+    // desc.customBytes[10] = averagedColors[eSAVED_CONTENT_SLOT2].b; // average color B
+
+    // desc.customBytes[11] = averagedColors[eSAVED_CONTENT_SLOT3].r; // average color R
+    // desc.customBytes[12] = averagedColors[eSAVED_CONTENT_SLOT3].g; // average color G
+    // desc.customBytes[13] = averagedColors[eSAVED_CONTENT_SLOT3].b; // average color B
 
     return desc;
 }

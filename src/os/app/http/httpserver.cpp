@@ -63,7 +63,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "setStripColor",
   "stripLoadFromMemory",
   "stripOverwriteSlot",
-  "stRmChng"
+  "stRmChng",
+  "segSwtch"
 };
 
 
@@ -98,7 +99,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)

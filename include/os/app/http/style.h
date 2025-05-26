@@ -672,7 +672,7 @@ footer a {\
     transition: left 0.3s, box-shadow 0.3s;\
 }\
 .segThumb{\
-  background:#5A8DEE;\
+  background:radial-gradient(circle at 30% 40%, #accefb, #12009d);\
   position: absolute;\
   top: 2px;\
   left: 2px;\
@@ -686,6 +686,10 @@ footer a {\
     background: #4caf50;\
 }\
 .switch.on .thumb {\
+    left: calc(100% - 30px);\
+    box-shadow: 0 2px 8px rgba(76,175,80,0.6);\
+}\
+.switch.on .segThumb {\
     left: calc(100% - 30px);\
     box-shadow: 0 2px 8px rgba(76,175,80,0.6);\
 }\

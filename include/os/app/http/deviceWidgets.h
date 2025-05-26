@@ -99,16 +99,25 @@ function generateSegLedWidget(deviceContainer, device) {\
         colorPicker.className = 'color-picker';\
         colorPicker.classList.add('segColDisp');\
         const colorDisplay = document.createElement('div');\
-        colorDisplay.className = `color-display on`;\
-        colorDisplay.style.backgroundColor = '#1af265';\
-        colorPicker.appendChild(colorDisplay);\
+        colorDisplay.className = `color-display`;\
+        colorDisplay.style.backgroundColor = device.colors[i];\
         const tog = document.createElement('div');\
         tog.classList.add('switch');\
+        if(device.segments[i] == 1){\
+            tog.classList.add('on');\
+            colorDisplay.classList.add('on');\
+        }\
         tog.classList.add('segLedTog');\
+        tog.addEventListener('click', () => {\
+         tog.classList.toggle('on');\
+         const isOn = tog.classList.contains('on');\
+         asyncSegSwitch(device.id, i, isOn);\
+        });\
         const tmb = document.createElement('div');\
         tmb.classList.add('segThumb');\
         tog.appendChild(tmb);\
         \
+        colorPicker.appendChild(colorDisplay);\
         deviceContainer.appendChild(colorPicker);\
         deviceContainer.appendChild(tog);\
     };\

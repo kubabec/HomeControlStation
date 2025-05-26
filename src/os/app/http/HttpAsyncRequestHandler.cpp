@@ -279,8 +279,38 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
         jsonResponse +="\"humid\":"+ String((int)deviceInThisRoom->customBytes[2])+",";
       }
 
+
+
+
       if(deviceInThisRoom->deviceType == type_LED_STRIP_SEGMENTED){
         jsonResponse +="\"segCount\":"+ String((int)deviceInThisRoom->customBytes[0])+",";
+
+        jsonResponse += "\"segments\":[";
+        for(uint8_t statusIdx = 1; statusIdx < 6; statusIdx++){
+            uint8_t status = deviceInThisRoom->customBytes[statusIdx];
+            jsonResponse += "\""+String((int)status)+"\",";
+        }
+        jsonResponse +="$";
+        jsonResponse += "],";
+
+
+        uint8_t red = 0;
+        uint8_t green = 1;
+        uint8_t blue = 2;
+
+        jsonResponse += "\"colors\":[";
+        for(uint8_t color = 0; color < 5; color++){
+            red = deviceInThisRoom->customBytes[7 + (color * 3)];
+            green = deviceInThisRoom->customBytes[8 + (color * 3)];
+            blue = deviceInThisRoom->customBytes[9 + (color * 3)];
+
+            String rgbColor = getHexColor(red, green, blue);
+            jsonResponse += "\"#"+rgbColor+"\",";
+        }
+        jsonResponse +="$";
+        jsonResponse.replace(",$", "");
+        jsonResponse += "],";
+
       }
       
       jsonResponse +="\"brightness\":" + String((int)deviceInThisRoom->customBytes[2]);
@@ -304,6 +334,8 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
     roomIteratorCount++;
   }
   jsonResponse +="}";
+
+//   Serial.println(jsonResponse);
 
 }
 

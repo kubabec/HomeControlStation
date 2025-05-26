@@ -10,14 +10,17 @@
 
 #include "Arduino.h"
 
-
+struct SegmentData {
+    LedColor* current = nullptr;
+    LedColor* savedSlot1 = nullptr;
+    LedColor* savedSlot2 = nullptr;   
+};
 
 class SegLedWS1228bDeviceType : public Device {
     enum LedStripContentIndex{
         eACTIVE_CURRENT_CONTENT = 0,
         eSAVED_CONTENT_SLOT1,
         eSAVED_CONTENT_SLOT2,
-        eSAVED_CONTENT_SLOT3,
         eDIFFERENT_CONTENTS_COUNT
     };
     /*SEG properties*/
@@ -27,8 +30,18 @@ class SegLedWS1228bDeviceType : public Device {
 
 
     uint8_t* extendedMemoryPointer = nullptr;
-    LedColor* stripContent[4];
-    LedColor averagedColors[4] = {0};
+    std::vector<SegmentData> stripContents; //colors for each segment led strip
+
+
+
+
+    LedColor averagedColors[eDIFFERENT_CONTENTS_COUNT] = {0};
+    std::vector<uint8_t> segmentStatus;
+    std::vector<LedColor> segmentColors; //colors for each segment
+
+    int totalLedsCount = 0; //total number of physical leds in strip
+
+
     bool isContentInitialized = false;
     bool isInversedOrder = false;
     bool isOn = false; //stan urzadzenia
@@ -47,6 +60,8 @@ class SegLedWS1228bDeviceType : public Device {
 
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
+
+    void setSegmentState(uint8_t segmentIndex, uint8_t state);
     public:
     SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
 
@@ -66,12 +81,7 @@ class SegLedWS1228bDeviceType : public Device {
 
     void setColors(LedColor* ledsArray, uint16_t count);
     void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
-
-    void applyColors();
     
-
-    void updateAveragedColor(LedStripContentIndex content);
-
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);
