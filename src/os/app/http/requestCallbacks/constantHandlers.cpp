@@ -231,11 +231,12 @@ void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient& client)
   try{
     std::vector<NetworkNodeInfo> networkNodes = std::any_cast<std::vector<NetworkNodeInfo> >(DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO));
     client.println("<table class=\"table-graphite\">");
-    client.println("<thead><tr><th>Type</th><th>IP</th></tr></thead>");
+    client.println("<thead><tr><th>Type</th><th>IP</th><th>Web interface</th></tr></thead>");
     client.println("<tbody>");
     for(auto& node : networkNodes){
       String nodeType = node.nodeType == NetworkNodeInfo::NodeType::Master ? "Master" : "Slave";
-      client.println("<tr><td>"+nodeType+"</td><td>"+String((int)node.nodeIP.octet1)+"."+String((int)node.nodeIP.octet2)+"."+String((int)node.nodeIP.octet3)+"."+String((int)node.nodeIP.octet4)+"</td></tr>");
+      String nodeIpString = String((int)node.nodeIP.octet1)+"."+String((int)node.nodeIP.octet2)+"."+String((int)node.nodeIP.octet3)+"."+String((int)node.nodeIP.octet4);
+      client.println("<tr><td>"+nodeType+"</td><td>"+nodeIpString+"</td><td><a class=\"button\" href=\"http://"+nodeIpString+"/\">Go</a></td></tr>");
     }
     client.println("</tbody>");
 

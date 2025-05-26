@@ -268,6 +268,10 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
         jsonResponse +="\"avgColor\":\"#"+rgbColor+"\",";
       }
 
+      if(deviceInThisRoom->deviceType == type_DISTANCE_SENSOR){
+        jsonResponse +="\"dist\":"+ String((int)deviceInThisRoom->customBytes[0])+",";
+      }
+
       if(deviceInThisRoom->deviceType == type_TEMP_SENSOR){
         float temperature = 0.f;
         memcpy(&temperature, &deviceInThisRoom->customBytes[3], sizeof(temperature));

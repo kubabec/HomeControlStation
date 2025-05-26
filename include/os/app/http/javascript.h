@@ -200,6 +200,25 @@ let isNotificationPollingActive = 1;\
         room:dataRoom,\
       };\
     }\
+    function getDistSensorConfigurationJson(id){\
+        var enable = \"enabled\" + id;\
+        var enableValue = document.getElementById(enable).checked;\
+        var dataName = document.getElementById('name' + id).value;\
+        var dataPin = document.getElementById('pin' + id).value;\
+        var dataRoom = document.getElementById('room' + id).value;\
+        var tx = document.getElementById('pinTx-' + id).value;\
+        var rx = document.getElementById('pinRx-' + id).value;\
+        return {\
+        type:\"DistanceSensor\",\
+        id:id,\
+        enabled:enableValue,\
+        name:dataName,\
+        pin:dataPin,\
+        room:dataRoom,\
+        pinTx:tx,\
+        pinRx:rx\
+      };\
+    }\
     function getEmptyConfigurationJson(id){\
         return {\
         type:\"Empty\",\
@@ -222,6 +241,8 @@ let isNotificationPollingActive = 1;\
                 devices.push(getTempSensorConfigurationJson(i));\
             } else if(deviceTypeValue == 46) {\
                 devices.push(getSegStripConfigJson(i));\
+            } else if(deviceTypeValue == 47) {\
+                devices.push(getDistSensorConfigurationJson(i));\
             } else {\
                 devices.push(getEmptyConfigurationJson(i));\
             }\

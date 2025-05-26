@@ -6,8 +6,12 @@
 #include <devices/LedStrip/LedWS1228b.hpp>
 #include <devices/LedStrip/Segmented_LedWS1228b.hpp>
 #include <devices/tempSensorDHT11.hpp>
+#include <devices/distanceSensor.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
+
+
+
 
 class DeviceManager 
 {
@@ -22,6 +26,9 @@ class DeviceManager
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
     static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
+#endif
+#ifdef DISTANCE_SENSOR_SUPPORTED
+    static std::vector<DistanceSensor> distanceSensorsDevices;
 #endif
 
     static ConfigSlotsDataType pinConfigSlotsRamMirror;

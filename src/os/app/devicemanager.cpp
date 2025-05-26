@@ -14,6 +14,9 @@ std::vector<SegLedWS1228bDeviceType> DeviceManager::segmentedWs2812bDevices = {}
 std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
 #endif
 
+std::vector<DistanceSensor> DeviceManager::distanceSensorsDevices = {};
+
+
 
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
@@ -140,6 +143,13 @@ void DeviceManager::init()
 #ifdef TEMP_SENSOR_SUPPORTED
         /* Add temperature sensors to common devices vector*/
         for(TempSensorDHT11DeviceType& device: tempSensorsDevices){
+            devices.push_back(&device);
+        }
+#endif
+
+#ifdef DISTANCE_SENSOR_SUPPORTED
+        /* Add distance sensors to common devices vector*/
+        for(DistanceSensor& device: distanceSensorsDevices){
             devices.push_back(&device);
         }
 #endif
@@ -344,6 +354,12 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
                     tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
                     isValidDeviceGiven = true;
 #endif
+                break;
+                case type_DISTANCE_SENSOR:
+
+                    distanceSensorsDevices.push_back(DistanceSensor(nvmData));
+                    isValidDeviceGiven = true;
+
                 break;
 
                 default:break;
@@ -588,6 +604,28 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 }
                 configSlot.pinNumber = pin.toInt();
                 configSlot.roomId = room.toInt();
+
+            } else if(type == "DistanceSensor"){
+
+                /* extract remaining OnOff data */
+                String name =              String(doc["devices"][i]["name"]);
+                String pin =               String(doc["devices"][i]["pin"]);
+                String room =              String(doc["devices"][i]["room"]);
+                String txPin =             String(doc["devices"][i]["pinTx"]);
+                String rxPin =             String(doc["devices"][i]["pinRx"]);
+
+                /* Put data to config slot memory*/
+                configSlot.deviceType = (uint8_t)type_DISTANCE_SENSOR;
+                configSlot.isActive = isEnabled;
+                configSlot.deviceId = id;
+                if(name.length() < 25){
+                    memcpy(configSlot.deviceName, name.c_str(), name.length());
+                }
+                configSlot.pinNumber = pin.toInt();
+                configSlot.roomId = room.toInt();
+                configSlot.customBytes[2] = txPin.toInt();
+                configSlot.customBytes[3] = rxPin.toInt();
+                
 
             } else if(type == "SegLedStrip") {
 

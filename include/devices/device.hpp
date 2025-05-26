@@ -51,7 +51,9 @@ typedef enum {
     type_LED_STRIP,
     type_TEMP_SENSOR,
     type_LED_STRIP_SEGMENTED,
-    type_DEVICE_TYPE_LAST = type_LED_STRIP_SEGMENTED
+    type_DISTANCE_SENSOR,
+    type_DEVICE_TYPE_LAST = type_DISTANCE_SENSOR
+
 }DevType;
 
 typedef struct
