@@ -1066,9 +1066,23 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   /* Extended memory usage */
   ExtendedMemoryCtrlAPI extMemoryFunctions = 
         std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
-  client.println("<label>Memory usage:<input disabled value=\"");
-  client.println(String((int)extMemoryFunctions.getCurrentMemoryUsage()) + " / 2 500 bytes");
-  client.println("\" type=\"text\" \"></label>");
+  // client.println("<label>Memory usage:<input disabled value=\"");
+  // client.println(String((int)extMemoryFunctions.getCurrentMemoryUsage()) + " / 2 500 bytes");
+  // client.println("\" type=\"text\" \"></label>");
+
+  int memoryUsagePercent = (int)((float)extMemoryFunctions.getCurrentMemoryUsage() / 2500.f * 100.f);
+
+  client.println("<label>Memory usage: <div class=\"memory-bar\" id=\"memoryBar\">");
+  client.println("<div class=\"memory-bar-fill\" id=\"memoryBarFill\"></div>");
+  client.println("</div></label>");
+  client.println("<script>\
+    function setMemoryBarValue(value) {\
+      const bar = document.getElementById('memoryBarFill');\
+      const clampedValue = Math.min(100, Math.max(0, value));\
+      bar.style.width = clampedValue + '%';\
+    }\
+    setMemoryBarValue("+String((int)memoryUsagePercent)+");\
+  </script>");
 
   /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr class=\"custom-hr\">");  

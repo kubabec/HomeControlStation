@@ -85,6 +85,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
 \
 \
         fetchData();\
+        hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
         setInterval(fetchData, 500);\

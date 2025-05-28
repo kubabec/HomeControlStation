@@ -746,6 +746,21 @@ top:0%;\
   top:25px;\
   margin-left: -22%;\
 }\
+.memory-bar {\
+position: relative;\
+width: 100%;\
+max-width: 400px;\
+height: 20px;\
+background-color: #333;\
+border-radius: 5px;\
+overflow: hidden;\
+}\
+.memory-bar-fill {\
+background-color: #2196f3;\
+height: 100%;\
+width: 0%;\
+transition: width 0.3s ease;\
+}\
 </style>\
 ";
 

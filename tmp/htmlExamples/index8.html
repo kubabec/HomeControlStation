@@ -2,69 +2,41 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Switch bez ::before</title>
   <style>
-    .switch {
+    .memory-bar {
       position: relative;
-      width: 56px;
-      height: 32px;
-      background: #333;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: background 0.3s;
+      width: 100%;
+      max-width: 400px;
+      height: 20px;
+      background-color: #333; /* ciemnoszare tło */
+      border-radius: 5px;
+      overflow: hidden;
     }
-    .switch .thumb {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #eee, #888);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-      transition: left 0.3s, box-shadow 0.3s;
-    }
-    .switch.on {
-      background: #4caf50;
-    }
-    .switch.on .thumb {
-      left: calc(100% - 30px);
-      box-shadow: 0 2px 8px rgba(76,175,80,0.6);
+
+    .memory-bar-fill {
+      background-color: #2196f3; /* niebieski pasek */
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
     }
   </style>
 </head>
 <body>
 
-  <div id="container"></div>
+  <div class="memory-bar" id="memoryBar">
+    <div class="memory-bar-fill" id="memoryBarFill"></div>
+  </div>
 
   <script>
-    // Funkcja tworząca przełącznik
-    function createSwitch(initialState = false, onToggle) {
-      const sw = document.createElement('div');
-      sw.classList.add('switch');
-      if (initialState) sw.classList.add('on');
-
-      // dodajemy rzeczywisty element "thumb"
-      const thumb = document.createElement('div');
-      thumb.classList.add('thumb');
-      sw.appendChild(thumb);
-
-      // kliknięcie zmienia stan
-      sw.addEventListener('click', () => {
-        sw.classList.toggle('on');
-        const isOn = sw.classList.contains('on');
-        onToggle(isOn);
-      });
-
-      return sw;
+    // Funkcja do ustawiania wartości paska: 0–100 (%)
+    function setMemoryBarValue(value) {
+      const bar = document.getElementById('memoryBarFill');
+      const clampedValue = Math.min(100, Math.max(0, value));
+      bar.style.width = clampedValue + '%';
     }
 
-    // przykładowe użycie
-    const container = document.getElementById('container');
-    const mySwitch = createSwitch(false, (state) => {
-      console.log('Przełącznik to teraz', state ? 'ON' : 'OFF');
-    });
-    container.appendChild(mySwitch);
+    // Przykład użycia:
+    setMemoryBarValue(40); // 40% zużycia pamięci
   </script>
 
 </body>
