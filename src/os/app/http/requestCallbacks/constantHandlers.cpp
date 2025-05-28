@@ -208,7 +208,7 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient& client)
     client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
     /* restart */
     std::any_cast<std::function<void(uint16_t)>>
-    (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
+    (DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
   }catch (std::bad_any_cast ex)
   {
 

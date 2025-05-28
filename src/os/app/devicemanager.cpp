@@ -586,7 +586,13 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 uint16_t numberOfLedsUint = numberOfLeds.toInt();
                 memcpy(&configSlot.customBytes[0], &(numberOfLedsUint), sizeof(uint16_t));
                 configSlot.customBytes[2] = sideFlp.toInt();
-                configSlot.customBytes[3] = currentLimiter.toInt();
+                if(currentLimiter.toInt() < 255){
+                    configSlot.customBytes[3] = currentLimiter.toInt();
+                    configSlot.customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION - 1] = currentLimiter.toInt();
+                }else {
+                    configSlot.customBytes[3] = 0;
+                    configSlot.customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION - 1] = 0;
+                }
 
             }else if(type == "TempSensor"){
 
@@ -700,7 +706,7 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
     Serial.println("New config JSON received, reboot ...");
 
     std::any_cast<std::function<void(uint16_t)>>
-        (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
+        (DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
 
     //{"devices":[{"type":"OnOff","id":1,"enabled":true,"name":"name","pin":"1","room":"2","briSup":"1"}]}
 

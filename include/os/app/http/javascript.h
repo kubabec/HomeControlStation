@@ -140,7 +140,7 @@ let isNotificationPollingActive = 1;\
         var dataRoom = document.getElementById('room' + id).value;\
         var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
         var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
-        var curLim =  document.getElementById('curLimVal-' + id).value;\ 
+        var curLim =  document.getElementById('curLim-' + id).value;\ 
         return {\
         type:\"LedStrip\",\
         id:id,\

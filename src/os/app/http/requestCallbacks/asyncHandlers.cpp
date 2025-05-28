@@ -84,7 +84,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String& r
 
   /* successfully loaded */
   if(notification.type == UserInterfaceNotification::INFO){
-    std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(5000);
+    std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
   }
 }
 
@@ -154,7 +154,7 @@ void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String& reque
 {
 
   escapeSpecialCharsInJson(request);
-  request.replace("/stripLoadFromMemory&", "");
+  request.replace("stripLoadFromMemory&", "");
 
   Serial.println(request);
   JsonDocument doc;
@@ -184,7 +184,7 @@ void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String& reque
 void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client)
 {
   escapeSpecialCharsInJson(request);
-  request.replace("/stripOverwriteSlot&", "");
+  request.replace("stripOverwriteSlot&", "");
 
   Serial.println(request);
 

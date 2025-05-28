@@ -14,7 +14,7 @@ void HomeLightHttpServer::parameterizedHandler_newConfigApply(String& request, W
     (DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).setDeviceCfgViaJson(request)) {
 
         std::any_cast<std::function<void(uint16_t)>>
-          (DataContainer::getSignalValue(CBK_RESET_DEVICE))(7000);
+          (DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
       }
 }
 

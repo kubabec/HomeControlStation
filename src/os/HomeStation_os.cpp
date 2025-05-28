@@ -390,7 +390,7 @@ void OperatingSystem::detectHwMassEraseRequest(){
     if(isMassEraseRequestActivated){ /* keep it first, to execute reset in the next execution to avoid reset when bootloader btn is pressed */
         if(digitalRead(0) == 1){ /* button was released, reset can be performed */
             std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
-            std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
+            std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
         }
     }
 
@@ -400,7 +400,7 @@ void OperatingSystem::detectHwMassEraseRequest(){
         activationTimeCounter = 0; /* reset activation timer */
     }
 
-    if(activationTimeCounter > 5){ /* 5 sec to activate reset */
+    if(activationTimeCounter > 3){ /* 5 sec to activate reset */
         isMassEraseRequestActivated = true;
         Serial.println("OS://HW MASS ERASE ACTIVATED.");
     }

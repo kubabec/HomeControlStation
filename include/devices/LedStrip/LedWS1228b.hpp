@@ -36,6 +36,7 @@ class LedWS1228bDeviceType : public Device {
     String deviceName;
     uint8_t roomId;
     std::function<void(void)> m_reportNvmDataChangedCbk;
+    long long animationProcessTime = 0; // time in ms for animation processing
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
     ILedAnimation* ongoingAnimation = nullptr;
     ILedAnimation* switchOffAnimation = nullptr;

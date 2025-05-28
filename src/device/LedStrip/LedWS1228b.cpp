@@ -41,7 +41,11 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::fu
     adafruit_ws2812b->begin();
 
     Serial.println("LedWS1228bDeviceType:// Applying current limit to : " +String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
-    adafruit_ws2812b->setBrightness(nvmData.customBytes[3]); /* current limiter usage */
+    
+
+    /* safety check of doubled the same value of current limitation */
+    uint8_t currentLimit = (nvmData.customBytes[3] == nvmData.customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION - 1]) ? nvmData.customBytes[3] : 0; /* if current limit is set to 0, use 100% */
+    adafruit_ws2812b->setBrightness(currentLimit); /* current limiter usage */
 
 
 }
@@ -78,7 +82,6 @@ void LedWS1228bDeviceType::init(){
 }
 
 void LedWS1228bDeviceType::cyclic(){
-    static long long animationProcessTime = 0;
 
     if(switchOffAnimation != nullptr){
         if(millis() - animationProcessTime > 60){

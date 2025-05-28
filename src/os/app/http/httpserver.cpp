@@ -726,6 +726,7 @@ void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& sl
 
   client.println("<label>Current limiter</label>");
   int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
+  Serial.println("Current limiter value: " + String((int)slot.customBytes[3]) + " -> " + String(percentValue) + "%");
   client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
   client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");

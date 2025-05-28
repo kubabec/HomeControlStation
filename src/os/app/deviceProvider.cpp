@@ -92,6 +92,7 @@ void DeviceProvider::cyclic()
         ServiceParameters_set1 serviceParameters;
         serviceParameters.a = (uint8_t) requestedRoomState;
         uint8_t deviceId = roomStateChangeDeviceIdQueue.front();
+        Serial.println("DeviceProvider: Processing room state change for device ID: " + String((int)deviceId) + " to state: " + String((int)requestedRoomState));
 
         if(
             service(

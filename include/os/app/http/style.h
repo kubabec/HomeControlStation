@@ -490,8 +490,8 @@ background-color:rgba(93, 190, 255, 0.9);\
 .color-picker-popup {\
 position: fixed;\
 top: 25%;\
-background: #fffff7;\
-border: 1px solid #b0c8d8;\
+background: #2A2E35;\
+color: #5A8DEE;\
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);\
 padding: 20px;\
 border-radius: 8px;\
