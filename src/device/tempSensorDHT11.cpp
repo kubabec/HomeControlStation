@@ -35,7 +35,7 @@ void TempSensorDHT11DeviceType::init()
 
 void TempSensorDHT11DeviceType::cyclic()
 {
-
+    // teraz sie zaczna pytania
     if (millis() - lastDataUpdateTime > 4000)
     {
         float h = dht->readHumidity();
