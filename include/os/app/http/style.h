@@ -761,6 +761,20 @@ height: 100%;\
 width: 0%;\
 transition: width 0.3s ease;\
 }\
+.sensor-error {\
+color: #ff4c4c;\
+background-color: #2a2a2a;\
+padding: 10px;\
+border-radius: 10px;\
+font-weight: bold;\
+margin-top: 5px;\
+box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);\
+display: flex;\
+text-align: center;\
+justify-content: center;\
+align-items: center;\
+height: 100%; /* Możesz dostosować */\
+}\
 </style>\
 ";
 

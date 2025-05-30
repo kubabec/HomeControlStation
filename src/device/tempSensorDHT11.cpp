@@ -35,23 +35,26 @@ void TempSensorDHT11DeviceType::init()
 
 void TempSensorDHT11DeviceType::cyclic()
 {
-
+    // teraz sie zaczna pytania
     if (millis() - lastDataUpdateTime > 4000)
     {
         float h = dht->readHumidity();
         float t = dht->readTemperature();
         if(!isnan(t))
         {
+            temHumSensError = 0;
             currentTemp = t;
             Serial.println("Temp: " + String(currentTemp));
-        }else {
-            Serial.println("Failed to read temperature");
-        }
-        if(!isnan(h)){
+            if(!isnan(h))
+            {
             currentHumid = (int)h;
             Serial.println("Humidity: " + String(currentHumid));
-        }else {
-            Serial.println("Failed to read humidity");
+            }
+        }
+        else 
+        {
+            temHumSensError = 1;
+            Serial.println("Temperature and humidity sensor error");
         }
 
         lastDataUpdateTime = millis();
@@ -118,6 +121,7 @@ DeviceDescription TempSensorDHT11DeviceType::getDeviceDescription()
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
     desc.customBytes[2] = currentHumid; // humidity
+    desc.customBytes[0] = temHumSensError;
     memcpy(&desc.customBytes[3], &currentTemp, sizeof(currentTemp));
     // desc.customBytes[3] = 73; // average color G
     return desc;

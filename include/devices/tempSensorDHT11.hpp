@@ -18,6 +18,7 @@ class TempSensorDHT11DeviceType : public Device
     uint8_t roomId;
     float currentTemp = 255.f;
     uint8_t currentHumid = 255;
+    uint8_t temHumSensError = 0; // blad czujnika temperatury i wilgotnosci 0 - czujnik dziala poprawnie, 1 - nie dziala
 
     long lastDataUpdateTime = 0;
 
