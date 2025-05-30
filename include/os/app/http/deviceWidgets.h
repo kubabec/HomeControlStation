@@ -83,14 +83,19 @@ function generateDistSensWidget(deviceContainer, device) {\
 \
 function generateTempWidget(deviceContainer, device) {\
     const temperatureContainer = document.createElement('div');\
+    if(device.Err == 0){\
     temperatureContainer.className = `temperature-container`;\
     temperatureContainer.innerHTML = `<div id=\"gauge${device.id}\" class=\"temperature-widget\"><canvas style=\"max-width: 100px;\"></canvas><div class=\"temperature-value\">20°C</div></div><div id=\"humidity${device.id}\" class=\"humidity-widget\"><canvas></canvas><div class=\"value-display humidity-value\">50%</div></div>`;\
-    deviceContainer.appendChild(temperatureContainer);\
 \
     listOfTempWidgets.push(`gauge${device.id}`);\
     listOfTempValues.push(device.temp);\
     listOfHumidWidgets.push(`humidity${device.id}`);\
     listOfHumidValues.push(device.humid);\
+    }else {\
+        temperatureContainer.className = 'sensor-error';\
+        temperatureContainer.innerHTML = 'SENSOR ERROR';\
+    }\
+    deviceContainer.appendChild(temperatureContainer);\
 }\
 function generateSegLedWidget(deviceContainer, device) {\
     const segCnt = device.segCount;\

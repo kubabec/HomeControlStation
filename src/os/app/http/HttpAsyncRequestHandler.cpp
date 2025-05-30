@@ -277,6 +277,7 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
         memcpy(&temperature, &deviceInThisRoom->customBytes[3], sizeof(temperature));
         jsonResponse +="\"temp\":"+ String(temperature)+",";
         jsonResponse +="\"humid\":"+ String((int)deviceInThisRoom->customBytes[2])+",";
+        jsonResponse +="\"Err\":"+ String((int)deviceInThisRoom->customBytes[0])+",";
       }
 
 
