@@ -35,20 +35,28 @@ void TempSensorDHT11DeviceType::init()
 
 void TempSensorDHT11DeviceType::cyclic()
 {
-    // teraz sie zaczna pytania
     if (millis() - lastDataUpdateTime > 4000)
     {
         float h = dht->readHumidity();
         float t = dht->readTemperature();
+
         if(!isnan(t))
         {
-            temHumSensError = 0;
-            currentTemp = t;
-            Serial.println("Temp: " + String(currentTemp));
+            if (lastTemp == 0 || abs(t - lastTemp) <= 2.0)
+            {
+                temHumSensError = 0;
+                currentTemp = t;
+                lastTemp = t;
+                Serial.println("Temp: " + String(currentTemp));
+            }
+            else
+            {
+                Serial.println("Rejected due to unpredicted temperature jump: " + String(t));
+            }
             if(!isnan(h))
             {
-            currentHumid = (int)h;
-            Serial.println("Humidity: " + String(currentHumid));
+                currentHumid = (int)h;
+                Serial.println("Humidity: " + String(currentHumid));
             }
         }
         else 
