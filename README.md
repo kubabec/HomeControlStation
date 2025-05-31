@@ -28,12 +28,11 @@ Future plans:
 
 ## Demo
 
-![Demo](https://github.com/kubabec/HomeControlStation/blob/main/demo/demo1.gif "Demo")
-![Demo2](https://github.com/kubabec/HomeControlStation/blob/main/demo/demo3.gif "Demo")
 
-![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/demoImg2.png "Main page")
+![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.06.34.png?raw=false "Main page")
+![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.07.55.png?raw=false "Pinout configuration")
+![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.08.20.png?raw=false "Multi-node inspection")
 
-![Pinout configuration](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-01-12%20o%2012.25.29.png "Pinout configuration")
 
 ## Usage
 
