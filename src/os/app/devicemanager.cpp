@@ -587,11 +587,12 @@ bool DeviceManager::setLocalSetupViaJson(String& json)
                 memcpy(&configSlot.customBytes[0], &(numberOfLedsUint), sizeof(uint16_t));
                 configSlot.customBytes[2] = sideFlp.toInt();
                 if(currentLimiter.toInt() < 255){
+                    /* make info redundant due to safety reasons */
                     configSlot.customBytes[3] = currentLimiter.toInt();
-                    configSlot.customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION - 1] = currentLimiter.toInt();
+                    configSlot.customBytes[19] = currentLimiter.toInt();
                 }else {
                     configSlot.customBytes[3] = 0;
-                    configSlot.customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION - 1] = 0;
+                    configSlot.customBytes[19] = 0;
                 }
 
             }else if(type == "TempSensor"){

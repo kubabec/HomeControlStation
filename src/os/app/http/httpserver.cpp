@@ -40,7 +40,8 @@ std::vector<String> constantRequests = {
   "roomAssignment",
   "masseraseviahttp",
   "asyncRequestTest",
-  "networkInspection"
+  "networkInspection",
+  "sysDetails"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -64,7 +65,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "stripLoadFromMemory",
   "stripOverwriteSlot",
   "stRmChng",
-  "segSwtch"
+  "segSwtch",
+  "gtSysDet"
 };
 
 
@@ -77,6 +79,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -100,7 +103,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_asyncSystemDetails, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
@@ -1098,6 +1102,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+  }
+
+  if( std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT))){
+    client.println("<div class=\"button-link\" onclick=\"sysPropert()\">System properties</div>");
   }
     
   /* Devices setup button */

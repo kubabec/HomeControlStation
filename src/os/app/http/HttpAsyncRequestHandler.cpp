@@ -204,6 +204,10 @@ void HTTPAsyncRequestHandler::processRequest()
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
 
+        case ASYNC_GET_SYSTEM_DETAILS:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
+            
         case ASYNC_GET_NOTIFICATION_LIST:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
@@ -340,6 +344,24 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
 
 }
 
+void HTTPAsyncRequestHandler::createSystemDetailsJson()
+{
+    ServiceInformation info = 
+        std::any_cast<std::function<ServiceInformation()>>(DataContainer::getSignalValue(CBK_DISPLAY_RAM_USAGE))();
+
+    const float tempMax = 100.f;
+    const float tempPercent = (info.coreTemperature / tempMax) * 100.f;
+
+    jsonResponse += "{";
+    jsonResponse += "\"ramFree\": "+String((int)info.ramFree)+",";
+    jsonResponse += "\"ramTotal\": "+String((int)info.ramFree)+","; 
+    jsonResponse += "\"ramUsed\": "+String((int)info.ramFree)+",";   
+    jsonResponse += "\"temp\": "+String((float)tempPercent);   
+    jsonResponse += "}";
+
+    // Serial.println(jsonResponse);
+}
+
 void HTTPAsyncRequestHandler::createNotificationListContentJson()
 {
     uint8_t activeNotificationCount = 
@@ -399,7 +421,11 @@ void HTTPAsyncRequestHandler::createJsonResponse()
         case ASYNC_GET_PAGE_CONTENT:
             createMainPageContentJson();
             break;
-        
+
+        case ASYNC_GET_SYSTEM_DETAILS:
+            createSystemDetailsJson();
+            break;
+            
         case ASYNC_GET_NOTIFICATION_LIST:
             createNotificationListContentJson();
             break;

@@ -34,6 +34,7 @@ typedef enum
     ASYNC_TYPE_INVALID,
     ASYNC_TYPE_DEVICE_SERVICE_CALL,
     ASYNC_GET_PAGE_CONTENT,
+    ASYNC_GET_SYSTEM_DETAILS,
     ASYNC_GET_NOTIFICATION_LIST,
     ASYNC_DOWNLOAD_CONFIGURATION,
     ASYNC_REDIRECT_TO_MAIN_PAGE,
@@ -76,6 +77,7 @@ class HTTPAsyncRequestHandler{
     static void createDeviceConfigurationJson();
     static void createRedirectToMainJson();
     static void createExtendedControls();
+    static void createSystemDetailsJson();
 
     public :
 
