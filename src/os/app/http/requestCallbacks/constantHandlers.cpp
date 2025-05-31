@@ -1,4 +1,5 @@
 #include <os/app/http/httpserver.hpp>
+#include <Esp.h>
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 {
@@ -252,3 +253,62 @@ void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient& client)
   client.println("</div>");
 
 }
+
+void HomeLightHttpServer::constantHandler_systemDetails(WiFiClient& client)
+{
+  client.println("<div class=\"wrapper\">\
+        <div class=\"header\">System details</div>");
+
+  std::vector<NetworkNodeInfo> networkNodes = std::any_cast<std::vector<NetworkNodeInfo> >(DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO));
+  client.println("<table class=\"table-graphite\">");
+  client.println("<thead><tr><th>Parameter</th><th>Value</th></tr></thead>");
+  client.println("<tbody>");
+  client.println("<tr><td>free RAM</td><td>"+String((int)ESP.getFreeHeap())+" bytes</td></tr>");
+  client.println("<tr><td>CPU frequency</td><td>"+String((int)ESP.getCpuFreqMHz())+" MHz</td></tr>");
+  client.println("<tr><td><div id=\"systmp\">Temperature</div></td><td>");
+
+  client.println("<div class=\"memory-bar\"><div class=\"memory-bar-fill\" id=\"tempBarFill\"></div>");
+  client.println("</div></div>");
+  client.println("<script>\
+    function setTempBarValue(value) {\
+      const bar = document.getElementById('tempBarFill');\
+      const clampedValue = Math.min(100, Math.max(0, value));\
+      bar.style.width = clampedValue + '%';\
+      const tempDiv = document.getElementById('systmp');\
+      tempDiv.innerHTML = 'Temperature: ' + value + '°C';\
+    }\
+  </script>");
+  client.println("</td></tr></tbody>");
+
+  client.println("</table>");
+
+  client.println("<a href=\"/config\" class=\"button\">Config Page</a><br>");
+
+  client.println("</div>");
+
+  client.println("<script>\
+\
+\
+        async function fetchSys() {\
+            try {\
+                const response = await fetch('/gtSysDet');\
+                const sysDat = await response.json();\
+                setTempBarValue(sysDat.temp);\
+                console.log('System data fetched:', sysDat);\
+            } catch (error) {\
+                console.error('Error sys fetching data:', error);\
+            }\
+        }\
+\
+\
+        fetchSys();\
+\
+        setInterval(fetchSys, 500);\
+\
+\
+\
+    </script>");
+
+}
+
+

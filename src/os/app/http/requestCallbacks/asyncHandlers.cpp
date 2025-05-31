@@ -290,6 +290,16 @@ void HomeLightHttpServer::parameterizedHandler_segmentStateSwitch(String& reques
   }
 }
 
+void HomeLightHttpServer::parameterizedHandler_asyncSystemDetails(String& request, WiFiClient& client)
+{
+  /* this request is only handled when there is Active Cooling system present in HomeControl device */
+  if( std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT))){
+    HTTPAsyncRequestHandler::createRequest(ASYNC_GET_SYSTEM_DETAILS, nullptr, 0);
+  }
+}
+
+
+
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String& request, WiFiClient& client){
     Serial.println("Extended controls requested");
     escapeSpecialCharsInJson(request);

@@ -175,4 +175,11 @@ struct NetworkNodeInfo{
     MessageUDP::IPAddr nodeIP;
 };
 
+struct ServiceInformation{
+    uint32_t ramTotal = 0;
+    uint32_t ramFree = 0;
+    uint32_t ramUsed = 0;
+    float coreTemperature = 0.0f;
+};
+
 #endif 

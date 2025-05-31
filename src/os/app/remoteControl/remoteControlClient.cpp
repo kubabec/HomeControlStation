@@ -244,10 +244,6 @@ bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
         // Serial.println("!!! RemoteControlClient - processResponse - ");
         RcResponse& remoteControlResponse = vecResponseMessage.front();
-        std::any_cast <std::function<void()>>(
-            DataContainer::getSignalValue(CBK_DISPLAY_RAM_USAGE)
-        )();
-
         uint8_t* serializedResponse = (uint8_t*)malloc(remoteControlResponse.getSize());
 
         if(serializedResponse != nullptr){

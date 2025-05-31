@@ -66,6 +66,10 @@ let isNotificationPollingActive = 1;\
         var url = `/networkInspection`;\
         window.location.href = url;\
     }\
+    function sysPropert() {\
+        var url = `/sysDetails`;\
+        window.location.href = url;\
+    }\
     function massErase(){\
         var url = `/masseraseviahttp`;\
         window.location.href = url;\

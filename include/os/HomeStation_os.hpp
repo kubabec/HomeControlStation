@@ -48,13 +48,16 @@ private:
     static void detectHwMassEraseRequest();
 
     static void handleNvmSaveMech();
-
+    static void initializeActiveCoolingSystem();
+    
     
 
 public:
 
     static void init();
     static void reset(uint16_t delay);
+
+    static ServiceInformation displayRamUsage();
     static void saveNvmData();
     static void activateNvmSaveTimer();
 
