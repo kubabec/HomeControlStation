@@ -57,6 +57,30 @@ typedef enum {
 
 }DevType;
 
+
+struct RtcTime
+{
+  int	sec = 0;
+  int	min = 0;
+  int	hour = 0;
+  int	mday = 0;
+  int	mon = 0;
+  int	year = 0;
+  int	wday = 0;
+  int	yday = 0;
+  int	isdst = 0;
+
+  String toString()
+  {
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
+             year, mon, mday,
+             hour, min, sec);
+    return String(buffer);
+  }
+
+};
+
 typedef struct
 {
     uint8_t a = 0xff;

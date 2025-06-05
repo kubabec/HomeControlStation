@@ -142,30 +142,6 @@ typedef struct
     std::function<bool(JsonDocument&)> loadConfigFromFile;
 }DeviceConfigManipulationAPI;
 
-
-struct RtcTime
-{
-  int	sec;
-  int	min;
-  int	hour;
-  int	mday;
-  int	mon;
-  int	year;
-  int	wday;
-  int	yday;
-  int	isdst;
-
-  String toString()
-  {
-    char buffer[20];
-    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
-             year, mon, mday,
-             hour, min, sec);
-    return String(buffer);
-  }
-
-};
-
 struct NetworkNodeInfo{
     enum NodeType{
         Master,

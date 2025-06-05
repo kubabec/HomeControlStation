@@ -48,7 +48,7 @@ public:
     static bool setLocalSetupViaJson(String& json);
     static String getLocalSetupJson();
 
-    static void getRtcTimeWrapper();
+    static RtcTime getRtcTimeWrapper();
     static void persistentDataChanged();
 
     /* TESTCODE */
