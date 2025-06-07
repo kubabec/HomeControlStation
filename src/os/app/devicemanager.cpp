@@ -351,7 +351,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nv
 
                 case type_TEMP_SENSOR:
 #ifdef TEMP_SENSOR_SUPPORTED
-                    tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData));
+                    tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData, static_cast<std::function<RtcTime()>>(DeviceManager::getRtcTimeWrapper)) );
                     isValidDeviceGiven = true;
 #endif
                 break;
@@ -813,20 +813,23 @@ ServiceRequestErrorCode DeviceManager::service(
     return retVal;  
 }
 
-void DeviceManager::getRtcTimeWrapper()
+RtcTime DeviceManager::getRtcTimeWrapper()
 {
     /* this function is a wrapper for lower level devices, which do not have access 
     DataContainer directly, but they can read RTC value via this function when pointer to it 
     will be passed to specific device type as a constructor parameter */
+    RtcTime retTimeVal;
 
     try{
         auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
-        RtcTime currentTime = getTimeCallback();
+        retTimeVal = getTimeCallback();
 
         /* TODO: map currentTime to device-friendly type and change this function to return this value */
 
     }catch(std::bad_any_cast ex){
 
     }
+
+    return retTimeVal;
 }
 
