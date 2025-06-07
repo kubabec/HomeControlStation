@@ -23,6 +23,16 @@ struct LedColor{
 
     LedColor(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0) 
         : r(red), g(green), b(blue) {}
+
+            // operator== przyda się do implementacji operator!=
+    bool operator==(const LedColor& o) const {
+        return r == o.r && g == o.g && b == o.b;
+    }
+
+    // operator!=
+    bool operator!=(const LedColor& o) const {
+        return !(*this == o);
+    }
 };
 
 #endif

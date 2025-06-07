@@ -4,6 +4,7 @@
 #include <WiFiUdp.h>
 #include <string>
 
+#include "os/CyclicProfiler.hpp"
 
 #include <os/app/http/HttpServer.hpp>
 #include <os/app/DeviceManager.hpp>

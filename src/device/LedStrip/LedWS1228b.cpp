@@ -84,7 +84,7 @@ void LedWS1228bDeviceType::init(){
 void LedWS1228bDeviceType::cyclic(){
 
     if(switchOffAnimation != nullptr){
-        if(millis() - animationProcessTime > 60){
+        if(ticksToAnimate == 0){
             if(switchOffAnimation->isInProgress()){
                 switchOffAnimation->process();
                 applyVirtualToRealDiodes();
@@ -94,10 +94,12 @@ void LedWS1228bDeviceType::cyclic(){
                 switchOffAnimation = nullptr;
             }
 
-            animationProcessTime = millis();
+            ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // reset ticks to animate
+        }else {
+            ticksToAnimate--;
         }
     }else if(ongoingAnimation != nullptr){
-        if(millis() - animationProcessTime > 60){
+        if(ticksToAnimate == 0){
             if(ongoingAnimation->isInProgress()){
                 ongoingAnimation->process();
                 applyVirtualToRealDiodes();
@@ -107,7 +109,9 @@ void LedWS1228bDeviceType::cyclic(){
                 ongoingAnimation = nullptr;
             }
 
-            animationProcessTime = millis();
+            ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // reset ticks to animate
+        }else {
+            ticksToAnimate--;
         }
     }
 }
@@ -125,9 +129,10 @@ void LedWS1228bDeviceType::applyColors(){
             delete ongoingAnimation;
         }
         Serial.println("Starting fade in animation");
-        ongoingAnimation = new FadeInAnimation(
+        ongoingAnimation = new BounceInAnimation(
             stripContent[eACTIVE_CURRENT_CONTENT],
-            virtualDiodesCount
+            virtualDiodesCount,
+            35
         );
 
         if(!isOn){
@@ -224,7 +229,7 @@ void LedWS1228bDeviceType::stripOff()
     if(switchOffAnimation != nullptr){
         delete switchOffAnimation;
     }
-    switchOffAnimation = new FadeOutAnimation(
+    switchOffAnimation = new RollOutAnimation(
         stripContent[eACTIVE_CURRENT_CONTENT],
         virtualDiodesCount
     );

@@ -7,9 +7,16 @@
 #include "Adafruit_NeoPixel.h"
 #include "Animations/FadeIn.hpp"
 #include "Animations/FadeOut.hpp"
+#include "Animations/RollInAnimation.hpp"
+#include "Animations/RollOutAnimation.hpp"
+#include "Animations/SparkleInAnimation.hpp"
+#include "Animations/WaveInAnimation.hpp"
+#include "Animations/TwinkleInAnimation.hpp"
+#include "Animations/BounceInAnimation.hpp"
 
 #include "Arduino.h"
 
+#define DEFAULT_TICKS_TO_ANIMATE 3 // 3 * 10ms = 30ms for animation processing
 
 
 class LedWS1228bDeviceType : public Device {
@@ -36,7 +43,7 @@ class LedWS1228bDeviceType : public Device {
     String deviceName;
     uint8_t roomId;
     std::function<void(void)> m_reportNvmDataChangedCbk;
-    long long animationProcessTime = 0; // time in ms for animation processing
+    int ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for animation processing
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
     ILedAnimation* ongoingAnimation = nullptr;
     ILedAnimation* switchOffAnimation = nullptr;

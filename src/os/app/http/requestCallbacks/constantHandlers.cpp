@@ -89,7 +89,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
         hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
-        setInterval(fetchData, 500);\
+        setInterval(fetchData, 2000);\
 \
 \
 \

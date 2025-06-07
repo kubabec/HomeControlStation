@@ -141,30 +141,30 @@ void OperatingSystem::init()
 
 void OperatingSystem::task10ms()
 {
-    NetworkDriver::cyclic();
+    CyclicProfiler::call("NetworkDriver", NetworkDriver::cyclic);
 
     if(isHttpServerRunning){
-        HomeLightHttpServer::cyclic();
+        CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
     }
 
     if(isRCServerRunning){
-        RemoteControlServer::cyclic();
-        RemoteDevicesManager::cyclic();
+        CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
+        CyclicProfiler::call("RemoteDevicesManager", RemoteDevicesManager::cyclic);
     }else{
-        RemoteControlClient::cyclic();
+        CyclicProfiler::call("RemoteControlClient", RemoteControlClient::cyclic);
     }
+    CyclicProfiler::call("DeviceManager", DeviceManager::cyclic);
 }
 
 void OperatingSystem::task20ms()
 {
-    DeviceManager::cyclic();
-    DeviceProvider::cyclic();
+    CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
 }
 
 void OperatingSystem::task50ms()
 {
-    NotificationHandler::cyclic();
-    ExtendedMemoryManager::cyclic();
+    CyclicProfiler::call("NotificationHandler", NotificationHandler::cyclic);
+    CyclicProfiler::call("ExtendedMemoryManager", ExtendedMemoryManager::cyclic);
 
     if(resetPending){
         resetCountdown -= 50;
