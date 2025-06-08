@@ -139,13 +139,19 @@ void OperatingSystem::init()
 }
 
 
+void OperatingSystem::task2ms()
+{
+}
+
 void OperatingSystem::task10ms()
 {
-    CyclicProfiler::call("NetworkDriver", NetworkDriver::cyclic);
-
     if(isHttpServerRunning){
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
     }
+    CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
+    
+
+    CyclicProfiler::call("NetworkDriver", NetworkDriver::cyclic);
 
     if(isRCServerRunning){
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
@@ -158,7 +164,7 @@ void OperatingSystem::task10ms()
 
 void OperatingSystem::task20ms()
 {
-    CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
+    
 }
 
 void OperatingSystem::task50ms()
@@ -204,7 +210,7 @@ void OperatingSystem::task1s()
     Serial.print(".");
     
     handleSecurityAccessLevelExpiration();        
-    TimeMaster::cyclic();
+    CyclicProfiler::call("TimeMaster", TimeMaster::cyclic);
 
     detectHwMassEraseRequest();
     handleNvmSaveMech();

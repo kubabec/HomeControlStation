@@ -65,6 +65,7 @@ public:
     static void requestSecurityAccessLevelChangeViaString(String password);
 
 
+    static void task2ms();
     static void task10ms();
     static void task20ms();
     static void task50ms();

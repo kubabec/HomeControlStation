@@ -94,7 +94,7 @@ void LedWS1228bDeviceType::cyclic(){
                 switchOffAnimation = nullptr;
             }
 
-            ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // reset ticks to animate
+            ticksToAnimate = animationWaitTicks; // reset ticks to animate
         }else {
             ticksToAnimate--;
         }
@@ -109,7 +109,7 @@ void LedWS1228bDeviceType::cyclic(){
                 ongoingAnimation = nullptr;
             }
 
-            ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // reset ticks to animate
+            ticksToAnimate = animationWaitTicks; // reset ticks to animate
         }else {
             ticksToAnimate--;
         }
@@ -129,11 +129,12 @@ void LedWS1228bDeviceType::applyColors(){
             delete ongoingAnimation;
         }
         Serial.println("Starting fade in animation");
-        ongoingAnimation = new BounceInAnimation(
-            stripContent[eACTIVE_CURRENT_CONTENT],
-            virtualDiodesCount,
-            35
-        );
+        // ongoingAnimation = new BounceInAnimation(
+        //     stripContent[eACTIVE_CURRENT_CONTENT],
+        //     virtualDiodesCount,
+        //     35
+        // );
+        createEnablingAnimation();
 
         if(!isOn){
             ongoingAnimation->start(true); // start from beginning
@@ -229,10 +230,11 @@ void LedWS1228bDeviceType::stripOff()
     if(switchOffAnimation != nullptr){
         delete switchOffAnimation;
     }
-    switchOffAnimation = new RollOutAnimation(
-        stripContent[eACTIVE_CURRENT_CONTENT],
-        virtualDiodesCount
-    );
+    // switchOffAnimation = new RollOutAnimation(
+    //     stripContent[eACTIVE_CURRENT_CONTENT],
+    //     virtualDiodesCount
+    // );
+    createDisablingAnimation();
     switchOffAnimation->start(false);
 }
 
@@ -322,20 +324,29 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     switch(serviceType){
         case DEVSERVICE_GET_ADVANCED_CONTROLS:
         case DEVSERVICE_GET_DETAILED_COLORS:
-            Serial.println("Advanced controls requested");
-            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
+            Serial.println("Advanced controls requested with size: " + String((int)param.size) + ", virtualDiodesCount: " + String((int)virtualDiodesCount));
+            
+            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)  + sizeof(LedStripAnimationProperties) ))
             {
-                getDetailedColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+                // Copy properties
+                Serial.println((uintptr_t)param.buff, HEX);
+                memcpy(param.buff, &animationProperties, sizeof(LedStripAnimationProperties));
+                param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
+                Serial.println((uintptr_t)param.buff, HEX);
+                getDetailedColors((LedColor*)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) /sizeof(LedColor)));
+
+
                 return SERV_SUCCESS;
             }else {
                 return SERV_EXECUTION_FAILURE;
             }
         case DEVSERVICE_SET_DETAILED_COLORS:
-            Serial.println("param.size: " + String((int)param.size) + ", must be : " + String((int)virtualDiodesCount*sizeof(LedColor)));
-            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor)))
+            if(isStripInitialized() && param.size == (virtualDiodesCount*sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
             {
-                Serial.println("Color change requested");
-                setColors((LedColor*)param.buff, (param.size/sizeof(LedColor)));
+                // Serial.println("Color change requested");
+                memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
+                param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
+                setColors((LedColor*)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) /sizeof(LedColor)));
 
                 /* this action will affect NVM data */
                 if(m_reportNvmDataChangedCbk){
@@ -366,6 +377,89 @@ void LedWS1228bDeviceType::applyVirtualToRealDiodes()
     }
 
     adafruit_ws2812b->show();
+}
+
+ void LedWS1228bDeviceType::createEnablingAnimation()
+ {
+    switch(animationProperties.enableAnimation){
+        case 0:
+        ongoingAnimation = new RollInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount,
+            Direction::LeftToRight
+        );
+        break;
+        case 1:
+        ongoingAnimation = new FadeInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount
+        );
+        break;
+        case 2:
+        ongoingAnimation = new SparkleInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount
+        );
+        case 3:
+        ongoingAnimation = new TwinkleInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount
+        );
+        break;
+        case 4:
+        ongoingAnimation = new BounceInAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount,
+            (diodesCount / 2)
+        );
+        break;
+    }
+
+    updateAnimationSpeed();
+
+ }
+void LedWS1228bDeviceType::createDisablingAnimation()
+{
+    switch(animationProperties.disableAnimation){
+        case 0:
+        switchOffAnimation = new FadeOutAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount
+        );
+        break;
+        case 1:
+        switchOffAnimation = new RollOutAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount,
+            Direction::LeftToRight
+        );
+        break;
+        case 2:
+        switchOffAnimation = new RollOutAnimation(
+            stripContent[eACTIVE_CURRENT_CONTENT],
+            virtualDiodesCount,
+            Direction::RightToLeft
+        );
+        break;
+    }
+
+    updateAnimationSpeed();
+}
+
+void LedWS1228bDeviceType::updateAnimationSpeed()
+{
+    switch(animationProperties.animationSpeed){
+        case 0:
+        animationWaitTicks = 3;
+        break;
+        case 1:
+        animationWaitTicks = 1;
+        break;
+        case 2:
+        animationWaitTicks = 6;
+        break;
+    }
+    ticksToAnimate = animationWaitTicks; // reset ticks to animate
 }
 
 

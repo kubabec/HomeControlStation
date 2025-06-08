@@ -10,6 +10,7 @@ void setup() {
 }
 
 void loop() {
+  static unsigned long next2ms   = 0;
   static unsigned long next10ms   = 0;
   static unsigned long next20ms   = 0;
   static unsigned long next50ms   = 0;
@@ -19,6 +20,7 @@ void loop() {
   const   unsigned long REPORT_PERIOD_US = REPORT_PERIOD_MS * 1000UL;
 
   // Statystyki czasowe (w µs) i backlogi
+  static uint32_t sum2=0, cnt2=0, max2=0, backlog2=0;
   static uint32_t sum10=0, cnt10=0, max10=0, backlog10=0;
   static uint32_t sum20=0, cnt20=0, max20=0, backlog20=0;
   static uint32_t sum50=0, cnt50=0, max50=0, backlog50=0;
@@ -30,10 +32,28 @@ void loop() {
   // Pierwsza inicjalizacja
   if (nextReport == 0) {
     nextReport = now + REPORT_PERIOD_MS;
+    next2ms = now;
     next10ms   = now;
     next20ms   = now;
     next50ms   = now;
     next1s     = now;
+  }
+
+  // --- task2ms ---
+
+  {
+    int iterations = 0;
+    while (now >= next2ms) {
+      iterations++;
+      unsigned long t0 = micros();
+      OperatingSystem::task2ms();
+      unsigned long dt = micros() - t0;
+      sum2 += dt; 
+      cnt2++;
+      if (dt > max2) max2 = dt;
+      next2ms += 2;
+    }
+    if (iterations > 1) backlog2 += (iterations - 1);
   }
 
   // --- task10ms ---

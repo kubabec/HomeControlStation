@@ -16,6 +16,12 @@ struct AdvancedControlsOnOff{
 
 };
 
+struct LedStripAnimationProperties{
+    uint8_t enableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink 
+    uint8_t disableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink
+    uint8_t animationSpeed = 0; // 0 - slow, 1 - medium, 2 - fast
+};
+
 struct LedColor{
     uint8_t r = 0;
     uint8_t g = 0;

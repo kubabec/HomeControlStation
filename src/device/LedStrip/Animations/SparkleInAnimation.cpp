@@ -13,7 +13,7 @@ SparkleInAnimation::SparkleInAnimation(LedColor* mainStripPtr, uint16_t ledsCoun
         for (uint16_t i = 0; i < ledsCount; ++i)
             mainStrip[i] = LedColor(0,0,0);
         position = (direction == Direction::LeftToRight) ? 0 : ledsCount - 1;
-        rngState = 123;
+        rngState = 20;
         inProgress = true;
     }
 

@@ -31,6 +31,8 @@ class LedWS1228bDeviceType : public Device {
     uint8_t* extendedMemoryPointer = nullptr;
     LedColor* stripContent[4];
     LedColor averagedColors[4] = {0};
+    LedStripAnimationProperties animationProperties;
+    uint8_t animationWaitTicks = 4;
     bool isContentInitialized = false;
     bool isInversedOrder = false;
     bool isOn = false; //stan urzadzenia
@@ -50,6 +52,12 @@ class LedWS1228bDeviceType : public Device {
 
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
+
+    void createEnablingAnimation();
+    void createDisablingAnimation();
+
+    void updateAnimationSpeed();
+
     public:
     LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
 

@@ -96,20 +96,24 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
   if(success == DeserializationError::Code::Ok){
-    uint16_t numberOfLeds = doc["color"].size();;
+    uint16_t numberOfLeds = doc["color"].size();
 
     uint8_t* memory = (uint8_t*)malloc(numberOfLeds * 3 + 40);
     memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
     memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
 
-    *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor));
+    *((uint16_t*)(memory+DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor)) + sizeof(LedStripAnimationProperties);
     
 
     memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
-    LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX];
+    /* set the colors data */
+    LedColor* ledValueAddr = (LedColor*) &memory[DYNAMIC_REQUEST_START_OF_DATA_IDX + sizeof(LedStripAnimationProperties)];
 
 
     String deviceId = String(doc["devId"]);
+    String enAnim = String(doc["enableAnimation"]);
+    String disAnim = String(doc["disableAnimation"]);
+    String animSpeed = String(doc["speed"]);
     /* Process JSON to extrac each device slot*/
     for(uint16_t i = 0; i < numberOfLeds; i++)
     {
@@ -135,8 +139,19 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String& request, Wi
     }
 
     if(deviceId != "null"){
-      memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
+      // Parse animation properties from json values 
+      uint8_t enableAnimation = enAnim.toInt() ? enAnim.toInt() : 0;
+      uint8_t disableAnimation = disAnim.toInt() ? disAnim.toInt() : 0;
+      uint8_t speed = animSpeed.toInt() ? animSpeed.toInt() : 0;
+      LedStripAnimationProperties animationProperties = {
+        .enableAnimation= enableAnimation,
+        .disableAnimation = disableAnimation,
+        .animationSpeed = speed
+      };
+      // Set animation properties to the request 
+      memcpy(memory+DYNAMIC_REQUEST_START_OF_DATA_IDX, &animationProperties, sizeof(LedStripAnimationProperties));
 
+      memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
 
       // Serial.println(request);
       HTTPAsyncRequestHandler::createRequest(

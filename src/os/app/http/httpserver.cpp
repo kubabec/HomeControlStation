@@ -552,10 +552,11 @@ void HomeLightHttpServer::handleClientRequest()
               /* Process request only when user interface is NOT blocked */
               Serial.println("Processing link...");
               processLinkRequestData(client);
-            
-              client.println("<script>\
-                setInterval(getNotifications, 10000);\
-              </script>");
+
+              // TEMPORARY DISABLED DUE TO PERFORMANCE ISSUES
+              // client.println("<script>\
+              //   setInterval(getNotifications, 9325);\
+              // </script>");
 
               client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.0</p></footer>");
 

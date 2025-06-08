@@ -15,7 +15,7 @@ uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceTyp
         break;
 
         case type_LED_STRIP:
-            return currentlyRequestedDeviceDescription.customBytes[0] * sizeof(LedColor);
+            return (currentlyRequestedDeviceDescription.customBytes[0] * sizeof(LedColor)) + sizeof(LedStripAnimationProperties);
         break;
 
         case type_TEMP_SENSOR:
@@ -31,11 +31,14 @@ uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceTyp
 uint8_t* AdvancedControlsLoader::allocateMemoryForControlsBasedOnDeviceType(uint8_t deviceType){
     /* release previously loaded controls */
     if(currentAdvancedControls != nullptr){
+        Serial.println("AdvancedControlsLoader://Releasing old memory");;
         free(currentAdvancedControls);
     }
 
     currentAdvancedControls = nullptr;
+    Serial.println("AdvancedControlsLoader://Allocating memory for device type : " + String((int)deviceType));
     if(deviceType >= type_ONOFFDEVICE && deviceType <= type_DEVICE_TYPE_LAST){
+        Serial.println("AdvancedControlsLoader://Allocating memory for type {"+String((int)deviceType)+"} with size : " + String((int)getControlsSizeBasedOnDevType(deviceType)));
         currentAdvancedControls = (uint8_t*)malloc(getControlsSizeBasedOnDevType(deviceType));
     }else {
         Serial.println("AdvancedControlsLoader://Type {"+String((int)deviceType)+"} is out of range");
@@ -179,7 +182,12 @@ String AdvancedControlsLoader::createJsForOnOff(){
 String AdvancedControlsLoader::createJsForLedStrip(){
     String popupContentJavaScript = "";
 #ifdef LED_STRIP_SUPPORTED
-    LedColor* ledColors = (LedColor*) currentAdvancedControls; 
+    LedStripAnimationProperties stripAnimationProperties;
+    // Copy the properties from the current advanced controls
+    memcpy(&stripAnimationProperties, currentAdvancedControls, sizeof(LedStripAnimationProperties));
+
+    // Set pointer to the colors array
+    LedColor* ledColors = (LedColor*) ((uint8_t*) currentAdvancedControls + sizeof(LedStripAnimationProperties)); 
 
     uint8_t diodeCount = currentlyRequestedDeviceDescription.customBytes[0];
     
@@ -300,7 +308,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "var colorPicker = document.createElement('input');";
     popupContentJavaScript += "colorPicker.className = 'color-input';";
     popupContentJavaScript += "colorPicker.type = 'color';";
-    popupContentJavaScript += "colorPicker.value = '#ffffff';";
+    popupContentJavaScript += "colorPicker.value = '#0010Af';";
     popupContentJavaScript += "colorPicker.onblur = function (){\
         const r = parseInt(this.value.substr(1,2), 16);\
         const g = parseInt(this.value.substr(3,2), 16);\
@@ -330,15 +338,148 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "popup.appendChild(colorPickerDiv);";
     popupContentJavaScript += "popup.appendChild(colorPicker);";
 
+    /* Enable Animation Section */
+    /* Enable animation */
+    popupContentJavaScript += "var enableAnimDesc = document.createElement('label');";
+    popupContentJavaScript += "enableAnimDesc.innerText = 'Enable animation:';";
+
+    popupContentJavaScript += "var enableAnimSelector = document.createElement('select');";
+    popupContentJavaScript += "enableAnimSelector.id = \"EnAnimSelect\";";
+
+    popupContentJavaScript += "var optEn1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn3 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn4 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optEn5 = document.createElement(\"option\");";
+    popupContentJavaScript += "optEn1.value = 0;";
+    popupContentJavaScript += "optEn1.text = 'Roll (left)';";
+    popupContentJavaScript += "optEn2.value = 1;";
+    popupContentJavaScript += "optEn2.text = 'Fade';";
+    popupContentJavaScript += "optEn3.value = 2;";
+    popupContentJavaScript += "optEn3.text = 'Sparkle';";
+    popupContentJavaScript += "optEn4.value = 3;";
+    popupContentJavaScript += "optEn4.text = 'Twinkle';";
+    popupContentJavaScript += "optEn5.value = 4;";
+    popupContentJavaScript += "optEn5.text = 'Bounce';";
+
+
+    switch(stripAnimationProperties.enableAnimation){
+        case 0:
+            popupContentJavaScript += "optEn1.setAttribute('selected', true);";
+        break;
+        case 1:
+            popupContentJavaScript += "optEn2.setAttribute('selected', true);";
+        break;
+        case 2:
+            popupContentJavaScript += "optEn3.setAttribute('selected', true);";
+        break;
+        case 3:
+            popupContentJavaScript += "optEn4.setAttribute('selected', true);";
+        break;
+        case 4:
+            popupContentJavaScript += "optEn5.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn1);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn2);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn3);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn4);";
+    popupContentJavaScript += "enableAnimSelector.appendChild(optEn5);";
+
+    popupContentJavaScript += "enableAnimDesc.appendChild(enableAnimSelector);";
+    popupContentJavaScript += "popup.appendChild(enableAnimDesc);";
+    // popupContentJavaScript += "popup.appendChild();";
+
+    /* DISABLE Animation Section */
+    popupContentJavaScript += "var disableAnimDesc = document.createElement('label');";
+    popupContentJavaScript += "disableAnimDesc.innerText = 'Disable animation:';";
+
+    popupContentJavaScript += "var disableAnimSelector = document.createElement('select');";
+    popupContentJavaScript += "disableAnimSelector.id = \"DiAnimSelect\";";
+
+    popupContentJavaScript += "var optDi1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optDi2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optDi3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optDi1.value = 0;";
+    popupContentJavaScript += "optDi1.text = 'Fade out';";
+    popupContentJavaScript += "optDi2.value = 1;";
+    popupContentJavaScript += "optDi2.text = 'Roll out (right)';";
+    popupContentJavaScript += "optDi3.value = 2;";
+    popupContentJavaScript += "optDi3.text = 'Roll out (left)';";
+
+    switch(stripAnimationProperties.disableAnimation){
+        case 0:
+            popupContentJavaScript += "optDi1.setAttribute('selected', true);";
+        break;
+        case 1:
+            popupContentJavaScript += "optDi2.setAttribute('selected', true);";
+        break;
+        case 2:
+            popupContentJavaScript += "optDi3.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi1);";
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi2);";
+    popupContentJavaScript += "disableAnimSelector.appendChild(optDi3);";
+
+    popupContentJavaScript += "disableAnimDesc.appendChild(disableAnimSelector);";
+    popupContentJavaScript += "popup.appendChild(disableAnimDesc);";
+
+    /* DISABLE Animation Section END */
+
+    /* Enable Animation Section END */
+
+    /* Enable Animation SPEED Section */
+    popupContentJavaScript += "var enspeedDesc = document.createElement('label');";
+    popupContentJavaScript += "enspeedDesc.innerText = 'Animation speed:';";
+
+    popupContentJavaScript += "var enspeedSelector = document.createElement('select');";
+    popupContentJavaScript += "enspeedSelector.id = \"EnSpeSelect\";";
+
+    popupContentJavaScript += "var optES1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optES2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optES3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optES1.value = 0;";
+    popupContentJavaScript += "optES1.text = 'Normal';";
+    popupContentJavaScript += "optES2.value = 1;";
+    popupContentJavaScript += "optES2.text = 'Fast';";
+    popupContentJavaScript += "optES3.value = 2;";
+    popupContentJavaScript += "optES3.text = 'Slow';";
+
+    switch(stripAnimationProperties.animationSpeed){
+        case 0:
+            popupContentJavaScript += "optES1.setAttribute('selected', true);";
+        break;
+        case 1:
+            popupContentJavaScript += "optES2.setAttribute('selected', true);";
+        break;
+        case 2:
+            popupContentJavaScript += "optES3.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "enspeedSelector.appendChild(optES1);";
+    popupContentJavaScript += "enspeedSelector.appendChild(optES2);";
+    popupContentJavaScript += "enspeedSelector.appendChild(optES3);";
+
+    popupContentJavaScript += "enspeedDesc.appendChild(enspeedSelector);";
+    popupContentJavaScript += "popup.appendChild(enspeedDesc);";
+
+    /* enable Animation SPEED Section END */
+
+    
+
 
     popupContentJavaScript += "var memoryBtn = document.createElement('button');";
     popupContentJavaScript += "memoryBtn.innerHTML = 'Memory';";
-    popupContentJavaScript += "memoryBtn.className = 'popup-button';";
+    popupContentJavaScript += "memoryBtn.className = 'button';";
     popupContentJavaScript += "memoryBtn.onclick = openLedStripMemorySlots;";
 
     popupContentJavaScript += "var saveBtn = document.createElement('button');";
     popupContentJavaScript += "saveBtn.innerHTML = 'Apply';";
-    popupContentJavaScript += "saveBtn.className = 'popup-button';";
+    popupContentJavaScript += "saveBtn.className = 'button';";
 
     popupContentJavaScript += "saveBtn.onclick = function () { \
     let jsonString = JSON.stringify(ledGetStateJson());\
@@ -379,7 +520,10 @@ String AdvancedControlsLoader::createJsForLedStrip(){
 
     popupContentJavaScript += "function ledGetStateJson()\
     {\
-        let ledState = {'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'color': []};\
+        let enAnim = document.getElementById('EnAnimSelect').value;\
+        let disAnim = document.getElementById('DiAnimSelect').value;\
+        let enSpeed = document.getElementById('EnSpeSelect').value;\
+        let ledState = { 'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'enableAnimation': enAnim, 'disableAnimation': disAnim, 'speed': enSpeed, 'color': []};\
         for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
             ledState.color.push(nameToRgb(ledsTab[i].childNodes[0].style.backgroundColor));\
         }\
@@ -453,6 +597,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
                 // Allocate buffer for advanced controls for this particular device type
                 Serial.println("AdvancedControlsLoader:// Allocating memory for id:" + String((int)deviceIdentifier));
                 allocateMemoryForControlsBasedOnDeviceType(currentlyRequestedDeviceDescription.deviceType);
+
 
                 //return SERV_SUCCESS;
             }
