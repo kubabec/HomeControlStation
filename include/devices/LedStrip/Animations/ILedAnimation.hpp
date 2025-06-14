@@ -3,11 +3,6 @@
 #define ILED_ANIMATION_H
 #include "devices/AdvancedControls.hpp"
 
-enum class Direction {
-    LeftToRight,
-    RightToLeft
-};
-
 class ILedAnimation {
 protected:
     uint16_t ledsCount;

@@ -495,6 +495,13 @@ function asyncRoomStateSwitch(room, state){\
     var url = getRoomChangeUrl(room, state);\
     createAsyncRequestWithRenderRoomsResponse(url);\
 }\
+function asyncLiveAnimation(device){\
+    let json = {devId: device};\
+    let jsonString = JSON.stringify(json);\
+    const container = document.getElementById('container' + device);\
+    let url = '/ledsLiveSwtch&' + jsonString;\
+    createAsyncRequestWithRenderRoomsResponse(url, container);\
+}\
 function asyncDeviceStateSwitch(device, state){\
 var url = '/stDvstte' + device.toString() + 'state';\
 const container = document.getElementById('container' + device);\

@@ -160,7 +160,7 @@ void RemoteControlServer::requestNodeInitialData(){
 }
 void RemoteControlServer::requestNodeDetailedData(){
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
-    Serial.println("---> Wysylam REQUEST_NODE_DETAILED_DATA ---> ");
+    // Serial.println("---> Wysylam REQUEST_NODE_DETAILED_DATA ---> ");
     NetworkDriver::sendBroadcast(msg);
 
 }

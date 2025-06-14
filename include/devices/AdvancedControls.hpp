@@ -1,7 +1,10 @@
 #ifndef ADVANCED_CONTROLS_H
 #define ADVANCED_CONTROLS_H
 #include <Arduino.h>
-
+enum class Direction {
+    LeftToRight,
+    RightToLeft
+};
 
 struct AdvancedControlsOnOff{
     enum OnOffAnimations{
@@ -20,6 +23,8 @@ struct LedStripAnimationProperties{
     uint8_t enableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink 
     uint8_t disableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink
     uint8_t animationSpeed = 0; // 0 - slow, 1 - medium, 2 - fast
+    uint8_t liveAnimation = 0; 
+    uint8_t liveAnimationSpeed = 0; // 0 - slow, 1 - medium, 2 - fast
 };
 
 struct LedColor{

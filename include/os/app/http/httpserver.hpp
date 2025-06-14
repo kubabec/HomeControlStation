@@ -98,6 +98,7 @@ public:
     static void parameterizedHandler_roomStateChange(String& request, WiFiClient& client);
     static void parameterizedHandler_segmentStateSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_asyncSystemDetails(String& request, WiFiClient& client);
+    static void parameterizedHandler_ledsLiveSwitch(String& request, WiFiClient& client);
     
 };
 

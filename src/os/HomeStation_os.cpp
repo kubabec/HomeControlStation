@@ -141,6 +141,7 @@ void OperatingSystem::init()
 
 void OperatingSystem::task2ms()
 {
+    CyclicProfiler::call("NetworkDriver", NetworkDriver::cyclic);
 }
 
 void OperatingSystem::task10ms()
@@ -149,9 +150,6 @@ void OperatingSystem::task10ms()
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
     }
     CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
-    
-
-    CyclicProfiler::call("NetworkDriver", NetworkDriver::cyclic);
 
     if(isRCServerRunning){
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);

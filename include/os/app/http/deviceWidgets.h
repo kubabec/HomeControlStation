@@ -69,7 +69,12 @@ function generateLedStripWidget(deviceContainer, device) {\
     buttonMore.className = 'button';\
     buttonMore.textContent = '. . .';\
     buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
+    const buttonAnim = document.createElement('a');\
+    buttonAnim.className = 'button';\
+    buttonAnim.textContent = 'live';\
+    buttonAnim.onclick = () => asyncLiveAnimation(device.id, deviceContainer);\
     btnContainer.appendChild(buttonMore);\
+    btnContainer.appendChild(buttonAnim);\
     btnContainer.appendChild(button);\
     deviceContainer.appendChild(btnContainer);\
 }\

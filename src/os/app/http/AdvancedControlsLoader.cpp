@@ -389,7 +389,6 @@ String AdvancedControlsLoader::createJsForLedStrip(){
 
     popupContentJavaScript += "enableAnimDesc.appendChild(enableAnimSelector);";
     popupContentJavaScript += "popup.appendChild(enableAnimDesc);";
-    // popupContentJavaScript += "popup.appendChild();";
 
     /* DISABLE Animation Section */
     popupContentJavaScript += "var disableAnimDesc = document.createElement('label');";
@@ -468,9 +467,78 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "popup.appendChild(enspeedDesc);";
 
     /* enable Animation SPEED Section END */
+    /* LIVE ANIMATION */
+    popupContentJavaScript += "var liveDesc = document.createElement('label');";
+    popupContentJavaScript += "liveDesc.innerText = 'Live animation';";
 
+    popupContentJavaScript += "var liveSel = document.createElement('select');";
+    popupContentJavaScript += "liveSel.id = \"LiveSel\";";
+
+    popupContentJavaScript += "var optLive1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optLive2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optLive3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optLive1.value = 0;";
+    popupContentJavaScript += "optLive1.text = 'Picking';";
+    popupContentJavaScript += "optLive2.value = 1;";
+    popupContentJavaScript += "optLive2.text = 'Wave';";
+    popupContentJavaScript += "optLive3.value = 2;";
+    popupContentJavaScript += "optLive3.text = 'Double wave';";
+
+    switch(stripAnimationProperties.liveAnimation){
+        case 0:
+            popupContentJavaScript += "optLive1.setAttribute('selected', true);";
+        break;
+        case 1:
+            popupContentJavaScript += "optLive2.setAttribute('selected', true);";
+        break;
+        case 2:
+            popupContentJavaScript += "optLive3.setAttribute('selected', true);";
+        break;
+    }
+    popupContentJavaScript += "liveSel.appendChild(optLive1);";
+    popupContentJavaScript += "liveSel.appendChild(optLive2);";
+    popupContentJavaScript += "liveSel.appendChild(optLive3);";
+
+    popupContentJavaScript += "liveDesc.appendChild(liveSel);";
+    popupContentJavaScript += "popup.appendChild(liveDesc);";
+
+    // ---------
+    popupContentJavaScript += "var liveSpdDesc = document.createElement('label');";
+    popupContentJavaScript += "liveSpdDesc.innerText = 'Live speed';";
+
+    popupContentJavaScript += "var liveSpdSel = document.createElement('select');";
+    popupContentJavaScript += "liveSpdSel.id = \"LiveSpdSel\";";
+
+    popupContentJavaScript += "var optLSpd1 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optLSpd2 = document.createElement(\"option\");";
+    popupContentJavaScript += "var optLSpd3 = document.createElement(\"option\");";
+    popupContentJavaScript += "optLSpd1.value = 0;";
+    popupContentJavaScript += "optLSpd1.text = 'Slow';";
+    popupContentJavaScript += "optLSpd2.value = 1;";
+    popupContentJavaScript += "optLSpd2.text = 'Medium';";
+    popupContentJavaScript += "optLSpd3.value = 2;";
+    popupContentJavaScript += "optLSpd3.text = 'Fast';";
+
+    switch(stripAnimationProperties.liveAnimationSpeed){
+        case 0:
+            popupContentJavaScript += "optLSpd1.setAttribute('selected', true);";
+        break;
+        case 1:
+            popupContentJavaScript += "optLSpd2.setAttribute('selected', true);";
+        break;
+        case 2:
+            popupContentJavaScript += "optLSpd3.setAttribute('selected', true);";
+        break;
+    }
+
+    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd1);";
+    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd2);";
+    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd3);";
+
+    popupContentJavaScript += "liveSpdDesc.appendChild(liveSpdSel);";
+    popupContentJavaScript += "popup.appendChild(liveSpdDesc);";
     
-
+    /* LIVE ANIMATION */
 
     popupContentJavaScript += "var memoryBtn = document.createElement('button');";
     popupContentJavaScript += "memoryBtn.innerHTML = 'Memory';";
@@ -523,7 +591,9 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         let enAnim = document.getElementById('EnAnimSelect').value;\
         let disAnim = document.getElementById('DiAnimSelect').value;\
         let enSpeed = document.getElementById('EnSpeSelect').value;\
-        let ledState = { 'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'enableAnimation': enAnim, 'disableAnimation': disAnim, 'speed': enSpeed, 'color': []};\
+        let liveAnim = document.getElementById('LiveSel').value;\
+        let liveSpeed = document.getElementById('LiveSpdSel').value;\
+        let ledState = { 'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'enableAnimation': enAnim, 'disableAnimation': disAnim, 'speed': enSpeed, 'live': liveAnim, 'liveSpd': liveSpeed ,'color': []};\
         for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
             ledState.color.push(nameToRgb(ledsTab[i].childNodes[0].style.backgroundColor));\
         }\

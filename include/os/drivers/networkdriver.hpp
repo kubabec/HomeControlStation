@@ -4,6 +4,7 @@
 #include <os/tools/WifiAdapter.hpp>
 #include <os/tools/UdpAdapter.hpp>
 #include <functional>
+#include <queue>
 
 enum PacketRangeDefinition {
     SERVICE_RANGE_BEGIN = 0,
@@ -17,6 +18,7 @@ static const MessageUDP::IPAddr NETWORK_BROADCAST{192, 168, 1, 255};
 class NetworkDriver
 {
     static bool networkCredentialsAvailable;
+    static std::queue<MessageUDP> pendingToSendPackets;
 
     static void mapReceivedPacketToInternalReceiver(MessageUDP& packet);
 

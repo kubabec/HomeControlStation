@@ -14,6 +14,8 @@
 #include "Animations/TwinkleInAnimation.hpp"
 #include "Animations/BounceInAnimation.hpp"
 
+#include "Animations/live/SingleWaveAnimation.hpp"
+
 #include "Arduino.h"
 
 #define DEFAULT_TICKS_TO_ANIMATE 3 // 3 * 10ms = 30ms for animation processing
@@ -30,6 +32,7 @@ class LedWS1228bDeviceType : public Device {
 
     uint8_t* extendedMemoryPointer = nullptr;
     LedColor* stripContent[4];
+    LedColor* runtimeBuffer = nullptr; // buffer for runtime operations
     LedColor averagedColors[4] = {0};
     LedStripAnimationProperties animationProperties;
     uint8_t animationWaitTicks = 4;
@@ -46,15 +49,21 @@ class LedWS1228bDeviceType : public Device {
     uint8_t roomId;
     std::function<void(void)> m_reportNvmDataChangedCbk;
     int ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for animation processing
+    int liveAnimationTicksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for live animation processing
+    int waitTicksLive = 20;
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
     ILedAnimation* ongoingAnimation = nullptr;
     ILedAnimation* switchOffAnimation = nullptr;
+
+    ILiveAnimation* liveAnimation = nullptr;
 
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
 
     void createEnablingAnimation();
     void createDisablingAnimation();
+    void createLiveAnimation();
+    void stopLiveAnimation();
 
     void updateAnimationSpeed();
 

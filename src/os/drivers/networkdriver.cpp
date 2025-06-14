@@ -6,6 +6,7 @@
 bool NetworkDriver::networkCredentialsAvailable = false;
 
 std::vector<int> NetworkDriver::packetRanges;
+std::queue<MessageUDP> NetworkDriver::pendingToSendPackets;
 std::vector<std::function<void(MessageUDP&)>> NetworkDriver::packetReceivers;
 
 void dummyTobeRemoved(MessageUDP& data){
@@ -109,6 +110,12 @@ void NetworkDriver::cyclic()
     // Update UDP task to be able to receive UDP packets
     UDPAdapter::task();
 
+    if(pendingToSendPackets.size() > 0){
+        // Send one pending packet per cyclic
+        UDPAdapter::send(pendingToSendPackets.front());
+        pendingToSendPackets.pop();
+    }
+
 }
 
 
@@ -117,7 +124,6 @@ void NetworkDriver::cyclic()
 void NetworkDriver::udpReceive(MessageUDP data)
 {
     mapReceivedPacketToInternalReceiver(data);
-    //Serial.print("!!!!!! DUPA");
 }
 
 /*This is accessor function for UDPAdapter.send()*/
@@ -125,7 +131,8 @@ bool NetworkDriver::send(MessageUDP& data)
 {
     if(WiFiAdapter::isConnected()){
         // Serial.println("Sending data via UDP");
-        UDPAdapter::send(data);
+        pendingToSendPackets.push(std::move(data));
+        // UDPAdapter::send(data);
         return true;
     }
     else
