@@ -26,9 +26,7 @@ function generateOnOffWidget(deviceContainer, device) {\
         buttonMore.className ='icon-btn settings';\
         buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
         btnContainer.appendChild(buttonMore);\
-    }else {\
-    button.style.width = '13.5rem';\
-}\
+    }\
     btnContainer.appendChild(button);\
     deviceContainer.appendChild(btnContainer);\
 \

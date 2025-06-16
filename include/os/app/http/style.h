@@ -780,22 +780,20 @@ position: relative;\
 display: inline-flex;\
 align-items: center;\
 justify-content: center;\
-margin-top:5px;\
-width: 3.5rem;\
-height: 2.4rem;\
+margin-top:7px;\
+height: 2.3rem;\
+flex:1;\
 background-color: #5A8DEE;\
 border: none;\
-border-radius: 0.8rem;\
+border-radius: 15px;\
 color: #ffffff;\
 font-size: 1.8rem;\
 cursor: pointer;\
-transition: background-color 0.15s, color 0.15s;\
 box-shadow: inset 0 1px 0 rgba(255,255,255,0.05),\
             0 2px 6px rgba(0,0,0,0.4);\
 }\
 .icon-btn:hover {\
-background-color: #37404e;\
-color: #5f8bff;\
+background:linear-gradient(135deg, #5aa9d4, #337bbf);\
 }\
 .icon-btn:active {\
 background-color: #24303e;\
