@@ -8,8 +8,11 @@ function generateOnOffWidget(deviceContainer, device) {\
     btnContainer.className = 'button-container';\
     \
     const button = document.createElement('a');\
-    button.className = 'button';\
-    button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
+    if(device.status == 'on') {\
+        button.className ='icon-btn off';\ 
+    } else {\
+        button.className ='icon-btn on';\ 
+    }\
 \
     var switchValue = 0;\
     if(device.status == 'off'){\
@@ -20,11 +23,12 @@ function generateOnOffWidget(deviceContainer, device) {\
 \
     if(device.hasBrightness == 1){\
         const buttonMore = document.createElement('a');\
-        buttonMore.className = 'button';\
-        buttonMore.textContent = '. . .';\
+        buttonMore.className ='icon-btn settings';\
         buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
         btnContainer.appendChild(buttonMore);\
-    }\
+    }else {\
+    button.style.width = '13.5rem';\
+}\
     btnContainer.appendChild(button);\
     deviceContainer.appendChild(btnContainer);\
 \
@@ -55,9 +59,12 @@ function generateLedStripWidget(deviceContainer, device) {\
     btnContainer.className = 'button-container';\
 \
     const button = document.createElement('a');\
-    button.className = 'button';\
-    button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
-\
+    if(device.status == 'on') {\
+        button.className ='icon-btn off';\ 
+    } else {\
+        button.className ='icon-btn on';\ 
+    }\
+    \
     var switchValue = 0;\
     if(device.status == 'off'){\
         switchValue = 1;\
@@ -66,12 +73,10 @@ function generateLedStripWidget(deviceContainer, device) {\
     button.id = `switchBtn${device.id}`;\
 \
     const buttonMore = document.createElement('a');\
-    buttonMore.className = 'button';\
-    buttonMore.textContent = '. . .';\
+    buttonMore.className ='icon-btn settings';\
     buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
     const buttonAnim = document.createElement('a');\
-    buttonAnim.className = 'button';\
-    buttonAnim.textContent = 'live';\
+    buttonAnim.className ='icon-btn play';\
     buttonAnim.onclick = () => asyncLiveAnimation(device.id, deviceContainer);\
     btnContainer.appendChild(buttonMore);\
     btnContainer.appendChild(buttonAnim);\
@@ -135,8 +140,11 @@ function generateSegLedWidget(deviceContainer, device) {\
     btnContainer.className = 'button-container';\
 \
     const button = document.createElement('a');\
-    button.className = 'button';\
-    button.textContent = (device.status == 'on') ? 'OFF' : 'ON';\
+    if(device.status == 'on') {\
+        button.className ='icon-btn off';\ 
+    } else {\
+        button.className ='icon-btn on';\ 
+    }\
 \
     var switchValue = 0;\
     if(device.status == 'off'){\
@@ -146,8 +154,7 @@ function generateSegLedWidget(deviceContainer, device) {\
     button.id = `switchBtn${device.id}`;\
 \
     const buttonMore = document.createElement('a');\
-    buttonMore.className = 'button';\
-    buttonMore.textContent = '. . .';\
+    buttonMore.className ='icon-btn settings';\
     btnContainer.appendChild(buttonMore);\
     btnContainer.appendChild(button);\
     deviceContainer.appendChild(btnContainer);\

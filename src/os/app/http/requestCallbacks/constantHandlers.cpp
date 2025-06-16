@@ -28,15 +28,15 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient& client)
 
 client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlId = 255;</script>\
   <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
-      <div class=\"header2\">Saved compositions</div><hr>\
-        <div id=\"ledStripExt1\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx1\">Overwrite</button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx1\">Load</button></div>\
-        <hr><br>\
-        <div id=\"ledStripExt2\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx2\">Overwrite</button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx2\">Load</button></div>\
-        <hr><br>\
-        <div id=\"ledStripExt3\" class=\"color-display on\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"overWrEx3\">Overwrite</button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"button\" id=\"loadEx3\">Load</button></div>\
+      <div class=\"header2\">Saved compositions</div>\
+        <div id=\"ledStripExt1\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx1\"></button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx1\"></button></div>\
+        <br>\
+        <div id=\"ledStripExt2\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn save\"id=\"overWrEx2\"></button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx2\"></button></div>\
+        <br>\
+        <div id=\"ledStripExt3\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx3\"></button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx3\"></button></div>\
         <button class=\"button\" id=\"composClose\">Close</button>\
   </div>");
 

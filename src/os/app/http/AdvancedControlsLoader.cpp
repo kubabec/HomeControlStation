@@ -350,17 +350,14 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     popupContentJavaScript += "var optEn2 = document.createElement(\"option\");";
     popupContentJavaScript += "var optEn3 = document.createElement(\"option\");";
     popupContentJavaScript += "var optEn4 = document.createElement(\"option\");";
-    popupContentJavaScript += "var optEn5 = document.createElement(\"option\");";
     popupContentJavaScript += "optEn1.value = 0;";
     popupContentJavaScript += "optEn1.text = 'Roll (left)';";
     popupContentJavaScript += "optEn2.value = 1;";
-    popupContentJavaScript += "optEn2.text = 'Fade';";
+    popupContentJavaScript += "optEn2.text = 'Roll (right)';";
     popupContentJavaScript += "optEn3.value = 2;";
-    popupContentJavaScript += "optEn3.text = 'Sparkle';";
+    popupContentJavaScript += "optEn3.text = 'Fade';";
     popupContentJavaScript += "optEn4.value = 3;";
-    popupContentJavaScript += "optEn4.text = 'Twinkle';";
-    popupContentJavaScript += "optEn5.value = 4;";
-    popupContentJavaScript += "optEn5.text = 'Bounce';";
+    popupContentJavaScript += "optEn4.text = 'Bounce';";
 
 
     switch(stripAnimationProperties.enableAnimation){
@@ -376,16 +373,13 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         case 3:
             popupContentJavaScript += "optEn4.setAttribute('selected', true);";
         break;
-        case 4:
-            popupContentJavaScript += "optEn5.setAttribute('selected', true);";
-        break;
+
     }
 
     popupContentJavaScript += "enableAnimSelector.appendChild(optEn1);";
     popupContentJavaScript += "enableAnimSelector.appendChild(optEn2);";
     popupContentJavaScript += "enableAnimSelector.appendChild(optEn3);";
     popupContentJavaScript += "enableAnimSelector.appendChild(optEn4);";
-    popupContentJavaScript += "enableAnimSelector.appendChild(optEn5);";
 
     popupContentJavaScript += "enableAnimDesc.appendChild(enableAnimSelector);";
     popupContentJavaScript += "popup.appendChild(enableAnimDesc);";
@@ -468,86 +462,84 @@ String AdvancedControlsLoader::createJsForLedStrip(){
 
     /* enable Animation SPEED Section END */
     /* LIVE ANIMATION */
-    popupContentJavaScript += "var liveDesc = document.createElement('label');";
-    popupContentJavaScript += "liveDesc.innerText = 'Live animation';";
+    // popupContentJavaScript += "var liveDesc = document.createElement('label');";
+    // popupContentJavaScript += "liveDesc.innerText = 'Live animation';";
 
-    popupContentJavaScript += "var liveSel = document.createElement('select');";
-    popupContentJavaScript += "liveSel.id = \"LiveSel\";";
+    // popupContentJavaScript += "var liveSel = document.createElement('select');";
+    // popupContentJavaScript += "liveSel.id = \"LiveSel\";";
 
-    popupContentJavaScript += "var optLive1 = document.createElement(\"option\");";
-    popupContentJavaScript += "var optLive2 = document.createElement(\"option\");";
-    popupContentJavaScript += "var optLive3 = document.createElement(\"option\");";
-    popupContentJavaScript += "optLive1.value = 0;";
-    popupContentJavaScript += "optLive1.text = 'Picking';";
-    popupContentJavaScript += "optLive2.value = 1;";
-    popupContentJavaScript += "optLive2.text = 'Wave';";
-    popupContentJavaScript += "optLive3.value = 2;";
-    popupContentJavaScript += "optLive3.text = 'Double wave';";
+    // popupContentJavaScript += "var optLive1 = document.createElement(\"option\");";
+    // popupContentJavaScript += "var optLive2 = document.createElement(\"option\");";
+    // popupContentJavaScript += "var optLive3 = document.createElement(\"option\");";
+    // popupContentJavaScript += "optLive1.value = 0;";
+    // popupContentJavaScript += "optLive1.text = 'Picking';";
+    // popupContentJavaScript += "optLive2.value = 1;";
+    // popupContentJavaScript += "optLive2.text = 'Wave';";
+    // popupContentJavaScript += "optLive3.value = 2;";
+    // popupContentJavaScript += "optLive3.text = 'Double wave';";
 
-    switch(stripAnimationProperties.liveAnimation){
-        case 0:
-            popupContentJavaScript += "optLive1.setAttribute('selected', true);";
-        break;
-        case 1:
-            popupContentJavaScript += "optLive2.setAttribute('selected', true);";
-        break;
-        case 2:
-            popupContentJavaScript += "optLive3.setAttribute('selected', true);";
-        break;
-    }
-    popupContentJavaScript += "liveSel.appendChild(optLive1);";
-    popupContentJavaScript += "liveSel.appendChild(optLive2);";
-    popupContentJavaScript += "liveSel.appendChild(optLive3);";
+    // switch(stripAnimationProperties.liveAnimation){
+    //     case 0:
+    //         popupContentJavaScript += "optLive1.setAttribute('selected', true);";
+    //     break;
+    //     case 1:
+    //         popupContentJavaScript += "optLive2.setAttribute('selected', true);";
+    //     break;
+    //     case 2:
+    //         popupContentJavaScript += "optLive3.setAttribute('selected', true);";
+    //     break;
+    // }
+    // popupContentJavaScript += "liveSel.appendChild(optLive1);";
+    // popupContentJavaScript += "liveSel.appendChild(optLive2);";
+    // popupContentJavaScript += "liveSel.appendChild(optLive3);";
 
-    popupContentJavaScript += "liveDesc.appendChild(liveSel);";
-    popupContentJavaScript += "popup.appendChild(liveDesc);";
+    // popupContentJavaScript += "liveDesc.appendChild(liveSel);";
+    // popupContentJavaScript += "popup.appendChild(liveDesc);";
 
     // ---------
-    popupContentJavaScript += "var liveSpdDesc = document.createElement('label');";
-    popupContentJavaScript += "liveSpdDesc.innerText = 'Live speed';";
+    // popupContentJavaScript += "var liveSpdDesc = document.createElement('label');";
+    // popupContentJavaScript += "liveSpdDesc.innerText = 'Live speed';";
 
-    popupContentJavaScript += "var liveSpdSel = document.createElement('select');";
-    popupContentJavaScript += "liveSpdSel.id = \"LiveSpdSel\";";
+    // popupContentJavaScript += "var liveSpdSel = document.createElement('select');";
+    // popupContentJavaScript += "liveSpdSel.id = \"LiveSpdSel\";";
 
-    popupContentJavaScript += "var optLSpd1 = document.createElement(\"option\");";
-    popupContentJavaScript += "var optLSpd2 = document.createElement(\"option\");";
-    popupContentJavaScript += "var optLSpd3 = document.createElement(\"option\");";
-    popupContentJavaScript += "optLSpd1.value = 0;";
-    popupContentJavaScript += "optLSpd1.text = 'Slow';";
-    popupContentJavaScript += "optLSpd2.value = 1;";
-    popupContentJavaScript += "optLSpd2.text = 'Medium';";
-    popupContentJavaScript += "optLSpd3.value = 2;";
-    popupContentJavaScript += "optLSpd3.text = 'Fast';";
+    // popupContentJavaScript += "var optLSpd1 = document.createElement(\"option\");";
+    // popupContentJavaScript += "var optLSpd2 = document.createElement(\"option\");";
+    // popupContentJavaScript += "var optLSpd3 = document.createElement(\"option\");";
+    // popupContentJavaScript += "optLSpd1.value = 0;";
+    // popupContentJavaScript += "optLSpd1.text = 'Slow';";
+    // popupContentJavaScript += "optLSpd2.value = 1;";
+    // popupContentJavaScript += "optLSpd2.text = 'Medium';";
+    // popupContentJavaScript += "optLSpd3.value = 2;";
+    // popupContentJavaScript += "optLSpd3.text = 'Fast';";
 
-    switch(stripAnimationProperties.liveAnimationSpeed){
-        case 0:
-            popupContentJavaScript += "optLSpd1.setAttribute('selected', true);";
-        break;
-        case 1:
-            popupContentJavaScript += "optLSpd2.setAttribute('selected', true);";
-        break;
-        case 2:
-            popupContentJavaScript += "optLSpd3.setAttribute('selected', true);";
-        break;
-    }
+    // switch(stripAnimationProperties.liveAnimationSpeed){
+    //     case 0:
+    //         popupContentJavaScript += "optLSpd1.setAttribute('selected', true);";
+    //     break;
+    //     case 1:
+    //         popupContentJavaScript += "optLSpd2.setAttribute('selected', true);";
+    //     break;
+    //     case 2:
+    //         popupContentJavaScript += "optLSpd3.setAttribute('selected', true);";
+    //     break;
+    // }
 
-    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd1);";
-    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd2);";
-    popupContentJavaScript += "liveSpdSel.appendChild(optLSpd3);";
+    // popupContentJavaScript += "liveSpdSel.appendChild(optLSpd1);";
+    // popupContentJavaScript += "liveSpdSel.appendChild(optLSpd2);";
+    // popupContentJavaScript += "liveSpdSel.appendChild(optLSpd3);";
 
-    popupContentJavaScript += "liveSpdDesc.appendChild(liveSpdSel);";
-    popupContentJavaScript += "popup.appendChild(liveSpdDesc);";
+    // popupContentJavaScript += "liveSpdDesc.appendChild(liveSpdSel);";
+    // popupContentJavaScript += "popup.appendChild(liveSpdDesc);";
     
     /* LIVE ANIMATION */
 
     popupContentJavaScript += "var memoryBtn = document.createElement('button');";
-    popupContentJavaScript += "memoryBtn.innerHTML = 'Memory';";
-    popupContentJavaScript += "memoryBtn.className = 'button';";
+    popupContentJavaScript += "memoryBtn.className = 'icon-btn presets';";
     popupContentJavaScript += "memoryBtn.onclick = openLedStripMemorySlots;";
 
     popupContentJavaScript += "var saveBtn = document.createElement('button');";
-    popupContentJavaScript += "saveBtn.innerHTML = 'Apply';";
-    popupContentJavaScript += "saveBtn.className = 'button';";
+    popupContentJavaScript += "saveBtn.className = 'icon-btn ok';";
 
     popupContentJavaScript += "saveBtn.onclick = function () { \
     let jsonString = JSON.stringify(ledGetStateJson());\

@@ -775,6 +775,67 @@ justify-content: center;\
 align-items: center;\
 height: 100%; /* Możesz dostosować */\
 }\
+.icon-btn {\
+position: relative;\
+display: inline-flex;\
+align-items: center;\
+justify-content: center;\
+margin-top:5px;\
+width: 3.5rem;\
+height: 2.4rem;\
+background-color: #5A8DEE;\
+border: none;\
+border-radius: 0.8rem;\
+color: #ffffff;\
+font-size: 1.8rem;\
+cursor: pointer;\
+transition: background-color 0.15s, color 0.15s;\
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.05),\
+            0 2px 6px rgba(0,0,0,0.4);\
+}\
+.icon-btn:hover {\
+background-color: #37404e;\
+color: #5f8bff;\
+}\
+.icon-btn:active {\
+background-color: #24303e;\
+box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);\
+}\
+\
+.icon-btn::before {\
+content: '';\
+display: inline-block;\
+}\
+.icon-btn.on::before {\
+content: '\\23FB';\
+}\
+.icon-btn.off::before {\
+content: '\\23FB';\
+text-shadow: 0 0 20px rgba(0,255,0,1);\
+color:#0df90d;\
+}\
+.icon-btn.play::before {\
+content: '\\25B6';\
+margin-left: 2px;\
+}\
+.icon-btn.stop::before {\
+content: '\\25A0';\
+}\
+.icon-btn.save::before {\
+content: '\\1F4BE';\
+}\
+.icon-btn.load::before {\
+content: '\\1F4E5';\
+}\
+.icon-btn.settings::before {\
+content: '\\2699';\
+}\
+.icon-btn.presets::before {\
+content: '\\1F5C3';\
+}\
+.icon-btn.ok::before {\
+content: '\\2714';\
+}\
 </style>\
 ";
 

@@ -169,20 +169,22 @@ void LedWS1228bDeviceType::createLiveAnimation()
         delete liveAnimation; // delete previous animation if it exists
     }
 
-    switch (animationProperties.liveAnimationSpeed)
-    {
-    case 0: // slow
-        waitTicksLive = 12;
-        break;
-    case 1: // medium
-        waitTicksLive = 7;
-        break;
-    case 2: // fast
-        waitTicksLive = 4;
-        break;
-    default:
-        waitTicksLive = 7; // default value
-    }
+    // switch (animationProperties.liveAnimationSpeed)
+    // {
+    // case 0: // slow
+    //     waitTicksLive = 12;
+    //     break;
+    // case 1: // medium
+    //     waitTicksLive = 7;
+    //     break;
+    // case 2: // fast
+    //     waitTicksLive = 4;
+    //     break;
+    // default:
+    //     waitTicksLive = 7; // default value
+    // }
+
+    waitTicksLive = 10;
 
     liveAnimation = new ComplexSequenceAnimation();
 
@@ -325,6 +327,15 @@ void LedWS1228bDeviceType::stripOn()
 
 void LedWS1228bDeviceType::stripOff()
 {
+    if(liveAnimation != nullptr)
+    {
+        liveAnimation->stop(); // stop live animation if it is running
+        delete liveAnimation;
+        liveAnimation = nullptr;
+
+        memcpy(runtimeBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (virtualDiodesCount * sizeof(LedColor)));
+    }
+
     if (switchOffAnimation != nullptr)
     {
         delete switchOffAnimation;
@@ -522,20 +533,16 @@ void LedWS1228bDeviceType::createEnablingAnimation()
             Direction::LeftToRight);
         break;
     case 1:
+        ongoingAnimation = new RollInAnimation(
+            runtimeBuffer,
+            virtualDiodesCount,
+            Direction::RightToLeft);
+        break;
+    case 2:
         ongoingAnimation = new FadeInAnimation(
             runtimeBuffer,
             virtualDiodesCount);
-        break;
-    case 2:
-        ongoingAnimation = new SparkleInAnimation(
-            runtimeBuffer,
-            virtualDiodesCount);
     case 3:
-        ongoingAnimation = new TwinkleInAnimation(
-            runtimeBuffer,
-            virtualDiodesCount);
-        break;
-    case 4:
         ongoingAnimation = new BounceInAnimation(
             runtimeBuffer,
             virtualDiodesCount,
