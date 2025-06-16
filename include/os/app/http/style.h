@@ -410,7 +410,7 @@ margin-top:5px;\
 }\
 \
 .color-input {\
-width: 70px;\
+width: 50%;\
 height:40px;\
 padding: 0px 0px;\
 border: none;\
