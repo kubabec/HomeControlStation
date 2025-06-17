@@ -69,6 +69,7 @@ public:
     static void task10ms();
     static void task20ms();
     static void task50ms();
+    static void task100ms();
     static void task1s();
 
     

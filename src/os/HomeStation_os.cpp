@@ -146,9 +146,7 @@ void OperatingSystem::task2ms()
 
 void OperatingSystem::task10ms()
 {
-    if(isHttpServerRunning){
-        CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
-    }
+    
     CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
 
     if(isRCServerRunning){
@@ -181,6 +179,12 @@ void OperatingSystem::task50ms()
 
     calculateRuntimeNodeHash();
     
+}
+
+void OperatingSystem::task100ms(){
+    if(isHttpServerRunning){
+        CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
+    }
 }
 
 void OperatingSystem::activateNvmSaveTimer(){

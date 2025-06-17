@@ -48,6 +48,7 @@ class LedWS1228bDeviceType : public Device {
     String deviceName;
     uint8_t roomId;
     std::function<void(void)> m_reportNvmDataChangedCbk;
+    std::function<void(void)> m_queuedAction = nullptr;
     int ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for animation processing
     int liveAnimationTicksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for live animation processing
     int waitTicksLive = 20;

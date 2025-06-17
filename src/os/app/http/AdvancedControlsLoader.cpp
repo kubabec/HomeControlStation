@@ -586,9 +586,7 @@ String AdvancedControlsLoader::createJsForLedStrip(){
         let enAnim = document.getElementById('EnAnimSelect').value;\
         let disAnim = document.getElementById('DiAnimSelect').value;\
         let enSpeed = document.getElementById('EnSpeSelect').value;\
-        let liveAnim = document.getElementById('LiveSel').value;\
-        let liveSpeed = document.getElementById('LiveSpdSel').value;\
-        let ledState = { 'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'enableAnimation': enAnim, 'disableAnimation': disAnim, 'speed': enSpeed, 'live': liveAnim, 'liveSpd': liveSpeed ,'color': []};\
+        let ledState = { 'devId': "+String((int)currentlyRequestedDeviceDescription.deviceId)+", 'enableAnimation': enAnim, 'disableAnimation': disAnim, 'speed': enSpeed,'color': []};\
         for(let i = 0; i < "+String((int)ledsCount)+"; i++){\
             ledState.color.push(nameToRgb(ledsTab[i].childNodes[0].style.backgroundColor));\
         }\

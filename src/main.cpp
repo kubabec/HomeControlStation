@@ -14,6 +14,7 @@ void loop() {
   static unsigned long next10ms   = 0;
   static unsigned long next20ms   = 0;
   static unsigned long next50ms   = 0;
+  static unsigned long next100ms   = 0;
   static unsigned long next1s     = 0;
   static unsigned long nextReport = 0;
   const   unsigned long REPORT_PERIOD_MS = 15000;
@@ -24,6 +25,7 @@ void loop() {
   static uint32_t sum10=0, cnt10=0, max10=0, backlog10=0;
   static uint32_t sum20=0, cnt20=0, max20=0, backlog20=0;
   static uint32_t sum50=0, cnt50=0, max50=0, backlog50=0;
+  static uint32_t sum100=0, cnt100=0, max100=0, backlog100=0;
   static uint32_t sum1s=0, cnt1s=0, max1s=0, backlog1s=0;
 
   unsigned long now   = millis();
@@ -102,6 +104,22 @@ void loop() {
       next50ms += 50;
     }
     if (iterations > 1) backlog50 += (iterations - 1);
+  }
+
+  // --- task100ms ---
+  {
+    int iterations = 0;
+    while (now >= next100ms) {
+      iterations++;
+      unsigned long t0 = micros();
+      OperatingSystem::task100ms();
+      unsigned long dt = micros() - t0;
+      sum100 += dt; 
+      cnt100++;
+      if (dt > max100) max100 = dt;
+      next100ms += 100;
+    }
+    if (iterations > 1) backlog100 += (iterations - 1);
   }
 
   // --- task1s ---

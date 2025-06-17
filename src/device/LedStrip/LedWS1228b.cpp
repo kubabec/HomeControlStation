@@ -57,19 +57,16 @@ ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t *p
         /* Data with valid length is allocated, pointer can be used */
         extendedMemoryPointer = ptr;
 
-
         stripContent[eACTIVE_CURRENT_CONTENT] = (LedColor *)extendedMemoryPointer;
         stripContent[eSAVED_CONTENT_SLOT1] = (LedColor *)((uint8_t *)stripContent[eACTIVE_CURRENT_CONTENT] + (virtualDiodesCount * sizeof(LedColor)));
         stripContent[eSAVED_CONTENT_SLOT2] = (LedColor *)((uint8_t *)stripContent[eSAVED_CONTENT_SLOT1] + (virtualDiodesCount * sizeof(LedColor)));
         stripContent[eSAVED_CONTENT_SLOT3] = (LedColor *)((uint8_t *)stripContent[eSAVED_CONTENT_SLOT2] + (virtualDiodesCount * sizeof(LedColor)));
 
-        // We will be using runtime buffer for runtime operations 
+        // We will be using runtime buffer for runtime operations
         // like animations, so we allocate it here
         // and copy the initial content from the active current content.
-        runtimeBuffer = (LedColor*)malloc(virtualDiodesCount * sizeof(LedColor));
+        runtimeBuffer = (LedColor *)malloc(virtualDiodesCount * sizeof(LedColor));
         memcpy(runtimeBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (virtualDiodesCount * sizeof(LedColor)));
-
-
 
         updateAveragedColor(eACTIVE_CURRENT_CONTENT);
         updateAveragedColor(eSAVED_CONTENT_SLOT1);
@@ -136,7 +133,8 @@ void LedWS1228bDeviceType::cyclic()
         {
             ticksToAnimate--;
         }
-    }else if (liveAnimation != nullptr)
+    }
+    else if (liveAnimation != nullptr)
     {
         if (liveAnimationTicksToAnimate == 0)
         {
@@ -157,13 +155,27 @@ void LedWS1228bDeviceType::cyclic()
             liveAnimationTicksToAnimate--;
         }
     }
+
+    /* execute this code whenever there was multiple actions queued */
+    if (m_queuedAction != nullptr)
+    {
+        /* conditions to start the function must be fulfilled */
+        if (ongoingAnimation == nullptr && switchOffAnimation == nullptr && liveAnimation == nullptr)
+        {
+            m_queuedAction();         // execute queued action if exists
+            m_queuedAction = nullptr; // reset queued action
+        }
+    }
 }
 
 void LedWS1228bDeviceType::createLiveAnimation()
 {
-    // liveAnimation = new SmoothWaveAnimation(virtualDiodesCount/10, Direction::LeftToRight, 70u);
-    // liveAnimation = new ShootingStarAnimation(virtualDiodesCount/10, 100u);
-    // liveAnimation = new GradientFlowAnimation();
+    /* this function shall be forbiden when enabling animation is ongoing */
+    if (ongoingAnimation != nullptr)
+    {
+        return;
+    }
+
     if (liveAnimation != nullptr)
     {
         delete liveAnimation; // delete previous animation if it exists
@@ -184,7 +196,7 @@ void LedWS1228bDeviceType::createLiveAnimation()
     //     waitTicksLive = 7; // default value
     // }
 
-    waitTicksLive = 10;
+    waitTicksLive = 7;
 
     liveAnimation = new ComplexSequenceAnimation();
 
@@ -199,7 +211,6 @@ void LedWS1228bDeviceType::stopLiveAnimation()
         liveAnimation->stop(); // stop live animation if it is running
         delete liveAnimation;
         liveAnimation = nullptr;
-
 
         memcpy(runtimeBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (virtualDiodesCount * sizeof(LedColor)));
         stripOn();
@@ -327,13 +338,15 @@ void LedWS1228bDeviceType::stripOn()
 
 void LedWS1228bDeviceType::stripOff()
 {
-    if(liveAnimation != nullptr)
+    /* this function shall be forbiden when  live animation is ongoing */
+    if (liveAnimation != nullptr)
     {
-        liveAnimation->stop(); // stop live animation if it is running
-        delete liveAnimation;
-        liveAnimation = nullptr;
+        return;
+        // liveAnimation->stop(); // stop live animation if it is running
+        // delete liveAnimation;
+        // liveAnimation = nullptr;
 
-        memcpy(runtimeBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (virtualDiodesCount * sizeof(LedColor)));
+        // memcpy(runtimeBuffer, stripContent[eACTIVE_CURRENT_CONTENT], (virtualDiodesCount * sizeof(LedColor)));
     }
 
     if (switchOffAnimation != nullptr)
@@ -414,7 +427,16 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         }
         else
         {
-            stripOff();
+            if (liveAnimation != nullptr)
+            {
+                m_queuedAction = [this]()
+                { this->stripOff(); };
+                stopLiveAnimation();
+            }
+            else
+            {
+                stripOff();
+            }
             isOn = false;
         }
         return SERV_SUCCESS;
@@ -427,10 +449,21 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
         return applyContent((LedStripContentIndex)param.a);
     case DEVSERVICE_LIVE_ANIMATION:
-        if(param.a == 1 && liveAnimation == nullptr ) // start animation 
+        if (param.a == 1 && liveAnimation == nullptr) // start animation
         {
-            createLiveAnimation();
-        }else if(param.a == 0 && liveAnimation != nullptr) // stop animation
+            /* Strip is off, we must start switch on animation and queue live for later */
+            if (!isOn)
+            {
+                m_queuedAction = [this]()
+                { this->createLiveAnimation(); };
+                stripOn();
+            }
+            else /* otherwise just run the animation */
+            {
+                createLiveAnimation();
+            }
+        }
+        else if (param.a == 0 && liveAnimation != nullptr) // stop animation
         {
             stopLiveAnimation();
         }
