@@ -21,12 +21,6 @@ function generateOnOffWidget(deviceContainer, device) {\
     button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
     button.id = `switchBtn${device.id}`;\
 \
-    if(device.hasBrightness == 1){\
-        const buttonMore = document.createElement('a');\
-        buttonMore.className ='icon-btn settings';\
-        buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
-        btnContainer.appendChild(buttonMore);\
-    }\
     btnContainer.appendChild(button);\
     deviceContainer.appendChild(btnContainer);\
 \
@@ -74,8 +68,13 @@ function generateLedStripWidget(deviceContainer, device) {\
     buttonMore.className ='icon-btn settings';\
     buttonMore.onclick = () => getExtendedControlsRequest(device.id, deviceContainer);\
     const buttonAnim = document.createElement('a');\
-    buttonAnim.className ='icon-btn play';\
-    buttonAnim.onclick = () => asyncLiveAnimation(device.id, deviceContainer);\
+    if(device.liveStatus == 0){\
+        buttonAnim.className ='icon-btn play';\
+        buttonAnim.onclick = () => asyncLiveAnimation(device.id, 1);\
+    }else {\
+        buttonAnim.className ='icon-btn stop';\
+        buttonAnim.onclick = () => asyncLiveAnimation(device.id, 0);\
+    }\
     btnContainer.appendChild(buttonMore);\
     btnContainer.appendChild(buttonAnim);\
     btnContainer.appendChild(button);\

@@ -30,13 +30,13 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
   <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
       <div class=\"header2\">Saved compositions</div>\
         <div id=\"ledStripExt1\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx1\"></button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx1\"></button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx1\"></button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx1\"></button></div>\
         <br>\
         <div id=\"ledStripExt2\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn save\"id=\"overWrEx2\"></button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx2\"></button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn save\"id=\"overWrEx2\"></button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx2\"></button></div>\
         <br>\
         <div id=\"ledStripExt3\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx3\"></button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn load\" id=\"loadEx3\"></button></div>\
+        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx3\"></button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx3\"></button></div>\
         <button class=\"button\" id=\"composClose\">Close</button>\
   </div>");
 

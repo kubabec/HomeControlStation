@@ -270,6 +270,7 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
             deviceInThisRoom->customBytes[3],
             deviceInThisRoom->customBytes[4]);
         jsonResponse +="\"avgColor\":\"#"+rgbColor+"\",";
+        jsonResponse +="\"liveStatus\":"+ String((int)deviceInThisRoom->customBytes[15])+",";
       }
 
       if(deviceInThisRoom->deviceType == type_DISTANCE_SENSOR){

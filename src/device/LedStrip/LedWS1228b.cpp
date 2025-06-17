@@ -398,25 +398,6 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 {
     switch (serviceType)
     {
-    case DEVSERVICE_LIVE_ANIMATION:
-        if (liveAnimation != nullptr) // Must be disabled
-        {
-            Serial.println("LedWS1228bDeviceType:// DEVSERVICE_LIVE_ANIMATION - stopping live animation");
-           stopLiveAnimation();
-        }
-        else
-        {
-            Serial.println("LedWS1228bDeviceType:// DEVSERVICE_LIVE_ANIMATION - starting live animation");
-            // Is strip enabled?
-            if (!isOn)
-            {
-                stripOn();
-            }
-            createLiveAnimation();
-        }
-
-        return SERV_SUCCESS;
-
     default:
         return SERV_NOT_SUPPORTED;
     };
@@ -445,7 +426,15 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     case DEVSERVICE_LED_STRIP_SWITCH_CONTENT:
         Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
         return applyContent((LedStripContentIndex)param.a);
-
+    case DEVSERVICE_LIVE_ANIMATION:
+        if(param.a == 1 && liveAnimation == nullptr ) // start animation 
+        {
+            createLiveAnimation();
+        }else if(param.a == 0 && liveAnimation != nullptr) // stop animation
+        {
+            stopLiveAnimation();
+        }
+        return SERV_SUCCESS;
     default:
         return SERV_NOT_SUPPORTED;
     };
@@ -670,6 +659,8 @@ DeviceDescription LedWS1228bDeviceType::getDeviceDescription()
     desc.customBytes[11] = averagedColors[eSAVED_CONTENT_SLOT3].r; // average color R
     desc.customBytes[12] = averagedColors[eSAVED_CONTENT_SLOT3].g; // average color G
     desc.customBytes[13] = averagedColors[eSAVED_CONTENT_SLOT3].b; // average color B
+
+    desc.customBytes[15] = (liveAnimation != nullptr) ? 1 : 0; // live animation running flag
 
     return desc;
 }

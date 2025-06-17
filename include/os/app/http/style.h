@@ -818,6 +818,8 @@ margin-left: 2px;\
 }\
 .icon-btn.stop::before {\
 content: '\\25A0';\
+color:#64ff5d;\
+text-shadow: 0 0 20px rgba(0, 255, 0, 3);\
 }\
 .icon-btn.save::before {\
 content: '\\1F4BE';\

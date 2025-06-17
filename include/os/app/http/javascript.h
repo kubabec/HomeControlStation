@@ -495,8 +495,8 @@ function asyncRoomStateSwitch(room, state){\
     var url = getRoomChangeUrl(room, state);\
     createAsyncRequestWithRenderRoomsResponse(url);\
 }\
-function asyncLiveAnimation(device){\
-    let json = {devId: device};\
+function asyncLiveAnimation(device, val){\
+    let json = {devId: device, state: val};\
     let jsonString = JSON.stringify(json);\
     const container = document.getElementById('container' + device);\
     let url = '/ledsLiveSwtch&' + jsonString;\
