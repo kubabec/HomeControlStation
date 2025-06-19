@@ -204,6 +204,10 @@ void HTTPAsyncRequestHandler::processRequest()
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
 
+        case ASYNC_GET_HASH:
+            currentRequest.state = ASYNC_REQUEST_COMPLETED;
+            break;
+
         case ASYNC_GET_SYSTEM_DETAILS:
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
@@ -234,10 +238,24 @@ String getHexColor(uint8_t r, uint8_t g, uint8_t b){
 }
 
 
+void HTTPAsyncRequestHandler::createHashJson()
+{
+    uint16_t hash = 0;
+    try {
+        hash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
+    }catch (std::bad_any_cast ex){
+        Serial.println("HTTPAsyncRequestHandler: Error while getting hash from DataContainer");
+    }
+
+    jsonResponse += "{";
+    jsonResponse += "\"hash\":" + String((int)hash);
+    jsonResponse += "}";
+}
+
 void HTTPAsyncRequestHandler::createMainPageContentJson()
 { 
 //   Serial.println("HTTPAsyncRequestHandler: Starting JSON response preparation ...");
-  jsonResponse += "{";
+  jsonResponse += "[{";
   uint8_t roomIteratorCount = 1;
   for(auto& room : *deviceToRoomMappingList_ptr)
   {
@@ -339,9 +357,10 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
     }
     roomIteratorCount++;
   }
-  jsonResponse +="}";
-
-//   Serial.println(jsonResponse);
+  jsonResponse +="},";
+  createHashJson();
+  jsonResponse +="]";
+  Serial.println(jsonResponse);
 
 }
 
@@ -421,6 +440,10 @@ void HTTPAsyncRequestHandler::createJsonResponse()
 
         case ASYNC_GET_PAGE_CONTENT:
             createMainPageContentJson();
+            break;
+
+        case ASYNC_GET_HASH:
+            createHashJson();
             break;
 
         case ASYNC_GET_SYSTEM_DETAILS:

@@ -73,12 +73,11 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
   if(interfaceVisible){\
             try {\
                 const response = await fetch('/getPageContent');\
-                const newData = await response.json();\
-\
+                const [newData, hashObj] = await response.json();\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
+                    hash = hashObj.hash;\
                     renderRooms(currentData);\
-                    console.log(currentData);\
                 }\
             } catch (error) {\
                 console.error('Error fetching data:', error);\
@@ -88,12 +87,28 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
   }\
         }\
 \
+let hash = 0;\
+    async function getHash(){\
+  if(interfaceVisible){\
+        try {\
+            const response = await fetch('/getHash');\
+            const newHash = await response.json();\
+            if(newHash.hash != hash){\
+                hash = newHash.hash;\
+                fetchData();}\
+        } catch (error) {\
+            console.error('Error fetching hash:', error);\
+        }\
+  }else {\
+    renderRooms({});\
+  }\
+    }\
 \
-        fetchData();\
+        getHash();\
         hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
-        setInterval(fetchData, 2000);\
+        setInterval(getHash, 1000);\
 \
 \
 \

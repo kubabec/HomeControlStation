@@ -67,7 +67,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "stRmChng",
   "segSwtch",
   "gtSysDet",
-  "ledsLiveSwtch"
+  "ledsLiveSwtch",
+  "getHash"
 };
 
 
@@ -106,7 +107,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_asyncSystemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_getHash, e_ACCESS_LEVEL_NONE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)

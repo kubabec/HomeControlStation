@@ -11,6 +11,7 @@ document.addEventListener('visibilitychange', () => {\
   } else {\
     interfaceVisible = true;\
     currentData = {};\
+    hash = 0;\
     fetchData();\
 }});\
 function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
@@ -20,12 +21,15 @@ function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
         showLoading(container);\
     }\
     xhr.open(\"GET\", url, true);\
+    console.log(url);\
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                const newData = JSON.parse(xhr.responseText);\
+                console.log(xhr.responseText);\
+                const [newData, hashObj] = JSON.parse(xhr.responseText);\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
+                    hash = hashObj.hash;\
                     renderRooms(currentData);\
                 }\
             } else { \
@@ -548,7 +552,6 @@ function hideLoading(container) {\
     }\
 }\
 function displayNotifications(data){\
-    console.log(data);\
     if (data.count > 0) {\
         isNotificationPollingActive = 0;\
         const notificationsList = document.getElementById('notificationsList');\
@@ -617,7 +620,6 @@ function downloadDeviceConfiguration(){\
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                console.log(xhr.responseText);\
                     const element = document.createElement('a'); \
                     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + (xhr.responseText));\
                     element.setAttribute('download', 'HomeControlStationConfig.json');\

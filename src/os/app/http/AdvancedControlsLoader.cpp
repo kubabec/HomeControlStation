@@ -552,9 +552,10 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     xhr.onreadystatechange = function() {\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
-                const newData = JSON.parse(xhr.responseText);\
+                const [newData, hashObj] = JSON.parse(xhr.responseText);\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
+                    hash = hashObj.hash;\
                     renderRooms(currentData);\
                 }\
             } else { \

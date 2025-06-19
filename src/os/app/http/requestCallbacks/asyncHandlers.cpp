@@ -345,6 +345,11 @@ void HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch(String &request, W
   }
 }
 
+void HomeLightHttpServer::parameterizedHandler_getHash(String &request, WiFiClient &client)
+{
+    HTTPAsyncRequestHandler::createRequest(ASYNC_GET_HASH, nullptr, 0);
+}
+
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String &request, WiFiClient &client)
 {
   Serial.println("Extended controls requested");
