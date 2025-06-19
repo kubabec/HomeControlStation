@@ -70,6 +70,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
 \
 \
         async function fetchData() {\
+  if(interfaceVisible){\
             try {\
                 const response = await fetch('/getPageContent');\
                 const newData = await response.json();\
@@ -82,6 +83,9 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
             } catch (error) {\
                 console.error('Error fetching data:', error);\
             }\
+  }else {\
+    renderRooms({});\
+  }\
         }\
 \
 \
@@ -89,7 +93,7 @@ client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlI
         hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
-        setInterval(fetchData, 6000);\
+        setInterval(fetchData, 2000);\
 \
 \
 \

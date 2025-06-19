@@ -4,6 +4,15 @@
 
 const char* javascript = "\
 <script>\
+let interfaceVisible = true;\
+document.addEventListener('visibilitychange', () => {\
+  if (document.hidden) {\
+    interfaceVisible = false;\
+  } else {\
+    interfaceVisible = true;\
+    currentData = {};\
+    fetchData();\
+}});\
 function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
     const xhr = new XMLHttpRequest();\
     xhr.timeout = 10000;\
