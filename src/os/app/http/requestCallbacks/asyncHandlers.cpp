@@ -274,6 +274,72 @@ void HomeLightHttpServer::parameterizedHandler_roomStateChange(String &request, 
   }
 }
 
+
+void HomeLightHttpServer::parameterizedHandler_roomToggle(String& request, WiFiClient& client)
+{
+  escapeSpecialCharsInJson(request);
+  request.replace("roomToggle&", "");
+
+  Serial.println(request);
+
+  JsonDocument doc;
+  DeserializationError success = deserializeJson(doc, request.c_str());
+  if (success == DeserializationError::Code::Ok)
+  {
+    String roomIdStr = doc["roomId"];
+
+    if (roomIdStr != "null")
+    {
+      uint8_t roomId = 255;
+      // Try to find roomId in the mapping;
+      for (auto &room : roomNamesMapping)
+      {
+        if (room.second == roomIdStr)
+        {
+          roomId = room.first;
+          break;
+        }
+      }
+
+      // Name not found in mapping - use the string as roomId
+      if (roomId == 255)
+      {
+        roomId = roomIdStr.toInt();
+      }
+
+      // Need to evaluate toggle value
+      std::vector<DeviceDescription> devicesCollection = 
+            std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+      bool toggleValue = true;
+      
+      for(auto& device : devicesCollection)
+      {
+        if(device.roomId == roomId && (device.isEnabled == 1)) // compare to 1 as non-disablabe will return 2 or 3
+        {
+          toggleValue = false; // at least one device is ON, so we need to turn it OFF
+          break;
+        }
+      }
+
+      Serial.println("Room state change requested.");
+      uint8_t parameters[4];
+      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = roomId;   /* idx 0 */
+      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
+      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_ROOM_STATE_CHANGE;  /* idx 2 */
+      parameters[3] = toggleValue;                     /* idx 3 */
+
+      HTTPAsyncRequestHandler::createRequest(
+          ASYNC_TYPE_DEVICE_SERVICE_CALL,
+          parameters,
+          4);
+    }
+  }
+  else
+  {
+    Serial.println("Error with JSON parsing");
+  }
+}
+
 void HomeLightHttpServer::parameterizedHandler_segmentStateSwitch(String &request, WiFiClient &client)
 {
   escapeSpecialCharsInJson(request);
