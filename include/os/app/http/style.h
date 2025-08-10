@@ -389,7 +389,7 @@ transition: transform 0.2s ease;\
 }\
 \
 .room-container:hover {\
-box-shadow: 0 8px 15px rgba(99, 97, 144, 0.1);\
+box-shadow:inset 0 0 0 1px #34393fff, 0 8px 24px rgba(0, 0, 0, 0.7);\
 }\
 \
 .room-header {\
