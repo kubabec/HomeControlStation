@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 42
+#define NUMBER_OF_SIGNALS 41
 enum Signal
 {
     /* Type: bool , somme description */
@@ -90,8 +90,6 @@ enum Signal
     SIG_NETWORK_NODES_INFO,
 
     /*  std::function<void(void)> */
-    CBK_START_NVM_SAVE_TIMER,
-
-    SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT
+    CBK_START_NVM_SAVE_TIMER
 };
 #endif

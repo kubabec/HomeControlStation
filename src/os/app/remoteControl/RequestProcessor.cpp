@@ -61,7 +61,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     } else{/* Processing allready known request */
         
         /* Does message send retry count exceed maximum allowed number? */
-        if(currentRequest.getRequestSendCount() >= 3 ){
+        if(currentRequest.getRequestSendCount() >= 4 ){
             /* Max number reqests exceed , timeout request*/
             Serial.println("Request "+String((int)currentRequest.getRequestId())+" processing failed");
             /* clear the current request */
@@ -69,7 +69,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 3000){
+            if(millis() - lastSendTime > 500){
                 Serial.println("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);

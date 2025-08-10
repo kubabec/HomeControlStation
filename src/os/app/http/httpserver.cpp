@@ -66,7 +66,6 @@ std::vector<String> parameterizedAsyncRequests = {
   "stripOverwriteSlot",
   "stRmChng",
   "segSwtch",
-  "gtSysDet",
   "ledsLiveSwtch",
   "getHash",
   "roomToggle"
@@ -107,7 +106,6 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_asyncSystemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_getHash, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE}
@@ -999,17 +997,19 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   }
   /* intended TAB */
     /* Is Http Server configuration */
-    client.println("<label>HTTP Server:<select name=\"isHTTPServer\">");
-    if(currentConfig.isHttpServer)
-    {
-      client.println(yesSelected);
-      client.println(noNotSelected);
-    }else
-    {
-      client.println(yesNotSelected);
-      client.println(noSelected);
-    }
-    client.println("</select></label>");
+
+    /* Temporary disabled as there is no planned feature to disable HTTP server */
+    // client.println("<label>HTTP Server:<select name=\"isHTTPServer\">");
+    // if(currentConfig.isHttpServer)
+    // {
+    //   client.println(yesSelected);
+    //   client.println(noNotSelected);
+    // }else
+    // {
+    //   client.println(yesNotSelected);
+    //   client.println(noSelected);
+    // }
+    // client.println("</select></label>");
 
     /* Is RC Server configuration */
     client.println("<label>Is Master:<select name=\"isRCServer\">");
@@ -1110,18 +1110,16 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
   }
-
-  if( std::any_cast<bool>(DataContainer::getSignalValue(SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT))){
-    client.println("<div class=\"button-link\" onclick=\"sysPropert()\">System properties</div>");
-  }
     
   /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
     client.println("<hr class=\"custom-hr\">");
-    client.println("<div class=\"button-link\" onclick=\"downloadDeviceConfiguration()\">Download config file</div>");
-    client.println("<div class=\"button-link\" onclick=\"uploadConfigFile()\">Load configuration file</div>");
-    client.println("<hr class=\"custom-hr\">");
+
+    /* Temporary disabled */
+    // client.println("<div class=\"button-link\" onclick=\"downloadDeviceConfiguration()\">Download config file</div>");
+    // client.println("<div class=\"button-link\" onclick=\"uploadConfigFile()\">Load configuration file</div>");
+    // client.println("<hr class=\"custom-hr\">");
 
   /* Reboot button*/
   client.println("<div class=\"error-button\" style=\"background-color: yellow;\" onclick=\"showMessage('You really want to reboot this device?', resetDevice)\">Restart</div>");

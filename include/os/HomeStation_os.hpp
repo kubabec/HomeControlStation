@@ -49,7 +49,6 @@ private:
     static void detectHwMassEraseRequest();
 
     static void handleNvmSaveMech();
-    static void initializeActiveCoolingSystem();
     
     
 

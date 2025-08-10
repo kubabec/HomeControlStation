@@ -108,7 +108,7 @@ let hash = 0;\
         hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
-        setInterval(getHash, 1000);\
+        setInterval(getHash, 373);\
 \
 \
 \

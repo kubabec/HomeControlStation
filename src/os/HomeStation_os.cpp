@@ -41,25 +41,9 @@ ServiceInformation OperatingSystem::displayRamUsage()
     return info;
 }
 
-void OperatingSystem::initializeActiveCoolingSystem()
-{
-    tempSensor.begin();
-    float t = tempSensor.readTemperature();
-    if(!isnan(t))
-    {
-        DataContainer::setSignalValue(SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT, static_cast<bool>(true));
-        Serial.println("OS//:  Active cooling system AVAILABLE.");
-    }else {
-        DataContainer::setSignalValue(SIG_IS_ACTIVE_COOLING_SYSTEM_PRESENT, static_cast<bool>(false));
-        Serial.println("OS//:  Active cooling system is NOT AVAILABLE.");
-    }
-
-}
-
 void OperatingSystem::init()
 {
     pinMode(0, INPUT_PULLUP);
-    initializeActiveCoolingSystem();
 
     uniqueLifecycleId = (uint16_t)random(10, 10000);
     DataContainer::setSignalValue(CBK_DISPLAY_RAM_USAGE, static_cast<std::function<ServiceInformation()>>(OperatingSystem::displayRamUsage));

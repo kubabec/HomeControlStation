@@ -2,7 +2,7 @@
 
 #ifdef TEMP_SENSOR_SUPPORTED
 
-TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData,  std::function<RtcTime(void)> getTimeCallback)
+TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData, std::function<RtcTime(void)> getTimeCallback)
 {
     isOn = false;
     /* save pointer to getRTCTime callback */
@@ -13,20 +13,20 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     deviceName = String(nvmData.deviceName);
     roomId = nvmData.roomId;
 
-    dht = new DHT(pinNumber, DHT11);
+    dht = new DHT(pinNumber, DHT22);
     Serial.println("DHT11 device id: " + String((int)deviceId) + ", pin: " + String(pinNumber));
 
-    
     dht->begin();
 
     float h = dht->readHumidity();
     float t = dht->readTemperature();
-    if(!isnan(t))
+    if (!isnan(t))
     {
         currentTemp = t;
         Serial.println("Temp: " + String(currentTemp));
     }
-    if(!isnan(h)){
+    if (!isnan(h))
+    {
         currentHumid = (int)h;
         Serial.println("Humidity: " + String(currentHumid));
     }
@@ -54,13 +54,14 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
     Serial.print("Laczna liczba pomiarow: ");
     Serial.println(sensorData.size());
     Serial.println("Zawartosc wektora sensorData:");
-    for (const auto& r : sensorData) 
+    for (const auto &r : sensorData)
     {
         // Format czasu z zerowaniem minut (np. 10:05)
         Serial.print("Czas: ");
         Serial.print(r.timestamp.hour);
         Serial.print(":");
-        if (r.timestamp.min < 10) Serial.print("0");
+        if (r.timestamp.min < 10)
+            Serial.print("0");
         Serial.print(r.timestamp.min);
         // Dane pomiarowe
         Serial.print(" | Temperatura: ");
@@ -76,51 +77,51 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
 void TempSensorDHT11DeviceType::temHumReading()
 {
     if (millis() - lastDataUpdateTime > 4000)
+    {
+        float h = dht->readHumidity();
+        float t = dht->readTemperature();
+
+        if (!isnan(t))
         {
-            float h = dht->readHumidity();
-            float t = dht->readTemperature();
-
-            if(!isnan(t))
+            if (lastTemp == 0 || abs(t - lastTemp) <= 2.0)
             {
-                if (lastTemp == 0 || abs(t - lastTemp) <= 2.0)
-                {
-                    temHumSensError = 0;
-                    currentTemp = t;
-                    lastTemp = t;
-                    Serial.println("Temperature: " + String(currentTemp));
-                }
-                    else
-                    {
-                        Serial.println("Rejected due to unpredicted temperature jump: " + String(t));
-                    }
-                if(!isnan(h))
-                {
-                    currentHumid = (int)h;
-                    Serial.println("Humidity: " + String(currentHumid));
-                }
-                    }
-                    else 
-                    {
-                        temHumSensError = 1;
-                        Serial.println("Temperature and humidity sensor error");
-                    }
-
-            lastDataUpdateTime = millis();
-
-            // Serial.println("Temp: " + String(currentTemp));
+                temHumSensError = 0;
+                currentTemp = t;
+                lastTemp = t;
+                Serial.println("Temperature: " + String(currentTemp));
+            }
+            else
+            {
+                Serial.println("Rejected due to unpredicted temperature jump: " + String(t));
+            }
+            if (!isnan(h))
+            {
+                currentHumid = (int)h;
+                Serial.println("Humidity: " + String(currentHumid));
+            }
         }
+        else
+        {
+            temHumSensError = 1;
+            Serial.println("Temperature and humidity sensor error");
+        }
+
+        lastDataUpdateTime = millis();
+
+        // Serial.println("Temp: " + String(currentTemp));
+    }
 }
 
 void TempSensorDHT11DeviceType::dhtSensorRecords()
 {
     RtcTime time;
-        if(getTime)
-        {
-            time = getTime();
-        }
+    if (getTime)
+    {
+        time = getTime();
+    }
     // Sprawdzaj co 30 sekund
-    if (millis() - lastCheckedTime >= TIME_STORE_PERIOD && (time.year != 1970)) 
-    {            
+    if (millis() - lastCheckedTime >= TIME_STORE_PERIOD && (time.year != 1970))
+    {
         // Zapisz tylko jesli:
         // 1. Minuta jest podzielna przez 15 (czyli 00, 15, 30, 45)
         // 2. Jeszcze nie zapisywalismy w tej minucie
@@ -129,7 +130,7 @@ void TempSensorDHT11DeviceType::dhtSensorRecords()
         {
             float h = dht->readHumidity();
             float t = dht->readTemperature();
-            if(!isnan(t))
+            if (!isnan(t))
             {
                 if (sensorData.size() >= MAX_ENTRIES)
                 {
@@ -143,10 +144,10 @@ void TempSensorDHT11DeviceType::dhtSensorRecords()
                 lastLoggedMinute = time.min;
                 printSensorData(t, h, reading);
             }
-            else 
+            else
             {
                 Serial.println("Blad czujnika DHT");
-            }        
+            }
         }
         lastCheckedTime = millis();
     }
@@ -159,7 +160,7 @@ void TempSensorDHT11DeviceType::init()
 void TempSensorDHT11DeviceType::cyclic()
 {
     temHumReading();
-    dhtSensorRecords();
+    // dhtSensorRecords();
 }
 
 uint16_t TempSensorDHT11DeviceType::getExtendedMemoryLength()
