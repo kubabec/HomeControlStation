@@ -10,6 +10,7 @@ unsigned long TimeMaster::lastMillis = 0;
 bool TimeMaster::ntpAvailable = false;
 uint8_t TimeMaster::initialRetryCount = 0; // Licznik prób synchronizacji NTP
 bool TimeMaster::wasNtpEverSynced = false;
+bool TimeMaster::startupTimeInitialized = false;
 
 WiFiUDP TimeMaster::ntpUDP;
 NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
@@ -17,6 +18,8 @@ NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
 
 void TimeMaster::init() {
     Serial.println("DeviceProvider init ...");
+    RtcTime startupTime;
+    DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(startupTime));
 
 
     
@@ -28,6 +31,8 @@ void TimeMaster::init() {
     if (timeClient.update()) {
         updateNtpVariables();
         Serial.println("Synchronized with NTP!");
+        DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(getRtcTime()));
+        startupTimeInitialized = true; // Czas startowy został zainicjalizowany
     } else {
         // NTP nie działa - przechodzimy na freerunning
         ntpAvailable = false;
@@ -49,6 +54,12 @@ void TimeMaster::cyclic() {
         if (timeClient.update()) {
             updateNtpVariables();
             initialRetryCount = 0; // Resetujemy licznik prób synchronizacji
+
+            // Do only once after first successful NTP sync
+            if(!startupTimeInitialized) {
+                DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(getRtcTime()));
+                startupTimeInitialized = true; // Czas startowy został zainicjalizowany
+            }
         } else {
             initialRetryCount++;
         }

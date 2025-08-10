@@ -139,39 +139,39 @@ void loop() {
   }
 
   // --- raport co 15 sekund ---
-  if (now >= nextReport) {
-    Serial.println(F("=== Statystyki czasowe OS (15s) ==="));
+  // if (now >= nextReport) {
+  //   Serial.println(F("=== Statystyki czasowe OS (15s) ==="));
 
-    if (cnt10) {
-      float load10 = sum10 / (float)REPORT_PERIOD_US * 100.0f;
-      Serial.printf(" task10ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
-                    sum10/(float)cnt10, max10, backlog10, load10);
-    }
-    if (cnt20) {
-      float load20 = sum20 / (float)REPORT_PERIOD_US * 100.0f;
-      Serial.printf(" task20ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
-                    sum20/(float)cnt20, max20, backlog20, load20);
-    }
-    if (cnt50) {
-      float load50 = sum50 / (float)REPORT_PERIOD_US * 100.0f;
-      Serial.printf(" task50ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
-                    sum50/(float)cnt50, max50, backlog50, load50);
-    }
-    if (cnt1s) {
-      float load1s = sum1s / (float)REPORT_PERIOD_US * 100.0f;
-      Serial.printf(" task1s():   avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
-                    sum1s/(float)cnt1s, max1s, backlog1s, load1s);
-    }
+  //   if (cnt10) {
+  //     float load10 = sum10 / (float)REPORT_PERIOD_US * 100.0f;
+  //     Serial.printf(" task10ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
+  //                   sum10/(float)cnt10, max10, backlog10, load10);
+  //   }
+  //   if (cnt20) {
+  //     float load20 = sum20 / (float)REPORT_PERIOD_US * 100.0f;
+  //     Serial.printf(" task20ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
+  //                   sum20/(float)cnt20, max20, backlog20, load20);
+  //   }
+  //   if (cnt50) {
+  //     float load50 = sum50 / (float)REPORT_PERIOD_US * 100.0f;
+  //     Serial.printf(" task50ms(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
+  //                   sum50/(float)cnt50, max50, backlog50, load50);
+  //   }
+  //   if (cnt1s) {
+  //     float load1s = sum1s / (float)REPORT_PERIOD_US * 100.0f;
+  //     Serial.printf(" task1s():   avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
+  //                   sum1s/(float)cnt1s, max1s, backlog1s, load1s);
+  //   }
 
-    Serial.println(F("==================================="));
+  //   Serial.println(F("==================================="));
 
-    // Zerowanie statystyk i umówienie kolejnego raportu
-    sum10 = cnt10 = max10 = backlog10 = 0;
-    sum20 = cnt20 = max20 = backlog20 = 0;
-    sum50 = cnt50 = max50 = backlog50 = 0;
-    sum1s = cnt1s = max1s = backlog1s = 0;
-    nextReport += REPORT_PERIOD_MS;
-  }
+  //   // Zerowanie statystyk i umówienie kolejnego raportu
+  //   sum10 = cnt10 = max10 = backlog10 = 0;
+  //   sum20 = cnt20 = max20 = backlog20 = 0;
+  //   sum50 = cnt50 = max50 = backlog50 = 0;
+  //   sum1s = cnt1s = max1s = backlog1s = 0;
+  //   nextReport += REPORT_PERIOD_MS;
+  // }
 
   CyclicProfiler::reportEvery(15000);
 }

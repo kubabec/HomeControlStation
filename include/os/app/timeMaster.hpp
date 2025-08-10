@@ -28,6 +28,7 @@ public:
 private:
 
     static NTPClient timeClient;
+    static bool startupTimeInitialized; // Flaga, czy czas startowy został zainicjalizowany
     static WiFiUDP ntpUDP;
     static uint8_t initialRetryCount; // Licznik prób synchronizacji NTP
     static bool wasNtpEverSynced; // Flaga, czy NTP był kiedykolwiek zsynchronizowany

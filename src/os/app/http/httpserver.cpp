@@ -131,6 +131,7 @@ void HomeLightHttpServer::cyclic()
 
     if(HTTPAsyncRequestHandler::getProcessingState() == ASYNC_REQUEST_COMPLETED){
       String jsonResponse = HTTPAsyncRequestHandler::getJsonResponse();
+      // Serial.println("HTTPServer : // JSON Response: " + jsonResponse);
 
       if(client){
         client.println("HTTP/1.1 200 OK");
@@ -967,8 +968,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
       String currentTime = getTimeCallback().toString(); // Get the current time as a string
 
-    //client.printf("<div class=\"current-time\">Aktualny czas: %s</div>", currentTime.c_str());
-    client.printf("<div class=\"current-time\">Aktualny czas: <span id=\"currentDateTime\">%s</span></div>\n", currentTime.c_str());
+    client.printf("<div class=\"current-time\">System time: <span id=\"currentDateTime\">%s</span></div>\n", currentTime.c_str());
 
     // skrypt inicjalizujący
     client.println("<script>");
@@ -1094,6 +1094,13 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     }\
     setMemoryBarValue("+String((int)memoryUsagePercent)+");\
   </script>");
+
+  /* Time when system was launched */
+
+  RtcTime time = std::any_cast<RtcTime>(DataContainer::getSignalValue(SIG_STARTUP_TIME));
+  client.println("<label>Launch time:<input value=\"");
+  client.println(time.toString());
+  client.println("\" type=\"text\" disabled></label>");
 
   /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr class=\"custom-hr\">");  

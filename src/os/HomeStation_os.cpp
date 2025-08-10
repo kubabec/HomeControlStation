@@ -16,7 +16,6 @@ long long OperatingSystem::nvmSaveTimerValue = 0;
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
 
-
 long long uiBlockTime = 0;
 
 ServiceInformation OperatingSystem::displayRamUsage()
@@ -26,14 +25,14 @@ ServiceInformation OperatingSystem::displayRamUsage()
 
     float T = 0.f;
     float t = tempSensor.readTemperature();
-    if(!isnan(t))
+    if (!isnan(t))
     {
         T = t;
     }
 
     ServiceInformation info;
     info.ramTotal = esp_get_free_heap_size();
-    info.ramFree =  heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+    info.ramFree = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
     info.ramUsed = info.ramTotal - info.ramFree;
 
     info.coreTemperature = T;
@@ -52,21 +51,15 @@ void OperatingSystem::init()
     DataContainer::setSignalValue(CBK_CALCULATE_RUNTIME_NODE_HASH, static_cast<std::function<uint16_t()>>(OperatingSystem::calculateRuntimeNodeHash));
     DataContainer::setSignalValue(CBK_START_NVM_SAVE_TIMER, static_cast<std::function<void()>>(OperatingSystem::activateNvmSaveTimer));
 
-
-
     DataContainer::setSignalValue(
         CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING,
-        static_cast<std::function<void(String)>>(OperatingSystem::requestSecurityAccessLevelChangeViaString)
-    );
+        static_cast<std::function<void(String)>>(OperatingSystem::requestSecurityAccessLevelChangeViaString));
 
-    DataContainer::subscribe(SIG_IS_HTTP_SERVER, [](std::any signal) {
-        isHttpServerRunning = (std::any_cast<bool>(signal));
-    });
+    DataContainer::subscribe(SIG_IS_HTTP_SERVER, [](std::any signal)
+                             { isHttpServerRunning = (std::any_cast<bool>(signal)); });
 
-    DataContainer::subscribe(SIG_IS_RC_SERVER, [](std::any signal) {
-        isRCServerRunning = (std::any_cast<bool>(signal));
-    });
-
+    DataContainer::subscribe(SIG_IS_RC_SERVER, [](std::any signal)
+                             { isRCServerRunning = (std::any_cast<bool>(signal)); });
 
     NotificationHandler::init();
 
@@ -75,53 +68,52 @@ void OperatingSystem::init()
     ConfigProvider::init();
     ExtendedMemoryManager::init();
 
-
     calculateRuntimeNodeHash();
     DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
-    
+
     // Inicialize device manager, devices settings etc.
     DeviceManager::init();
 
-    // Initialize network settings such as 
+    // Initialize network settings such as
     // WiFi network connection etc.
     NetworkDriver::init();
 
-    if(isHttpServerRunning){
+    if (isHttpServerRunning)
+    {
         HomeLightHttpServer::init();
     }
 
-    if(isRCServerRunning){
+    if (isRCServerRunning)
+    {
         RemoteControlServer::init();
         RemoteDevicesManager::init();
-    }else{
+    }
+    else
+    {
         RemoteControlClient::init();
     }
 
     DeviceProvider::init();
-    TimeMaster::init(); 
-    
+    TimeMaster::init();
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
-    NodeConfiguration currentConfig = 
+    NodeConfiguration currentConfig =
         std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if( currentConfig.nodeType == 255 || /* invalid node type  */
-        !currentConfig.networkCredentialsAvailable || /* no network credentials */
-        (std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_LOCAL_COLLECTION)).size() == 0)){ /* no devices configured yet */
+    if (currentConfig.nodeType == 255 ||           /* invalid node type  */
+        !currentConfig.networkCredentialsAvailable /* no network credentials */
+    )
+    {
         changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
 
-
-        UserInterfaceNotification notif {
+        UserInterfaceNotification notif{
             .title = "Service access granted",
             .body = "Device received service mode access due to one of the following reasons: Invalid configuration / No WiFi configured / No local devices configured",
-            .type = UserInterfaceNotification::INFO
-        };
+            .type = UserInterfaceNotification::INFO};
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 
-
     Serial.println("HomeStationOS:// Init completed.");
 }
-
 
 void OperatingSystem::task2ms()
 {
@@ -130,13 +122,16 @@ void OperatingSystem::task2ms()
 
 void OperatingSystem::task10ms()
 {
-    
+
     CyclicProfiler::call("DeviceProvider", DeviceProvider::cyclic);
 
-    if(isRCServerRunning){
+    if (isRCServerRunning)
+    {
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
         CyclicProfiler::call("RemoteDevicesManager", RemoteDevicesManager::cyclic);
-    }else{
+    }
+    else
+    {
         CyclicProfiler::call("RemoteControlClient", RemoteControlClient::cyclic);
     }
     CyclicProfiler::call("DeviceManager", DeviceManager::cyclic);
@@ -144,7 +139,6 @@ void OperatingSystem::task10ms()
 
 void OperatingSystem::task20ms()
 {
-    
 }
 
 void OperatingSystem::task50ms()
@@ -152,26 +146,29 @@ void OperatingSystem::task50ms()
     CyclicProfiler::call("NotificationHandler", NotificationHandler::cyclic);
     CyclicProfiler::call("ExtendedMemoryManager", ExtendedMemoryManager::cyclic);
 
-    if(resetPending){
+    if (resetPending)
+    {
         resetCountdown -= 50;
 
-        if(resetCountdown <= 0)
+        if (resetCountdown <= 0)
         {
             performReset();
         }
     }
 
     calculateRuntimeNodeHash();
-    
 }
 
-void OperatingSystem::task100ms(){
-    if(isHttpServerRunning){
+void OperatingSystem::task100ms()
+{
+    if (isHttpServerRunning)
+    {
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
     }
 }
 
-void OperatingSystem::activateNvmSaveTimer(){
+void OperatingSystem::activateNvmSaveTimer()
+{
     Serial.println("NVM save timer activated.");
     isNvmSaveTimerActive = true;
     nvmSaveTimerValue = millis();
@@ -179,13 +176,17 @@ void OperatingSystem::activateNvmSaveTimer(){
 
 void OperatingSystem::handleNvmSaveMech()
 {
-    if(isNvmSaveTimerActive){
-        if(abs(millis() - nvmSaveTimerValue) > (1000 * 60 * 30)){ /* 30 minutes */
+    if (isNvmSaveTimerActive)
+    {
+        if (abs(millis() - nvmSaveTimerValue) > (1000 * 60 * 30))
+        { /* 30 minutes */
             isNvmSaveTimerActive = false;
             nvmSaveTimerValue = 0;
             Serial.println("NVM save timer expired, saving NVM data.");
             saveNvmData();
-        }else {
+        }
+        else
+        {
             nvmSaveTimerValue -= 1; // - 1 sec
         }
     }
@@ -194,8 +195,8 @@ void OperatingSystem::handleNvmSaveMech()
 void OperatingSystem::task1s()
 {
     Serial.print(".");
-    
-    handleSecurityAccessLevelExpiration();        
+
+    handleSecurityAccessLevelExpiration();
     CyclicProfiler::call("TimeMaster", TimeMaster::cyclic);
 
     detectHwMassEraseRequest();
@@ -203,24 +204,27 @@ void OperatingSystem::task1s()
 
     static long long lastCheck = 0;
 
-    if(millis() - lastCheck > 3000){
+    if (millis() - lastCheck > 3000)
+    {
         // displayRamUsage();
         lastCheck = millis();
     }
 }
 
-void OperatingSystem::reset(uint16_t delay) {
-    if(!resetPending){
+void OperatingSystem::reset(uint16_t delay)
+{
+    if (!resetPending)
+    {
         resetPending = true;
         resetCountdown = delay;
     }
 }
 
-
 void OperatingSystem::saveNvmData()
 {
     DeviceManager::flushNvmData();
-    if(isHttpServerRunning){
+    if (isHttpServerRunning)
+    {
         HomeLightHttpServer::flushNvmData();
     }
     ExtendedMemoryManager::flushNvmData();
@@ -231,16 +235,20 @@ void OperatingSystem::performReset()
 {
     DeviceProvider::deinit();
 
-    if(isRCServerRunning){
+    if (isRCServerRunning)
+    {
         RemoteDevicesManager::deinit();
         RemoteControlServer::deinit();
-    }else{
+    }
+    else
+    {
         RemoteControlClient::deinit();
     }
 
     DeviceManager::deinit();
 
-    if(isHttpServerRunning){
+    if (isHttpServerRunning)
+    {
         HomeLightHttpServer::deinit();
     }
 
@@ -260,8 +268,10 @@ void OperatingSystem::handleSecurityAccessLevelExpiration()
 {
     const unsigned timeToExpireAccessLevel = (1000 * 60) * 5; /* 5 minutes */
     /* access level is granted? */
-    if(currentAccessLevel > e_ACCESS_LEVEL_NONE){
-        if(abs(millis() - accessLevelGrantedTimeSnapshot) > timeToExpireAccessLevel){
+    if (currentAccessLevel > e_ACCESS_LEVEL_NONE)
+    {
+        if (abs(millis() - accessLevelGrantedTimeSnapshot) > timeToExpireAccessLevel)
+        {
             accessLevelGrantedTimeSnapshot = 0;
             currentAccessLevel = e_ACCESS_LEVEL_NONE;
             DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
@@ -271,8 +281,7 @@ void OperatingSystem::handleSecurityAccessLevelExpiration()
             UserInterfaceNotification notif{
                 .title = "Device lock/unlock",
                 .body = "Unlock time expired, device is locked again.",
-                .type = UserInterfaceNotification::INFO
-            };
+                .type = UserInterfaceNotification::INFO};
             std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
     }
@@ -283,53 +292,58 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 {
     uint64_t hash = 0;
 
-    //hash += uniqueLifecycleId;
+    // hash += uniqueLifecycleId;
 
     /* Get configuration */
-    try{
-        NodeConfiguration configuration = 
+    try
+    {
+        NodeConfiguration configuration =
             std::any_cast<NodeConfiguration>(
-                DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)
-            );
-        hash +=  configuration.isHttpServer;
-        hash +=  configuration.isRcServer;
-        hash +=  configuration.isDefaultUserAdmin;
-        hash +=  configuration.networkCredentialsAvailable;
-        hash +=  configuration.nodeType;
-        for(uint8_t idx = 0 ; idx < configuration.networkSSID.length(); idx ++)
+                DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+        hash += configuration.isHttpServer;
+        hash += configuration.isRcServer;
+        hash += configuration.isDefaultUserAdmin;
+        hash += configuration.networkCredentialsAvailable;
+        hash += configuration.nodeType;
+        for (uint8_t idx = 0; idx < configuration.networkSSID.length(); idx++)
         {
             hash += configuration.networkSSID.charAt(idx);
         }
-        for(uint8_t idx = 0 ; idx < configuration.networkPassword.length(); idx ++)
+        for (uint8_t idx = 0; idx < configuration.networkPassword.length(); idx++)
         {
             hash += configuration.networkPassword.charAt(idx);
         }
-    }catch (std::bad_any_cast ex){}
-
+    }
+    catch (std::bad_any_cast ex)
+    {
+    }
 
     /* Get devices data */
-    try{
-        std::vector<DeviceDescription> devicesVector = 
+    try
+    {
+        std::vector<DeviceDescription> devicesVector =
             std::any_cast<std::vector<DeviceDescription>>(
-                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION)
-            );
-        for(auto& device : devicesVector)
+                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+        for (auto &device : devicesVector)
         {
             hash += device.deviceId;
             hash += device.macAddress;
             hash += device.isEnabled;
-            for(uint8_t idx = 0 ; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION ; idx ++)
+            for (uint8_t idx = 0; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; idx++)
             {
                 hash += device.customBytes[idx];
             }
-            for(uint8_t idx = 0 ; idx < device.deviceName.length(); idx ++)
+            for (uint8_t idx = 0; idx < device.deviceName.length(); idx++)
             {
                 hash += device.deviceName.charAt(idx);
             }
         }
-    }catch (std::bad_any_cast ex){}
+    }
+    catch (std::bad_any_cast ex)
+    {
+    }
 
-    //Serial.println("Hash : " + String((int)hash));
+    // Serial.println("Hash : " + String((int)hash));
 
     memcpy(&runtimeNodeHash, &hash, sizeof(uint16_t));
     DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
@@ -341,29 +355,34 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 {
     NodeConfiguration currentConfig = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if(password == "admin"){
+    if (password == "admin")
+    {
         changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
-    }else if(password == currentConfig.panelPassword){ /* check is password for the user matches */
+    }
+    else if (password == currentConfig.panelPassword)
+    { /* check is password for the user matches */
         SecurityAccessLevelType userRights = e_ACCESS_LEVEL_AUTH_USER;
 
-        if(currentConfig.isDefaultUserAdmin){ /* verify if default user can have admin rights */
+        if (currentConfig.isDefaultUserAdmin)
+        { /* verify if default user can have admin rights */
             userRights = e_ACCESS_LEVEL_SERVICE_MODE;
         }
         changeSecurityAccessLevel(userRights);
-    }else {
+    }
+    else
+    {
         /* notification */
         UserInterfaceNotification notif{
             .title = "Wrong password",
             .body = "Device unlock try failed due to invalid password.",
-            .type = UserInterfaceNotification::WARNING
-        };
+            .type = UserInterfaceNotification::WARNING};
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 }
 
 void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAccessLevel)
 {
-    
+
     currentAccessLevel = newAccessLevel;
     accessLevelGrantedTimeSnapshot = millis();
     DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
@@ -372,8 +391,7 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     UserInterfaceNotification notif{
         .title = "Device lock/unlock",
         .body = "",
-        .type = UserInterfaceNotification::WARNING
-    };
+        .type = UserInterfaceNotification::WARNING};
 
     Serial.print("Access level granted: ");
     switch (currentAccessLevel)
@@ -381,7 +399,7 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     case e_ACCESS_LEVEL_NONE:
         Serial.println("e_ACCESS_LEVEL_NONE");
         break;
-    
+
     case e_ACCESS_LEVEL_AUTH_USER:
         Serial.println("e_ACCESS_LEVEL_AUTH_USER");
         notif.type = UserInterfaceNotification::INFO;
@@ -391,36 +409,40 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
 
     case e_ACCESS_LEVEL_SERVICE_MODE:
 
-
         Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
-        break;      
-    
-   
+        break;
+
     default:
         Serial.println("INVALID");
         break;
     }
 }
 
-
-void OperatingSystem::detectHwMassEraseRequest(){
+void OperatingSystem::detectHwMassEraseRequest()
+{
     static uint8_t activationTimeCounter = 0;
     static bool isMassEraseRequestActivated = false;
 
-    if(isMassEraseRequestActivated){ /* keep it first, to execute reset in the next execution to avoid reset when bootloader btn is pressed */
-        if(digitalRead(0) == 1){ /* button was released, reset can be performed */
+    if (isMassEraseRequestActivated)
+    { /* keep it first, to execute reset in the next execution to avoid reset when bootloader btn is pressed */
+        if (digitalRead(0) == 1)
+        { /* button was released, reset can be performed */
             std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
             std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
         }
     }
 
-    if(digitalRead(0) == 0){ /* Button is pressed */
+    if (digitalRead(0) == 0)
+    { /* Button is pressed */
         activationTimeCounter++;
-    }else {
+    }
+    else
+    {
         activationTimeCounter = 0; /* reset activation timer */
     }
 
-    if(activationTimeCounter > 3){ /* 5 sec to activate reset */
+    if (activationTimeCounter > 3)
+    { /* 5 sec to activate reset */
         isMassEraseRequestActivated = true;
         Serial.println("OS://HW MASS ERASE ACTIVATED.");
     }

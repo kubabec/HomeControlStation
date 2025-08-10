@@ -250,7 +250,7 @@ bool ConfigProvider::setConfigViaString(String& configString)
         if(success == DeserializationError::Code::Ok){
             String oldWiFiSSID = String(configRamMirror.networkSSID); /* IP detection workaround need */
 
-            String isHttpServerActive       = String(doc["httpActive"]);
+            String isHttpServerActive       = String("yes" /*doc["httpActive"]*/);
             String isRcServerActive         = String(doc["rcServerActive"]);
             String hasUserAdminRights       = String(doc["usrAdmin"]);
             String nodeType                 = String(doc["type"]);

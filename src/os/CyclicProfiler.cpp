@@ -27,25 +27,26 @@ void CyclicProfiler::setLastIterations(int it) {
     unsigned long now = millis();
     if (nextReport == 0) nextReport = now + ms;
 
-    if (now >= nextReport) {
-      Serial.println(F("------ Statystyki aplikacji cyclic() ------"));
-      for (auto& kv : stats) {
-        auto& name = kv.first;
-        auto& s    = kv.second;
-        if (s.count == 0) continue;
+    /* Profiler logging disabled */
+    // if (now >= nextReport) {
+    //   Serial.println(F("------ Statystyki aplikacji cyclic() ------"));
+    //   for (auto& kv : stats) {
+    //     auto& name = kv.first;
+    //     auto& s    = kv.second;
+    //     if (s.count == 0) continue;
 
-        float avg  = s.totalTime / (float)s.count;
-        float load = s.totalTime / (float)(ms * 1000UL) * 100.0f;
+    //     float avg  = s.totalTime / (float)s.count;
+    //     float load = s.totalTime / (float)(ms * 1000UL) * 100.0f;
 
-        Serial.printf(" %s(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
-                      name.c_str(), (double)avg, s.maxTime, s.backlog, (double)load);
+    //     Serial.printf(" %s(): avg = %.1f µs, max = %lu µs, backlog = %lu, load = %.2f %%\n",
+    //                   name.c_str(), (double)avg, s.maxTime, s.backlog, (double)load);
 
-        // wyzeruj na kolejny okres
-        s = Stat{};
-      }
-      Serial.println(F("--------------------------------------------"));
+    //     // wyzeruj na kolejny okres
+    //     s = Stat{};
+    //   }
+    //   Serial.println(F("--------------------------------------------"));
 
-      nextReport += ms;
-    }
+    //   nextReport += ms;
+    // }
   }
 

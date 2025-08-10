@@ -44,7 +44,7 @@ function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
 }\
 let isNotificationPollingActive = 1;\
     function applySettings() {\
-        var isHTTPServer = document.querySelector('select[name=\"isHTTPServer\"]').value;\
+        var isHTTPServer = 'yes';\
         var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;\
         var isUserAdmin = document.querySelector('select[name=\"isUserAsAdmin\"]').value;\
         var nodeType = document.querySelector('select[name=\"nodetype\"]').value;\

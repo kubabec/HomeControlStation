@@ -69,7 +69,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 500){
+            if(millis() - lastSendTime > 1000){
                 Serial.println("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
