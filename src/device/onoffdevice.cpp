@@ -44,8 +44,10 @@ void OnOffDevice::on() {
 
     isOn = true;
     if(brightnessLevelSupport) {
-        brightnessLevel = brightnessLevelTarget;
-        analogWrite(pinNumber, mapBrightness(brightnessLevel));
+        brightnessLevelTarget = brightnessLevelBackupWhenOff; // Restore brightness level
+        brightnessLevel = 0 ; // = brightnessLevelTarget;
+        timePrevious1 = millis();
+        // analogWrite(pinNumber, mapBrightness(brightnessLevel));
     } else {
         digitalWrite(pinNumber, (activeLow ? LOW : HIGH));
     }   
@@ -61,8 +63,11 @@ void OnOffDevice::off() {
 
     isOn = false;
     if(brightnessLevelSupport) {
-        //brightnessLevelTarget = brightnessLevel; // Zapisujemy aktualną jasność
-        analogWrite(pinNumber, activeLow ? 255 : 0);
+        brightnessLevelBackupWhenOff = brightnessLevel; // Save current brightness level
+        brightnessLevelTarget = 0; // Zapisujemy aktualną jasność
+        Serial.println("brightnessLevelBackupWhenOff: " + String(brightnessLevelBackupWhenOff));
+        Serial.println("Triggering brightness change to 0");
+        // analogWrite(pinNumber, activeLow ? 255 : 0);
     } else {
         digitalWrite(pinNumber, activeLow ? HIGH : LOW);
     }
@@ -87,7 +92,7 @@ int OnOffDevice::getBrightnessStepDuration() {
 void OnOffDevice::brightnessChangeHandler() {
     
     if(brightnessLevel != brightnessLevelTarget) {        
-        if ((millis() - timePrevious1) >= brightnessStepDurationMS) {
+        if ((millis() - timePrevious1) >= 10 /*brightnessStepDurationMS*/) {
             //Serial.print("Zmiana jasności : ");
             if(brightnessLevel < brightnessLevelTarget) {
                 brightnessLevel ++;                
@@ -96,7 +101,7 @@ void OnOffDevice::brightnessChangeHandler() {
                 brightnessLevel --;
             }
 
-            if(isOn && brightnessLevelSupport) {
+            if(brightnessLevelSupport) {
                 analogWrite(pinNumber, mapBrightness(brightnessLevel));             
          
             }
@@ -122,8 +127,11 @@ void OnOffDevice::timerHandler() {
 void OnOffDevice::changeBrightness(int requestedBrightness) {
     Serial.println("Requested: " + String(requestedBrightness));
     brightnessLevelTarget = requestedBrightness;
+    brightnessLevelBackupWhenOff = requestedBrightness; // Save current brightness level
     float brightnessDelta = abs(brightnessLevelTarget - brightnessLevel);
     brightnessStepDurationMS = brightnessChangeTime / brightnessDelta;    
+
+    isOn = true; // Ensure device is ON when changing brightness
     timePrevious1 = millis();
 }
 
@@ -131,6 +139,10 @@ void OnOffDevice::changeBrightness(int requestedBrightness) {
 void OnOffDevice::init() {
     pinMode(pinNumber,OUTPUT);
     off();
+
+    if(brightnessLevelSupport) {
+        analogWrite(pinNumber, mapBrightness(brightnessLevel));             
+    }
 
 
     controls.switchAnimationTime = 200 + deviceId;
@@ -259,7 +271,7 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
     memset(desc.customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     desc.customBytes[0] = brightnessLevelSupport;
     desc.customBytes[1] = activeLow ? 0 : 1;
-    desc.customBytes[2] = brightnessLevelTarget;
+    desc.customBytes[2] = brightnessLevelBackupWhenOff;
     
     
 
@@ -268,12 +280,17 @@ DeviceDescription OnOffDevice::getDeviceDescription(){
 
 
 int OnOffDevice::mapBrightness(int brightness) {
+    // if(brightness < 95){
+    //     // Need to map that 0-99 percent must be PWM in range between 0-60%
+    //     brightness = (brightness * 70) / 100; // Map to 0-60%
+    // }
+
     if(activeLow) {
-        // Dla urządzeń aktywowanych LOW (0V = włączone)
-        return maxPwmValue - (brightness * (maxPwmValue - minPwmValue)) / 100;
+        // For devices activated by LOW (0V = ON)
+        return maxPwmValue - ((brightness * (maxPwmValue - minPwmValue)) / 100);
     } else {
-        // Dla urządzeń aktywowanych HIGH (3.3V/5V = włączone)
-        return (brightness * (maxPwmValue - minPwmValue)) / 100;
+        // For devices activated by HIGH (3.3V/5V = ON)
+        return minPwmValue + ((brightness * (maxPwmValue - minPwmValue)) / 100);
     }
 }
 

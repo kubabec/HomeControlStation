@@ -129,7 +129,7 @@ input[type=\"range\"] {\
 -webkit-appearance: none;\
 width: 100%;\
 height: 3px;\
-margin-top:15px;\
+margin-top:20px;\
 border-radius: 25px;\
 background: #5A8DEE;\
 outline: none;\

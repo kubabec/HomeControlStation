@@ -17,8 +17,9 @@ private:
     uint8_t roomId;
     bool activeLow = true; // Urządzenia aktywowane przy stanie LOW lub HIGH
     bool brightnessLevelSupport = true; //czy obslugiwana jest zmiana jasnosci
-    int brightnessLevel = 30;
-    int brightnessLevelTarget = 30;
+    int brightnessLevel = 0;
+    int brightnessLevelTarget = 0;
+    int brightnessLevelBackupWhenOff = 0;
     const int brightnessChangeTime = 3000;
     int lightDurationTimerMS = 8000;
 
