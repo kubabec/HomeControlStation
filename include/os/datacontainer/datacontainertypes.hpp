@@ -158,4 +158,23 @@ struct ServiceInformation{
     float coreTemperature = 0.0f;
 };
 
+namespace DigitalButton{
+    enum AffectedType {
+        ROOM = 11,
+        DEVICE
+    };
+
+    enum ActionType {
+        ON = 21,
+        OFF,
+        TOGGLE
+    };
+
+    struct ButtonEvent{
+        AffectedType affectedType;
+        uint32_t affectedId;
+        ActionType actionType;
+    };
+}
+
 #endif 

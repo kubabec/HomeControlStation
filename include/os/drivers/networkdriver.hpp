@@ -9,7 +9,8 @@
 enum PacketRangeDefinition {
     SERVICE_RANGE_BEGIN = 0,
     RCS_RANGE_BEGIN = 50,
-    USR_DATA_RANGE_BEGIN = 100
+    DIGITAL_BUTTON_RANGE = 100,
+    USR_DATA_RANGE_BEGIN = 150
 };
 
 static const MessageUDP::IPAddr NETWORK_BROADCAST{192, 168, 1, 255};
