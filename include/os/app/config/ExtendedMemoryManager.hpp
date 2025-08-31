@@ -5,7 +5,7 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <vector>
 
-#define MAX_EXT_MEMORY_SIZE_TOTAL 2500 /* bytes */
+#define MAX_EXT_MEMORY_SIZE_TOTAL 2000 /* bytes */
 #define SLOTS_FOR_EXT_MEMORY_BUFFERS 10 /* number of slots for independent data pointers */
 
 typedef struct{

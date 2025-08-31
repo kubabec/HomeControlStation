@@ -2,19 +2,20 @@
 
 #include <os/app/config/PersistentMemoryAccess.hpp>
 #include <ArduinoJson.h>
+#include "os/datacontainer/datacontainertypes.hpp"
 #include <Regexp.h>
 
 
 
 ConfigData ConfigProvider::configRamMirror = {255, 0, 0, 1, 255, "\0", "\0", "\0"};
-PersistentDataBlock ConfigProvider::dataBlocksRamMirror[NUMBER_OF_PERSISTENT_DATABLOCKS] = {'\0'};
+PersistentDataBlock ConfigProvider::dataBlocksRamMirror[PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
 
 void ConfigProvider::init()
 {
     Serial.println("ConfigProvider init ...");
-    totalNvmSize = configRamMirror.getSize() + NUMBER_OF_PERSISTENT_DATABLOCKS * PersistentDataBlock::getSize();
+    totalNvmSize = configRamMirror.getSize() + PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize();
 
     PersistentMemoryAccess::init(totalNvmSize);
 
@@ -320,7 +321,7 @@ bool ConfigProvider::saveRamMirrorToNvm()
         memcpy(
             mergedBuffer + configRamMirror.getSize(),
             dataBlocksRamMirror->data,
-            NUMBER_OF_PERSISTENT_DATABLOCKS * PersistentDataBlock::getSize()
+            PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize()
         );
 
         /* Try to save entire mergedBuffer into persistent memory */
@@ -367,7 +368,7 @@ bool ConfigProvider::readRamMirrorFromNvm()
             memcpy(
                 dataBlocksRamMirror->data,
                 mergedBuffer + configRamMirror.getSize(),
-                NUMBER_OF_PERSISTENT_DATABLOCKS * PersistentDataBlock::getSize()
+                PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize()
             );
 
             updateNodeConfigurationSignal();

@@ -21,9 +21,9 @@ struct RCTranslation {
     }
 };
 
-struct ExternalNodeMapping{
-    uint8_t isUsed = 0;
+struct __attribute__((packed)) ExternalNodeMapping{
     uint64_t mac;
+    uint8_t isUsed = 0;
 };
 
 class RemoteDevicesManager 

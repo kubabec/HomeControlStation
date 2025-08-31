@@ -16,7 +16,7 @@ void PersistentMemoryAccess::init(uint16_t eepromSize)
         eepromSize +
         sizeof(int);
 
-    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 2500);
+    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 2000);
     if(eepromInitializedSuccessfully){
         standardDataEepromSize = finalSize;
     }
@@ -128,7 +128,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
-    uint16_t eepromSize2 = standardDataEepromSize + 2500;
+    uint16_t eepromSize2 = standardDataEepromSize + 2200;
     Serial.println("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
     for(uint16_t i = 0; i < eepromSize2; i ++){
         EEPROM.write(i, 0);

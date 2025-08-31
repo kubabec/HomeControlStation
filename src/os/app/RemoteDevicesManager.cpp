@@ -11,9 +11,45 @@ uint8_t RemoteDevicesManager::awaitingResponseId = 255;
 ServiceParameters_set3 localCopyOfLastActiveRequestParamSet3;
 ServiceOverloadingFunction localCopyOfLastOverloading = serviceCall_INVALID;
 
+const uint8_t NVM_VALID_FLAG = 0xC4;
+
 void RemoteDevicesManager::init()
 {
     Serial.println("RemoteDevicesManager init ...");
+
+    /* Read NVM data for HttpServer application */
+    uint16_t sizeOfNvm = (e_BLOCK_RDM_5 - e_BLOCK_RDM_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
+    /* Allocate memory for NVM data */
+    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+    uint8_t offset = 0;
+    for (uint8_t blockID = e_BLOCK_RDM_1; blockID <= e_BLOCK_RDM_5; blockID++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+    // check if FIRST byte of NVM contains validity flag
+    if (nvmData[0] == NVM_VALID_FLAG)
+    {
+        size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
+        if (sizeOfNvm < arr_bytes)
+        {
+            Serial.println("RemoteDevicesManager:// NVM restoration error, invalid size");
+        }
+        else
+        {
+            memcpy(mappingSlotsForExternalNodes.data(), &(nvmData[1]), arr_bytes);
+            Serial.println("RemoteDevicesManager:// NVM restored succesfully");
+        }
+    }
+
+    free(nvmData);
 
     DataContainer::subscribe(SIG_RC_DEVICES_INTERNAL_TUNNEL, RemoteDevicesManager::tunnelDataUpdate);
 
@@ -162,6 +198,37 @@ RCTranslation RemoteDevicesManager::getTranslationFromUnique(uint8_t uniqueId)
 
 void RemoteDevicesManager::deinit()
 {
+    // We only have NVM data if we handshaked at least 1 slave node
+    /* Write NVM data for RemoteDevicesManager application */
+    uint16_t sizeOfNvm = (e_BLOCK_RDM_5 - e_BLOCK_RDM_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
+    /* Allocate memory for NVM data */
+    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+
+    // Data validity indicator
+    nvmData[0] = NVM_VALID_FLAG;
+    // Serialize the array
+    size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
+    // Serial.println("arr_bytes: " + String((int)arr_bytes));
+    memcpy(&(nvmData[1]), mappingSlotsForExternalNodes.data(), arr_bytes);
+
+    uint8_t offset = 0;
+
+    for (uint8_t blockID = e_BLOCK_RDM_1; blockID <= e_BLOCK_RDM_5; blockID++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK))(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+    // Serial.println("RemoteDevicesManager:// Data serialized.");
+
+    /* release heap buffer */
+    free(nvmData);
 }
 
 void RemoteDevicesManager::cyclic()

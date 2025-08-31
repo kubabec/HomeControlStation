@@ -6,7 +6,6 @@
 
 #define SSID_LENGTH 30
 #define PASSWORD_LENGTH 30
-#define NUMBER_OF_PERSISTENT_DATABLOCKS 15
 typedef struct
 {
     uint8_t safeShutdownFlag = 255;
@@ -101,7 +100,7 @@ class ConfigProvider
 {
 
     static ConfigData configRamMirror;
-    static PersistentDataBlock dataBlocksRamMirror[e_NUMBER_OF_PERSISTENT_BLOCKS];
+    static PersistentDataBlock dataBlocksRamMirror[PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS];
     static uint16_t totalNvmSize;
 
     static bool nvmDataAvailable;

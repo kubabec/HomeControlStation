@@ -1081,7 +1081,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   // client.println(String((int)extMemoryFunctions.getCurrentMemoryUsage()) + " / 2 500 bytes");
   // client.println("\" type=\"text\" \"></label>");
 
-  int memoryUsagePercent = (int)((float)extMemoryFunctions.getCurrentMemoryUsage() / 2500.f * 100.f);
+  int memoryUsagePercent = (int)((float)extMemoryFunctions.getCurrentMemoryUsage() / 2000.f * 100.f);
 
   client.println("<label>Memory usage: <div class=\"memory-bar\" id=\"memoryBar\">");
   client.println("<div class=\"memory-bar-fill\" id=\"memoryBarFill\"></div>");
