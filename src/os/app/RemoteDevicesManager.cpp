@@ -17,7 +17,7 @@ void RemoteDevicesManager::init()
 {
     Serial.println("RemoteDevicesManager init ...");
 
-    /* Read NVM data for HttpServer application */
+    /* Read NVM data for RemoteDevicesManager application */
     uint16_t sizeOfNvm = (e_BLOCK_RDM_5 - e_BLOCK_RDM_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
     /* Allocate memory for NVM data */
     uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);

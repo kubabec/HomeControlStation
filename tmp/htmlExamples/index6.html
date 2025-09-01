@@ -1,118 +1,298 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Strip Without Borders</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .led-strip-container {
-            width: 189px;
-            background-color: #ddeff7;
-            border: 1px solid #b0c8d8;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .led-strip-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2b3a47;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .led-strip {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .led {
-            height: 15px;
-            border-radius: 1px; /* Zaokrąglenie narożników */
-            margin: 0;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edytowalna tabela — zależne SELECTy i eksport JSON</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px auto;padding:0 16px}
+    table{width:100%;border-collapse:collapse;margin-bottom:12px}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:middle}
+    th{background:#f5f5f5}
+    input[type=text],select{width:100%;box-sizing:border-box;padding:6px}
+    button{padding:8px 12px;margin:6px 4px;border-radius:6px;border:1px solid #bbb;background:#fff;cursor:pointer}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    pre{background:#111;color:#e6e6e6;padding:12px;border-radius:6px;overflow:auto}
+    .small{font-size:0.9rem;color:#555}
+    .remove{background:#ffecec;border-color:#ffb3b3}
+    caption{font-weight:600;padding-bottom:8px}
+  </style>
 </head>
-
 <body>
-    <!-- Widget 1: 10 LEDs -->
-    <div class="led-strip-container">
-        <div class="led-strip-header">LED Strip - 10 LEDs</div>
-        <div id="ledStrip1" class="led-strip"></div>
-    </div>
+  <h1>Edytowalna tabela — zależne SELECTy i eksport JSON</h1>
+  <p class="small">Uzupełnij pola, dodaj nowe rekordy przyciskiem <strong>Dodaj rekord</strong>, a następnie naciśnij <strong>Wyślij</strong> by otrzymać strukturę JSON (z polem <code>elements</code> zależnym od <code>type</code>).</p>
 
-    <!-- Widget 2: 50 LEDs -->
-    <div class="led-strip-container">
-        <div class="led-strip-header">LED Strip - 50 LEDs</div>
-        <div id="ledStrip2" class="led-strip"></div>
-    </div>
+  <table id="data-table" aria-describedby="table-desc">
+    <caption id="table-desc" style="text-align:left;padding:8px 0">Tabela zawierająca rekordy (kolumny: ID, Type, Elements, Action)</caption>
+    <thead>
+      <tr>
+        <th style="width:40%">ID (tekst)</th>
+        <th style="width:18%">Type</th>
+        <th style="width:22%">Elements</th>
+        <th style="width:18%">Action</th>
+        <th style="width:80px">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Przykładowe wiersze załadowane wraz z treścią strony -->
+      <tr>
+        <td><input type="text" class="cell-id" value="r1" /></td>
+        <td>
+          <select class="cell-type">
+            <option value="Room" selected>Room</option>
+            <option value="Device">Device</option>
+            <option value="User">User</option>
+          </select>
+        </td>
+        <td>
+          <select class="cell-elements">
+            <!-- wypełnione w skrypcie przy inicjalizacji -->
+          </select>
+        </td>
+        <td>
+          <select class="cell-action">
+            <option value="on">On</option>
+            <option value="off" selected>Off</option>
+            <option value="toggle">Toggle</option>
+          </select>
+        </td>
+        <td><button type="button" class="remove" title="Usuń wiersz">Usuń</button></td>
+      </tr>
 
-    <!-- Widget 3: 100 LEDs -->
-    <div class="led-strip-container">
-        <div class="led-strip-header">LED Strip - 100 LEDs</div>
-        <div id="ledStrip3" class="led-strip"></div>
-    </div>
+      <tr>
+        <td><input type="text" class="cell-id" value="d1" /></td>
+        <td>
+          <select class="cell-type">
+            <option value="Room">Room</option>
+            <option value="Device" selected>Device</option>
+            <option value="User">User</option>
+          </select>
+        </td>
+        <td>
+          <select class="cell-elements">
+            <!-- wypełnione w skrypcie przy inicjalizacji -->
+          </select>
+        </td>
+        <td>
+          <select class="cell-action">
+            <option value="on" selected>On</option>
+            <option value="off">Off</option>
+            <option value="toggle">Toggle</option>
+          </select>
+        </td>
+        <td><button type="button" class="remove" title="Usuń wiersz">Usuń</button></td>
+      </tr>
+    </tbody>
+  </table>
 
-    <script>
-        const ledContainerWidth = 189; // Szerokość kontenera LED (stała)
+  <div class="controls">
+    <button id="add-row">Dodaj rekord</button>
+    <button id="submit-btn">Wyślij (pobierz JSON)</button>
+    <button id="download-btn" style="display:none">Pobierz JSON</button>
+    <span class="small">(usuń wiersze przyciskiem <em>Usuń</em>)</span>
+  </div>
 
-        // Funkcja obliczająca szerokość diod i ich ustawienie
-        function createLedStrip(containerId, count, colors) {
-            const ledStripElement = document.getElementById(containerId);
-            ledStripElement.innerHTML = '';
+  <h2>Wygenerowany JSON</h2>
+  <pre id="json-output">[]</pre>
 
-            // Oblicz szerokość pojedynczej diody
-            const baseWidth = Math.floor(ledContainerWidth / count);
-            const remainingPixels = ledContainerWidth % count;
+  <!-- Szablon wiersza do klonowania -->
+  <template id="row-template">
+    <tr>
+      <td><input type="text" class="cell-id" value="" /></td>
+      <td>
+        <select class="cell-type">
+          <option value="Room">Room</option>
+          <option value="Device">Device</option>
+          <option value="User">User</option>
+        </select>
+      </td>
+      <td>
+        <select class="cell-elements"></select>
+      </td>
+      <td>
+        <select class="cell-action">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+          <option value="toggle">Toggle</option>
+        </select>
+      </td>
+      <td><button type="button" class="remove" title="Usuń wiersz">Usuń</button></td>
+    </tr>
+  </template>
 
-            for (let i = 0; i < count; i++) {
-                const led = document.createElement("div");
-                led.className = "led";
+  <script>
+  (function(){
+    const table = document.getElementById('data-table');
+    const tbody = table.querySelector('tbody');
+    const addBtn = document.getElementById('add-row');
+    const submitBtn = document.getElementById('submit-btn');
+    const jsonOut = document.getElementById('json-output');
+    const template = document.getElementById('row-template');
+    const downloadBtn = document.getElementById('download-btn');
 
-                // Krańcowe diody z dopasowaną szerokością
-                if (i === 0 || i === count - 1) {
-                    led.style.width = `${baseWidth + (remainingPixels > 0 ? 1 : 0)}px`;
-                } else {
-                    led.style.width = `${baseWidth}px`;
-                }
+    // Mapowanie dostępnych opcji dla pola Elements w zależności od Type
+    const elementsByType = {
+      "Room": [
+        { value: "living_room", label: "Living Room" },
+        { value: "kitchen", label: "Kitchen" },
+        { value: "bedroom", label: "Bedroom" },
+        { value: "bathroom", label: "Bathroom" }
+      ],
+      "Device": [
+        { value: "tv", label: "TV" },
+        { value: "speaker", label: "Speaker" },
+        { value: "router", label: "Router" },
+        { value: "light", label: "Light" }
+      ],
+      "User": [
+        { value: "admin", label: "Admin" },
+        { value: "guest", label: "Guest" },
+        { value: "service", label: "Service" }
+      ]
+    };
 
-                // Ustaw kolor diody
-                led.style.backgroundColor = colors[i] || "#ddd";
-
-                ledStripElement.appendChild(led);
-            }
+    // Funkcja do ustawienia opcji <select class="cell-elements"> bazując na typie
+    function populateElementsSelect(selectEl, type, selectedValue){
+      // Wyczyść istniejące opcje
+      selectEl.innerHTML = "";
+      const list = elementsByType[type] || [];
+      // Jeśli lista pusta, dodaj opcję pustą
+      if(list.length === 0){
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "(brak elementów)";
+        selectEl.appendChild(opt);
+        return;
+      }
+      list.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.value;
+        opt.textContent = item.label;
+        if(selectedValue !== undefined && String(selectedValue) === String(item.value)){
+          opt.selected = true;
         }
+        selectEl.appendChild(opt);
+      });
+      // Jeśli nie zaznaczono nic a są opcje, ustaw pierwszą jako selected
+      if(!selectEl.value && selectEl.options.length > 0){
+        selectEl.selectedIndex = 0;
+      }
+    }
 
-        // Przykładowe zestawy kolorów
-        const colors10 = Array(30).fill("#50F0A0");
-        const colors50 = Array(50).fill("#00FF00");
-        colors50[0] = "#FF0000"; // Pierwsza dioda czerwona
-        colors50[49] = "#0000FF"; // Ostatnia dioda niebieska
+    // Dodaje nowy wiersz (klonuje template). Można przekazać values = {id,type,elements,action}
+    function addRow(values){
+      const clone = template.content.firstElementChild.cloneNode(true);
+      const idEl = clone.querySelector('.cell-id');
+      const typeEl = clone.querySelector('.cell-type');
+      const elementsEl = clone.querySelector('.cell-elements');
+      const actionEl = clone.querySelector('.cell-action');
 
-        const colors100 = Array(63).fill("#FFA500"); // Wszystkie diody pomarańczowe
+      if(values){
+        if(values.id !== undefined) idEl.value = values.id;
+        if(values.type !== undefined) typeEl.value = values.type;
+        // populateElementsSelect ustawi selected na podstawie values.elements
+        populateElementsSelect(elementsEl, values.type || typeEl.value, values.elements);
+        if(values.action !== undefined) actionEl.value = values.action;
+      } else {
+        // domyślna inicjalizacja selectów
+        populateElementsSelect(elementsEl, typeEl.value);
+      }
 
-        // Tworzenie pasków LED
-        createLedStrip("ledStrip1", 30, colors10);
-        createLedStrip("ledStrip2", 50, colors50);
-        createLedStrip("ledStrip3", 63, colors100);
-    </script>
+      tbody.appendChild(clone);
+    }
+
+    // Delegacja klikania dla przycisku Usuń
+    tbody.addEventListener('click', function(e){
+      if(e.target && e.target.classList.contains('remove')){
+        const tr = e.target.closest('tr');
+        if(tr) tr.remove();
+      }
+    });
+
+    // Jeśli zmieni się Type w dowolnym wierszu, zaktualizuj odpowiadający Elements
+    tbody.addEventListener('change', function(e){
+      const target = e.target;
+      if(target && target.classList.contains('cell-type')){
+        const tr = target.closest('tr');
+        if(!tr) return;
+        const elementsSelect = tr.querySelector('.cell-elements');
+        // zachowaj aktualną wartość elements jeśli pasuje do nowej listy; jeśli nie, ustaw pierwszy
+        const currentValue = elementsSelect ? elementsSelect.value : undefined;
+        populateElementsSelect(elementsSelect, target.value, currentValue);
+      }
+    });
+
+    // Dodawanie nowego wiersza po kliknięciu
+    addBtn.addEventListener('click', function(){
+      addRow(); // pusty wiersz
+    });
+
+    // Zbiera wszystkie wiersze i tworzy tablicę obiektów
+    function collectRows(){
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const result = rows.map(tr => {
+        const idEl = tr.querySelector('.cell-id');
+        const typeEl = tr.querySelector('.cell-type');
+        const elementsEl = tr.querySelector('.cell-elements');
+        const actionEl = tr.querySelector('.cell-action');
+        return {
+          id: idEl ? String(idEl.value) : '',
+          type: typeEl ? String(typeEl.value) : '',
+          elements: elementsEl ? String(elementsEl.value) : '',
+          action: actionEl ? String(actionEl.value) : ''
+        };
+      });
+      return result;
+    }
+
+    // Aktualizuje widoczny <pre> oraz przygotowuje przycisk pobierania
+    function updateOutput(array){
+      const json = JSON.stringify(array, null, 2);
+      jsonOut.textContent = json;
+
+      // Tworzymy Blob do pobrania
+      const blob = new Blob([json], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      downloadBtn.style.display = array.length ? 'inline-block' : 'none';
+      downloadBtn.onclick = function(){
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tabela.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=> URL.revokeObjectURL(url), 1000);
+      };
+    }
+
+    // Obsługa submit (gromadzi dane i pokazuje JSON)
+    submitBtn.addEventListener('click', function(){
+      const data = collectRows();
+      updateOutput(data);
+      console.log('Wyeksportowane dane:', data);
+      // tutaj można dodać wysyłkę AJAX/Fetch do serwera jeśli potrzeba
+    });
+
+    // Inicjalizacja: uzupełnij pola Elements w istniejących wierszach po załadowaniu
+    (function initExisting(){
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.forEach(tr => {
+        const typeEl = tr.querySelector('.cell-type');
+        const elementsEl = tr.querySelector('.cell-elements');
+        // spróbuj odczytać wartość z istniejącego elements (jeśli podano w HTML) - ale w naszym HTML selecty byly puste
+        const existingElementsValue = elementsEl ? elementsEl.getAttribute('data-value') : undefined;
+        populateElementsSelect(elementsEl, typeEl ? typeEl.value : '', existingElementsValue);
+      });
+    })();
+
+    // Opcjonalnie: zapobiegamy wysyłaniu formularza przy Enter w polach tekstowych (nie zamykamy modułu)
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && e.target && (e.target.tagName === 'INPUT')){
+        // e.preventDefault(); // odkomentuj jeśli chcesz zablokować Enter
+      }
+    });
+
+  })();
+  </script>
 </body>
-
 </html>

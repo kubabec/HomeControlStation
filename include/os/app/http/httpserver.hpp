@@ -79,6 +79,7 @@ public:
     static void constantHandler_asyncTest(WiFiClient& client);
     static void constantHandler_asyncGetPageContent(String& request, WiFiClient& client);
     static void constantHandler_asyncGetNotifications(String& request, WiFiClient& client);
+    static void constantHandler_digitalButtons(WiFiClient& client);
     static void pending(WiFiClient& client);
 
     static void parameterizedHandler_newConfigApply(String& request, WiFiClient& client);
@@ -100,6 +101,7 @@ public:
     static void parameterizedHandler_segmentStateSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_ledsLiveSwitch(String& request, WiFiClient& client);
     static void parameterizedHandler_getHash(String& request, WiFiClient& client);
+    static void parameterizedHandler_newDigBtnTab(String& request, WiFiClient& client);
     
 };
 

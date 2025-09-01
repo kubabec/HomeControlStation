@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 43
+#define NUMBER_OF_SIGNALS 45
 enum Signal
 {
     /* Type: bool , somme description */
@@ -94,6 +94,10 @@ enum Signal
 
     SIG_STARTUP_TIME,
 
-    CBK_FIRE_DIGITAL_BUTTON
+    CBK_FIRE_DIGITAL_BUTTON,
+
+    SIG_DIGITAL_BTN_MAPPING,
+
+    CBK_UPDATE_DIG_BTN_TABLE
 };
 #endif

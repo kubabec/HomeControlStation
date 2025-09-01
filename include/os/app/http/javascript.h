@@ -67,30 +67,6 @@ let isNotificationPollingActive = 1;\
         var url = '/newCfgApply&' + jsonString;\
         window.location.href = url;\
     }\
-    function goToDevicesManagement() {\
-        var url = `/localDevices`;\
-        window.location.href = url;\
-    }\
-    function goToRoomSettings() {\
-        var url = `/roomAssignment`;\
-        window.location.href = url;\
-    }\
-    function goToNetIns() {\
-        var url = `/networkInspection`;\
-        window.location.href = url;\
-    }\
-    function sysPropert() {\
-        var url = `/sysDetails`;\
-        window.location.href = url;\
-    }\
-    function massErase(){\
-        var url = `/masseraseviahttp`;\
-        window.location.href = url;\
-    }\
-    function resetDevice(){\
-        var url = `/resetDevice`;\
-        window.location.href = url;\
-    }\
     function onRangeTimChanged(value) {\
         value = parseInt(value);\
         window.location.assign(\"/?tim\"+value+\"&\");\

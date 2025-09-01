@@ -41,7 +41,8 @@ std::vector<String> constantRequests = {
   "masseraseviahttp",
   "asyncRequestTest",
   "networkInspection",
-  "sysDetails"
+  "sysDetails",
+  "digBtn"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -68,7 +69,8 @@ std::vector<String> parameterizedAsyncRequests = {
   "segSwtch",
   "ledsLiveSwtch",
   "getHash",
-  "roomToggle"
+  "roomToggle",
+  "newDigBtnTab"
 };
 
 
@@ -82,6 +84,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_digitalButtons, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -108,7 +111,8 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_getHash, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE}
+  {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_newDigBtnTab, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
@@ -563,7 +567,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.0</p></footer>");
+              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.1</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            
@@ -956,6 +960,35 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   NodeConfiguration currentConfig = 
     std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
 
+  client.println("<script>function goToDevicesManagement() {\
+        var url = `/localDevices`;\
+        window.location.href = url;\
+    }\
+    function goToRoomSettings() {\
+        var url = `/roomAssignment`;\
+        window.location.href = url;\
+    }\
+    function goToNetIns() {\
+        var url = `/networkInspection`;\
+        window.location.href = url;\
+    }\
+    function sysPropert() {\
+        var url = `/sysDetails`;\
+        window.location.href = url;\
+    }\
+    function massErase(){\
+        var url = `/masseraseviahttp`;\
+        window.location.href = url;\
+    }\
+    function digitalBtn(){\
+        var url = `/digBtn`;\
+        window.location.href = url;\
+    }\
+    function resetDevice(){\
+        var url = `/resetDevice`;\
+        window.location.href = url;\
+    }</script>");
+
 
   const String yesNotSelected = "<option value=\"yes\">Yes</option>";
   const String noNotSelected = "<option value=\"no\">No</option>";
@@ -1116,6 +1149,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+    client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital buttons</div>");
   }
     
   /* Devices setup button */
