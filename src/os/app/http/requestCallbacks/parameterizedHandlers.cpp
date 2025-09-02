@@ -79,17 +79,17 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String &requ
   }
 }
 
-void HomeLightHttpServer::parameterizedHandler_newDigBtnTab(String &request, WiFiClient &client)
+void HomeLightHttpServer::parameterizedHandler_newDigEvntTab(String &request, WiFiClient &client)
 {
   SecurityAccessLevelType currentAccessLevel =
       std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
   if (currentAccessLevel == e_ACCESS_LEVEL_SERVICE_MODE)
   {
     escapeSpecialCharsInJson(request);
-    request.replace("/newDigBtnTab&", "");
+    request.replace("/newDigEvntTab&", "");
     try
     {
-      std::any_cast<std::function<void(String &)>>(DataContainer::getSignalValue(CBK_UPDATE_DIG_BTN_TABLE))(request);
+      std::any_cast<std::function<void(String &)>>(DataContainer::getSignalValue(CBK_UPDATE_DIG_EVNT_TABLE))(request);
     }
     catch (std::bad_any_cast ex)
     {

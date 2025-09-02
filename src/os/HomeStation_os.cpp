@@ -87,12 +87,12 @@ void OperatingSystem::init()
     {
         RemoteControlServer::init();
         RemoteDevicesManager::init();
-        DigitalButtonReceiver::init();
+        DigitalEventReceiver::init();
     }
     else
     {
         RemoteControlClient::init();
-        DigitalButtonTransmitter::init();
+        DigitalEventTransmitter::init();
     }
 
     DeviceProvider::init();
@@ -131,12 +131,12 @@ void OperatingSystem::task10ms()
     {
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
         CyclicProfiler::call("RemoteDevicesManager", RemoteDevicesManager::cyclic);
-        CyclicProfiler::call("DigitalButtonReceiver", DigitalButtonReceiver::cyclic);
+        CyclicProfiler::call("DigitalEventReceiver", DigitalEventReceiver::cyclic);
     }
     else
     {
         CyclicProfiler::call("RemoteControlClient", RemoteControlClient::cyclic);
-        CyclicProfiler::call("DigitalButtonTransmitter", DigitalButtonTransmitter::cyclic);
+        CyclicProfiler::call("DigitalEventTransmitter", DigitalEventTransmitter::cyclic);
     }
     CyclicProfiler::call("DeviceManager", DeviceManager::cyclic);
 }
@@ -243,12 +243,12 @@ void OperatingSystem::performReset()
     {
         RemoteDevicesManager::deinit();
         RemoteControlServer::deinit();
-        DigitalButtonReceiver::deinit();
+        DigitalEventReceiver::deinit();
     }
     else
     {
         RemoteControlClient::deinit();
-        DigitalButtonTransmitter::deinit();
+        DigitalEventTransmitter::deinit();
     }
 
     DeviceManager::deinit();

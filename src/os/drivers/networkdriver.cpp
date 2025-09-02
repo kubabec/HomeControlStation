@@ -1,7 +1,7 @@
 #include <os/drivers/NetworkDriver.hpp>
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
-#include <os/app/DigitalButton/DigitalButtonReceiver.hpp>
+#include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <esp_wifi.h>
 
 bool NetworkDriver::networkCredentialsAvailable = false;
@@ -72,7 +72,7 @@ void NetworkDriver::init()
 
     if(isRcServer){
         packetRanges.push_back(DIGITAL_BUTTON_RANGE);
-        packetReceivers.push_back(DigitalButtonReceiver::receiveUDP);
+        packetReceivers.push_back(DigitalEventReceiver::receiveUDP);
     }
 
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);

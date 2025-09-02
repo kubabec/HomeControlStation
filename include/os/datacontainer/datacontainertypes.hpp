@@ -57,13 +57,13 @@ typedef enum
     e_BLOCK_RDM_3,
     e_BLOCK_RDM_4,
     e_BLOCK_RDM_5,
-    e_BLOCK_DIGITAL_BUTTON_1,
-    e_BLOCK_DIGITAL_BUTTON_2,
-    e_BLOCK_DIGITAL_BUTTON_3,
-    e_BLOCK_DIGITAL_BUTTON_4,
-    e_BLOCK_DIGITAL_BUTTON_5,
-    e_BLOCK_DIGITAL_BUTTON_6,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DIGITAL_BUTTON_6,
+    e_BLOCK_DIGITAL_EVENT_1,
+    e_BLOCK_DIGITAL_EVENT_2,
+    e_BLOCK_DIGITAL_EVENT_3,
+    e_BLOCK_DIGITAL_EVENT_4,
+    e_BLOCK_DIGITAL_EVENT_5,
+    e_BLOCK_DIGITAL_EVENT_6,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DIGITAL_EVENT_6,
     e_NUMBER_OF_PERSISTENT_BLOCKS = (e_PERSISTENT_BLOCK_LAST + 1)
 }PersistentDatablockID;
 
@@ -169,7 +169,7 @@ struct ServiceInformation{
     float coreTemperature = 0.0f;
 };
 
-namespace DigitalButton{
+namespace DigitalEvent{
     enum AffectedType {
         ROOM = 11,
         DEVICE
@@ -181,7 +181,7 @@ namespace DigitalButton{
         TOGGLE
     };
 
-    struct __attribute__((packed)) ButtonEvent{
+    struct __attribute__((packed)) Event{
         uint8_t affectedType;
         uint32_t affectedId;
         uint8_t actionType;

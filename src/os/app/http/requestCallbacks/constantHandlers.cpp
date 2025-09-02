@@ -137,6 +137,8 @@ void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient &client)
 
 void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient &client)
 {
+  // std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(777);
+
   client.println("<div class=\"wrapper\">\
         <div class=\"header\">Room name mapping</div>");
 
@@ -324,29 +326,29 @@ void HomeLightHttpServer::constantHandler_systemDetails(WiFiClient &client)
     </script>");
 }
 
-void HomeLightHttpServer::constantHandler_digitalButtons(WiFiClient &client)
+void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
 {
 
-  std::vector<std::pair<uint64_t, DigitalButton::ButtonEvent>> digitalButtonsMapping =
-      std::any_cast<std::vector<std::pair<uint64_t, DigitalButton::ButtonEvent>>>(DataContainer::getSignalValue(SIG_DIGITAL_BTN_MAPPING));
+  std::vector<std::pair<uint64_t, DigitalEvent::Event>> digitalEventsMapping =
+      std::any_cast<std::vector<std::pair<uint64_t, DigitalEvent::Event>>>(DataContainer::getSignalValue(SIG_DIGITAL_EVNT_MAPPING));
 
   client.println("\
     <table class=\"table-graphite\" id=\"data-table\" aria-describedby=\"table-desc\">\
-    <thead><tr><th style=\"width:25%\">Button ID</th><th style=\"width:25%\">Affects</th><th style=\"width:25%\">Affected Item</th><th style=\"width:25%\">Action</th><th style=\"width:90px\">&nbsp;</th>\
+    <thead><tr><th style=\"width:25%\">Event ID</th><th style=\"width:25%\">Affects</th><th style=\"width:25%\">Affected Item</th><th style=\"width:25%\">Action</th><th style=\"width:90px\">&nbsp;</th>\
     </tr></thead><tbody>");
 
-  for (auto &mapping : digitalButtonsMapping)
+  for (auto &mapping : digitalEventsMapping)
   {
     client.println("<tr><td><input type=\"text\" class=\"cell-id\" value=\"" + String((int)mapping.first) + "\" /></td>");
 
-    if (mapping.second.affectedType == DigitalButton::AffectedType::DEVICE)
+    if (mapping.second.affectedType == DigitalEvent::AffectedType::DEVICE)
     {
       client.println("<td>\
           <select class=\"cell-type\">\
             <option value=\"" +
-                     String((int)DigitalButton::AffectedType::ROOM) + "\">Room</option>\
+                     String((int)DigitalEvent::AffectedType::ROOM) + "\">Room</option>\
             <option value=\"" +
-                     String((int)DigitalButton::AffectedType::DEVICE) + "\" selected>Device</option>\
+                     String((int)DigitalEvent::AffectedType::DEVICE) + "\" selected>Device</option>\
           </select>\
         </td>");
     }
@@ -355,38 +357,38 @@ void HomeLightHttpServer::constantHandler_digitalButtons(WiFiClient &client)
       client.println("<td>\
           <select class=\"cell-type\">\
             <option value=\"" +
-                     String((int)DigitalButton::AffectedType::ROOM) + "\" selected>Room</option>\
+                     String((int)DigitalEvent::AffectedType::ROOM) + "\" selected>Room</option>\
             <option value=\"" +
-                     String((int)DigitalButton::AffectedType::DEVICE) + "\">Device</option>\
+                     String((int)DigitalEvent::AffectedType::DEVICE) + "\">Device</option>\
           </select>\
         </td>");
     }
 
     client.println("<td><input type=\"text\" class=\"cell-target-id\" value=\"" + String((int)mapping.second.affectedId) + "\" /></td>");
 
-    if (mapping.second.actionType == DigitalButton::ActionType::TOGGLE)
+    if (mapping.second.actionType == DigitalEvent::ActionType::TOGGLE)
     {
       client.println("<td>\
           <select class=\"cell-action\">\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::TOGGLE) + "\" selected>TOGGLE</option>\
+                     String((int)DigitalEvent::ActionType::TOGGLE) + "\" selected>TOGGLE</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::ON) + "\" >ON</option>\
+                     String((int)DigitalEvent::ActionType::ON) + "\" >ON</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::OFF) + "\">OFF</option>\
+                     String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
           </select>\
         </td>");
     }
-    else if (mapping.second.actionType == DigitalButton::ActionType::ON)
+    else if (mapping.second.actionType == DigitalEvent::ActionType::ON)
     {
       client.println("<td>\
           <select class=\"cell-action\">\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::TOGGLE) + "\">TOGGLE</option>\
+                     String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::ON) + "\" selected>ON</option>\
+                     String((int)DigitalEvent::ActionType::ON) + "\" selected>ON</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::OFF) + "\">OFF</option>\
+                     String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
           </select>\
         </td>");
     }
@@ -395,11 +397,11 @@ void HomeLightHttpServer::constantHandler_digitalButtons(WiFiClient &client)
       client.println("<td>\
           <select class=\"cell-action\">\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::TOGGLE) + "\">TOGGLE</option>\
+                     String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::ON) + "\" >ON</option>\
+                     String((int)DigitalEvent::ActionType::ON) + "\" >ON</option>\
             <option value=\"" +
-                     String((int)DigitalButton::ActionType::OFF) + "\" selected>OFF</option>\
+                     String((int)DigitalEvent::ActionType::OFF) + "\" selected>OFF</option>\
           </select>\
         </td>");
     }
@@ -423,20 +425,20 @@ void HomeLightHttpServer::constantHandler_digitalButtons(WiFiClient &client)
       <td>\
         <select class=\"cell-type\">\
           <option value=\"" +
-                 String((int)DigitalButton::AffectedType::ROOM) + "\">Room</option>\
+                 String((int)DigitalEvent::AffectedType::ROOM) + "\">Room</option>\
           <option value=\"" +
-                 String((int)DigitalButton::AffectedType::DEVICE) + "\">Device</option>\
+                 String((int)DigitalEvent::AffectedType::DEVICE) + "\">Device</option>\
         </select>\
       </td>\
       <td><input type=\"text\" class=\"cell-target-id\" value=\"0\" /></td>\
       <td>\
         <select class=\"cell-action\">\
           <option value=\"" +
-                 String((int)DigitalButton::ActionType::TOGGLE) + "\">TOGGLE</option>\
+                 String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
           <option value=\"" +
-                 String((int)DigitalButton::ActionType::ON) + "\">ON</option>\
+                 String((int)DigitalEvent::ActionType::ON) + "\">ON</option>\
           <option value=\"" +
-                 String((int)DigitalButton::ActionType::OFF) + "\">OFF</option>\
+                 String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
         </select>\
       </td>\
       <td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>\
@@ -561,7 +563,7 @@ void HomeLightHttpServer::constantHandler_digitalButtons(WiFiClient &client)
     const data = collectRows();
     console.log('Wyeksportowane dane:', data);
     if(jsonOut) jsonOut.textContent = JSON.stringify(data, null, 2);
-    var url = '/newDigBtnTab&' + JSON.stringify(data);
+    var url = '/newDigEvntTab&' + JSON.stringify(data);
 
     const xhr = new XMLHttpRequest();
         xhr.timeout = 10000;

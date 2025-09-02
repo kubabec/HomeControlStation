@@ -16,8 +16,8 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DeviceProvider.hpp>
 #include <os/app/NotificationHandler.hpp>
-#include <os/app/DigitalButton/DigitalButtonReceiver.hpp>
-#include <os/app/DigitalButton/DigitalButtonTransmitter.hpp>
+#include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+#include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/timeMaster.hpp>
 

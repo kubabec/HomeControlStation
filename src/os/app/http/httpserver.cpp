@@ -70,7 +70,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "ledsLiveSwtch",
   "getHash",
   "roomToggle",
-  "newDigBtnTab"
+  "newDigEvntTab"
 };
 
 
@@ -84,7 +84,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_digitalButtons, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -112,7 +112,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_getHash, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_newDigBtnTab, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::parameterizedHandler_newDigEvntTab, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
@@ -1149,7 +1149,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
-    client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital buttons</div>");
+    client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital Events</div>");
   }
     
   /* Devices setup button */

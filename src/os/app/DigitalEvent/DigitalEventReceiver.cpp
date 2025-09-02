@@ -1,0 +1,319 @@
+#include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+
+std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
+std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
+
+const uint8_t NVM_VALID = 0xCD;
+
+void DigitalEventReceiver::init()
+{
+    Serial.println("DigitalEventReceiver init ...");
+
+    /* Read NVM data for DigitalEventReceiver application */
+    uint16_t sizeOfNvm = (e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
+    /* Allocate memory for NVM data */
+    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+    uint8_t offset = 0;
+    for (uint8_t blockID = e_BLOCK_DIGITAL_EVENT_1; blockID <= e_BLOCK_DIGITAL_EVENT_6; blockID++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+    // check if FIRST byte of NVM contains validity flag
+    if (nvmData[0] == NVM_VALID)
+    {
+        uint8_t numberOfElementsInNvm = nvmData[1];
+
+        // Are there any Event events saved in nvm?
+        if (numberOfElementsInNvm > 0)
+        {
+            for (uint8_t i = 0; i < numberOfElementsInNvm; i++)
+            {
+                uint64_t EventUniqueId = 0x00;
+                DigitalEvent::Event event;
+
+                // Copy corresponding EventUniqueId
+                memcpy(&EventUniqueId, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event)))]), sizeof(uint64_t));
+
+                // Copy corresponding Event event
+                memcpy(&event, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event))) + sizeof(EventUniqueId)]), sizeof(event));
+
+                digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
+            }
+
+            Serial.println("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
+        }
+    }
+
+    free(nvmData);
+
+    DataContainer::setSignalValue(SIG_DIGITAL_EVNT_MAPPING, digitalEventsMapping);
+    DataContainer::setSignalValue(CBK_UPDATE_DIG_EVNT_TABLE, std::function<void(String &)>(updateDigitalEventMappingViaJson));
+
+    DataContainer::setSignalValue(
+        CBK_FIRE_DIGITAL_EVENT,
+        static_cast<std::function<void(uint64_t)>>(DigitalEventReceiver::fireEvent));
+
+    // for(auto& mapping : digitalEventsMapping){
+    //     Serial.println("Mapping ID: " + String((int) mapping.first) + " ");
+    //     Serial.println("Mapping affectedType: " + String((int) mapping.second.affectedType) + " ");
+    //     Serial.println("Mapping affectedId: " + String((int) mapping.second.affectedId) + " ");
+    //     Serial.println("Mapping actionType: " + String((int) mapping.second.actionType) + " ");
+    // }
+
+    Serial.println("... done");
+}
+
+void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
+{
+
+    Serial.println("  ");
+    Serial.println(json);
+
+    JsonDocument doc;
+    DeserializationError success = deserializeJson(doc, json.c_str());
+    if (success == DeserializationError::Code::Ok)
+    {
+        digitalEventsMapping.clear();
+        // oczekujemy tablicy na rootzie
+        JsonArray arr = doc.as<JsonArray>();
+
+        // iteracja po tablicy obiektów
+        for (JsonObject obj : arr)
+        {
+            uint8_t requiredKeysCnt = 0;
+            // domyślne puste Stringi
+            uint64_t id = 0;
+            uint8_t type = 0;
+            uint32_t targetId = 0;
+            uint8_t action = 0;
+
+            // sprawdzamy czy klucz istnieje i przypisujemy
+            if (obj.containsKey("id"))
+            {
+                id = obj["id"].as<uint64_t>();
+                requiredKeysCnt++;
+            }
+            if (obj.containsKey("type"))
+            {
+                type = obj["type"].as<uint8_t>();
+                requiredKeysCnt++;
+            }
+            if (obj.containsKey("targetId"))
+            {
+                targetId = obj["targetId"].as<uint32_t>();
+                requiredKeysCnt++;
+            }
+            if (obj.containsKey("action"))
+            {
+                action = obj["action"].as<uint8_t>();
+                requiredKeysCnt++;
+            }
+
+            if (digitalEventsMapping.size() < 25)
+            {
+                DigitalEvent::Event ev;
+                uint8_t affectedType = type == DigitalEvent::AffectedType::ROOM ? type : (uint8_t)DigitalEvent::AffectedType::DEVICE;
+                uint8_t actionType;
+                if (action >= DigitalEvent::ActionType::ON && action <= DigitalEvent::ActionType::TOGGLE)
+                {
+                    actionType = action;
+                }
+                else
+                {
+                    actionType = (int8_t)DigitalEvent::ActionType::OFF;
+                }
+
+                ev.actionType = actionType;
+                ev.affectedType = affectedType;
+                ev.affectedId = targetId;
+
+                digitalEventsMapping.push_back({id, ev});
+            }
+        }
+
+        // Update data container
+        DataContainer::setSignalValue(SIG_DIGITAL_EVNT_MAPPING, digitalEventsMapping);
+
+        // Start NVM save countdown
+        std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+    }
+    else
+    {
+        Serial.println("DigitalEventReceiver:// Invalid JSON received");
+    }
+    Serial.println("  ");
+}
+
+void DigitalEventReceiver::cyclic()
+{
+    processEvents();
+}
+
+void DigitalEventReceiver::fireEvent(uint64_t eventId)
+{
+    // Push event to the queue
+    eventsQueue.push(eventId);
+}
+
+void DigitalEventReceiver::deinit()
+{
+    // We only have NVM data if we handshaked at least 1 slave node
+    /* Write NVM data for DigitalEventReceiver application */
+    uint16_t sizeOfNvm = (e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
+    /* Allocate memory for NVM data */
+    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+
+    // Data validity indicator
+    nvmData[0] = NVM_VALID;
+    // Number of mappings present in the system
+    nvmData[1] = digitalEventsMapping.size();
+
+    uint8_t i = 0;
+    // Serialize map to nvmData raw memory
+    for (auto it = digitalEventsMapping.begin(); it != digitalEventsMapping.end(); ++it, ++i)
+    {
+        memcpy(&(nvmData[2 + i * (sizeof(uint64_t) + sizeof(DigitalEvent::Event))]), &(it->first), sizeof(uint64_t));
+        memcpy(&(nvmData[2 + (i * (sizeof(uint64_t) + sizeof(DigitalEvent::Event)) + sizeof(uint64_t))]), &(it->second), sizeof(DigitalEvent::Event));
+    }
+
+    // Copy raw memory to datablocks
+    uint8_t offset = 0;
+    for (uint8_t blockID = e_BLOCK_DIGITAL_EVENT_1; blockID <= e_BLOCK_DIGITAL_EVENT_6; blockID++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK))(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+
+    /* release heap buffer */
+    free(nvmData);
+}
+
+void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
+{
+    /* Received UDP Message */
+    // Process the received digital Event message here
+    if (msg.getId() == DIGITAL_EVENT_FIRED_MSG_ID)
+    {
+        std::vector<uint8_t> &payload = msg.getPayload();
+        if (payload.size() == sizeof(uint64_t))
+        {
+            uint64_t triggeredEvent = 0;
+            memcpy(&triggeredEvent, &(payload.at(0)), sizeof(triggeredEvent));
+            fireEvent(triggeredEvent);
+        }
+        else
+        {
+            Serial.println("DigitalEventReceiver:// Invalid length of received DigitalEvent message");
+        }
+    }
+}
+
+void DigitalEventReceiver::processEvents()
+{
+
+    if (eventsQueue.size() > 0)
+    {
+        uint64_t eventHappened = eventsQueue.front();
+
+        for (auto &mapping : digitalEventsMapping)
+        {
+            if (mapping.first == eventHappened)
+            {
+                executeAction(mapping.second);
+            }
+        }
+
+        eventsQueue.pop();
+    }
+}
+
+const uint8_t deviceOrRoomIdIndex = 2;
+const uint8_t serviceOverloadingIndex = 1;
+const uint8_t serviceTypeIndex = 0;
+const uint8_t valueIndex = 3;
+void DigitalEventReceiver::executeAction(DigitalEvent::Event &action)
+{
+    switch (action.affectedType)
+    {
+    case DigitalEvent::AffectedType::DEVICE:
+        deviceAction(action);
+        break;
+
+    case DigitalEvent::AffectedType::ROOM:
+        roomAction(action);
+        break;
+
+    default:
+        break;
+    }
+}
+
+void DigitalEventReceiver::deviceAction(DigitalEvent::Event &action)
+{
+    ServiceParameters_set1 parameters;
+
+    if(action.actionType == DigitalEvent::ActionType::TOGGLE){
+        // We need device current status in order to toggle it
+        std::vector<DeviceDescription> devicesVector =
+            std::any_cast<std::vector<DeviceDescription>>(
+                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+        for (auto &device : devicesVector)
+        {
+            if(device.deviceId == action.affectedId)
+            {
+                parameters.a = !(device.isEnabled);
+                break;
+            }
+        }
+    }else {
+        parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
+    }
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_STATE_SWITCH, parameters);
+}
+
+void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
+{
+    ServiceParameters_set1 parameters;
+
+
+    if(action.actionType == DigitalEvent::ActionType::TOGGLE){
+        // We need to evaluate current room state to toggle it
+        std::vector<DeviceDescription> devicesVector =
+            std::any_cast<std::vector<DeviceDescription>>(
+                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+        uint8_t isRoomOn = 0;
+
+        for (auto &device : devicesVector)
+        {
+            if(device.roomId == action.affectedId)
+            {
+                // Found at least 1 device enabled in target ROOM
+                if(device.isEnabled){
+                    isRoomOn = 1;
+                    break;
+                }
+            }
+        }
+
+        parameters.a = !(isRoomOn);
+    }else {
+        parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
+    }
+
+    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
+}
