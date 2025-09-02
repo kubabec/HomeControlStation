@@ -504,15 +504,36 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     case DEVSERVICE_SET_DETAILED_COLORS:
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
-            // Serial.println("Color change requested");
-            memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
-            param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
-            setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
-
-            /* this action will affect NVM data */
-            if (m_reportNvmDataChangedCbk)
+            // Colors cannot be updated during ongoin LIVE show
+            if (liveAnimation != nullptr)
             {
-                m_reportNvmDataChangedCbk();
+                m_queuedAction = [&]()
+                {
+                    // Serial.println("Color change requested");
+                    memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
+                    param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
+                    setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
+
+                    /* this action will affect NVM data */
+                    if (m_reportNvmDataChangedCbk)
+                    {
+                        m_reportNvmDataChangedCbk();
+                    }
+                };
+                stopLiveAnimation();
+            }
+            else
+            {
+                // Serial.println("Color change requested");
+                memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
+                param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
+                setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
+
+                /* this action will affect NVM data */
+                if (m_reportNvmDataChangedCbk)
+                {
+                    m_reportNvmDataChangedCbk();
+                }
             }
             return SERV_SUCCESS;
         }
