@@ -131,12 +131,12 @@ void OperatingSystem::task10ms()
     {
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
         CyclicProfiler::call("RemoteDevicesManager", RemoteDevicesManager::cyclic);
-        CyclicProfiler::call("DigitalEventReceiver", DigitalEventReceiver::cyclic);
+        
     }
     else
     {
         CyclicProfiler::call("RemoteControlClient", RemoteControlClient::cyclic);
-        CyclicProfiler::call("DigitalEventTransmitter", DigitalEventTransmitter::cyclic);
+        
     }
     CyclicProfiler::call("DeviceManager", DeviceManager::cyclic);
 }
@@ -168,6 +168,13 @@ void OperatingSystem::task100ms()
     if (isHttpServerRunning)
     {
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
+    }
+
+    if(isRCServerRunning)
+    {
+        CyclicProfiler::call("DigitalEventReceiver", DigitalEventReceiver::cyclic);
+    }else {
+        CyclicProfiler::call("DigitalEventTransmitter", DigitalEventTransmitter::cyclic);
     }
 }
 

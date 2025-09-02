@@ -2,6 +2,7 @@
 
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
 std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
+std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;
 
 const uint8_t NVM_VALID = 0xCD;
 
@@ -74,8 +75,8 @@ void DigitalEventReceiver::init()
 void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
 {
 
-    Serial.println("  ");
-    Serial.println(json);
+    // Serial.println("  ");
+    // Serial.println(json);
 
     JsonDocument doc;
     DeserializationError success = deserializeJson(doc, json.c_str());
@@ -149,12 +150,29 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
     {
         Serial.println("DigitalEventReceiver:// Invalid JSON received");
     }
-    Serial.println("  ");
+    // Serial.println("  ");
 }
 
 void DigitalEventReceiver::cyclic()
 {
     processEvents();
+
+    if (pendingServiceCalls.size() > 0)
+    {
+        ServiceCallData &callData = pendingServiceCalls.front();
+
+        // Serial.println("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
+        ServiceRequestErrorCode errorCode =
+            std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(callData.deviceOrRoomId, callData.serviceType, callData.parameters);
+
+        // Serial.println("Service error code : " + String((int)errorCode));
+        if (errorCode != SERV_BUSY && errorCode != SERV_PENDING)
+        {
+            // Processing succeeded or failed, but for sure not queued
+            pendingServiceCalls.pop();
+            // Serial.println("x x x x Event processing completed");
+        }
+    }
 }
 
 void DigitalEventReceiver::fireEvent(uint64_t eventId)
@@ -267,31 +285,37 @@ void DigitalEventReceiver::deviceAction(DigitalEvent::Event &action)
 {
     ServiceParameters_set1 parameters;
 
-    if(action.actionType == DigitalEvent::ActionType::TOGGLE){
+    if (action.actionType == DigitalEvent::ActionType::TOGGLE)
+    {
         // We need device current status in order to toggle it
         std::vector<DeviceDescription> devicesVector =
             std::any_cast<std::vector<DeviceDescription>>(
                 DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
         for (auto &device : devicesVector)
         {
-            if(device.deviceId == action.affectedId)
+            if (device.deviceId == action.affectedId)
             {
                 parameters.a = !(device.isEnabled);
                 break;
             }
         }
-    }else {
+    }
+    else
+    {
         parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
     }
-    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_STATE_SWITCH, parameters);
+
+    Serial.println("DigitalEventReceiver:// Added DEVICE action");
+    pendingServiceCalls.push({action.affectedId, DEVSERVICE_STATE_SWITCH, parameters});
+    // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_STATE_SWITCH, parameters);
 }
 
 void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
 {
     ServiceParameters_set1 parameters;
 
-
-    if(action.actionType == DigitalEvent::ActionType::TOGGLE){
+    if (action.actionType == DigitalEvent::ActionType::TOGGLE)
+    {
         // We need to evaluate current room state to toggle it
         std::vector<DeviceDescription> devicesVector =
             std::any_cast<std::vector<DeviceDescription>>(
@@ -300,10 +324,11 @@ void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
 
         for (auto &device : devicesVector)
         {
-            if(device.roomId == action.affectedId)
+            if (device.roomId == action.affectedId)
             {
                 // Found at least 1 device enabled in target ROOM
-                if(device.isEnabled){
+                if (device.isEnabled)
+                {
                     isRoomOn = 1;
                     break;
                 }
@@ -311,9 +336,13 @@ void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
         }
 
         parameters.a = !(isRoomOn);
-    }else {
+    }
+    else
+    {
         parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
     }
 
-    std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
+    Serial.println("DigitalEventReceiver:// Added ROOM action");
+    pendingServiceCalls.push({action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters});
+    // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
 }

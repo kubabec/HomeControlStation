@@ -41,7 +41,7 @@ HttpErrorCode HTTPAsyncRequestHandler::createRequest(
         // Serial.println("HTTPAsyncRequestHandler: Starting new request processing ...");
         // currentRequest.print();
 
-        Serial.println("HTTPAsyncRequestHandler: Request created, type: " + String((int)requestType) + ", params length: " + String(paramsLength));
+        // Serial.println("HTTPAsyncRequestHandler: Request created, type: " + String((int)requestType) + ", params length: " + String(paramsLength));
         return e_HTTP_OK;
     }else {
         return e_HTTP_BUSY;
