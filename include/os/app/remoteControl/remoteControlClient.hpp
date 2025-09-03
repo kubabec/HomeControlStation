@@ -21,6 +21,9 @@ class RemoteControlClient
     static uint64_t localNodeMACAddress;
     static std::queue<RcResponse> vecResponseMessage; //vector containing the responses to the requests
     static std::queue<MessageUDP> pendingTxQueue;
+    static uint8_t lastReceivedRequestId;
+
+
     
     static void handleNodeInitialDataState();
     static void handleNodeDetailedDataState();

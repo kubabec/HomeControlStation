@@ -8,6 +8,7 @@ std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(RcRequest&)>, REQ_COUNT> RemoteControlClient::requestReceivers;
 std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
 std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
+uint8_t RemoteControlClient::lastReceivedRequestId = 0xFF;
 
 uint64_t RemoteControlClient::localNodeMACAddress;
 
@@ -100,9 +101,11 @@ void RemoteControlClient::processGenericRequest(MessageUDP& msg) {
     RcRequest newRequest;
     newRequest.fromByteArray(msg.getPayload().data(), msg.getPayload().size());
 
-    newRequest.print();
-    if(newRequest.getRequestNodeMAC() == localNodeMACAddress) {
+    // newRequest.print();
+    // Is request targeted to us AND we did not start the processing of this one already (repeat request received)
+    if(newRequest.getRequestNodeMAC() == localNodeMACAddress && lastReceivedRequestId != newRequest.getRequestId()) {
         if(newRequest.getRequestType() >= REQ_FIRST && newRequest.getRequestType() < UNKNOWN_REQ) {
+            lastReceivedRequestId = newRequest.getRequestId();
             //sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
             if(requestReceivers.at(newRequest.getRequestType())) {
                 //requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
