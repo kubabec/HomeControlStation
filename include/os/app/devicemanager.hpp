@@ -7,6 +7,7 @@
 #include <devices/LedStrip/Segmented_LedWS1228b.hpp>
 #include <devices/tempSensorDHT11.hpp>
 #include <devices/distanceSensor.hpp>
+#include <devices/CustomHardware/HwButton.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
@@ -30,6 +31,9 @@ class DeviceManager
 #ifdef DISTANCE_SENSOR_SUPPORTED
     static std::vector<DistanceSensor> distanceSensorsDevices;
 #endif
+
+    // Vector of hardware buttons, if any exists
+    static std::vector<HwButton> hardwareButtons;
 
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
     static ExtendedDataAllocator extDataAllocator;

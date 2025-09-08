@@ -20,6 +20,8 @@ class DigitalEventReceiver
     static std::queue<uint64_t> eventsQueue;
     static std::queue<ServiceCallData> pendingServiceCalls;
 
+    static uint8_t lastReceivedTransmissionId;
+
 public:
     static void init();
     static void cyclic();

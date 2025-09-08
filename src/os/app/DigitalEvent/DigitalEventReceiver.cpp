@@ -1,8 +1,11 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+#include <os/drivers/networkdriver.hpp>
 
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
 std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
 std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;
+
+uint8_t DigitalEventReceiver::lastReceivedTransmissionId = 0;
 
 const uint8_t NVM_VALID = 0xCD;
 
@@ -228,11 +231,24 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
     if (msg.getId() == DIGITAL_EVENT_FIRED_MSG_ID)
     {
         std::vector<uint8_t> &payload = msg.getPayload();
-        if (payload.size() == sizeof(uint64_t))
+        if (payload.size() == (sizeof(uint8_t) + sizeof(uint64_t)))
         {
+            uint8_t transmissionIdentfier = 0x00;
+            memcpy(&transmissionIdentfier, &(payload.at(0)), sizeof(transmissionIdentfier));
             uint64_t triggeredEvent = 0;
-            memcpy(&triggeredEvent, &(payload.at(0)), sizeof(triggeredEvent));
-            fireEvent(triggeredEvent);
+            memcpy(&triggeredEvent, &(payload.at(1)), sizeof(triggeredEvent));
+
+            // Protection against repeated request fake activation
+            if (transmissionIdentfier != lastReceivedTransmissionId)
+            {
+                lastReceivedTransmissionId = transmissionIdentfier;
+                fireEvent(triggeredEvent);
+
+                // Send back the handling confirmation
+                MessageUDP msg(DIGITAL_EVENT_CONFIRMED_MSG_ID, NETWORK_BROADCAST, 9001);
+                msg.pushData((uint8_t *)&triggeredEvent, sizeof(uint64_t));
+                NetworkDriver::sendBroadcast(msg);
+            }
         }
         else
         {
