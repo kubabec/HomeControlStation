@@ -339,7 +339,7 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
 
   for (auto &mapping : digitalEventsMapping)
   {
-    client.println("<tr><td><input type=\"text\" class=\"cell-id\" value=\"" + String((int)mapping.first) + "\" /></td>");
+    client.println("<tr><td><input type=\"text\" class=\"cell-id\" value=\"" + String((uint64_t)mapping.first) + "\" /></td>");
 
     if (mapping.second.affectedType == DigitalEvent::AffectedType::DEVICE)
     {
