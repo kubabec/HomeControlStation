@@ -8,6 +8,7 @@
 #include "os/app/http/tempGauge/tempGaugeJS.h"
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
+#include "build_info.h"
 
 
 WiFiServer HomeLightHttpServer::server(80);
@@ -995,8 +996,6 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String yesSelected = "<option selected=\"selected\" value=\"yes\">Yes</option>";
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
-  client.println("<div class=\"header\">General configuration</div>");
-
   try {
       auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
       String currentTime = getTimeCallback().toString(); // Get the current time as a string
@@ -1023,6 +1022,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\
     <div class=\"container\">\
     <form onsubmit=\"return false;\">");
+  client.println("<div class=\"header\">General configuration</div>");
   
   /* exclusion for ServiceMode Access level only */
   if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
@@ -1107,6 +1107,11 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(currentConfig.panelPassword);
   client.println("\" type=\"text\" name=\"UserPassword\"></label>");
 
+    /* Apply button*/
+  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");  
+  client.println("<hr class=\"custom-hr\"><br>");
+  client.println("<div class=\"header\">System info</div>");
+
   /* Extended memory usage */
   ExtendedMemoryCtrlAPI extMemoryFunctions = 
         std::any_cast<ExtendedMemoryCtrlAPI>(DataContainer::getSignalValue(SIG_EXT_MEM_CTRL_API));
@@ -1128,6 +1133,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     setMemoryBarValue("+String((int)memoryUsagePercent)+");\
   </script>");
 
+  
+
   /* Time when system was launched */
 
   RtcTime time = std::any_cast<RtcTime>(DataContainer::getSignalValue(SIG_STARTUP_TIME));
@@ -1135,9 +1142,12 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println(time.toString());
   client.println("\" type=\"text\" disabled></label>");
 
-  /* Apply button*/
-  client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div><hr class=\"custom-hr\">");  
-  
+  client.println("<label>Build info:<input value=\"");
+  client.println("Time: " BUILD_TIMESTAMP ", Git: " BUILD_GITHASH " Author: " DEVELOPER);
+  client.println("\" type=\"text\" disabled></label>");
+
+  client.println("<hr class=\"custom-hr\">");
+
 
   /* display room settings only if there are devices already configured */
   std::vector<DeviceDescription>  deviceCollection = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
