@@ -3,6 +3,7 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <esp_wifi.h>
+#include <os/drivers/ota.hpp>
 
 bool NetworkDriver::networkCredentialsAvailable = false;
 
@@ -91,6 +92,10 @@ void NetworkDriver::init()
     }
 
 
+
+    // OTA initialization
+    OTA::init("HomeControlStation-" + String((uint32_t)_chipmacid, HEX), "HCS2025");
+
     Serial.println("... done");
 }
 
@@ -122,6 +127,9 @@ void NetworkDriver::cyclic()
         pendingToSendPackets.pop();
     }
 
+
+    // Update OTA task to be able to process OTA requests
+    OTA::cyclic();
 }
 
 
