@@ -1143,7 +1143,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" disabled></label>");
 
   client.println("<label>Build info:<input value=\"");
-  client.println("Time: " BUILD_TIMESTAMP ", Git: " BUILD_GITHASH " Author: " DEVELOPER);
+  client.println("Time: [" BUILD_TIMESTAMP "], Git: [" BUILD_GITHASH "], Author: [" DEVELOPER "]");
   client.println("\" type=\"text\" disabled></label>");
 
   client.println("<hr class=\"custom-hr\">");
