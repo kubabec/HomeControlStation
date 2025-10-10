@@ -155,7 +155,9 @@ void OnOffDevice::changeBrightness(int requestedBrightness)
 void OnOffDevice::init()
 {
     pinMode(pinNumber, OUTPUT);
-    off();
+
+    // In case of active HIGH, device will be OFF at startup
+    digitalWrite(pinNumber, activeLow ? HIGH : LOW);
 
     if (brightnessLevelSupport)
     {
