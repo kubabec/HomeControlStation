@@ -1,9 +1,10 @@
 #include <os/app/NotificationHandler.hpp>
+#include "os/Logger.hpp"
 
 std::queue<UserInterfaceNotification> NotificationHandler::notifications;
 
 void NotificationHandler::init(){
-    Serial.println("NotificationHandler init ...");
+    Logger::log("NotificationHandler init ...");
 
     DataContainer::setSignalValue(SIG_UI_NOTIFICATIONS_CONTROL, static_cast<UINotificationsControlAPI>(UINotificationsControlAPI{
         .createNotification = createNotification,
@@ -12,7 +13,7 @@ void NotificationHandler::init(){
     }));
 
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void NotificationHandler::cyclic(){

@@ -4,6 +4,7 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <esp_wifi.h>
 #include <os/drivers/ota.hpp>
+#include "os/Logger.hpp"
 
 bool NetworkDriver::networkCredentialsAvailable = false;
 
@@ -21,7 +22,7 @@ void NetworkDriver::deinit() {
 
 void NetworkDriver::init()
 {
-    Serial.println("NetworkDriver init ...");
+    Logger::log("NetworkDriver init ...");
 
     /* Try to access device configuration to extract WiFi credentials */
     try {
@@ -38,13 +39,13 @@ void NetworkDriver::init()
         {
             // Connect to defaults
             /* Host accesspoint */
-            Serial.println("Starting AP due to invalid WiFi credentials");
+            Logger::log("Starting AP due to invalid WiFi credentials");
             WiFiAdapter::createAccessPoint();
         }
 
     }catch (const std::bad_any_cast& e){ 
         //WiFiAdapter::connectToNetwork( "", "");
-        Serial.println("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
+        Logger::log("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
         WiFiAdapter::createAccessPoint();
     }
 
@@ -85,7 +86,7 @@ void NetworkDriver::init()
     esp_efuse_mac_get_default((uint8_t*) (&_chipmacid));
 
 
-    Serial.println(_chipmacid);
+    Logger::log(String((long)_chipmacid));
 
     if(0LL != _chipmacid){
         DataContainer::setSignalValue(SIG_MAC_ADDRESS, static_cast<uint64_t>(_chipmacid));
@@ -96,7 +97,7 @@ void NetworkDriver::init()
     // OTA initialization
     OTA::init("HomeControlStation-" + String((uint32_t)_chipmacid, HEX), "HCS2025");
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void NetworkDriver::cyclic()
@@ -144,14 +145,14 @@ void NetworkDriver::udpReceive(MessageUDP data)
 bool NetworkDriver::send(MessageUDP& data)
 {
     if(WiFiAdapter::isConnected()){
-        // Serial.println("Sending data via UDP");
+        // Logger::log("Sending data via UDP");
         pendingToSendPackets.push(std::move(data));
         // UDPAdapter::send(data);
         return true;
     }
     else
     {
-        //Serial.println("No network connection. Sending data failed.");
+        //Logger::log("No network connection. Sending data failed.");
         return false;
     }
 }
@@ -180,14 +181,14 @@ bool NetworkDriver::sendBroadcast(MessageUDP& data)
         }
         
         data.setIpAddress(ipRef);
-        // Serial.println("Sending broadcast to " + String((uint8_t)ipRef.octet1) + 
+        // Logger::log("Sending broadcast to " + String((uint8_t)ipRef.octet1) + 
         // "." + String((uint8_t)ipRef.octet2) + 
         // "." + String((uint8_t)ipRef.octet3) + 
         // "." + String((uint8_t)ipRef.octet4));
         return send(data);
         
     } catch  (const std::bad_any_cast& e){ 
-        Serial.println("Broadcasting UDP failed, no IP address available!");
+        Logger::log("Broadcasting UDP failed, no IP address available!");
         return false;
     }
 
@@ -206,7 +207,7 @@ void NetworkDriver::mapReceivedPacketToInternalReceiver(MessageUDP& packet)
             return ;
         }
     } 
-    Serial.println("Packet out of range received , Id : " + String(packetId));
+    Logger::log("Packet out of range received , Id : " + String(packetId));
     
     
 }

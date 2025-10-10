@@ -1,4 +1,5 @@
 #include <devices/OnOffDevice.hpp>
+#include "os/Logger.hpp"
 
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId)
 {
@@ -40,9 +41,9 @@ OnOffDevice::OnOffDevice(DeviceConfigSlotType nvmData)
 void OnOffDevice::on()
 {
 
-    Serial.println("OnOffDevice::on() called");
-    Serial.println("brigtnessLevelTarget: " + String(brightnessLevelTarget));
-    Serial.println("brightnessLevel: " + String(brightnessLevel));
+    Logger::log("OnOffDevice::on() called");
+    Logger::log("brigtnessLevelTarget: " + String(brightnessLevelTarget));
+    Logger::log("brightnessLevel: " + String(brightnessLevel));
 
     isOn = true;
     if (brightnessLevelSupport)
@@ -61,17 +62,17 @@ void OnOffDevice::on()
 void OnOffDevice::off()
 {
 
-    Serial.println("OnOffDevice::off() called");
-    Serial.println("brigtnessLevelTarget: " + String(brightnessLevelTarget));
-    Serial.println("brightnessLevel: " + String(brightnessLevel));
+    Logger::log("OnOffDevice::off() called");
+    Logger::log("brigtnessLevelTarget: " + String(brightnessLevelTarget));
+    Logger::log("brightnessLevel: " + String(brightnessLevel));
 
     isOn = false;
     if (brightnessLevelSupport)
     {
         brightnessLevelBackupWhenOff = brightnessLevel; // Save current brightness level
         brightnessLevelTarget = 0;                      // Zapisujemy aktualną jasność
-        Serial.println("brightnessLevelBackupWhenOff: " + String(brightnessLevelBackupWhenOff));
-        Serial.println("Triggering brightness change to 0");
+        Logger::log("brightnessLevelBackupWhenOff: " + String(brightnessLevelBackupWhenOff));
+        Logger::log("Triggering brightness change to 0");
         // analogWrite(pinNumber, activeLow ? 255 : 0);
     }
     else
@@ -142,7 +143,7 @@ void OnOffDevice::timerHandler()
 
 void OnOffDevice::changeBrightness(int requestedBrightness)
 {
-    Serial.println("Requested: " + String(requestedBrightness));
+    Logger::log("Requested: " + String(requestedBrightness));
     brightnessLevelTarget = requestedBrightness;
     brightnessLevelBackupWhenOff = requestedBrightness; // Save current brightness level
     float brightnessDelta = abs(brightnessLevelTarget - brightnessLevel);
@@ -165,7 +166,7 @@ void OnOffDevice::init()
     }
 
     controls.switchAnimationTime = 200 + deviceId;
-    // Serial.println("Device " + deviceName + " initialized on pin " + String(pinNumber));
+    // Logger::log("Device " + deviceName + " initialized on pin " + String(pinNumber));
 }
 
 void OnOffDevice::cyclic()
@@ -192,9 +193,9 @@ int OnOffDevice::getBrightnessLevelTarget()
 void OnOffDevice::setLightDurationTimerMS(int requestedLightDuration)
 {
     lightDurationTimerMS = requestedLightDuration * 1000;
-    // Serial.println();
+    // Logger::log();
     // Serial.print("========Timer : ");
-    // Serial.println(lightDurationTimerMS);
+    // Logger::log(lightDurationTimerMS);
 }
 
 int OnOffDevice::getLightDurationTimerMS()
@@ -238,7 +239,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType)
     {
 
     default:
-        Serial.println("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (noParam)");
+        Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (noParam)");
         return SERV_NOT_SUPPORTED;
     };
 }
@@ -254,7 +255,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             {
                 on();
             }
-            Serial.println("Setting state: ON");
+            Logger::log("Setting state: ON");
         }
         else
         {
@@ -262,17 +263,17 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             {
                 off();
             }
-            Serial.println("Setting state: OFF");
+            Logger::log("Setting state: OFF");
         }
         return SERV_SUCCESS;
 
     case DEVSERVICE_BRIGHTNESS_CHANGE:
         changeBrightness(param.a);
-        Serial.println("Changing brightness to " + String((int)param.a));
+        Logger::log("Changing brightness to " + String((int)param.a));
         return SERV_SUCCESS;
 
     default:
-        Serial.println("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param1)");
+        Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param1)");
         return SERV_NOT_SUPPORTED;
     };
 }
@@ -282,7 +283,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     switch (serviceType)
     {
     default:
-        Serial.println("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param2)");
+        Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param2)");
         return SERV_NOT_SUPPORTED;
     };
 }
@@ -292,7 +293,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     switch (serviceType)
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
-        Serial.println("DEVSERVICE_GET_ADVANCED_CONTROLS");
+        Logger::log("DEVSERVICE_GET_ADVANCED_CONTROLS");
         if (param.size == sizeof(AdvancedControlsOnOff))
         {
             memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
@@ -302,7 +303,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
         break;
 
     default:
-        Serial.println("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param3)");
+        Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param3)");
         return SERV_NOT_SUPPORTED;
     };
 }

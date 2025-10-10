@@ -1,4 +1,5 @@
 #include <os/app/config/PersistentMemoryAccess.hpp>
+#include "os/Logger.hpp"
 
 #include <EEPROM.h>
 
@@ -58,18 +59,18 @@ bool PersistentMemoryAccess::saveData(uint8_t* data, uint16_t size)
 
         if(EEPROM.commit())
         {
-            Serial.println("Data saved with checkSum :" + String(checkSum));
+            Logger::log("Data saved with checkSum :" + String(checkSum));
             return true;
         }else
         {
-            Serial.println("Failed to save EEPROM data!");
+            Logger::log("Failed to save EEPROM data!");
             return false;
         }
 
         
     }else 
     {
-        Serial.println("EEPROM not initialized successfully!");
+        Logger::log("EEPROM not initialized successfully!");
         return false;
     }
 }
@@ -102,18 +103,18 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
                 // Compare calculated checkSum to memory read value
                 if(checkSum == EEPROM.read(currentAddress))
                 {
-                    Serial.println("Data read successfully!");
+                    Logger::log("Data read successfully!");
                     return true;
                 }
             }else
             {
-                Serial.println("Cannot read persistant data. END_OF_DATA missing");
+                Logger::log("Cannot read persistant data. END_OF_DATA missing");
                 return false;
             }
 
         }else
         {
-            Serial.println("Cannot read persistant data. START_OF_DATA missing");
+            Logger::log("Cannot read persistant data. START_OF_DATA missing");
             return false;
         }
         
@@ -121,7 +122,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
     }
     else 
     {
-        Serial.println("EEPROM not initialized successfully!");
+        Logger::log("EEPROM not initialized successfully!");
         return false;
     }
 }
@@ -129,7 +130,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
     uint16_t eepromSize2 = standardDataEepromSize + 2200;
-    Serial.println("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
+    Logger::log("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
     for(uint16_t i = 0; i < eepromSize2; i ++){
         EEPROM.write(i, 0);
     }

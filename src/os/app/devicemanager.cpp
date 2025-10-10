@@ -1,5 +1,6 @@
 #include <os/app/DeviceManager.hpp>
 #include <os/datacontainer/DataContainer.hpp>
+#include <os/Logger.hpp>
 #include <ArduinoJson.h>
 
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = {};
@@ -47,14 +48,14 @@ void DeviceManager::flushNvmData()
 
         if (!success)
         {
-            Serial.println("Error during saving " + String((int)i) + " datablock");
+            Logger::log("Error during saving " + String((int)i) + " datablock");
         }
     }
 }
 
 void DeviceManager::init()
 {
-    Serial.println("DeviceManager init ...");
+    Logger::log("DeviceManager init ...");
 
     /* Protection against PersistentDataBlock size modification without DeviceConfigSlotType update */
     if (PersistentDataBlock::getSize() == DeviceConfigSlotType::getSize())
@@ -89,7 +90,7 @@ void DeviceManager::init()
                 }
             }
 
-            Serial.println(String((int)numberOfSuccessfullyRetrievedDevices) +
+            Logger::log(String((int)numberOfSuccessfullyRetrievedDevices) +
                            " devices has been successfully retrieved from NVM memory");
 
             free(configBlock);
@@ -105,16 +106,16 @@ void DeviceManager::init()
             }
 
             /* Publish retrieved DeviceConfigSlots signal to the system */
-            Serial.println("DeviceManager//: Publishin config slots.");
+            Logger::log("DeviceManager//: Publishin config slots.");
             DataContainer::setSignalValue(SIG_CONFIG_SLOTS, static_cast<ConfigSlotsDataType>(pinConfigSlotsRamMirror));
         }
     }
     else
     {
-        Serial.println("DeviceConfigSlotType size does not match length of PersistentDataBlock");
+        Logger::log("DeviceConfigSlotType size does not match length of PersistentDataBlock");
     }
 
-    Serial.println("DeviceManager//: Config slots setup:");
+    Logger::log("DeviceManager//: Config slots setup:");
     for (auto &slot : pinConfigSlotsRamMirror.slots)
     {
         slot.print();
@@ -198,7 +199,7 @@ void DeviceManager::init()
                     /* was memory space reservation successful ? */
                     if (success)
                     {
-                        Serial.println("DeviceManager//:Additional reboot needed to prepare ExtMemory blocks");
+                        Logger::log("DeviceManager//:Additional reboot needed to prepare ExtMemory blocks");
                         /* it means that we need one more reboot to have extended memory space prepared */
                         isOneMoreRebootNeeded = true;
                     }
@@ -274,12 +275,11 @@ void DeviceManager::init()
         {
             desc.toByteArray(memory, desc.getSize());
             desc.print();
-            Serial.println("Serialized DeviceDescription:");
+            Logger::log("Serialized DeviceDescription:");
             for (uint16_t i = 0; i < desc.getSize(); i++)
             {
                 Serial.print(String((int)memory[i]));
             }
-            Serial.println();
 
             DeviceDescription desc2;
             desc2.fromByteArray(memory, desc.getSize());
@@ -290,7 +290,7 @@ void DeviceManager::init()
     }
     /*TESTCODE*/
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void DeviceManager::cyclic()
@@ -399,7 +399,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
                                                          std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(deviceToggleId, DEVSERVICE_STATE_SWITCH, parameters);
                                                      if (errorCode != SERV_SUCCESS)
                                                      {
-                                                         Serial.println(" Error toggling " + String((int)deviceToggleId) + " device via HW Button");
+                                                         Logger::log(" Error toggling " + String((int)deviceToggleId) + " device via HW Button");
                                                      }
                                                  } }),
                                              ([&](uint64_t eventId)
@@ -427,7 +427,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
             }
             else
             { /* Invalid number of config slot passed, e.g. to many NVM data in comparison to number of slots */
-                Serial.println("Invalid config slot ID given: " + String((int)configSlotID));
+                Logger::log("Invalid config slot ID given: " + String((int)configSlotID));
             }
         }
         else
@@ -438,7 +438,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
             /* Handle errors only when device is properly configured */
             if (currentConfig.networkSSID[0] != '\0')
             {
-                Serial.println("Invalid Device type for config slot : " + String((int)configSlotID));
+                Logger::log("Invalid Device type for config slot : " + String((int)configSlotID));
             }
         }
     }
@@ -538,7 +538,7 @@ bool DeviceManager::loadConfigFromFile(JsonDocument &doc)
 
         if (isCorrupted)
         {
-            Serial.println("Missing configuration for slot ID: " + slotNumber);
+            Logger::log("Missing configuration for slot ID: " + slotNumber);
             continue;
         }
 
@@ -574,7 +574,7 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
     json.replace("%20", " ");
     json.replace("/lclSetupJson&", "");
 
-    Serial.println(json);
+    Logger::log(json);
 
     JsonDocument doc;
     deserializeJson(doc, json.c_str());
@@ -582,7 +582,7 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
     /* we will extract received JSON configuration to this instance, if is valid*/
     ConfigSlotsDataType receivedConfigurationSet;
 
-    Serial.println("DeviceManager:// Following configuration slots found in JSON:");
+    Logger::log("DeviceManager:// Following configuration slots found in JSON:");
     /* Process JSON to extrac each device slot*/
     for (uint16_t i = 0; i < 6; i++)
     {
@@ -606,8 +606,8 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
                 String activationState = String(doc["devices"][i]["activeState"]);
                 String minPwm = String(doc["devices"][i]["PwmMin"]);
                 String maxPwm = String(doc["devices"][i]["PwmMax"]);
-                Serial.println("DeviceManager: minPwm  " + String(minPwm));
-                Serial.println("DeviceManager: maxPwm  " + String(maxPwm));
+                Logger::log("DeviceManager: minPwm  " + String(minPwm));
+                Logger::log("DeviceManager: maxPwm  " + String(maxPwm));
 
                 /* Put data to config slot memory*/
                 configSlot.deviceType = (uint8_t)type_ONOFFDEVICE;
@@ -747,7 +747,7 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
                 }
                 else
                 {
-                    Serial.println("DeviceManager: Segmented LED strip does not have segments defined");
+                    Logger::log("DeviceManager: Segmented LED strip does not have segments defined");
                 }
 
                 if (doc["devices"][i]["sideFlp"].is<JsonArray>())
@@ -761,7 +761,7 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
                 }
                 else
                 {
-                    Serial.println("DeviceManager: Segmented LED strip does not have flips defined");
+                    Logger::log("DeviceManager: Segmented LED strip does not have flips defined");
                 }
 
                 if (segmentLedCount.size() <= 5)
@@ -787,7 +787,7 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
 
     pinConfigSlotsRamMirror = receivedConfigurationSet;
 
-    Serial.println("New config JSON received, reboot ...");
+    Logger::log("New config JSON received, reboot ...");
 
     std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
 

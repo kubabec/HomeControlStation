@@ -1,5 +1,6 @@
 #include <os/app/http/HttpAsyncRequestHandler.hpp>
 #include <os/app/http/AdvancedControlsLoader.hpp>
+#include "os/Logger.hpp"
 
 
 
@@ -17,7 +18,7 @@ void HTTPAsyncRequestHandler::init(
 
     currentRequestClear();
 
-    Serial.println("HTTPAsyncRequestHandler initialized.");
+    Logger::log("HTTPAsyncRequestHandler initialized.");
 }
 
 HttpErrorCode HTTPAsyncRequestHandler::createRequest(
@@ -38,10 +39,10 @@ HttpErrorCode HTTPAsyncRequestHandler::createRequest(
             memcpy(currentRequest.requestData, requestParamsPtr, paramsLength);
         }
 
-        // Serial.println("HTTPAsyncRequestHandler: Starting new request processing ...");
+        // Logger::log("HTTPAsyncRequestHandler: Starting new request processing ...");
         // currentRequest.print();
 
-        // Serial.println("HTTPAsyncRequestHandler: Request created, type: " + String((int)requestType) + ", params length: " + String(paramsLength));
+        // Logger::log("HTTPAsyncRequestHandler: Request created, type: " + String((int)requestType) + ", params length: " + String(paramsLength));
         return e_HTTP_OK;
     }else {
         return e_HTTP_BUSY;
@@ -118,17 +119,17 @@ void HTTPAsyncRequestHandler::createServiceCall()
     switch(serviceCallStatus){
         case SERV_SUCCESS:
             /* Request completed successfully */
-            Serial.println("Service request processing finished.");
+            Logger::log("Service request processing finished.");
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             break;
         case SERV_PENDING:
             /* We are waiting for the response, service must be polled */
-            // Serial.println("HTTPAsyncRequestHandler: Request call returned PENDING");
+            // Logger::log("HTTPAsyncRequestHandler: Request call returned PENDING");
             currentRequest.state = ASYNC_REQUEST_PROCESSING;
             break;
         case SERV_BUSY:
             /* Trying to send request, but actually it is not possible */
-            Serial.println("HTTPAsyncRequestHandler: Request call returned BUSY");
+            Logger::log("HTTPAsyncRequestHandler: Request call returned BUSY");
             /* Dropping the request */
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             /* This will just do not return any valid JSON response */
@@ -137,13 +138,13 @@ void HTTPAsyncRequestHandler::createServiceCall()
 
         case SERV_NOT_SUPPORTED:
             /* Device does not support this service call */
-            Serial.println("HTTPAsyncRequestHandler: Request call returned NOT_SUPPORTED");
+            Logger::log("HTTPAsyncRequestHandler: Request call returned NOT_SUPPORTED");
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             currentRequest.type = ASYNC_TYPE_INVALID;
             break;
 
         default:
-            Serial.println("HTTPAsyncRequestHandler: Request call returned GENERAL_FAILURE, error code: " + String((int)serviceCallStatus));
+            Logger::log("HTTPAsyncRequestHandler: Request call returned GENERAL_FAILURE, error code: " + String((int)serviceCallStatus));
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             currentRequest.type = ASYNC_TYPE_INVALID;
             break;
@@ -157,7 +158,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls(){
     /* Copy device ID from request parameters */
     memcpy(&deviceId, currentRequest.requestData, sizeof(deviceId));
 
-    // Serial.println("Requesting controls for id " + String((int)deviceId));
+    // Logger::log("Requesting controls for id " + String((int)deviceId));
     /* call loading processing function */
     ServiceRequestErrorCode errorCode = 
         AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);
@@ -165,7 +166,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls(){
     switch(errorCode){
         case SERV_SUCCESS:
             /* Request completed successfully */
-            Serial.println("Advanced controls download processing finished.");
+            Logger::log("Advanced controls download processing finished.");
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             /* hack to fulfill output string data already in processing function, not return of the JSON */
             // jsonResponse += outputJS;
@@ -176,7 +177,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls(){
             break;
 
         default :
-            Serial.println("Loading failed with error: " + String((int)errorCode));
+            Logger::log("Loading failed with error: " + String((int)errorCode));
             currentRequest.state = ASYNC_REQUEST_COMPLETED;
             currentRequest.type = ASYNC_TYPE_INVALID;
             break; 
@@ -246,7 +247,7 @@ void HTTPAsyncRequestHandler::createHashJson()
     try {
         hash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
     }catch (std::bad_any_cast ex){
-        Serial.println("HTTPAsyncRequestHandler: Error while getting hash from DataContainer");
+        Logger::log("HTTPAsyncRequestHandler: Error while getting hash from DataContainer");
     }
 
     jsonResponse += "{";
@@ -256,7 +257,7 @@ void HTTPAsyncRequestHandler::createHashJson()
 
 void HTTPAsyncRequestHandler::createMainPageContentJson()
 { 
-//   Serial.println("HTTPAsyncRequestHandler: Starting JSON response preparation ...");
+//   Logger::log("HTTPAsyncRequestHandler: Starting JSON response preparation ...");
   jsonResponse += "[{";
   uint8_t roomIteratorCount = 1;
   for(auto& room : *deviceToRoomMappingList_ptr)
@@ -362,7 +363,7 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
   jsonResponse +="},";
   createHashJson();
   jsonResponse +="]";
-  Serial.println(jsonResponse);
+  Logger::log(jsonResponse);
 
 }
 
@@ -381,7 +382,7 @@ void HTTPAsyncRequestHandler::createSystemDetailsJson()
     jsonResponse += "\"temp\": "+String((float)tempPercent);   
     jsonResponse += "}";
 
-    // Serial.println(jsonResponse);
+    // Logger::log(jsonResponse);
 }
 
 void HTTPAsyncRequestHandler::createNotificationListContentJson()
@@ -435,7 +436,7 @@ void HTTPAsyncRequestHandler::createRedirectToMainJson()
 void HTTPAsyncRequestHandler::createJsonResponse()
 {
     jsonResponse = "";
-    // Serial.println("HTTPAsyncRequestHandler: Creating JSON response for request type: " + String((int)currentRequest.type));
+    // Logger::log("HTTPAsyncRequestHandler: Creating JSON response for request type: " + String((int)currentRequest.type));
     switch(currentRequest.type){
         case ASYNC_TYPE_DEVICE_SERVICE_CALL:
             createMainPageContentJson();
@@ -478,19 +479,19 @@ void HTTPAsyncRequestHandler::mainFunction()
     if(currentRequest.state == ASYNC_REQUEST_PROCESSING){
         /* do the request processing here */
         processRequest();
-        //Serial.println("HTTPAsyncRequestHandler: ...");
+        //Logger::log("HTTPAsyncRequestHandler: ...");
     }
 }
 
 
 String HTTPAsyncRequestHandler::getJsonResponse()
 {
-    //Serial.println("HTTPAsyncRequestHandler: Completed, returning JSON ...");
+    //Logger::log("HTTPAsyncRequestHandler: Completed, returning JSON ...");
     /* request processing is completed */
     createJsonResponse();
     /* Clear request data, as final state -> response is requested */
     currentRequestClear();
     /* Return previously prepared JSON */
-    // Serial.println("HTTPAsyncRequestHandler: Request processing finished!");
+    // Logger::log("HTTPAsyncRequestHandler: Request processing finished!");
     return jsonResponse;
 }

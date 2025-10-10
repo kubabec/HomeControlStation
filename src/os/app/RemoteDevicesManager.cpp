@@ -1,4 +1,5 @@
 #include <os/app/RemoteDevicesManager.hpp>
+#include "os/Logger.hpp"
 
 std::vector<DeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
 std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
@@ -15,7 +16,7 @@ const uint8_t NVM_VALID_FLAG = 0xC4;
 
 void RemoteDevicesManager::init()
 {
-    Serial.println("RemoteDevicesManager init ...");
+    Logger::log("RemoteDevicesManager init ...");
 
     /* Read NVM data for RemoteDevicesManager application */
     uint16_t sizeOfNvm = (e_BLOCK_RDM_5 - e_BLOCK_RDM_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
@@ -40,12 +41,12 @@ void RemoteDevicesManager::init()
         size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
         if (sizeOfNvm < arr_bytes)
         {
-            Serial.println("RemoteDevicesManager:// NVM restoration error, invalid size");
+            Logger::log("RemoteDevicesManager:// NVM restoration error, invalid size");
         }
         else
         {
             memcpy(mappingSlotsForExternalNodes.data(), &(nvmData[1]), arr_bytes);
-            Serial.println("RemoteDevicesManager:// NVM restored succesfully");
+            Logger::log("RemoteDevicesManager:// NVM restored succesfully");
         }
     }
 
@@ -89,7 +90,7 @@ void RemoteDevicesManager::init()
         static_cast<DeviceServicesAPI>(servicesFunctionSet));
     /*TESTCODE*/
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
@@ -155,7 +156,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
             RCTranslation translation = {
                 .mac = device.macAddress,
                 .onSourceNodeLocalId = device.deviceId};
-            // Serial.println("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
+            // Logger::log("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
 
             /* Replace original ID with our new Unique */
             device.deviceId = uniqueRcId;
@@ -169,7 +170,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 
         DataContainer::setSignalValue(SIG_REMOTE_COLLECTION, vecRemoteDevicesDescription);
 
-        // Serial.println("->RCS - Ustawienie sygnalu w Data Container");
+        // Logger::log("->RCS - Ustawienie sygnalu w Data Container");
         // printTranslationMap();
     }
     catch (std::bad_any_cast ex)
@@ -184,8 +185,8 @@ RCTranslation RemoteDevicesManager::getTranslationFromUnique(uint8_t uniqueId)
     if (currentIdMapping.find(uniqueId) == currentIdMapping.end())
     {
         // not found
-        Serial.println("RCDevManager-Translation for invalid ID received: " + String(uniqueId));
-        Serial.println("---------------------------------------");
+        Logger::log("RCDevManager-Translation for invalid ID received: " + String(uniqueId));
+        Logger::log("---------------------------------------");
     }
     else
     {
@@ -208,7 +209,7 @@ void RemoteDevicesManager::deinit()
     nvmData[0] = NVM_VALID_FLAG;
     // Serialize the array
     size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
-    // Serial.println("arr_bytes: " + String((int)arr_bytes));
+    // Logger::log("arr_bytes: " + String((int)arr_bytes));
     memcpy(&(nvmData[1]), mappingSlotsForExternalNodes.data(), arr_bytes);
 
     uint8_t offset = 0;
@@ -225,7 +226,7 @@ void RemoteDevicesManager::deinit()
         /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
         offset += PERSISTENT_DATABLOCK_SIZE;
     }
-    // Serial.println("RemoteDevicesManager:// Data serialized.");
+    // Logger::log("RemoteDevicesManager:// Data serialized.");
 
     /* release heap buffer */
     free(nvmData);
@@ -239,7 +240,7 @@ void RemoteDevicesManager::printTranslationMap()
 {
     for (auto &mapping : currentIdMapping)
     {
-        Serial.println(String((int)mapping.first) + ": ");
+        Logger::log(String((int)mapping.first) + ": ");
         mapping.second.print();
     }
 }
@@ -270,16 +271,16 @@ void RemoteDevicesManager::handleService3Response(RcResponse &response, DeviceDe
         }
         else
         {
-            Serial.println("RDM : //// Received serviceCall_3 response, OUT from device, not enough data");
-            Serial.println("received data size: " + String(response.getData().size()));
-            Serial.println("expected data size: " + String(responseDeviceDescription.getSize() + sizeof(uint16_t) + localCopyOfLastActiveRequestParamSet3.size));
+            Logger::log("RDM : //// Received serviceCall_3 response, OUT from device, not enough data");
+            Logger::log("received data size: " + String(response.getData().size()));
+            Logger::log("expected data size: " + String(responseDeviceDescription.getSize() + sizeof(uint16_t) + localCopyOfLastActiveRequestParamSet3.size));
         }
     }
 }
 
 bool RemoteDevicesManager::receiveResponse(RcResponse &response)
 {
-    // Serial.println("->Device Provider received response Id: " + String((int)response.getResponseId()));
+    // Logger::log("->Device Provider received response Id: " + String((int)response.getResponseId()));
     // response.print();
 
     /* TODO :
@@ -315,11 +316,11 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
                 responseNodeHash);
 
             currentRequestRespErrorCode = (response.getResponseType() == POSITIVE_RESP) ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
-            Serial.println("RDM : //// Received response with error code: " + String((int)currentRequestRespErrorCode));
+            Logger::log("RDM : //// Received response with error code: " + String((int)currentRequestRespErrorCode));
         }
         else
         {
-            Serial.println("Invalid data lenght received from remote slave, returning GENERAL_FAILURE");
+            Logger::log("Invalid data lenght received from remote slave, returning GENERAL_FAILURE");
             /* invalid response payload length received */
             currentRequestRespErrorCode = SERV_GENERAL_FAILURE;
         }
@@ -328,7 +329,7 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
     }
     else if (response.getResponseType() == INVALID_REQ_RESP)
     {
-        Serial.println("Invalid request received, returning GENERAL_FAILURE");
+        Logger::log("Invalid request received, returning GENERAL_FAILURE");
         requestProcessingState = RDM_REQUEST_FAILED;
     }
 
@@ -575,7 +576,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
     /* Check if RDM is capable to receive new request */
     if (requestProcessingState == RDM_NO_REQUEST)
     {
-        Serial.println("Starting new request with param3...");
+        Logger::log("Starting new request with param3...");
         RCTranslation val = getTranslationFromUnique(deviceId);
         if (val.isValid())
         {
@@ -611,7 +612,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
                 requestProcessingState = RDM_REQUEST_IN_PROGRESS;
 
-                Serial.println("RDM : //// Request with serviceCall_3 sent, waiting for the response");
+                Logger::log("RDM : //// Request with serviceCall_3 sent, waiting for the response");
 
                 /* RDM starts to wait for the response */
                 return SERV_PENDING;

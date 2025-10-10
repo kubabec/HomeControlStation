@@ -1,6 +1,7 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/datacontainer/SigMessages.hpp>
+#include "os/Logger.hpp"
 #include "esp_heap_caps.h"
 
 static ClientState currentState;
@@ -18,7 +19,7 @@ void RemoteControlClient::deinit() {
 
 void RemoteControlClient::init()
 {       
-    Serial.println("RemoteControlClient init ...");
+    Logger::log("RemoteControlClient init ...");
     DataContainer::setSignalValue(CBK_REGISTER_REQUEST_RECEIVER, static_cast<std::function<bool(RequestType, std::function<bool(RcRequest&)>)> >(RemoteControlClient::registerRequestReceiver));
 
     DataContainer::setSignalValue(CBK_RESPONSE, static_cast<std::function<bool(RcResponse&)> > (RemoteControlClient::sendResponse));
@@ -26,7 +27,7 @@ void RemoteControlClient::init()
     currentState = STATE_NODE_INITIAL_DATA;
     localNodeMACAddress = std::any_cast<uint64_t>(DataContainer::getSignalValue(SIG_MAC_ADDRESS));
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void RemoteControlClient::cyclic()
@@ -52,7 +53,7 @@ void RemoteControlClient::processPendingTxData()
         if(millis() - lastTxSendTime > frameTransmissionDelay)
         {
             NetworkDriver::sendBroadcast(pendingTxQueue.front());
-            // Serial.println("Sending broadcast with message id " + String((int)pendingTxQueue.front().getId()));
+            // Logger::log("Sending broadcast with message id " + String((int)pendingTxQueue.front().getId()));
             pendingTxQueue.pop();
             
             lastTxSendTime = millis();
@@ -63,29 +64,29 @@ void RemoteControlClient::processPendingTxData()
 void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     switch(msg.getId()) {
         case RC_REQUEST:
-            // Serial.println("-> Dostałem UDP type RC_REQUEST");
+            // Logger::log("-> Dostałem UDP type RC_REQUEST");
             processGenericRequest(msg);
             
             break;
 
         case REQUEST_NODE_INITIAL_DATA:
-            // Serial.println("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
+            // Logger::log("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
             sendInitialDataResponse();
 
 
             break;
         case REQUEST_NODE_DETAILED_DATA:
-            // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
+            // Logger::log("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
             sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA);
             break;
         
         case REQUEST_KEEP_ALIVE:
-            // Serial.println("-> Dostałem UDP REQUEST_KEEP_ALIVE");
+            // Logger::log("-> Dostałem UDP REQUEST_KEEP_ALIVE");
             sendKeepAlive();
             break;
         
         case REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE:
-            // Serial.println("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
+            // Logger::log("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
             sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE);
             break;
 
@@ -156,11 +157,11 @@ void RemoteControlClient::sendInitialDataResponse(){
 
     }catch (const std::bad_any_cast& e){ }
 
-    // Serial.println("InitialData hash content: " + String((int)initialData.nodeHash));
+    // Logger::log("InitialData hash content: " + String((int)initialData.nodeHash));
     
     initialDataResponse.pushData((byte*)&initialData, sizeof(NodeInitialData)); //wkleja do payload
     
-    Serial.println("<-Remote Control Client - ! Wysyłam Initial Data!");
+    Logger::log("<-Remote Control Client - ! Wysyłam Initial Data!");
     // MessageUDP::serialPrintMessageUDP(initialDataResponse);
 
     /* TX transmission will be handled in the available time from cyclic() context */
@@ -191,7 +192,7 @@ void RemoteControlClient::sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue)
             /* TX transmission will be handled in the available time from cyclic() context */
             pendingTxQueue.push(detailedDataResponse);
         }else {
-            Serial.println("RemoteControlClient:// Error during DeviceDescription serialization.");
+            Logger::log("RemoteControlClient:// Error during DeviceDescription serialization.");
         }        
       }
       /* release resources if needed */
@@ -209,8 +210,8 @@ void RemoteControlClient:: sendKeepAlive() {
 
     /* pobranie wartości Hash informujacej czy cos na ESP sie nie zmienilo*/
     keepAlive.nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
-    // Serial.println(" Node Hash :" + String(keepAlive.nodeHash));
-    // Serial.println("keepAlive.nodeHash : " + String((int)keepAlive.nodeHash ));
+    // Logger::log(" Node Hash :" + String(keepAlive.nodeHash));
+    // Logger::log("keepAlive.nodeHash : " + String((int)keepAlive.nodeHash ));
 
     MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
     keepAliveResponse.pushData((byte*)&keepAlive, sizeof(keepAlive));
@@ -235,7 +236,7 @@ bool RemoteControlClient::registerRequestReceiver(RequestType request, std::func
 }
 
 bool RemoteControlClient::sendResponse(RcResponse& response) {
-    Serial.println("!!! RemoteControlClient - sendResponse do vektora - ");
+    Logger::log("!!! RemoteControlClient - sendResponse do vektora - ");
     vecResponseMessage.push(std::move(response));
 
     return true;
@@ -245,27 +246,27 @@ bool RemoteControlClient::sendResponse(RcResponse& response) {
 // checking if the vector containing the response to the request has an entry 
 bool RemoteControlClient::processResponse() {
     if (!vecResponseMessage.empty()) {
-        // Serial.println("!!! RemoteControlClient - processResponse - ");
+        // Logger::log("!!! RemoteControlClient - processResponse - ");
         RcResponse& remoteControlResponse = vecResponseMessage.front();
         uint8_t* serializedResponse = (uint8_t*)malloc(remoteControlResponse.getSize());
 
         if(serializedResponse != nullptr){
-            // Serial.println("!!! RemoteControlClient - processResponse - serializedResponse != nullptr - ");
+            // Logger::log("!!! RemoteControlClient - processResponse - serializedResponse != nullptr - ");
             remoteControlResponse.toByteArray(serializedResponse, remoteControlResponse.getSize());
 
             MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
-            // Serial.println("!!! RemoteControlClient - processResponse - msg - ");
-            // Serial.println("Size of serializedResponse: " + String(remoteControlResponse.getSize()));
+            // Logger::log("!!! RemoteControlClient - processResponse - msg - ");
+            // Logger::log("Size of serializedResponse: " + String(remoteControlResponse.getSize()));
             msg.pushData((byte*)serializedResponse, remoteControlResponse.getSize());
-            // Serial.println("!!! RemoteControlClient - processResponse - msg.pushData - ");
+            // Logger::log("!!! RemoteControlClient - processResponse - msg.pushData - ");
 
             /* TX transmission will be handled in the available time from cyclic() context */
             pendingTxQueue.push(std::move(msg));
 
-            // Serial.println("!!! RemoteControlClient - processResponse - pendingTxQueue.push - ");
+            // Logger::log("!!! RemoteControlClient - processResponse - pendingTxQueue.push - ");
 
             free(serializedResponse);
-            // Serial.println("!!! RemoteControlClient - processResponse - free(serializedResponse) - ");
+            // Logger::log("!!! RemoteControlClient - processResponse - free(serializedResponse) - ");
             
             vecResponseMessage.pop();
             return true;

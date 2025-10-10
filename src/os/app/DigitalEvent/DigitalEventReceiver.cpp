@@ -1,5 +1,6 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/drivers/networkdriver.hpp>
+#include "os/Logger.hpp"
 
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
 std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
@@ -11,7 +12,7 @@ const uint8_t NVM_VALID = 0xCD;
 
 void DigitalEventReceiver::init()
 {
-    Serial.println("DigitalEventReceiver init ...");
+    Logger::log("DigitalEventReceiver init ...");
 
     /* Read NVM data for DigitalEventReceiver application */
     uint16_t sizeOfNvm = (e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
@@ -52,7 +53,7 @@ void DigitalEventReceiver::init()
                 digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
             }
 
-            Serial.println("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
+            Logger::log("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
         }
     }
 
@@ -66,20 +67,20 @@ void DigitalEventReceiver::init()
         static_cast<std::function<void(uint64_t)>>(DigitalEventReceiver::fireEvent));
 
     // for(auto& mapping : digitalEventsMapping){
-    //     Serial.println("Mapping ID: " + String((int) mapping.first) + " ");
-    //     Serial.println("Mapping affectedType: " + String((int) mapping.second.affectedType) + " ");
-    //     Serial.println("Mapping affectedId: " + String((int) mapping.second.affectedId) + " ");
-    //     Serial.println("Mapping actionType: " + String((int) mapping.second.actionType) + " ");
+    //     Logger::log("Mapping ID: " + String((int) mapping.first) + " ");
+    //     Logger::log("Mapping affectedType: " + String((int) mapping.second.affectedType) + " ");
+    //     Logger::log("Mapping affectedId: " + String((int) mapping.second.affectedId) + " ");
+    //     Logger::log("Mapping actionType: " + String((int) mapping.second.actionType) + " ");
     // }
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
 {
 
-    // Serial.println("  ");
-    // Serial.println(json);
+    // Logger::log("  ");
+    // Logger::log(json);
 
     JsonDocument doc;
     DeserializationError success = deserializeJson(doc, json.c_str());
@@ -151,9 +152,9 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
     }
     else
     {
-        Serial.println("DigitalEventReceiver:// Invalid JSON received");
+        Logger::log("DigitalEventReceiver:// Invalid JSON received");
     }
-    // Serial.println("  ");
+    // Logger::log("  ");
 }
 
 void DigitalEventReceiver::cyclic()
@@ -164,16 +165,16 @@ void DigitalEventReceiver::cyclic()
     {
         ServiceCallData &callData = pendingServiceCalls.front();
 
-        // Serial.println("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
+        // Logger::log("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
         ServiceRequestErrorCode errorCode =
             std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(callData.deviceOrRoomId, callData.serviceType, callData.parameters);
 
-        // Serial.println("Service error code : " + String((int)errorCode));
+        // Logger::log("Service error code : " + String((int)errorCode));
         if (errorCode != SERV_BUSY && errorCode != SERV_PENDING)
         {
             // Processing succeeded or failed, but for sure not queued
             pendingServiceCalls.pop();
-            // Serial.println("x x x x Event processing completed");
+            // Logger::log("x x x x Event processing completed");
         }
     }
 }
@@ -252,7 +253,7 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
         }
         else
         {
-            Serial.println("DigitalEventReceiver:// Invalid length of received DigitalEvent message");
+            Logger::log("DigitalEventReceiver:// Invalid length of received DigitalEvent message");
         }
     }
 }
@@ -321,7 +322,7 @@ void DigitalEventReceiver::deviceAction(DigitalEvent::Event &action)
         parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
     }
 
-    Serial.println("DigitalEventReceiver:// Added DEVICE action");
+    Logger::log("DigitalEventReceiver:// Added DEVICE action");
     pendingServiceCalls.push({action.affectedId, DEVSERVICE_STATE_SWITCH, parameters});
     // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_STATE_SWITCH, parameters);
 }
@@ -358,7 +359,7 @@ void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
         parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
     }
 
-    Serial.println("DigitalEventReceiver:// Added ROOM action");
+    Logger::log("DigitalEventReceiver:// Added ROOM action");
     pendingServiceCalls.push({action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters});
     // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
 }

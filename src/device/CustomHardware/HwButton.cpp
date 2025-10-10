@@ -1,4 +1,5 @@
 #include "devices/CustomHardware/HwButton.hpp"
+#include "os/Logger.hpp"
 
 void ICACHE_RAM_ATTR HwButton::interruptRouter(void *arg)
 {
@@ -59,7 +60,7 @@ HwButton::HwButton(DeviceConfigSlotType nvmData, std::function<void(uint64_t)> e
 
 void HwButton::init()
 {
-    Serial.println("Initializing button");
+    Logger::log("Initializing button");
     pinMode(pinNumber, INPUT_PULLUP);
 
     attachInterruptArg(digitalPinToInterrupt(pinNumber), HwButton::interruptRouter, (void *)this, CHANGE);
@@ -112,7 +113,7 @@ void HwButton::processButtonAction()
             if (doubleClick)
             {
                 event = DOUBLE_CLICK;
-                // Serial.println("DOUBLE CLICK, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
+                // Logger::log("DOUBLE CLICK, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
             }
             else
             {
@@ -120,7 +121,7 @@ void HwButton::processButtonAction()
                 if (eventEndTime <= eventStartTime)
                 {
                     event = LONG_PRESS;
-                    // Serial.println("LONG PRESS 1, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
+                    // Logger::log("LONG PRESS 1, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
                 }
                 else
                 {
@@ -129,12 +130,12 @@ void HwButton::processButtonAction()
                     {
                         // Touch longer than half of cycle
                         event = LONG_PRESS;
-                        // Serial.println("LONG PRESS 2, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
+                        // Logger::log("LONG PRESS 2, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
                     }
                     else
                     {
                         event = SINGLE_CLICK;
-                        // Serial.println("SINGLE CLICK, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
+                        // Logger::log("SINGLE CLICK, eventStartTime:" + String((int)eventStartTime) + " , eventEndTime: " + String((int)eventEndTime) + " ");
                     }
                 }
             }
@@ -143,24 +144,24 @@ void HwButton::processButtonAction()
             {
             case SINGLE_CLICK:
                 if(localDeviceTriggerFunction != nullptr){
-                    Serial.println("Triggering local device");
+                    Logger::log("Triggering local device");
                     localDeviceTriggerFunction(localDeviceIdToTrigger);
                 }else {
                     if(eventTriggerFunction != nullptr){
-                        Serial.println("Triggering remote device");
+                        Logger::log("Triggering remote device");
                         eventTriggerFunction(optionalSinglePressEventId);
                     }
                 }
                 break;
             case DOUBLE_CLICK:
                 if(eventTriggerFunction != nullptr){
-                        Serial.println("Triggering double click device");
+                        Logger::log("Triggering double click device");
                         eventTriggerFunction(doubleClickEventId);
                     }
                 break;
             case LONG_PRESS:
                 if(eventTriggerFunction != nullptr){
-                        Serial.println("Triggering long press device");
+                        Logger::log("Triggering long press device");
                         eventTriggerFunction(longPressEventId);
                     }
                 break;

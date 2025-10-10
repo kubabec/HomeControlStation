@@ -1,5 +1,6 @@
 #include "os/app/remoteControl/rcResponse.hpp"
 #include <iostream>
+#include "os/Logger.hpp"
 
 
 
@@ -26,20 +27,20 @@ uint16_t RcResponse::getSize() {
 }
 
 void RcResponse::print() {
-    Serial.println("### Response ###");
-    Serial.println("responseId: " + String((int)responseId));
-    Serial.println("macAddress: " + String((int)responseNodeMAC));
-    Serial.println("requestType: " + String((int)requestType));
-    Serial.println("responseType: " + String((int)responseType));
+    Logger::log("### Response ###");
+    Logger::log("responseId: " + String((int)responseId));
+    Logger::log("macAddress: " + String((int)responseNodeMAC));
+    Logger::log("requestType: " + String((int)requestType));
+    Logger::log("responseType: " + String((int)responseType));
     int i = 0;  
     for(auto& byte : data) {
         Serial.print((int)byte);
         i++;
     }
-    Serial.println("");
+    Logger::log("");
 
-    Serial.println("crc: " + String((int)crc));
-    Serial.println("###############");
+    Logger::log("crc: " + String((int)crc));
+    Logger::log("###############");
 }
 
 void RcResponse::setResponseId(uint8_t id)
@@ -87,12 +88,12 @@ bool RcResponse::fromByteArray(uint8_t* buffer, uint16_t size) {
     /* copy payload data if any */
     uint16_t payloadLength = size - (dataLengthBeforeDynamicPart + dataLengthAfterDynamicPart); 
     data.clear(); 
-    // Serial.println("Adding payload to Response ");
+    // Logger::log("Adding payload to Response ");
     for (uint16_t i = 0; i < payloadLength; i++) {
         data.push_back(buffer[offset + i]); 
     }
     offset += data.size();
-    // Serial.println("Added payload to Response ");
+    // Logger::log("Added payload to Response ");
 
     /* copy last part */
     memcpy(&crc, &buffer[offset], sizeof(crc));   
@@ -121,7 +122,7 @@ bool RcResponse::toByteArray(uint8_t* buffer, uint16_t size) {
     offset += data.size();
     memcpy(&buffer[offset], &crc, sizeof(crc));    
 
-    // Serial.println("### Response toByteArray ###");
+    // Logger::log("### Response toByteArray ###");
     return true;
 }
 
@@ -143,8 +144,8 @@ uint16_t RcResponse::calculateCrc()
 
 bool RcResponse::isValid()
 {
-    // Serial.println("CRC:| "+ String((int)crc));
-    // Serial.println("CRC:| "+ String((int)calculateCrc()));
+    // Logger::log("CRC:| "+ String((int)crc));
+    // Logger::log("CRC:| "+ String((int)calculateCrc()));
     return (crc == calculateCrc());
 }
 

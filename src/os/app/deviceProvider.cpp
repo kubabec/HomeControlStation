@@ -1,4 +1,5 @@
 #include <os/app/DeviceProvider.hpp>
+#include <os/Logger.hpp>
 #include "esp_heap_caps.h"
 
 #define MINIMAL_PAYLOAD_SIZE 2
@@ -19,7 +20,7 @@ void DeviceProvider::deinit()
 
 void DeviceProvider::init()
 {
-    Serial.println("DeviceProvider init ...");
+    Logger::log("DeviceProvider init ...");
 
     /*TESTCODE*/
     /* Link service API functions to DeviceProvider function calls */
@@ -71,7 +72,7 @@ void DeviceProvider::init()
 
     updateDeviceDescriptionSignal();
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void DeviceProvider::initLocalDevicesSetup()
@@ -92,7 +93,7 @@ void DeviceProvider::cyclic()
         ServiceParameters_set1 serviceParameters;
         serviceParameters.a = (uint8_t)requestedRoomState;
         uint8_t deviceId = roomStateChangeDeviceIdQueue.front();
-        // Serial.println("DeviceProvider: Processing room state change for device ID: " + String((int)deviceId) + " to state: " + String((int)requestedRoomState));
+        // Logger::log("DeviceProvider: Processing room state change for device ID: " + String((int)deviceId) + " to state: " + String((int)requestedRoomState));
 
         ServiceRequestErrorCode serviceErrorCode = service(
             deviceId,
@@ -112,8 +113,8 @@ DeviceTranslationDetails DeviceProvider::getOriginalIdFromUnique(uint8_t uniqueI
     if (uniqueDeviceIdToNormalDeviceIdMap.find(uniqueId) == uniqueDeviceIdToNormalDeviceIdMap.end())
     {
         // not found
-        Serial.println("Device Provider-Translation for invalid ID received: " + String(uniqueId));
-        Serial.println("---------------------------------------");
+        Logger::log("Device Provider-Translation for invalid ID received: " + String(uniqueId));
+        Logger::log("---------------------------------------");
     }
     else
     {
@@ -149,7 +150,7 @@ void DeviceProvider::updateDeviceDescriptionSignal()
             DeviceTranslationDetails translationDetails = {
                 .originalID = device.deviceId,
                 .isLocal = true};
-            // Serial.println("Local device id: " + String((int)device.deviceId));
+            // Logger::log("Local device id: " + String((int)device.deviceId));
 
             deviceDescriptionsTotal.push_back(device);
             uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t, DeviceTranslationDetails>{device.deviceId, translationDetails});
@@ -191,19 +192,19 @@ void DeviceProvider::updateDeviceDescriptionSignal()
 void DeviceProvider::printIdMap()
 {
 
-    Serial.println("=Device Provider - zawartosc mapy ");
+    Logger::log("=Device Provider - zawartosc mapy ");
     for (const auto &pair : uniqueDeviceIdToNormalDeviceIdMap)
     {
         uint8_t key = pair.first;
         DeviceTranslationDetails value = pair.second;
-        Serial.println("Unique ID: " + String(key) + ", Original ID: " + String(value.originalID) + ", Is Local: " + String(value.isLocal ? "true" : "false"));
+        Logger::log("Unique ID: " + String(key) + ", Original ID: " + String(value.originalID) + ", Is Local: " + String(value.isLocal ? "true" : "false"));
     }
 }
 
 void DeviceProvider::deviceReset()
 {
 
-    Serial.println(" -> DeviceProvider.deviceReset");
+    Logger::log(" -> DeviceProvider.deviceReset");
 }
 
 ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request, RcResponse &response, ServiceParameters_set3 &param, uint16_t payloadSize)
@@ -214,7 +215,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
 
     if (payloadSize < (sizeof(ServiceParameters_set3) + MINIMAL_PAYLOAD_SIZE))
     {
-        Serial.println("Payload size too small for set1");
+        Logger::log("Payload size too small for set1");
         response.setResponseType((uint8_t)INVALID_REQ_RESP);
         sendResponse(response);
         return SERV_GENERAL_FAILURE;
@@ -230,7 +231,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
 
         if (memoryAbstraction == nullptr)
         {
-            Serial.println("Unable to allocate memory for set3");
+            Logger::log("Unable to allocate memory for set3");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
@@ -251,7 +252,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
             /* we must also add device manipulated information to the response */
             response.pushData(memoryAbstraction, param.size);
             // response.print();
-            // Serial.println("Response total size: " + String(response.getData().size()));
+            // Logger::log("Response total size: " + String(response.getData().size()));
 
             sendResponse(response);
             free(memoryAbstraction);
@@ -262,7 +263,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
         {
             free(memoryAbstraction);
 
-            Serial.println("Problem with service call");
+            Logger::log("Problem with service call");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
@@ -274,7 +275,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
         /* we must copy data from the request to the param structure */
         if (payloadSize < (sizeof(ServiceParameters_set3) + param.size + MINIMAL_PAYLOAD_SIZE))
         {
-            Serial.println("Payload size too small for set1");
+            Logger::log("Payload size too small for set1");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
@@ -283,7 +284,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
         param.buff = (uint8_t *)malloc(param.size);
         if (param.buff == nullptr)
         {
-            Serial.println("Unable to allocate memory for set3");
+            Logger::log("Unable to allocate memory for set3");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
@@ -304,7 +305,7 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
         }
         else
         {
-            Serial.println("Problem with service call");
+            Logger::log("Problem with service call");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
@@ -328,7 +329,7 @@ bool DeviceProvider::receiveRequest(RcRequest &request)
 
     if (payloadSize < MINIMAL_PAYLOAD_SIZE)
     {
-        Serial.println("Payload size too small");
+        Logger::log("Payload size too small");
 
         sendResponse(response);
         return false;
@@ -350,7 +351,7 @@ bool DeviceProvider::receiveRequest(RcRequest &request)
                 );
                 if (result == SERV_SUCCESS)
                 {
-                    // Serial.println("Success, adding response metadata");
+                    // Logger::log("Success, adding response metadata");
                     response.setResponseType((uint8_t)POSITIVE_RESP);
                     addDeviceDescriptionToResponsePayload(response, devicedetails.originalID);
                 }
@@ -362,7 +363,7 @@ bool DeviceProvider::receiveRequest(RcRequest &request)
 
                 if (payloadSize < sizeof(ServiceParameters_set1) + MINIMAL_PAYLOAD_SIZE)
                 {
-                    Serial.println("Payload size too small for set1");
+                    Logger::log("Payload size too small for set1");
                     response.setResponseType((uint8_t)INVALID_REQ_RESP);
                     sendResponse(response);
                     return false;
@@ -395,12 +396,12 @@ bool DeviceProvider::receiveRequest(RcRequest &request)
         }
         else
         {
-            Serial.println("Device id corruption within received request " + String((int)request.getRequestId()));
+            Logger::log("Device id corruption within received request " + String((int)request.getRequestId()));
         }
     }
     else
     {
-        Serial.println("No mapping found for received DeviceID (" + String((int)request.getRequestDeviceId()) + ") in request " + String((int)request.getRequestId()));
+        Logger::log("No mapping found for received DeviceID (" + String((int)request.getRequestDeviceId()) + ") in request " + String((int)request.getRequestId()));
     }
     if (result == SERV_SUCCESS)
     {
@@ -449,9 +450,9 @@ ServiceRequestErrorCode DeviceProvider::service(
 {
     if (serviceType == DEVSERVICE_ROOM_STATE_CHANGE)
     {
-        Serial.println("DeviceProvider:// serviceType != DEVSERVICE_ROOM_STATE_CHANGE");
-        Serial.println("DeviceProvider:// param.a: " + String((int)param.a));
-        Serial.println("DeviceProvider:// deviceId: " + String((int)deviceId));
+        Logger::log("DeviceProvider:// serviceType != DEVSERVICE_ROOM_STATE_CHANGE");
+        Logger::log("DeviceProvider:// param.a: " + String((int)param.a));
+        Logger::log("DeviceProvider:// deviceId: " + String((int)deviceId));
 
         try
         {
@@ -469,7 +470,7 @@ ServiceRequestErrorCode DeviceProvider::service(
         }
         catch (std::bad_any_cast ex)
         {
-            Serial.println("DeviceProvider:// Error during device collection casting");
+            Logger::log("DeviceProvider:// Error during device collection casting");
         }
 
         return SERV_SUCCESS;
@@ -556,7 +557,7 @@ ServiceRequestErrorCode DeviceProvider::service(
             }
         }
     }
-    Serial.println("DeviceProvider:// General failure.");
+    Logger::log("DeviceProvider:// General failure.");
     return SERV_GENERAL_FAILURE;
 }
 
@@ -574,13 +575,13 @@ void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse &response,
                 device.toByteArray(serializedDescription, device.getSize());
                 /*Add memory buffer to response payload*/
                 response.pushData(serializedDescription, device.getSize());
-                Serial.println("serializedDescription size: " + String(device.getSize()));
+                Logger::log("serializedDescription size: " + String(device.getSize()));
 
                 free(serializedDescription);
             }
             else
             {
-                Serial.println("DeviceProvider:// Error during response memory allocation");
+                Logger::log("DeviceProvider:// Error during response memory allocation");
             }
             uint16_t nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
             response.pushData((uint8_t *)&nodeHash, sizeof(nodeHash));

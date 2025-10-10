@@ -1,10 +1,11 @@
 #include <os/app/http/httpserver.hpp>
+#include "os/Logger.hpp"
 
 void HomeLightHttpServer::parameterizedHandler_newConfigApply(String &request, WiFiClient &client)
 {
   // Configuration to be handled here
 
-  Serial.println("Applying new config!");
+  Logger::log("Applying new config!");
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */
   client.println("<meta http-equiv='refresh' content='0;  url=http://" + ipAddressString + "'>");
   client.println("</div></body></html>");
@@ -32,7 +33,7 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String &requ
     escapeSpecialCharsInJson(request);
     request.replace("roomMappingApply&", "");
 
-    // Serial.println("Json request:" + request);
+    // Logger::log("Json request:" + request);
 
     JsonDocument doc;
     DeserializationError success = deserializeJson(doc, request.c_str());
@@ -66,7 +67,7 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String &requ
     }
     else
     {
-      Serial.println("ConfigProvider://Problem with JSON parsing.");
+      Logger::log("ConfigProvider://Problem with JSON parsing.");
       notification.body = "Room names JSON content cannot be correctly evaluated";
       std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
     }
@@ -100,7 +101,7 @@ void HomeLightHttpServer::parameterizedHandler_newDigEvntTab(String &request, Wi
 void HomeLightHttpServer::parameterizedHandler_passwordApply(String &request, WiFiClient &client)
 {
 
-  Serial.println("Password apply processing");
+  Logger::log("Password apply processing");
   request = request.substring(String("passwordApply").length());
   try
   {
@@ -133,8 +134,8 @@ void HomeLightHttpServer::parameterizedHandler_ledStripColor(String &request, Wi
   //     leds.blue[i] = blue.toInt();
   //   }
 
-  //   Serial.println(devId);
-  //   Serial.println(red + ", " + green + " , " + blue);
+  //   Logger::log(devId);
+  //   Logger::log(red + ", " + green + " , " + blue);
 
   //   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }
@@ -156,8 +157,8 @@ void HomeLightHttpServer::parameterizedHandler_ledColor(String &request, WiFiCli
   //   leds.green[ledIndex.toInt()] = green.toInt();
   //   leds.blue[ledIndex.toInt()] = blue.toInt();
 
-  //   Serial.println(devId);
-  //   Serial.println(red + ", " + green + " , " + blue);
+  //   Logger::log(devId);
+  //   Logger::log(red + ", " + green + " , " + blue);
 
   //   client.println("<meta http-equiv='refresh' content='0; url=http://"+ ipAddressString +"'>");
 }

@@ -1,5 +1,5 @@
 #include "os/app/remoteControl/rcRequest.hpp"
-
+#include "os/Logger.hpp"
 
 
 
@@ -134,18 +134,17 @@ void RcRequest::calculateCrc() {
 }
 
 void RcRequest::print() {
-    Serial.println("Request ID: " + String((int)requestId));
-    Serial.println("Target Node MAC: " + String((int)targetNodeMAC));
-    Serial.println("Target Device ID: " + String((int)targetDeviceId));
-    Serial.println("Request Type: " + String((int)requestType));
-    Serial.println("Data: ");
+    Logger::log("Request ID: " + String((int)requestId));
+    Logger::log("Target Node MAC: " + String((int)targetNodeMAC));
+    Logger::log("Target Device ID: " + String((int)targetDeviceId));
+    Logger::log("Request Type: " + String((int)requestType));
+    Logger::log("Data: ");
     for (uint16_t i = 0; i < data.size(); i++) {
         Serial.print((int)data[i]);
         Serial.print(" ");
     }
-    Serial.println();
-    Serial.println("Request Send Count: " + String((int)requestSendCount));
-    Serial.println("CRC: " + String(crc));
+    Logger::log("Request Send Count: " + String((int)requestSendCount));
+    Logger::log("CRC: " + String(crc));
 }
 
 void RcRequest::clear() {

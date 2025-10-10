@@ -1,5 +1,6 @@
 #include <os/HomeStation_os.hpp>
 #include <DHT.h>
+#include <os/Logger.hpp>
 
 DHT tempSensor(21, DHT11);
 
@@ -114,7 +115,7 @@ void OperatingSystem::init()
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 
-    Serial.println("HomeStationOS:// Init completed.");
+    Logger::log("HomeStationOS:// Init completed.");
 }
 
 void OperatingSystem::task2ms()
@@ -180,7 +181,7 @@ void OperatingSystem::task100ms()
 
 void OperatingSystem::activateNvmSaveTimer()
 {
-    Serial.println("NVM save timer activated.");
+    Logger::log("NVM save timer activated.");
     isNvmSaveTimerActive = true;
     nvmSaveTimerValue = millis();
 }
@@ -193,7 +194,7 @@ void OperatingSystem::handleNvmSaveMech()
         { /* 30 minutes */
             isNvmSaveTimerActive = false;
             nvmSaveTimerValue = 0;
-            Serial.println("NVM save timer expired, saving NVM data.");
+            Logger::log("NVM save timer expired, saving NVM data.");
             saveNvmData();
         }
         else
@@ -206,6 +207,14 @@ void OperatingSystem::handleNvmSaveMech()
 void OperatingSystem::task1s()
 {
     Serial.print(".");
+
+    static int heartbeatCounter = 0;
+    heartbeatCounter++;
+    if (heartbeatCounter >= 30)
+    {
+        Logger::log("...");
+        heartbeatCounter = 0;
+    }
 
     handleSecurityAccessLevelExpiration();
     CyclicProfiler::call("TimeMaster", TimeMaster::cyclic);
@@ -288,7 +297,7 @@ void OperatingSystem::handleSecurityAccessLevelExpiration()
             accessLevelGrantedTimeSnapshot = 0;
             currentAccessLevel = e_ACCESS_LEVEL_NONE;
             DataContainer::setSignalValue(SIG_SECURITY_ACCESS_LEVEL, currentAccessLevel);
-            Serial.println("Access level unlock expired.");
+            Logger::log("Access level unlock expired.");
 
             /* notification */
             UserInterfaceNotification notif{
@@ -356,11 +365,11 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
     {
     }
 
-    // Serial.println("Hash : " + String((int)hash));
+    // Logger::log("Hash : " + String((int)hash));
 
     memcpy(&runtimeNodeHash, &hash, sizeof(uint16_t));
     DataContainer::setSignalValue(SIG_RUNTIME_NODE_HASH, static_cast<uint16_t>(runtimeNodeHash));
-    // Serial.println("New hash : " + String((int)hash));
+    // Logger::log("New hash : " + String((int)hash));
 
     return hash;
 }
@@ -410,11 +419,11 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     switch (currentAccessLevel)
     {
     case e_ACCESS_LEVEL_NONE:
-        Serial.println("e_ACCESS_LEVEL_NONE");
+        Logger::log("e_ACCESS_LEVEL_NONE");
         break;
 
     case e_ACCESS_LEVEL_AUTH_USER:
-        Serial.println("e_ACCESS_LEVEL_AUTH_USER");
+        Logger::log("e_ACCESS_LEVEL_AUTH_USER");
         notif.type = UserInterfaceNotification::INFO;
         notif.body = "Device is unlocked to authorized user level and will be automatically locked.";
         std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
@@ -422,11 +431,11 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
 
     case e_ACCESS_LEVEL_SERVICE_MODE:
 
-        Serial.println("e_ACCESS_LEVEL_SERVICE_MODE");
+        Logger::log("e_ACCESS_LEVEL_SERVICE_MODE");
         break;
 
     default:
-        Serial.println("INVALID");
+        Logger::log("INVALID");
         break;
     }
 }
@@ -457,6 +466,6 @@ void OperatingSystem::detectHwMassEraseRequest()
     if (activationTimeCounter > 3)
     { /* 5 sec to activate reset */
         isMassEraseRequestActivated = true;
-        Serial.println("OS://HW MASS ERASE ACTIVATED.");
+        Logger::log("OS://HW MASS ERASE ACTIVATED.");
     }
 }

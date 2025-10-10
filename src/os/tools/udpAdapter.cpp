@@ -1,4 +1,5 @@
 #include <os/tools/UdpAdapter.hpp>
+#include "os/Logger.hpp"
 
 const unsigned int UDPAdapter::senderPort = 9001;
 const char * UDPAdapter::broadcastIP = "192.168.1.255";
@@ -18,7 +19,7 @@ void UDPAdapter::task()
     if(packetSize > 0)
     {
         IPAddress senderIP = udp.remoteIP();
-    //    Serial.println("Received new package");
+    //    Logger::log("Received new package");
         
         std::vector<uint8_t> dataBuffer;
         dataBuffer.resize(packetSize);
@@ -27,7 +28,7 @@ void UDPAdapter::task()
         /* All data read correctly */
         if(len == packetSize)
         {
-            // Serial.println("Constructing MessageUDP...");
+            // Logger::log("Constructing MessageUDP...");
             MessageUDP receivedMessage = MessageUDP::fromUint8Vector(dataBuffer);
         //    MessageUDP::serialPrintMessageUDP(receivedMessage);
 
@@ -41,7 +42,7 @@ void UDPAdapter::task()
             }
             else
             {
-                Serial.println("Message invalid or callback not assigned");
+                Logger::log("Message invalid or callback not assigned");
             }
         }   
     }
@@ -49,11 +50,11 @@ void UDPAdapter::task()
 
 void UDPAdapter::send(MessageUDP& msg)
 {
-    // Serial.println();
-    // Serial.println("Received new UDP Message!");
+    // Logger::log();
+    // Logger::log("Received new UDP Message!");
     //MessageUDP::serialPrintMessageUDP(msg);
 
-    // Serial.println("Sending via WiFi!");
+    // Logger::log("Sending via WiFi!");
     std::vector<uint8_t>& payloadRef = msg.getPayload();
         IPAddress receiverIP(
         msg.getIPAddress().octet1, 
@@ -73,13 +74,13 @@ void UDPAdapter::send(MessageUDP& msg)
         }
         udp.endPacket();
         free(bufferToSend);
-        //Serial.println();
+        //Logger::log();
 
     }
 
     
 
-    // Serial.println("Packet sent.");
+    // Logger::log("Packet sent.");
 }
 
 void UDPAdapter::registerOnUdpReceiveCallback(std::function<void(MessageUDP&)> callback)

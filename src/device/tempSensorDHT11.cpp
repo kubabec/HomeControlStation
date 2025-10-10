@@ -1,4 +1,5 @@
 #include "devices/tempSensorDHT11.hpp"
+#include "os/Logger.hpp"
 
 #ifdef TEMP_SENSOR_SUPPORTED
 
@@ -14,7 +15,7 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     roomId = nvmData.roomId;
 
     dht = new DHT(pinNumber, DHT22);
-    Serial.println("DHT11 device id: " + String((int)deviceId) + ", pin: " + String(pinNumber));
+    Logger::log("DHT11 device id: " + String((int)deviceId) + ", pin: " + String(pinNumber));
 
     dht->begin();
 
@@ -23,21 +24,21 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     if (!isnan(t))
     {
         currentTemp = t;
-        Serial.println("Temp: " + String(currentTemp));
+        Logger::log("Temp: " + String(currentTemp));
     }
     if (!isnan(h))
     {
         currentHumid = (int)h;
-        Serial.println("Humidity: " + String(currentHumid));
+        Logger::log("Humidity: " + String(currentHumid));
     }
 }
 
 void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorReading reading)
 {
-    Serial.println(".....................................................");
-    Serial.println(".....................................................");
-    Serial.println(".....................................................");
-    Serial.println("Dodano nowy pomiar do wektora:");
+    Logger::log(".....................................................");
+    Logger::log(".....................................................");
+    Logger::log(".....................................................");
+    Logger::log("Dodano nowy pomiar do wektora:");
     Serial.print("Temp: ");
     Serial.print(temp);
     Serial.print("°C, Hum: ");
@@ -49,11 +50,11 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
     Serial.print(":");
     Serial.print(reading.timestamp.min);
     Serial.print(":");
-    Serial.println(reading.timestamp.sec);
-    Serial.println(".....................................................");
+    Logger::log(String((int)reading.timestamp.sec));
+    Logger::log(".....................................................");
     Serial.print("Laczna liczba pomiarow: ");
-    Serial.println(sensorData.size());
-    Serial.println("Zawartosc wektora sensorData:");
+    Logger::log(String((int)sensorData.size()));
+    Logger::log("Zawartosc wektora sensorData:");
     for (const auto &r : sensorData)
     {
         // Format czasu z zerowaniem minut (np. 10:05)
@@ -69,8 +70,8 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
         Serial.print(" °C");
         Serial.print(" | Wilgotnosc: ");
         Serial.print(r.humidity);
-        Serial.println(" %");
-        Serial.println(".....................................................");
+        Logger::log(" %");
+        Logger::log(".....................................................");
     }
 }
 
@@ -88,27 +89,27 @@ void TempSensorDHT11DeviceType::temHumReading()
                 temHumSensError = 0;
                 currentTemp = t;
                 lastTemp = t;
-                Serial.println("Temperature: " + String(currentTemp));
+                Logger::log("Temperature: " + String(currentTemp));
             }
             else
             {
-                Serial.println("Rejected due to unpredicted temperature jump: " + String(t));
+                Logger::log("Rejected due to unpredicted temperature jump: " + String(t));
             }
             if (!isnan(h))
             {
                 currentHumid = (int)h;
-                Serial.println("Humidity: " + String(currentHumid));
+                Logger::log("Humidity: " + String(currentHumid));
             }
         }
         else
         {
             temHumSensError = 1;
-            Serial.println("Temperature and humidity sensor error");
+            Logger::log("Temperature and humidity sensor error");
         }
 
         lastDataUpdateTime = millis();
 
-        // Serial.println("Temp: " + String(currentTemp));
+        // Logger::log("Temp: " + String(currentTemp));
     }
 }
 
@@ -146,7 +147,7 @@ void TempSensorDHT11DeviceType::dhtSensorRecords()
             }
             else
             {
-                Serial.println("Blad czujnika DHT");
+                Logger::log("Blad czujnika DHT");
             }
         }
         lastCheckedTime = millis();

@@ -1,5 +1,6 @@
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/config/PersistentMemoryAccess.hpp>
+#include "os/Logger.hpp"
 
 ExtMemoryMetadataType ExtendedMemoryManager::extMemoryMetadata;
 uint16_t ExtendedMemoryManager::extMemoryInUse;
@@ -8,7 +9,7 @@ std::vector<ExtMemoryData> ExtendedMemoryManager::extMemoryContainer;
 
 
 void ExtendedMemoryManager::init(){
-    Serial.println("ExtendedMemoryManager init ...");
+    Logger::log("ExtendedMemoryManager init ...");
     /* clear the ext memory sizes */
     for(uint8_t i = 0 ; i < SLOTS_FOR_EXT_MEMORY_BUFFERS; i ++)
     {
@@ -33,13 +34,13 @@ void ExtendedMemoryManager::init(){
     );
 
     if(!success){
-        Serial.println("Error during reading ExtMemory metadata nvm block");
+        Logger::log("Error during reading ExtMemory metadata nvm block");
         return;
     }
 
 
     restoreExtMemoryFromNvm();
-    Serial.println("ExtendedMemoryManager// Extended memory for " + String((int)extMemoryContainer.size()) + " devices restored with total size of "+String((int)extMemoryInUse)+ " bytes ");
+    Logger::log("ExtendedMemoryManager// Extended memory for " + String((int)extMemoryContainer.size()) + " devices restored with total size of "+String((int)extMemoryInUse)+ " bytes ");
 
 
 
@@ -47,7 +48,7 @@ void ExtendedMemoryManager::init(){
         entry.printExtMem();
     }
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void ExtendedMemoryManager::cyclic(){
@@ -63,7 +64,7 @@ void ExtendedMemoryManager::flushNvmData(){
         (uint8_t*)&extMemoryMetadata // local memory buffer for datablock data
     );
     if(!success){
-        Serial.println("Error during saving ExtMemory metadata nvm block");
+        Logger::log("Error during saving ExtMemory metadata nvm block");
     }
 
 
@@ -126,7 +127,7 @@ void ExtendedMemoryManager::restoreExtMemoryFromNvm()
                 offsetInNvm += extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId];
             }else 
             {
-                Serial.println("ExtendedMemoryManager//ERROR : Cannot allocate RAM mirror with length :" + String((int)extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId]));
+                Logger::log("ExtendedMemoryManager//ERROR : Cannot allocate RAM mirror with length :" + String((int)extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId]));
                 return;
             }
         }
@@ -143,11 +144,11 @@ bool ExtendedMemoryManager::requestNewExtendedMemorySpace(uint8_t deviceId, uint
             extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId-1] = spaceSize;
             success = true;
         }else {
-            Serial.println("ExtendedMemoryManager//ERROR: Cannot allocate space length: "+String((int)spaceSize)+", already in use: "+String((int)extMemoryInUse));
+            Logger::log("ExtendedMemoryManager//ERROR: Cannot allocate space length: "+String((int)spaceSize)+", already in use: "+String((int)extMemoryInUse));
         }
 
     }else {
-        Serial.println("ExtendedMemoryManager//ERROR: Invalid device ID to allocate ext memory: "+String((int)deviceId));
+        Logger::log("ExtendedMemoryManager//ERROR: Invalid device ID to allocate ext memory: "+String((int)deviceId));
     }
 
     return success;
@@ -157,7 +158,7 @@ void ExtendedMemoryManager::releaseExtendedMemorySpace(uint8_t deviceId){
     if(deviceId > 0 && deviceId < 10){
         extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId-1] = 0;
     }else {
-        Serial.println("ExtendedMemoryManager//ERROR: Invalid device ID to release ext memory: "+String((int)deviceId));
+        Logger::log("ExtendedMemoryManager//ERROR: Invalid device ID to release ext memory: "+String((int)deviceId));
     }
 }
 

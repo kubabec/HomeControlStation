@@ -1,4 +1,5 @@
 #include <os/app/remoteControl/RemoteControlServer.hpp>
+#include "os/Logger.hpp"
 
 
 long long requestInitialDataTimer = 0;
@@ -51,7 +52,7 @@ void RemoteControlServer::init(){
 
     /* Stub test code END */
 
-    Serial.println("RemoteControlServer init ...");
+    Logger::log("RemoteControlServer init ...");
     DataContainer::setSignalValue(
         CBK_REGISTER_RESPONSE_RECEIVER,
             static_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)> >(RemoteControlServer::registerResponseReceiver)
@@ -77,7 +78,7 @@ void RemoteControlServer::init(){
 
     updateNetworkNodesInformationSignal();
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void RemoteControlServer::cyclic(){   
@@ -89,7 +90,7 @@ void RemoteControlServer::cyclic(){
     /* did we receive any UDP ? */
     
     if(!receivedBuffer.empty()){
-        // Serial.println("Starting processing of udp message");
+        // Logger::log("Starting processing of udp message");
         processUDPMessage(receivedBuffer.front());
         receivedBuffer.pop();
     }
@@ -97,7 +98,7 @@ void RemoteControlServer::cyclic(){
 
     /* is there anything we can send ? */
     if(!pendingRequestsQueue.empty()){
-        // Serial.println("Pending request processing ongoing");
+        // Logger::log("Pending request processing ongoing");
         /* This call will return true as long as message is being processed, otherwise it will return false */
         if(processPendingRequest(pendingRequestsQueue.front()) == false){
             /* In this case processing returned true due to timeouted request */
@@ -125,7 +126,7 @@ void RemoteControlServer::cyclic(){
             pendingRequestsQueue.pop();
         }
 
-        // Serial.println("Pending request processing ongoing");
+        // Logger::log("Pending request processing ongoing");
         
     }else {
         slaveMonitoringBlockedDueToRequestProcessing = false;
@@ -155,12 +156,12 @@ void RemoteControlServer::requestNodeInitialData(){
     MessageUDP msg(REQUEST_NODE_INITIAL_DATA, NETWORK_BROADCAST, 9001);
     msg.pushData(msgCount);
     NetworkDriver::sendBroadcast(msg);
-    //Serial.println("---> Wysylam REQUEST_NODE_INITIAL_DATA ---> ");
+    //Logger::log("---> Wysylam REQUEST_NODE_INITIAL_DATA ---> ");
     msgCount++;
 }
 void RemoteControlServer::requestNodeDetailedData(){
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
-    // Serial.println("---> Wysylam REQUEST_NODE_DETAILED_DATA ---> ");
+    // Logger::log("---> Wysylam REQUEST_NODE_DETAILED_DATA ---> ");
     NetworkDriver::sendBroadcast(msg);
 
 }
@@ -181,7 +182,7 @@ void RemoteControlServer::handleRequestNodeInitialDataState() {
 
     if(abs(millis() - initialDataExitTimer) > TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED) 
     {
-        //Serial.println("Zmieniam stan na DETAILED_DATA================");
+        //Logger::log("Zmieniam stan na DETAILED_DATA================");
         currentState = STATE_REQUEST_NODE_DETAILED_DATA;
         initialDataExitTimer = millis();
     }
@@ -264,7 +265,7 @@ void RemoteControlServer::handleKeepAliveState() {
     if(nodesToBeRemoved.size() > 0) { 
         for(auto MAC : nodesToBeRemoved) {
             remoteNodes.erase(MAC);
-            Serial.println("Removing Node due to lack of communication MAC" + String((int)MAC));
+            Logger::log("Removing Node due to lack of communication MAC" + String((int)MAC));
             UserInterfaceNotification notif;
             notif.title = "Node disconnected";
             notif.body = "Node with MAC" + String(MAC) + " disconnected.";
@@ -303,7 +304,7 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector <uint64_t>& 
                 /* Node to be removed from the list */
                 nodesToBeRemoved.push_back(detailedDataPendingNodeMAC);
                 detailedDataPendingNodeMAC = 0 ;
-                Serial.println("Removing slave due to detailed data refresh failure");
+                Logger::log("Removing slave due to detailed data refresh failure");
             }else {
                 refreshRemoteNodeInfo(detailedDataPendingNodeMAC);
                 lastDetailedDataRequestTime = millis();
@@ -329,17 +330,17 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
         // is handshake message ?
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA || msg.getId() == RESPONSE_NODE_INITIAL_DATA) {
             handleHandShakeCommunication(msg);
-            //Serial.println("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
+            //Logger::log("<-RESPONSE_NODE_INITIAL/DETAILED_DATA");
         }
         if(msg.getId() == RESPONSE_KEEP_ALIVE) {
             if(!slaveMonitoringBlockedDueToRequestProcessing){
                 handleSlaveAliveMonitoring(msg);
             }
-            //Serial.println("RESPONSE_KEEP_ALIVE");
+            //Logger::log("RESPONSE_KEEP_ALIVE");
         }
         if(msg.getId() == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE) {
             handleDetailedDataUpdate(msg);
-            //Serial.println("<-RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
+            //Logger::log("<-RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
         }
     }
 
@@ -348,9 +349,9 @@ void RemoteControlServer::processUDPMessage(MessageUDP& msg) {
     if(msg.getId() == RC_RESPONSE)
     {
         /* Process RcResponse */
-        Serial.println("->Device Provider received Message with ID: " + String((int)msg.getId()));
+        Logger::log("->Device Provider received Message with ID: " + String((int)msg.getId()));
         processReceivedRcResponse(msg);
-        //Serial.println("<-RC_RESPONSE");
+        //Logger::log("<-RC_RESPONSE");
     }
 
 
@@ -376,11 +377,11 @@ ServerState RemoteControlServer::mapMsgIDToServerState(int msgID) {
 
 void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
     if(msg.getId() == RESPONSE_NODE_INITIAL_DATA) {
-        Serial.println("dostalismy msg i ID RESPONSE_NODE_INITIAL_DATA");
+        Logger::log("dostalismy msg i ID RESPONSE_NODE_INITIAL_DATA");
         NodeInitialData receivedInitialData = getInitialDataFromPayload(msg);
 
         if(receivedInitialData.isValid() ) {
-            //Serial.println("Sprawdzamy czy node jest w mapie.......................");
+            //Logger::log("Sprawdzamy czy node jest w mapie.......................");
             //czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
             if (remoteNodes.find(receivedInitialData.macAddress) == remoteNodes.end()) {
                 // not found - brak info o node, dodajemy info do mapy
@@ -393,11 +394,11 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
                 remoteNodes.insert({receivedInitialData.macAddress, nodeInfo});
                 nodeInfo.printLn();
                 updateNetworkNodesInformationSignal();
-                Serial.println("New Node Added, current remote nodes content:");                
+                Logger::log("New Node Added, current remote nodes content:");                
                 for(auto& node:remoteNodes){ // pętla iterująca przez wszystkie elementy w mapie remoteNodes
                     node.second.printLn(); // node.second oznacza, że korzystamy z drugiego elementu pary z każdego wpisu.
                 }               
-                //Serial.println("=========== Rozmiar mapy: " + String(RemoteControlServer::remoteNodes.size()));
+                //Logger::log("=========== Rozmiar mapy: " + String(RemoteControlServer::remoteNodes.size()));
 
             } else {
                 
@@ -417,7 +418,7 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
                 /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
                 if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
                     // not found
-                    Serial.println("Received Node ID Not Found");
+                    Logger::log("Received Node ID Not Found");
                 } else {
                     // found
                     /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego MAC */
@@ -427,24 +428,24 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP& msg) {
                     for(auto& device: collectionVecRef) {
                         if(device.deviceId == receivedDescription.deviceId){
                             isDeviceAlreadyInCollection = true;
-                            //Serial.println("Mam go w kolekcji");
+                            //Logger::log("Mam go w kolekcji");
                             break;
                         }
                     }
                     /* dodaj do kolekcji jesli nie istnieje*/
                     if(!isDeviceAlreadyInCollection) {
                         collectionVecRef.push_back(receivedDescription);
-                        //Serial.println("Dodaje do kolekcji");
+                        //Logger::log("Dodaje do kolekcji");
                     }
                     else{
-                        Serial.println("Device allready PRESENT");
+                        Logger::log("Device allready PRESENT");
                     }   
                 }
             }else {
-                Serial.println("RemoteControlServer:// Problem during DeviceDescription deserialization");
+                Logger::log("RemoteControlServer:// Problem during DeviceDescription deserialization");
             }
         }else {
-            Serial.println("RemoteControlServer:// Invalid length of received DeviceDescription message");
+            Logger::log("RemoteControlServer:// Invalid length of received DeviceDescription message");
         }
     }
 }
@@ -460,7 +461,7 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
             /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
             if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end()) {
                 // not found
-                Serial.println("Received Node ID Not Found");
+                Logger::log("Received Node ID Not Found");
             } else {
                 // found
                 /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora) device'ow dla otrzymanego MAC */
@@ -470,7 +471,7 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
                 for(auto& device: collectionVecRef) {
                     if(device.deviceId == receivedDescription.deviceId){
                         isDeviceAlreadyInCollection = true;
-                        //Serial.println("Mam go w kolekcji");
+                        //Logger::log("Mam go w kolekcji");
                         break;
                     }
                 }
@@ -483,14 +484,14 @@ void RemoteControlServer::handleDetailedDataUpdate(MessageUDP& msg){
                     }
                 }
                 else{
-                    Serial.println("Device allready PRESENT");
+                    Logger::log("Device allready PRESENT");
                 }   
             }
         }else {
-            Serial.println("RemoteControlServer:// Problem during DeviceDescription deserialization");
+            Logger::log("RemoteControlServer:// Problem during DeviceDescription deserialization");
         }
     }else {
-        Serial.println("RemoteControlServer:// Invalid length of received DeviceDescription message");
+        Logger::log("RemoteControlServer:// Invalid length of received DeviceDescription message");
     }
 }
 
@@ -515,18 +516,18 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP& msg) {
             // not found 
             remoteNodes.clear();
             currentState = STATE_REQUEST_NODE_INITIAL_DATA;
-            Serial.println("Reinit started unknow received");
+            Logger::log("Reinit started unknow received");
         } else {
             // found
             remoteNodes.find(receivedKeepAlive.mac)->second.lastKeepAliveReceivedTime = millis();
-            //Serial.println("<-Received Node ID :" + String(receivedKeepAlive.mac) + " Received Hash :" + String(receivedKeepAlive.nodeHash));
+            //Logger::log("<-Received Node ID :" + String(receivedKeepAlive.mac) + " Received Hash :" + String(receivedKeepAlive.nodeHash));
 
             /* Node hash validation */
             if(remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash != receivedKeepAlive.nodeHash)
             {
-                Serial.println("Old hash : " + String((int)remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash));
-                Serial.println("New hash : " + String((int)receivedKeepAlive.nodeHash));
-                Serial.println("RCServer//: Detected slave state change, DD refresh start ...");
+                Logger::log("Old hash : " + String((int)remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash));
+                Logger::log("New hash : " + String((int)receivedKeepAlive.nodeHash));
+                Logger::log("RCServer//: Detected slave state change, DD refresh start ...");
                 /* Detailed data collection refresh needed */
                 triggerDDRefresh(receivedKeepAlive.mac);
 
@@ -567,7 +568,7 @@ bool RemoteControlServer::processPendingRequest(RcRequest& request){
 
 
     slaveMonitoringBlockedDueToRequestProcessing = true;
-    // Serial.println("RCServer| Processing request with ID "+ String((int)request.getRequestId()));
+    // Logger::log("RCServer| Processing request with ID "+ String((int)request.getRequestId()));
     return requestProcessor.processReqest(request);
 }
 
@@ -578,7 +579,7 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 
     /* Try to construct response from the payload data */
     if(response.fromByteArray(msg.getPayload().data(), msg.getPayload().size())){
-        // Serial.println("Receiver response, checking validity ...");
+        // Logger::log("Receiver response, checking validity ...");
         // response.print();
 
         if(response.isValid()){
@@ -590,16 +591,16 @@ void RemoteControlServer::processReceivedRcResponse(MessageUDP& msg)
 
                 /* Do we have receiver registered for this type of the request ? */
                 if(responseReceivers.at(response.getRequestType())){
-                    Serial.println("RCS:// Forwarding response to the request author...");
+                    Logger::log("RCS:// Forwarding response to the request author...");
                     /* forward response in a callback to the request sender */
                     responseReceivers.at(response.getRequestType())(response);
                 }
             }
         }else {
-            Serial.println("Invalid response received!");
+            Logger::log("Invalid response received!");
         }
     }else {
-        Serial.println("Unable to unpack the response");
+        Logger::log("Unable to unpack the response");
     }
       
     /* TODO : Drop incorrect response (e.g. wrong service type, wrong slave ID, wrong CRC ) */
@@ -631,7 +632,7 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr){
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE,NETWORK_BROADCAST, 9001);
     msg.pushData((byte*)&macAddr, sizeof(uint64_t));
     NetworkDriver::sendBroadcast(msg);
-    Serial.println("->RCS - wysylam o detailed data dla node, MAC:"+ String(int(macAddr)));
+    Logger::log("->RCS - wysylam o detailed data dla node, MAC:"+ String(int(macAddr)));
     // msg.serialPrintMessageUDP(msg);
 }
 
@@ -641,9 +642,9 @@ uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
     newRequest.setID(generateRequestId());
 
     /* Creating new request */
-    Serial.println("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));
+    Logger::log("RCServer| Creating new request with ID "+ String((int)newRequest.getRequestId()));
     pendingRequestsQueue.push(std::move(newRequest));
-    // Serial.println("RCServer| Request with ID "+ String((int)newRequest.getRequestId()) + " added to the queue");
+    // Logger::log("RCServer| Request with ID "+ String((int)newRequest.getRequestId()) + " added to the queue");
 
     return newRequest.getRequestId();
 }
@@ -652,7 +653,7 @@ uint8_t RemoteControlServer::createRcRequest(RcRequest& newRequest)
 void RemoteControlServer::updateSlaveInformation(DeviceDescription& deviceDescription, uint16_t newNodeHash)
 {
     uint64_t macOfUpdatedSlave = deviceDescription.macAddress;
-    Serial.println((int)macOfUpdatedSlave);
+    Logger::log(String((int)macOfUpdatedSlave));
 
     if (remoteNodes.find(macOfUpdatedSlave) != remoteNodes.end()) {
         std::vector<DeviceDescription>& slaveDevices = remoteNodes.find(macOfUpdatedSlave)->second.devicesCollection;
@@ -668,7 +669,7 @@ void RemoteControlServer::updateSlaveInformation(DeviceDescription& deviceDescri
 
     }else {
         /* Slave not found */
-        Serial.println("Trying to update information about non existing slave");
+        Logger::log("Trying to update information about non existing slave");
     }
 
 }
@@ -691,7 +692,7 @@ void RemoteControlServer::updateNetworkNodesInformationSignal()
         networkNodes.push_back(localNodeInfo);
     }
     catch (const std::bad_any_cast& e) {
-        Serial.println("Error: " + String(e.what()));
+        Logger::log("Error: " + String(e.what()));
         // return;
     }
     

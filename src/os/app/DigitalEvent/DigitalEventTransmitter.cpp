@@ -1,16 +1,17 @@
 #include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/drivers/networkdriver.hpp>
+#include "os/Logger.hpp"
 
 void DigitalEventTransmitter::init()
 {
-    Serial.println("DigitalEventTransmitter init ...");
+    Logger::log("DigitalEventTransmitter init ...");
 
     DataContainer::setSignalValue(
         CBK_FIRE_DIGITAL_EVENT,
         static_cast<std::function<void(uint64_t)>>(DigitalEventTransmitter::fireEvent)
     );
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void DigitalEventTransmitter::cyclic()

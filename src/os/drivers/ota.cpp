@@ -1,5 +1,6 @@
 #include "os/drivers/ota.hpp"
 #include "os/datacontainer/DataContainer.hpp"
+#include "os/Logger.hpp"
 
 void OTA::init(const String hostname, const String password)
 {
@@ -20,10 +21,10 @@ void OTA::init(const String hostname, const String password)
             type = "filesystem";
 
         // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        Serial.println("Start updating " + type);
+        Logger::log("Start updating " + type);
     });
     ArduinoOTA.onEnd([]() {
-        Serial.println("\nEnd");
+        Logger::log("\nEnd");
 
         std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
 
@@ -34,21 +35,21 @@ void OTA::init(const String hostname, const String password)
     ArduinoOTA.onError([](ota_error_t error) {
         Serial.printf("Error[%u]: ", error);
         if (error == OTA_AUTH_ERROR)
-            Serial.println("Auth Failed");
+            Logger::log("Auth Failed");
         else if (error == OTA_BEGIN_ERROR)
-            Serial.println("Begin Failed");
+            Logger::log("Begin Failed");
         else if (error == OTA_CONNECT_ERROR)
-            Serial.println("Connect Failed");
+            Logger::log("Connect Failed");
         else if (error == OTA_RECEIVE_ERROR)
-            Serial.println("Receive Failed");
+            Logger::log("Receive Failed");
         else if (error == OTA_END_ERROR)
-            Serial.println("End Failed");
+            Logger::log("End Failed");
     });
     ArduinoOTA.setMdnsEnabled(false);
     ArduinoOTA.begin();
-    Serial.println("OTA Ready");
+    Logger::log("OTA Ready");
     Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Logger::log(WiFi.localIP().toString());
 }
 
 void OTA::cyclic()

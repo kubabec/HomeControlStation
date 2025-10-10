@@ -1,4 +1,5 @@
 #include "devices/LedStrip/LedWS1228b.hpp"
+#include "os/Logger.hpp"
 #ifdef LED_STRIP_SUPPORTED
 const uint8_t maxVirtualLeds = 100;
 
@@ -18,7 +19,7 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::fu
         }
 
         virtualDiodesCount = (diodesCount / physicalLedsPerVirtualLed);
-        Serial.println("VirtualDiodesCount : " + String((int)virtualDiodesCount));
+        Logger::log("VirtualDiodesCount : " + String((int)virtualDiodesCount));
     }
     else
     {
@@ -41,7 +42,7 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::fu
 
     adafruit_ws2812b->begin();
 
-    Serial.println("LedWS1228bDeviceType:// Applying current limit to : " + String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
+    Logger::log("LedWS1228bDeviceType:// Applying current limit to : " + String((int)nvmData.customBytes[3]) + " for device id : " + String((int)deviceId));
 
     /* safety check of doubled the same value of current limitation */
     uint8_t currentLimit = (nvmData.customBytes[3] == nvmData.customBytes[19]) ? nvmData.customBytes[3] : 0; /* if current limit is set to 0, use 100% */
@@ -122,7 +123,7 @@ void LedWS1228bDeviceType::cyclic()
             }
             else
             {
-                Serial.println("ON animation completed");
+                Logger::log("ON animation completed");
                 delete ongoingAnimation;
                 ongoingAnimation = nullptr;
             }
@@ -285,7 +286,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::applyContent(LedStripContentIndex 
 
     if (isContentInitialized && contentIndex > eACTIVE_CURRENT_CONTENT && contentIndex < eDIFFERENT_CONTENTS_COUNT)
     {
-        Serial.println("LedWS1228bDeviceType:// requested load content " + String((int)contentIndex));
+        Logger::log("LedWS1228bDeviceType:// requested load content " + String((int)contentIndex));
         memcpy(/* copy data from requested content to active content */
                stripContent[eACTIVE_CURRENT_CONTENT],
                stripContent[contentIndex],
@@ -306,18 +307,18 @@ ServiceRequestErrorCode LedWS1228bDeviceType::saveContentAs(LedStripContentIndex
 
     if (isContentInitialized && contentIndex > eACTIVE_CURRENT_CONTENT && contentIndex < eDIFFERENT_CONTENTS_COUNT)
     {
-        Serial.println("LedWS1228bDeviceType:// requested overwrite content " + String((int)contentIndex));
-        Serial.println("contentIndex : " + String((int)contentIndex));
+        Logger::log("LedWS1228bDeviceType:// requested overwrite content " + String((int)contentIndex));
+        Logger::log("contentIndex : " + String((int)contentIndex));
         memcpy(/* copy data from active content to choosen content slot */
                stripContent[contentIndex],
                stripContent[eACTIVE_CURRENT_CONTENT],
                (virtualDiodesCount * sizeof(LedColor)));
 
-        Serial.println("Slot saved");
+        Logger::log("Slot saved");
 
         averagedColors[contentIndex] = averagedColors[eACTIVE_CURRENT_CONTENT];
 
-        Serial.println("memoryAveragedColors saved");
+        Logger::log("memoryAveragedColors saved");
 
         retVal = SERV_SUCCESS;
 
@@ -442,11 +443,11 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         return SERV_SUCCESS;
 
     case DEVSERVICE_LED_STRIP_SAVE_CONTENT:
-        Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
+        Logger::log("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
         return saveContentAs((LedStripContentIndex)param.a);
 
     case DEVSERVICE_LED_STRIP_SWITCH_CONTENT:
-        Serial.println("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
+        Logger::log("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
         return applyContent((LedStripContentIndex)param.a);
     case DEVSERVICE_LIVE_ANIMATION:
         if (param.a == 1 && liveAnimation == nullptr) // start animation
@@ -486,7 +487,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
     case DEVSERVICE_GET_DETAILED_COLORS:
-        Serial.println("Advanced controls requested with size: " + String((int)param.size) + ", virtualDiodesCount: " + String((int)virtualDiodesCount));
+        Logger::log("Advanced controls requested with size: " + String((int)param.size) + ", virtualDiodesCount: " + String((int)virtualDiodesCount));
 
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
@@ -509,7 +510,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             {
                 m_queuedAction = [&]()
                 {
-                    // Serial.println("Color change requested");
+                    // Logger::log("Color change requested");
                     memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
                     param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
                     setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
@@ -524,7 +525,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             }
             else
             {
-                // Serial.println("Color change requested");
+                // Logger::log("Color change requested");
                 memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
                 param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
                 setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));

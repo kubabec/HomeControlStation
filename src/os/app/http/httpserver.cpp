@@ -9,6 +9,7 @@
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
 #include "build_info.h"
+#include "os/Logger.hpp"
 
 
 WiFiServer HomeLightHttpServer::server(80);
@@ -136,7 +137,7 @@ void HomeLightHttpServer::cyclic()
 
     if(HTTPAsyncRequestHandler::getProcessingState() == ASYNC_REQUEST_COMPLETED){
       String jsonResponse = HTTPAsyncRequestHandler::getJsonResponse();
-      // Serial.println("HTTPServer : // JSON Response: " + jsonResponse);
+      // Logger::log("HTTPServer : // JSON Response: " + jsonResponse);
 
       if(client){
         client.println("HTTP/1.1 200 OK");
@@ -214,7 +215,7 @@ bool HomeLightHttpServer::packNvmData(uint8_t* nvmData, uint16_t length)
 
 void HomeLightHttpServer::init()
 {
-  Serial.println("HomeLightHttpServer init ...");
+  Logger::log("HomeLightHttpServer init ...");
 
   server.setTimeout(10);
 
@@ -281,7 +282,7 @@ void HomeLightHttpServer::init()
   HTTPAsyncRequestHandler::init(&roomNamesMapping, &deviceToRoomMappingList);
 
 
-  Serial.println("... done");
+  Logger::log("... done");
 }
 
 void HomeLightHttpServer::restoreNvmData(uint8_t* nvmData, uint16_t length)
@@ -327,7 +328,7 @@ void HomeLightHttpServer::restoreNvmData(uint8_t* nvmData, uint16_t length)
       }
 
     }else{
-      Serial.println("HttpServer://Failure during NVM data restore try");
+      Logger::log("HttpServer://Failure during NVM data restore try");
     }
   }
 }
@@ -355,7 +356,7 @@ void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
     (header.length() - (String(" HTTP/1.1").length()+2) )
   );
 
-  Serial.println("Request : " + linkRequest);
+  Logger::log("Request : " + linkRequest);
 
   /* If request is not known in list of constant commands */
   if(!processConstantRequests(linkRequest, client))
@@ -363,7 +364,7 @@ void HomeLightHttpServer::processLinkRequestData(WiFiClient& client)
     /* Process request in terms of parameterized command (e.g. brightness&VALUE )*/
     if(!processParameterizedRequests(linkRequest, client))
     {
-      Serial.println("Invalid request received : " + linkRequest);
+      Logger::log("Invalid request received : " + linkRequest);
     }
   }
 }
@@ -464,7 +465,7 @@ bool HomeLightHttpServer::processParameterizedRequests(String& request, WiFiClie
           parameterizedRequestHandlers.at(knownRequest).first(request, client);
           retVal = true;
 
-          Serial.println("Request handler found at : " + String((int)knownRequest));
+          Logger::log("Request handler found at : " + String((int)knownRequest));
         }else 
         {
           /* Redirect client to main page as security access is too low */
@@ -500,7 +501,7 @@ bool HomeLightHttpServer::processParameterizedAsyncRequests(String& request, WiF
       {
         /* Check if access level allows to enter the request */
         if(secAccessLevel >= parameterizedAsyncRequestHandlers.at(knownRequest).second){
-          //Serial.println("Running async function handler at index : " + String((int)knownRequest) + " for request " + request);
+          //Logger::log("Running async function handler at index : " + String((int)knownRequest) + " for request " + request);
           parameterizedAsyncRequestHandlers.at(knownRequest).first(request, client);
           retVal = true;
         }
@@ -560,7 +561,7 @@ void HomeLightHttpServer::handleClientRequest()
               client.println(popupContent);
 
               /* Process request only when user interface is NOT blocked */
-              Serial.println("Processing link...");
+              Logger::log("Processing link...");
               processLinkRequestData(client);
 
               // TEMPORARY DISABLED DUE TO PERFORMANCE ISSUES
@@ -617,7 +618,7 @@ void HomeLightHttpServer::onDeviceDescriptionChange(std::any newDescriptionVecto
 void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
 {
   client.println("{");
-  // Serial.println("{");
+  // Logger::log("{");
   uint8_t roomIteratorCount = 1;
   for(auto& room : deviceToRoomMappingList)
   {
@@ -625,51 +626,51 @@ void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
 
     if(roomNamesMapping.find(room.first) == roomNamesMapping.end()){
       client.println("\""+String((int)room.first)+"\": [");
-      // Serial.println("\""+String((int)room.first)+"\": [");
+      // Logger::log("\""+String((int)room.first)+"\": [");
     }else
     {
       client.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
-      // Serial.println("\""+roomNamesMapping.find(room.first)->second+"\": [");
+      // Logger::log("\""+roomNamesMapping.find(room.first)->second+"\": [");
     }
     for(auto& deviceInThisRoom : room.second){
       client.println("{");
-      // Serial.println("{");
+      // Logger::log("{");
       client.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
-      // Serial.println("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
+      // Logger::log("\"id\":" + String((int)deviceInThisRoom->deviceId) + ",");
       client.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
-      // Serial.println("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
+      // Logger::log("\"name\":\"" + deviceInThisRoom->deviceName + "\",");
       if(deviceInThisRoom->isEnabled){
         client.println("\"status\":\"on\",");
-        // Serial.println("\"status\":\"on\",");
+        // Logger::log("\"status\":\"on\",");
       }else {
         client.println("\"status\":\"off\",");
-        // Serial.println("\"status\":\"off\",");
+        // Logger::log("\"status\":\"off\",");
       }
       client.println("\"hasBrightness\":" + String((int)deviceInThisRoom->customBytes[0]) + ",");
       client.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
-      // Serial.println("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
+      // Logger::log("\"brightness\":" + String((int)deviceInThisRoom->customBytes[1]));
       if(deviceIteratorCount < room.second.size()){
         client.println("},");
-        // Serial.println("},");
+        // Logger::log("},");
       }else {
         client.println("}");
-        // Serial.println("}");
+        // Logger::log("}");
       }
       deviceIteratorCount++;
     }
     
     if(roomIteratorCount < deviceToRoomMappingList.size()){
       client.println("],");
-      // Serial.println("],");
+      // Logger::log("],");
     }else 
     {
       client.println("]");
-      // Serial.println("]");
+      // Logger::log("]");
     }
     roomIteratorCount++;
   }
   client.println("}");
-  // Serial.println("}");
+  // Logger::log("}");
 }
 
 void generateExtraFieldsForOnOff(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
@@ -741,7 +742,7 @@ void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& sl
 
   client.println("<label>Current limiter</label>");
   int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
-  Serial.println("Current limiter value: " + String((int)slot.customBytes[3]) + " -> " + String(percentValue) + "%");
+  Logger::log("Current limiter value: " + String((int)slot.customBytes[3]) + " -> " + String(percentValue) + "%");
   client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
   client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
   //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
@@ -1195,7 +1196,7 @@ void HomeLightHttpServer::printSlotsConfigPage(WiFiClient& client)
 
   ConfigSlotsDataType cfgSlots = std::any_cast<ConfigSlotsDataType>(DataContainer::getSignalValue(SIG_CONFIG_SLOTS));
   // ConfigSlotsDataType cfgSlots;
-  // Serial.println("HTTPServer//:Printing config slots:");
+  // Logger::log("HTTPServer//:Printing config slots:");
   // for(auto& slot: cfgSlots.slots){
   //   slot.print();
   // }

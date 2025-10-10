@@ -1,5 +1,6 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
 #include <SystemDefinition.hpp>
+#include "os/Logger.hpp"
 
 #define ONOFF_ADV_CONTROLS_SIZE 100
 #define TEMPSENSOR_ADV_CONTROLS_SIZE 50
@@ -31,17 +32,17 @@ uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceTyp
 uint8_t* AdvancedControlsLoader::allocateMemoryForControlsBasedOnDeviceType(uint8_t deviceType){
     /* release previously loaded controls */
     if(currentAdvancedControls != nullptr){
-        Serial.println("AdvancedControlsLoader://Releasing old memory");;
+        Logger::log("AdvancedControlsLoader://Releasing old memory");;
         free(currentAdvancedControls);
     }
 
     currentAdvancedControls = nullptr;
-    Serial.println("AdvancedControlsLoader://Allocating memory for device type : " + String((int)deviceType));
+    Logger::log("AdvancedControlsLoader://Allocating memory for device type : " + String((int)deviceType));
     if(deviceType >= type_ONOFFDEVICE && deviceType <= type_DEVICE_TYPE_LAST){
-        Serial.println("AdvancedControlsLoader://Allocating memory for type {"+String((int)deviceType)+"} with size : " + String((int)getControlsSizeBasedOnDevType(deviceType)));
+        Logger::log("AdvancedControlsLoader://Allocating memory for type {"+String((int)deviceType)+"} with size : " + String((int)getControlsSizeBasedOnDevType(deviceType)));
         currentAdvancedControls = (uint8_t*)malloc(getControlsSizeBasedOnDevType(deviceType));
     }else {
-        Serial.println("AdvancedControlsLoader://Type {"+String((int)deviceType)+"} is out of range");
+        Logger::log("AdvancedControlsLoader://Type {"+String((int)deviceType)+"} is out of range");
     }
 
     return currentAdvancedControls;
@@ -193,8 +194,8 @@ String AdvancedControlsLoader::createJsForLedStrip(){
     
     popupContentJavaScript += "var ledColors = [";
     for(int i = 0 ; i < diodeCount; i ++){
-        // Serial.println("-- LED --");
-        // Serial.println("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
+        // Logger::log("-- LED --");
+        // Logger::log("R: " + String((int)ledColors[i].r) + " , G: " + String((int)ledColors[i].g) + " , B: " + String((int)ledColors[i].b));
         popupContentJavaScript += "['"+String((int)ledColors[i].r)+"', '"+String((int)ledColors[i].g)+"', '"+String((int)ledColors[i].b)+"'],";
     }
     popupContentJavaScript.remove(popupContentJavaScript.length()-1);
@@ -659,7 +660,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
 
                 // Requested device found
                 // Allocate buffer for advanced controls for this particular device type
-                Serial.println("AdvancedControlsLoader:// Allocating memory for id:" + String((int)deviceIdentifier));
+                Logger::log("AdvancedControlsLoader:// Allocating memory for id:" + String((int)deviceIdentifier));
                 allocateMemoryForControlsBasedOnDeviceType(currentlyRequestedDeviceDescription.deviceType);
 
 
@@ -669,7 +670,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
         }
         
         if(currentlyRequestedDeviceDescription.deviceId != deviceIdentifier){
-            Serial.println("AdvancedControlsLoader:// Unable to find this device");
+            Logger::log("AdvancedControlsLoader:// Unable to find this device");
             return SERV_GENERAL_FAILURE;
         }
     }
@@ -685,7 +686,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
         parameters.direction = (uint8_t)e_OUT_from_DEVICE;
 
         /* call service on the device, to fulfill the controls memory */
-        // Serial.println("AdvancedControlsLoader:// Waiting for the device...");
+        // Logger::log("AdvancedControlsLoader:// Waiting for the device...");
         ServiceRequestErrorCode serviceErrorCode = 
             std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set3(
                 currentlyRequestedDeviceDescription.deviceId,
@@ -698,7 +699,7 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
         {
             case SERV_SUCCESS:
                 /* Advanced controls successfully loaded */
-                Serial.println("AdvancedControlsLoader:// Loading successfully completed.");
+                Logger::log("AdvancedControlsLoader:// Loading successfully completed.");
                 prepareJsStringWithAdvancedControls();
                 retVal = SERV_SUCCESS;
                 break;
@@ -719,12 +720,12 @@ ServiceRequestErrorCode AdvancedControlsLoader::loadAdvancedControlsToJavaScript
                 notif.body = "Could not load advanced controls from " + currentlyRequestedDeviceDescription.deviceName+ ". Please try again.";
                 notif.type = UserInterfaceNotification::WARNING;
                 std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-                Serial.println("Service failed with error: " + String((int)serviceErrorCode));
+                Logger::log("Service failed with error: " + String((int)serviceErrorCode));
                 break;
         }
 
     }else {
-        Serial.println("Unable to allocate resources");
+        Logger::log("Unable to allocate resources");
     }
     }
     return retVal;

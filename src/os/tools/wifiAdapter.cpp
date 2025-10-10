@@ -1,6 +1,7 @@
 #include <os/tools/WifiAdapter.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <ESPmDNS.h>
+#include "os/Logger.hpp"
 
 
 bool WiFiAdapter::isConnectedFlag = false;
@@ -20,8 +21,8 @@ void WiFiAdapter::waitForConnection500ms()
 
 void WiFiAdapter::connectToNetwork(const String ssid, const String password, bool activeWait)
 {
-    // Serial.println("Network " + ssid+ " with password " + password + " connection try " + String(retryCount));
-    Serial.println("WiFiAdapter://Attempting WiFi connection to network " + ssid);
+    // Logger::log("Network " + ssid+ " with password " + password + " connection try " + String(retryCount));
+    Logger::log("WiFiAdapter://Attempting WiFi connection to network " + ssid);
     if(WiFi.status() != WL_CONNECTED){
         WiFi.disconnect(true);
         WiFi.mode(WIFI_STA);
@@ -36,9 +37,9 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password, boo
     if(WiFi.status() == WL_CONNECTED)
     {
         isConnectedFlag = true;
-        Serial.println("WiFiAdapter://Connected.");
-        Serial.println("======== IP Adres =========");
-        Serial.println(WiFi.localIP());
+        Logger::log("WiFiAdapter://Connected.");
+        Logger::log("======== IP Adres =========");
+        Logger::log(WiFi.localIP().toString());
         DataContainer::setSignalValue(
             SIG_IP_ADDRESS_STRING,
             static_cast<String>(WiFi.localIP().toString()
@@ -94,8 +95,8 @@ void WiFiAdapter::task()
             isConnectedFlag = false;
         }else {
             if(isConnectedFlag == false){ /*transition from disconnected to connected */
-                Serial.println("======== IP Adres =========");
-                Serial.println(WiFi.localIP());
+                Logger::log("======== IP Adres =========");
+                Logger::log(WiFi.localIP().toString());
                 DataContainer::setSignalValue(
                     SIG_IP_ADDRESS_STRING,
                     static_cast<String>(WiFi.localIP().toString()
@@ -141,10 +142,10 @@ void WiFiAdapter::createAccessPoint()
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(IPAddress(192, 168, 0, 1), IPAddress(192, 168, 0, 1), IPAddress(255,255,255,0));
     WiFi.softAP(ssidWithMac, "HomeStation");
-    Serial.println("AP created successfully");
+    Logger::log("AP created successfully");
 
-    Serial.println("======== IP Adres =========");
-    Serial.println(WiFi.softAPIP());
+    Logger::log("======== IP Adres =========");
+    Logger::log(WiFi.softAPIP().toString());
     DataContainer::setSignalValue(
         SIG_IP_ADDRESS_STRING,
         static_cast<String>(WiFi.softAPIP().toString())
@@ -166,12 +167,12 @@ void WiFiAdapter::createAccessPoint()
 void WiFiAdapter::enableMDNSResponder(){
     String hostName = "home";
     if (!MDNS.begin(hostName.c_str())) {
-        Serial.println("Error setting up MDNS responder!");
+        Logger::log("Error setting up MDNS responder!");
     } else {
         DataContainer::setSignalValue(
             SIG_IP_ADDRESS_STRING,
             static_cast<String>(hostName + String(".local"))
         );
-        Serial.println("mDNS responder started with hostname: " + hostName + ".local");
+        Logger::log("mDNS responder started with hostname: " + hostName + ".local");
     }
 }

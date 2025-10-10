@@ -1,4 +1,5 @@
 #include <os/app/http/httpserver.hpp>
+#include "os/Logger.hpp"
 
 void HomeLightHttpServer::parameterizedHandler_newSetupJson(String &request, WiFiClient &client)
 {
@@ -27,18 +28,18 @@ void HomeLightHttpServer::parameterizedHandler_deviceSwitch(String &request, WiF
       parameters,
       4);
 
-  Serial.println("Async request processing started ");
+  Logger::log("Async request processing started ");
   /* Request will be processed in next cycle of the HttpServer */
 }
 
 void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String &request, WiFiClient &client)
 {
-  Serial.println("Loading configuration from file request ...");
+  Logger::log("Loading configuration from file request ...");
 
   escapeSpecialCharsInJson(request);
   request.replace("loaddeicvcfg&", "");
 
-  // Serial.println(request);
+  // Logger::log(request);
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
@@ -46,7 +47,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String &r
 
   if (success == DeserializationError::Code::Ok)
   {
-    Serial.println("Json deserialized successfully");
+    Logger::log("Json deserialized successfully");
     bool loadingFailure = false;
     loadingFailure |= std::any_cast<DeviceConfigManipulationAPI>(DataContainer::getSignalValue(SIG_SET_CONFIG_VIA_JSON_STRING)).loadConfigFromFile(doc);
 
@@ -62,7 +63,7 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String &r
   else
   {
 
-    Serial.println("Json file loading error");
+    Logger::log("Json file loading error");
     notification.title = "Config file loading failure";
     notification.type = UserInterfaceNotification::ERROR;
     notification.body = "Problem occurred with configuration file loading.";
@@ -118,7 +119,7 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String &request, Wi
         ledValueAddr->g = g.toInt() <= 255 ? g.toInt() : 255;
         ledValueAddr->b = b.toInt() <= 255 ? b.toInt() : 255;
 
-        // Serial.println(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
+        // Logger::log(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
       }
       else
       {
@@ -149,7 +150,7 @@ void HomeLightHttpServer::parameterizedHandler_setStripColor(String &request, Wi
 
       memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
 
-      // Serial.println(request);
+      // Logger::log(request);
       HTTPAsyncRequestHandler::createRequest(
           ASYNC_TYPE_DEVICE_SERVICE_CALL,
           memory,
@@ -165,7 +166,7 @@ void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String &reque
   escapeSpecialCharsInJson(request);
   request.replace("stripLoadFromMemory&", "");
 
-  Serial.println(request);
+  Logger::log(request);
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
   if (success == DeserializationError::Code::Ok)
@@ -175,7 +176,7 @@ void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String &reque
 
     if (devIdStr != "null" && memorySlotStr != "null")
     {
-      Serial.println("Load strip from memory ...");
+      Logger::log("Load strip from memory ...");
       uint8_t parameters[4];
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;         /* idx 1 */
@@ -195,7 +196,7 @@ void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String &request,
   escapeSpecialCharsInJson(request);
   request.replace("stripOverwriteSlot&", "");
 
-  Serial.println(request);
+  Logger::log(request);
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
@@ -207,7 +208,7 @@ void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String &request,
     if (devId != "null" && slot != "null")
     {
 
-      Serial.println("Request: stripOverwriteSlot {devId, slot}");
+      Logger::log("Request: stripOverwriteSlot {devId, slot}");
       uint8_t parameters[4];
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devId.toInt(); /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;      /* idx 1 */
@@ -227,7 +228,7 @@ void HomeLightHttpServer::parameterizedHandler_roomStateChange(String &request, 
   escapeSpecialCharsInJson(request);
   request.replace("stRmChng&", "");
 
-  Serial.println(request);
+  Logger::log(request);
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
@@ -255,7 +256,7 @@ void HomeLightHttpServer::parameterizedHandler_roomStateChange(String &request, 
         roomId = roomIdStr.toInt();
       }
 
-      // Serial.println("Room state change requested.");
+      // Logger::log("Room state change requested.");
       uint8_t parameters[4];
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = roomId;   /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
@@ -270,7 +271,7 @@ void HomeLightHttpServer::parameterizedHandler_roomStateChange(String &request, 
   }
   else
   {
-    Serial.println("Error with JSON parsing");
+    Logger::log("Error with JSON parsing");
   }
 }
 
@@ -280,7 +281,7 @@ void HomeLightHttpServer::parameterizedHandler_roomToggle(String& request, WiFiC
   escapeSpecialCharsInJson(request);
   request.replace("roomToggle&", "");
 
-  Serial.println(request);
+  Logger::log(request);
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
@@ -321,7 +322,7 @@ void HomeLightHttpServer::parameterizedHandler_roomToggle(String& request, WiFiC
         }
       }
 
-      Serial.println("Room state change requested.");
+      Logger::log("Room state change requested.");
       uint8_t parameters[4];
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = roomId;   /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1; /* idx 1 */
@@ -336,7 +337,7 @@ void HomeLightHttpServer::parameterizedHandler_roomToggle(String& request, WiFiC
   }
   else
   {
-    Serial.println("Error with JSON parsing");
+    Logger::log("Error with JSON parsing");
   }
 }
 
@@ -409,11 +410,11 @@ void HomeLightHttpServer::parameterizedHandler_getHash(String &request, WiFiClie
 
 void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String &request, WiFiClient &client)
 {
-  Serial.println("Extended controls requested");
+  Logger::log("Extended controls requested");
   escapeSpecialCharsInJson(request);
   request.replace("/getExtendedControls&", "");
 
-  Serial.println(request);
+  Logger::log(request);
 
   JsonDocument doc;
   DeserializationError success = deserializeJson(doc, request.c_str());
@@ -423,7 +424,7 @@ void HomeLightHttpServer::parameterizedHandler_getExtendedControls(String &reque
     if (deviceIdStr != "null")
     {
       uint16_t deviceId = deviceIdStr.toInt();
-      Serial.println("Advanced controls requested.");
+      Logger::log("Advanced controls requested.");
       HTTPAsyncRequestHandler::createRequest(
           ASYNC_GET_ADVANCED_CONTROLS,
           (uint8_t *)&deviceId,
@@ -440,7 +441,7 @@ void HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration(Strin
       nullptr,
       0);
 
-  Serial.println("Device configuration download requested ...");
+  Logger::log("Device configuration download requested ...");
   /* Request will be processed in next cycle of the HttpServer */
 }
 

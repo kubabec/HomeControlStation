@@ -1,5 +1,5 @@
 #include <os/app/timeMaster.hpp>
-
+#include "os/Logger.hpp"
 
 #define NTP_RESYNC_TIME (5 * 60 * 1000) //5 minut
 #define HALF_NTP_RESYNC_TIME (NTP_RESYNC_TIME / 2) //2.5 minut
@@ -17,7 +17,7 @@ NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
 
 
 void TimeMaster::init() {
-    Serial.println("DeviceProvider init ...");
+    Logger::log("DeviceProvider init ...");
     RtcTime startupTime;
     DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(startupTime));
 
@@ -30,17 +30,17 @@ void TimeMaster::init() {
     // Próba synchronizacji z NTP
     if (timeClient.update()) {
         updateNtpVariables();
-        Serial.println("Synchronized with NTP!");
+        Logger::log("Synchronized with NTP!");
         DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(getRtcTime()));
         startupTimeInitialized = true; // Czas startowy został zainicjalizowany
     } else {
         // NTP nie działa - przechodzimy na freerunning
         ntpAvailable = false;
-        Serial.println("NTP unavailable");
+        Logger::log("NTP unavailable");
     }    
     DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<RtcTime()>>(TimeMaster::getRtcTime));
      
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void TimeMaster::deinit() {
@@ -70,7 +70,7 @@ void TimeMaster::cyclic() {
     unsigned long now = millis();
 
     if (now - lastUpdateTime >= NTP_RESYNC_TIME) {
-        Serial.println("NTP resyncing ...");
+        Logger::log("NTP resyncing ...");
         if (timeClient.update()) {
             updateNtpVariables();
         } else {
@@ -123,7 +123,7 @@ void TimeMaster::updateNtpVariables() {
     ntpAvailable = true;
     lastUpdateTime = millis();
     wasNtpEverSynced = true; // NTP był kiedykolwiek zsynchronizowany 
-    Serial.println("NTP time updated: " + String(lastNTPTime));         
+    Logger::log("NTP time updated: " + String(lastNTPTime));         
 }
     
  

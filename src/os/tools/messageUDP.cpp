@@ -1,4 +1,5 @@
 #include <os/tools/MessageUDP.hpp>
+#include "os/Logger.hpp"
 
 MessageUDP::MessageUDP()
 {
@@ -121,13 +122,13 @@ bool MessageUDP::pushData(byte* arr, size_t size)
 
         //dataBuffer.reserve(dataBuffer.size() + size);
         dataBuffer.insert(dataBuffer.end(), arr, arr + size);
-        // Serial.println("MessageSize : " + String((int)dataBuffer.size()) + " bytes");
+        // Logger::log("MessageSize : " + String((int)dataBuffer.size()) + " bytes");
 
         /* Update total size */
         updateTotalSize();
     }
     else{
-        Serial.println("Nullptr passed to pushData");
+        Logger::log("Nullptr passed to pushData");
     }
 
     return true;
@@ -177,12 +178,12 @@ bool MessageUDP::toByteArray(byte* bufferPtr, size_t sizeCheck)
 
 MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
 {
-    // Serial.println("Constructing new UDP message ...");
+    // Logger::log("Constructing new UDP message ...");
     MessageUDP returnedMessage(-1, {0,0,0,0}, 0);
 
     /* Minimum size is fulfilled */
     if(vec.size() >= getMinimumSize()){
-        // Serial.println("Size correct.");
+        // Logger::log("Size correct.");
 
         // Extract id bytes from vector
         uint8_t idExtractBytes[4] = {0};
@@ -215,14 +216,14 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
 
 
         uint8_t tmpLastByte = (uint8_t)vec.at(vec.size()-1);
-        // Serial.println("tmplastByte " + String(tmpLastByte));
+        // Logger::log("tmplastByte " + String(tmpLastByte));
 
         if( validateMessageId(tmpId) && 
             validateTotalSize(vec.size(), tmpSize) && 
             validateLastByteValue(tmpLastByte) &&
             validateIpAddress(tmpAddr) )
         {
-            // Serial.println("Validation completed successfully");
+            // Logger::log("Validation completed successfully");
             returnedMessage.id = tmpId;
             returnedMessage.totalSize = tmpSize;
             returnedMessage.ipAddress = tmpAddr;
@@ -237,23 +238,23 @@ MessageUDP MessageUDP::fromUint8Vector(std::vector<uint8_t>& vec)
                 {
                     returnedMessage.dataBuffer.push_back(vec.at(i));
                 }
-                // Serial.println("Data copying completed with payload size " + String(returnedMessage.dataBuffer.size()) + " bytes");
+                // Logger::log("Data copying completed with payload size " + String(returnedMessage.dataBuffer.size()) + " bytes");
             }
         }
     }
 
-    // Serial.println("Constructing new message done");
+    // Logger::log("Constructing new message done");
     return returnedMessage;
 }
 
 void MessageUDP::serialPrintMessageUDP(MessageUDP& msg)
 {
-    Serial.println("- - ** UDP Message ** - -");
+    Logger::log("- - ** UDP Message ** - -");
 
     Serial.print("ID: " + String(msg.id));
     Serial.print(" TotalSize: " + String(msg.totalSize));
     Serial.print(" IP Address: " + String(msg.ipAddress.octet1) + "." + String(String(msg.ipAddress.octet2)) + "." + String(msg.ipAddress.octet3) + "." + String(msg.ipAddress.octet4));
-    Serial.println(" Port: " + String(msg.udpPort));
+    Logger::log(" Port: " + String(msg.udpPort));
 
     Serial.print(" Payload: ");
     for(int i = 0 ; i < msg.dataBuffer.size(); i ++)
@@ -263,7 +264,6 @@ void MessageUDP::serialPrintMessageUDP(MessageUDP& msg)
     }
 
     Serial.flush();
-    Serial.println();
 }
 
 void MessageUDP::resetByteIterationCount()
@@ -273,18 +273,18 @@ void MessageUDP::resetByteIterationCount()
 
 uint8_t MessageUDP::getCurrentByte()
 {
-     // Serial.println("Total size: " + String(totalSize));
-    // Serial.println("byteIterationIndex = " + String(byteIterationIndex));
+     // Logger::log("Total size: " + String(totalSize));
+    // Logger::log("byteIterationIndex = " + String(byteIterationIndex));
     if(byteIterationIndex > 13)
     {
         //return 0;
         if(byteIterationIndex != totalSize - 1)
         {
-            // Serial.println("Returning payload byte at index: " + String(byteIterationIndex-2));
+            // Logger::log("Returning payload byte at index: " + String(byteIterationIndex-2));
             return dataBuffer.at(byteIterationIndex-14); /* Return payload byte */
         }else
         {
-            // Serial.println("Returning checkusm byte");
+            // Logger::log("Returning checkusm byte");
             return lastByteCheckValue;
         }
         
@@ -292,12 +292,12 @@ uint8_t MessageUDP::getCurrentByte()
         /* Return message ID*/
         if(byteIterationIndex >= 0 && byteIterationIndex <= 3)
         {
-            // Serial.println("Returning message ID");
+            // Logger::log("Returning message ID");
             return *(((uint8_t*)&id) + byteIterationIndex);
             
         } else if (byteIterationIndex == 4) /* Return message size */
         {
-            // Serial.println("Returning total size");
+            // Logger::log("Returning total size");
             return (uint8_t)totalSize;
         } else if (byteIterationIndex >= 6 && byteIterationIndex <= 9)
         {

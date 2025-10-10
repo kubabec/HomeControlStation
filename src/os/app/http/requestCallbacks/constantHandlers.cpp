@@ -1,4 +1,5 @@
 #include <os/app/http/httpserver.hpp>
+#include "os/Logger.hpp"
 #include <Esp.h>
 
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
@@ -221,7 +222,7 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient &client)
   /* Erase flash callback */
   try
   {
-    Serial.println("Erasing flash!");
+    Logger::log("Erasing flash!");
     /* erase flash */
     std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
     /* redirect */
@@ -236,7 +237,7 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient &client)
 
 void HomeLightHttpServer::constantHandler_asyncTest(WiFiClient &client)
 {
-  Serial.println("Asysnc request received!");
+  Logger::log("Asysnc request received!");
 }
 
 void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)

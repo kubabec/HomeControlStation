@@ -1,4 +1,5 @@
 #include <os/tools/ExtendedDataAllocator.hpp>
+#include "os/Logger.hpp"    
 
 
 ExtendedData ExtendedDataAllocator::createNewExtendedData(uint16_t length){
@@ -60,11 +61,11 @@ ExtendedData ExtendedDataAllocator::getExtendedDataById(uint8_t id)
 
 void ExtendedDataAllocator::printExtendedDataContainer()
 {
-    Serial.println("-- Extended data list: --" );
+    Logger::log("-- Extended data list: --" );
     for(int i = 0 ; i < extendedDataContainer.size(); i++){
-        Serial.println("Identifier: " + String((int)extendedDataContainer.at(i).identifier));
-        Serial.println("Length: " + String((int)extendedDataContainer.at(i).length));
-        Serial.println(String("Address: %x", (int)extendedDataContainer.at(i).memoryPtr));    
+        Logger::log("Identifier: " + String((int)extendedDataContainer.at(i).identifier));
+        Logger::log("Length: " + String((int)extendedDataContainer.at(i).length));
+        Logger::log(String("Address: %x", (int)extendedDataContainer.at(i).memoryPtr));    
     }
-    Serial.println("-- --");
+    Logger::log("-- --");
 }

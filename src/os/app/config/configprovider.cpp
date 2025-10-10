@@ -1,4 +1,5 @@
 #include <os/app/config/ConfigProvider.hpp>
+#include "os/Logger.hpp"
 
 #include <os/app/config/PersistentMemoryAccess.hpp>
 #include <ArduinoJson.h>
@@ -14,7 +15,7 @@ bool ConfigProvider::nvmDataAvailable = false;
 
 void ConfigProvider::init()
 {
-    Serial.println("ConfigProvider init ...");
+    Logger::log("ConfigProvider init ...");
     totalNvmSize = configRamMirror.getSize() + PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize();
 
     PersistentMemoryAccess::init(totalNvmSize);
@@ -35,7 +36,7 @@ void ConfigProvider::init()
 
     if(readRamMirrorFromNvm())
     {
-        Serial.println("safe flag : " + String((int)configRamMirror.safeShutdownFlag ));
+        Logger::log("safe flag : " + String((int)configRamMirror.safeShutdownFlag ));
         if(configRamMirror.safeShutdownFlag != 37)
         {
             /* Unexpected reset detected! */
@@ -62,7 +63,7 @@ void ConfigProvider::init()
     }else 
     {
     
-        Serial.println("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
+        Logger::log("ConfigProvider:: Reading EEPROM failed, loading default configuration ...");
         NodeConfiguration emptyConfiguration;
         // Master device as default;
         emptyConfiguration.isHttpServer = true;
@@ -117,7 +118,7 @@ void ConfigProvider::init()
         static_cast<std::function<void(void)>>(ConfigProvider::massErase));
 
 
-    Serial.println("... done");
+    Logger::log("... done");
 }
 
 void ConfigProvider::updateNodeConfigurationSignal()
@@ -134,7 +135,7 @@ void ConfigProvider::updateNodeConfigurationSignal()
     if(validConfiguration.networkSSID.length() > 0){
         validConfiguration.networkCredentialsAvailable = true;
     }
-    Serial.println(validConfiguration.networkPassword);
+    Logger::log(validConfiguration.networkPassword);
 
     /* Write valid  configuration to DataContainer */
     // Obsolete signal to be removed
@@ -145,7 +146,7 @@ void ConfigProvider::updateNodeConfigurationSignal()
     // New signal to be used in the future implementation
     DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, validConfiguration);
 
-    Serial.println("NVM configuration restored successfully.");
+    Logger::log("NVM configuration restored successfully.");
 }
 
 void ConfigProvider::cyclic()
@@ -198,7 +199,7 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     String networkPassword          = String(doc["NodeConfig"][0]["wifiPass"]);
     String panelPassword            = String(doc["NodeConfig"][0]["usrPass"]);
 
-    //Serial.println(isHttpServerActive + " " + isRcServerActive + " " + hasUserAdminRights+ " " +  nodeType+ " " +  networkSSID+ " " +  networkPassword+ " " +  panelPassword);
+    //Logger::log(isHttpServerActive + " " + isRcServerActive + " " + hasUserAdminRights+ " " +  nodeType+ " " +  networkSSID+ " " +  networkPassword+ " " +  panelPassword);
 
     /*Assign parameters to RAM mirror whenever there was valid value in the configuration file */
     if(isNotNull(isHttpServerActive)){
@@ -273,7 +274,7 @@ bool ConfigProvider::setConfigViaString(String& configString)
                 configRamMirror.setPassword(networkPassword);
                 configRamMirror.setPanelPassword(panelPassword);
 
-                Serial.println("Applying following configuration :");
+                Logger::log("Applying following configuration :");
                 configRamMirror.serialPrint();
 
                 /* return success */
@@ -286,7 +287,7 @@ bool ConfigProvider::setConfigViaString(String& configString)
             }
             
         }else {
-            Serial.println("ConfigProvider://Problem with JSON parsing.");
+            Logger::log("ConfigProvider://Problem with JSON parsing.");
             notification.body = "Config JSON content cannot be correctly evaluated";
             std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notification);
         }
@@ -332,7 +333,7 @@ bool ConfigProvider::saveRamMirrorToNvm()
             retVal = true;
         }else 
         {
-            Serial.println("Saving config failed!");
+            Logger::log("Saving config failed!");
         }
 
         /* Release merged buffer resources */
@@ -427,21 +428,21 @@ bool ConfigProvider::getDatablock(PersistentDatablockID blockID, uint8_t* buffer
 
 void ConfigProvider::eraseDatablockMemory()
 {
-    Serial.println("Datablock erase start...");
+    Logger::log("Datablock erase start...");
     uint8_t eraserData[PERSISTENT_DATABLOCK_SIZE] = {0xFF};
 
     for(uint8_t datablock = e_PERSISTENT_BLOCK_FIRST; datablock <= e_PERSISTENT_BLOCK_LAST; datablock++)
     {
         if(!setDatablock((PersistentDatablockID)datablock, eraserData))
         {
-            Serial.println("Erasing failed!");
+            Logger::log("Erasing failed!");
             return;
         }
     }
 
     nvmDataAvailable = false;
 
-    Serial.println("Datablock erase done.");
+    Logger::log("Datablock erase done.");
 }
 
 void ConfigProvider::flushNvmData()
