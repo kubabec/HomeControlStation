@@ -421,6 +421,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     switch (serviceType)
     {
     case DEVSERVICE_STATE_SWITCH:
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_STATE_SWITCH, param.a: " + String((int)param.a));
         if (param.a == 1)
         {
             stripOn();
@@ -440,16 +441,18 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             }
             isOn = false;
         }
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_STATE_SWITCH completed");
         return SERV_SUCCESS;
 
     case DEVSERVICE_LED_STRIP_SAVE_CONTENT:
-        Logger::log("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SAVE_CONTENT");
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_LED_STRIP_SAVE_CONTENT, param.a: " + String((int)param.a));
         return saveContentAs((LedStripContentIndex)param.a);
 
     case DEVSERVICE_LED_STRIP_SWITCH_CONTENT:
-        Logger::log("LedWS1228bDeviceType://DEVSERVICE_LED_STRIP_SWITCH_CONTENT");
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_LED_STRIP_SWITCH_CONTENT, param.a: " + String((int)param.a));
         return applyContent((LedStripContentIndex)param.a);
     case DEVSERVICE_LIVE_ANIMATION:
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_LIVE_ANIMATION, param.a: " + String((int)param.a));
         if (param.a == 1 && liveAnimation == nullptr) // start animation
         {
             /* Strip is off, we must start switch on animation and queue live for later */
@@ -468,6 +471,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         {
             stopLiveAnimation();
         }
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_LIVE_ANIMATION completed");
         return SERV_SUCCESS;
     default:
         return SERV_NOT_SUPPORTED;
@@ -487,7 +491,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
     case DEVSERVICE_GET_DETAILED_COLORS:
-        Logger::log("Advanced controls requested with size: " + String((int)param.size) + ", virtualDiodesCount: " + String((int)virtualDiodesCount));
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_GET_ADVANCED_CONTROLS/DETAILED_COLORS, size: " + String((int)param.size));
 
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
@@ -496,13 +500,16 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
             getDetailedColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
 
+            Logger::log("<" + deviceName + "> Service: DEVSERVICE_GET_ADVANCED_CONTROLS/DETAILED_COLORS completed");
             return SERV_SUCCESS;
         }
         else
         {
+            Logger::log("<" + deviceName + "> Service: DEVSERVICE_GET_ADVANCED_CONTROLS/DETAILED_COLORS failed");
             return SERV_EXECUTION_FAILURE;
         }
     case DEVSERVICE_SET_DETAILED_COLORS:
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_SET_DETAILED_COLORS, size: " + String((int)param.size));
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
             // Colors cannot be updated during ongoin LIVE show
@@ -536,14 +543,17 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
                     m_reportNvmDataChangedCbk();
                 }
             }
+            Logger::log("<" + deviceName + "> Service: DEVSERVICE_SET_DETAILED_COLORS completed");
             return SERV_SUCCESS;
         }
         else
         {
+            Logger::log("<" + deviceName + "> Service: DEVSERVICE_SET_DETAILED_COLORS failed");
             return SERV_EXECUTION_FAILURE;
         }
 
     case DEVSERVICE_SET_EXT_MEMORY_PTR:
+        Logger::log("<" + deviceName + "> Service: DEVSERVICE_SET_EXT_MEMORY_PTR, size: " + String((int)param.size));
         return updateExtendedMemoryPtr(param.buff, param.size);
     default:
         return SERV_NOT_SUPPORTED;

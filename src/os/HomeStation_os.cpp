@@ -1,6 +1,7 @@
 #include <os/HomeStation_os.hpp>
 #include <DHT.h>
 #include <os/Logger.hpp>
+#include "esp_adc_cal.h"
 
 DHT tempSensor(21, DHT11);
 
@@ -212,7 +213,7 @@ void OperatingSystem::task1s()
     heartbeatCounter++;
     if (heartbeatCounter >= 30)
     {
-        Logger::log("...");
+        Logger::log("< SYSTEM HEARTBEAT > {RAM free: " + String((int)heap_caps_get_free_size(MALLOC_CAP_DEFAULT)) + " bytes}");
         heartbeatCounter = 0;
     }
 
@@ -415,7 +416,7 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
         .body = "",
         .type = UserInterfaceNotification::WARNING};
 
-    Serial.print("Access level granted: ");
+    Logger::log("Access level granted: ");
     switch (currentAccessLevel)
     {
     case e_ACCESS_LEVEL_NONE:

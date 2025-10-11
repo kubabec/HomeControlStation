@@ -249,6 +249,7 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     switch (serviceType)
     {
     case DEVSERVICE_STATE_SWITCH:
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_STATE_SWITCH, param.a: " + String((int)param.a));
         if (param.a == 1)
         {
             if (!isOn)
@@ -265,11 +266,14 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
             }
             Logger::log("Setting state: OFF");
         }
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_STATE_SWITCH completed");
         return SERV_SUCCESS;
 
     case DEVSERVICE_BRIGHTNESS_CHANGE:
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_BRIGHTNESS_CHANGE, param.a: " + String((int)param.a));
         changeBrightness(param.a);
         Logger::log("Changing brightness to " + String((int)param.a));
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_BRIGHTNESS_CHANGE completed");
         return SERV_SUCCESS;
 
     default:
@@ -293,12 +297,13 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     switch (serviceType)
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
-        Logger::log("DEVSERVICE_GET_ADVANCED_CONTROLS");
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS");
         if (param.size == sizeof(AdvancedControlsOnOff))
         {
             memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
         }
 
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS completed");
         return SERV_SUCCESS;
         break;
 

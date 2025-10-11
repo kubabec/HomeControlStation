@@ -33,10 +33,12 @@ void RcResponse::print() {
     Logger::log("requestType: " + String((int)requestType));
     Logger::log("responseType: " + String((int)responseType));
     int i = 0;  
+    String out = "Data: ";
     for(auto& byte : data) {
-        Serial.print((int)byte);
+        out += String((int)byte);
         i++;
     }
+    Logger::log(out);
     Logger::log("");
 
     Logger::log("crc: " + String((int)crc));

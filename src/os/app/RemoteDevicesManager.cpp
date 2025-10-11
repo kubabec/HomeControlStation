@@ -23,41 +23,58 @@ void RemoteDevicesManager::init()
     /* Allocate memory for NVM data */
     uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
     uint8_t offset = 0;
-    for (uint8_t blockID = e_BLOCK_RDM_1; blockID <= e_BLOCK_RDM_5; blockID++)
+    if (nvmData != nullptr)
     {
-        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
-        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
-            DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
-            (PersistentDatablockID)blockID, // Datablock ID
-            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
-        );
-
-        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
-        offset += PERSISTENT_DATABLOCK_SIZE;
-    }
-    // check if FIRST byte of NVM contains validity flag
-    if (nvmData[0] == NVM_VALID_FLAG)
-    {
-        size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
-        if (sizeOfNvm < arr_bytes)
+        for (uint8_t blockID = e_BLOCK_RDM_1; blockID <= e_BLOCK_RDM_5; blockID++)
         {
-            Logger::log("RemoteDevicesManager:// NVM restoration error, invalid size");
-        }
-        else
-        {
-            memcpy(mappingSlotsForExternalNodes.data(), &(nvmData[1]), arr_bytes);
-            Logger::log("RemoteDevicesManager:// NVM restored succesfully");
-        }
-    }
+            /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+            std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+                DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
+                (PersistentDatablockID)blockID, // Datablock ID
+                (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+            );
 
-    free(nvmData);
+            /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+            offset += PERSISTENT_DATABLOCK_SIZE;
+        }
+        // check if FIRST byte of NVM contains validity flag
+        if (nvmData[0] == NVM_VALID_FLAG)
+        {
+            size_t arr_bytes = mappingSlotsForExternalNodes.size() * sizeof(ExternalNodeMapping);
+            if (sizeOfNvm < arr_bytes)
+            {
+                Logger::log("RemoteDevicesManager:// NVM restoration error, invalid size");
+            }
+            else
+            {
+                memcpy(mappingSlotsForExternalNodes.data(), &(nvmData[1]), arr_bytes);
+                Logger::log("RemoteDevicesManager:// NVM restored succesfully");
+
+                for (int i = 0; i < mappingSlotsForExternalNodes.size(); i++)
+                {
+                    auto slot = mappingSlotsForExternalNodes.at(i);
+                    if (slot.isUsed)
+                    {
+                        char macStr[18];
+                        snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                                 (uint8_t)(slot.mac >> 56), (uint8_t)(slot.mac >> 48),
+                                 (uint8_t)(slot.mac >> 40), (uint8_t)(slot.mac >> 32),
+                                 (uint8_t)(slot.mac >> 24), (uint8_t)(slot.mac >> 16),
+                                 (uint8_t)(slot.mac >> 8), (uint8_t)(slot.mac));
+                        Logger::log("Restored mapping for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
+                    }
+                }
+            }
+        }
+
+        free(nvmData);
+    }
 
     DataContainer::subscribe(SIG_RC_DEVICES_INTERNAL_TUNNEL, RemoteDevicesManager::tunnelDataUpdate);
 
     std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse &)>)>>(DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER))(SERVICE_CALL_REQ, RemoteDevicesManager::receiveResponse);
 
     // std::any_cast<std::function<bool(RequestType, std::function<bool(RcResponse&)>)>>
-    // (DataContainer::getSignalValue(CBK_REGISTER_RESPONSE_RECEIVER)) (EXTENDED_DATA_DOWNLOAD_REQ, RemoteDevicesManager::receiveResponse);
 
     /*TESTCODE*/
     /* Link service API functions to RemoteDevicesManager function calls */
@@ -100,12 +117,19 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
     /* We must do:
     1. Check if this nodeMAC already exists in current mapping
     2. If not, assign first empty mapping to it */
+    char macStr[18];
+    snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+             (uint8_t)(nodeMAC >> 56), (uint8_t)(nodeMAC >> 48),
+             (uint8_t)(nodeMAC >> 40), (uint8_t)(nodeMAC >> 32),
+             (uint8_t)(nodeMAC >> 24), (uint8_t)(nodeMAC >> 16),
+             (uint8_t)(nodeMAC >> 8), (uint8_t)(nodeMAC));
 
     for (uint8_t i = 0; i < mappingSlotsForExternalNodes.size(); i++)
     {
         if (mappingSlotsForExternalNodes.at(i).isUsed &&
             mappingSlotsForExternalNodes.at(i).mac == nodeMAC)
         {
+            Logger::log("RemoteDevicesManager:// Existing mapping found for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
             /* mapping found at offset 'i' */
             return i;
         }
@@ -123,10 +147,12 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
             mappingSlotsForExternalNodes.at(i).mac = nodeMAC;
 
             /* new slot found at offset 'i' */
+            Logger::log("RemoteDevicesManager:// New mapping created for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
             return i;
         }
     }
 
+    Logger::log("RemoteDevicesManager:// No mapping slot available for node with MAC: " + String(macStr));
     return offset;
 }
 
@@ -150,7 +176,19 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
             (local devices count) + ((node identifiers range) * (offset for particular unique MAC)) + (local Device ID on it's node)
             e.g. :
             10 + (10 * 1) + 4 => 20 + 4 => 24 */
-            uint8_t uniqueRcId = numberOfLocalDevicesReserved + (rangeForEachNode * getMappingOffsetForNode(device.macAddress)) + device.deviceId;
+            uint8_t mappingOffset = getMappingOffsetForNode(device.macAddress);
+            char macStr[18];
+            snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                     (uint8_t)(device.macAddress >> 56), (uint8_t)(device.macAddress >> 48),
+                     (uint8_t)(device.macAddress >> 40), (uint8_t)(device.macAddress >> 32),
+                     (uint8_t)(device.macAddress >> 24), (uint8_t)(device.macAddress >> 16),
+                     (uint8_t)(device.macAddress >> 8), (uint8_t)(device.macAddress));
+            if (mappingOffset == 255)
+            {
+                Logger::log("RemoteDevicesManager:// No mapping offset available for device with local ID: " + String((int)device.deviceId) + ", MAC: " + String(macStr) + ", device skipped");
+                continue; /* skip this device, no mapping available */
+            }
+            uint8_t uniqueRcId = numberOfLocalDevicesReserved + (rangeForEachNode * mappingOffset) + device.deviceId;
 
             // Create new translation {node, device}
             RCTranslation translation = {
@@ -164,6 +202,8 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
             vecRemoteDevicesDescription.push_back(device);
 
             /* Save translation {uniqueID, {node, device}} to internal map*/
+
+                        Logger::log("RemoteDevicesManager:// New device with local ID" + String((int)translation.onSourceNodeLocalId) + ", MAC: " + String(macStr) + ",  saved with ID" + String((int)uniqueRcId));
             currentIdMapping.insert({uniqueRcId, translation});
             uniqueRcId++;
         }
@@ -316,7 +356,13 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
                 responseNodeHash);
 
             currentRequestRespErrorCode = (response.getResponseType() == POSITIVE_RESP) ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
-            Logger::log("RDM : //// Received response with error code: " + String((int)currentRequestRespErrorCode));
+            const char* errorText = "UNKNOWN";
+            switch (currentRequestRespErrorCode) {
+                case SERV_SUCCESS: errorText = "SUCCESS"; break;
+                case SERV_GENERAL_FAILURE: errorText = "GENERAL_FAILURE"; break;
+                default : break;
+            }
+            Logger::log("RDM : //// Received response with error code: " + String(errorText));
         }
         else
         {

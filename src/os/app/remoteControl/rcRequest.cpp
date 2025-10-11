@@ -134,17 +134,17 @@ void RcRequest::calculateCrc() {
 }
 
 void RcRequest::print() {
-    Logger::log("Request ID: " + String((int)requestId));
-    Logger::log("Target Node MAC: " + String((int)targetNodeMAC));
-    Logger::log("Target Device ID: " + String((int)targetDeviceId));
-    Logger::log("Request Type: " + String((int)requestType));
-    Logger::log("Data: ");
+    String out = "Request ID: " + String((int)requestId) + " | " +
+                 "Target Node MAC: " + String((int)targetNodeMAC) + " | " +
+                 "Target Device ID: " + String((int)targetDeviceId) + " | " +
+                 "Request Type: " + String((int)requestType) + " | " +
+                 "Data: ";
     for (uint16_t i = 0; i < data.size(); i++) {
-        Serial.print((int)data[i]);
-        Serial.print(" ");
+        out += String((int)data[i]) + " ";
     }
-    Logger::log("Request Send Count: " + String((int)requestSendCount));
-    Logger::log("CRC: " + String(crc));
+    out += "| Request Send Count: " + String((int)requestSendCount) +
+           " | CRC: " + String(crc);
+    Logger::log(out);
 }
 
 void RcRequest::clear() {

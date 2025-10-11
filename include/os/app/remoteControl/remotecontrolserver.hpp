@@ -7,10 +7,11 @@
 #include <os/datacontainer/SigMessages.hpp>
 #include <os/app/remoteControl/rc_DataTypes.hpp>
 #include <os/app/remoteControl/ReqestProcessor.hpp>
+#include "os/Logger.hpp"
 
 #define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
 #define TIME_TO_REPEAT_DETAILED_DATA_REQEST 500
-#define TIME_TO_REPEAT_KEEP_ALIVE_REQEST 10000
+#define TIME_TO_REPEAT_KEEP_ALIVE_REQEST 15000
 #define TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED 2000
 
 
@@ -25,15 +26,15 @@ typedef struct {
 
 
     void printLn(){
-        Serial.println("------- Remote Node Information --------------");
-        Serial.println("numberOfDevices : " + String(numberOfDevices));
-        Serial.println("IP Address : " + String(nodeIpAddress.octet1) + "." + String(nodeIpAddress.octet2) + "." + String(nodeIpAddress.octet3) + "." + String(nodeIpAddress.octet4));
+        Logger::log("Remote Node Info | Devices: " + String(numberOfDevices) +
+                " | IP: " + String(nodeIpAddress.octet1) + "." + String(nodeIpAddress.octet2) + "." +
+                String(nodeIpAddress.octet3) + "." + String(nodeIpAddress.octet4) +
+                " | Hash: " + String((int)lastKnownNodeHash) +
+                " | Completed: " + String(isDeviceCollectionCompleted) + "] | ---");
         for(auto& device: devicesCollection) {
             device.print();
         }
-        Serial.println("Device Hash : " + String((int)lastKnownNodeHash));
-        Serial.println("isDeviceCollectionCompleted : " + String(isDeviceCollectionCompleted));
-        Serial.println("------- ----------------------- --------------");                
+
     }
 } RemoteNodeInformation;
 

@@ -65,28 +65,33 @@ void RemoteControlClient::processUDPRequest(MessageUDP& msg){
     switch(msg.getId()) {
         case RC_REQUEST:
             // Logger::log("-> Dostałem UDP type RC_REQUEST");
+            Logger::log("RemoteControlClient:// Received RC_REQUEST message.");
             processGenericRequest(msg);
             
             break;
 
         case REQUEST_NODE_INITIAL_DATA:
             // Logger::log("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
+            Logger::log("RemoteControlClient:// Received REQUEST_NODE_INITIAL_DATA message.");
             sendInitialDataResponse();
 
 
             break;
         case REQUEST_NODE_DETAILED_DATA:
             // Logger::log("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA");
+            Logger::log("RemoteControlClient:// Received REQUEST_NODE_DETAILED_DATA message.");
             sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA);
             break;
         
         case REQUEST_KEEP_ALIVE:
             // Logger::log("-> Dostałem UDP REQUEST_KEEP_ALIVE");
+            Logger::log("RemoteControlClient:// Received REQUEST_KEEP_ALIVE message.");
             sendKeepAlive();
             break;
         
         case REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE:
             // Logger::log("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
+            Logger::log("RemoteControlClient:// Received REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE message.");
             sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE);
             break;
 
@@ -236,7 +241,6 @@ bool RemoteControlClient::registerRequestReceiver(RequestType request, std::func
 }
 
 bool RemoteControlClient::sendResponse(RcResponse& response) {
-    Logger::log("!!! RemoteControlClient - sendResponse do vektora - ");
     vecResponseMessage.push(std::move(response));
 
     return true;

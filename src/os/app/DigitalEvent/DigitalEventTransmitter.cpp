@@ -24,6 +24,7 @@ void DigitalEventTransmitter::deinit()
 
 void DigitalEventTransmitter::fireEvent(uint64_t eventId)
 {
+    Logger::log("DigitalEventTransmitter://Firing digital event with ID: " + String((unsigned long long)eventId));
     MessageUDP msg(DIGITAL_EVENT_FIRED_MSG_ID, NETWORK_BROADCAST, 9001);
     msg.pushData((uint8_t *)&eventId, sizeof(uint64_t));
 

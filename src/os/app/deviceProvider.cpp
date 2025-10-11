@@ -67,7 +67,6 @@ void DeviceProvider::init()
 
         std::any responseCBK = DataContainer::getSignalValue(CBK_RESPONSE);
         sendResponse = (std::any_cast<std::function<bool(RcResponse &)>>(responseCBK));
-        // requestResponseLong = (std::any_cast<std::function<bool(RcResponseLong&)>>(responseCBK));
     }
 
     updateDeviceDescriptionSignal();
@@ -575,7 +574,7 @@ void DeviceProvider::addDeviceDescriptionToResponsePayload(RcResponse &response,
                 device.toByteArray(serializedDescription, device.getSize());
                 /*Add memory buffer to response payload*/
                 response.pushData(serializedDescription, device.getSize());
-                Logger::log("serializedDescription size: " + String(device.getSize()));
+                // Logger::log("serializedDescription size: " + String(device.getSize()));
 
                 free(serializedDescription);
             }

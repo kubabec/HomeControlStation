@@ -4,6 +4,7 @@
 #include <map>
 #include <devices/device.hpp>
 #include <os/datacontainer/DataContainer.hpp>
+#include "os/Logger.hpp"
 
 
 #define DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL 2
@@ -52,11 +53,11 @@ class HTTPAsyncRequestHandler{
         uint8_t requestData[MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST];
 
         void print(){
-            Serial.println("Request type: " + String((int)type));
-            Serial.println("requestData[0]: " + String((int)requestData[0]));
-            Serial.println("requestData[1]: " + String((int)requestData[1]));
-            Serial.println("requestData[2]: " + String((int)requestData[2]));
-            Serial.println("requestData[3]: " + String((int)requestData[3]));
+            Logger::log("Request type: " + String((int)type));
+            Logger::log("requestData[0]: " + String((int)requestData[0]));
+            Logger::log("requestData[1]: " + String((int)requestData[1]));
+            Logger::log("requestData[2]: " + String((int)requestData[2]));
+            Logger::log("requestData[3]: " + String((int)requestData[3]));
         }
     }AsyncHttpRequest;
 

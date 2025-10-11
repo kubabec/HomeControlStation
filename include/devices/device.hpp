@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "AdvancedControls.hpp"
+#include "os/Logger.hpp"
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 #define DEVICE_NAME_MAX_LENGHT 25
@@ -10,7 +11,8 @@
 #define SERVICE_OVERLOADING_FUNCTION_INDEX 1
 #define SERVICE_NAME_INDEX 0
 
-enum ServiceOverloadingFunction{
+enum ServiceOverloadingFunction
+{
     serviceCall_NoParams,
     serviceCall_1,
     serviceCall_2,
@@ -26,7 +28,7 @@ typedef enum
     SERV_BUSY,
     SERV_PENDING,
     SERV_NOT_SUPPORTED
-}ServiceRequestErrorCode;
+} ServiceRequestErrorCode;
 
 typedef enum
 {
@@ -46,9 +48,10 @@ typedef enum
     DEVSERVICE_SEGMENT_STATE_SWITCH,
     DEVSERVICE_LIVE_ANIMATION,
     DEVSERVICE_INVALID
-}DeviceServicesType;
+} DeviceServicesType;
 
-typedef enum {
+typedef enum
+{
     type_ONOFFDEVICE = 43,
     type_LED_STRIP,
     type_TEMP_SENSOR,
@@ -57,30 +60,28 @@ typedef enum {
     type_HARDWARE_BUTTON,
     type_DEVICE_TYPE_LAST = type_HARDWARE_BUTTON
 
-}DevType;
-
+} DevType;
 
 struct RtcTime
 {
-  int	sec = 0;
-  int	min = 0;
-  int	hour = 0;
-  int	mday = 0;
-  int	mon = 0;
-  int	year = 0;
-  int	wday = 0;
-  int	yday = 0;
-  int	isdst = 0;
+    int sec = 0;
+    int min = 0;
+    int hour = 0;
+    int mday = 0;
+    int mon = 0;
+    int year = 0;
+    int wday = 0;
+    int yday = 0;
+    int isdst = 0;
 
-  String toString()
-  {
-    char buffer[20];
-    snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
-             year, mon, mday,
-             hour, min, sec);
-    return String(buffer);
-  }
-
+    String toString()
+    {
+        char buffer[20];
+        snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d %02d:%02d:%02d",
+                 year, mon, mday,
+                 hour, min, sec);
+        return String(buffer);
+    }
 };
 
 typedef struct
@@ -90,7 +91,7 @@ typedef struct
     uint8_t c = 0xff;
     uint8_t d = 0xff;
     uint8_t e = 0xff;
-}ServiceParameters_set1;
+} ServiceParameters_set1;
 
 typedef struct
 {
@@ -99,40 +100,42 @@ typedef struct
     float c = 0xff;
     float d = 0xff;
     float e = 0xff;
-}ServiceParameters_set2;
+} ServiceParameters_set2;
 
-typedef enum{
+typedef enum
+{
     e_OUT_from_DEVICE = 15,
     e_IN_to_DEVICE,
     e_UNKNOWN_PARAM_DIRECTION
-}ServiceDirectionType;
+} ServiceDirectionType;
 
 typedef struct
 {
-    uint8_t* buff = 0;
+    uint8_t *buff = 0;
     uint16_t size = 0xff;
     uint16_t additionalParam = 0xFF;
     uint8_t direction = (uint8_t)e_UNKNOWN_PARAM_DIRECTION;
 
-    void print(){
-        Serial.println("ServiceParameters_set3");
-        Serial.println("buff: " + String((int)buff));
-        Serial.println("size: " + String((int)size));
-        Serial.println("additionalParam: " + String((int)additionalParam));
-        switch(direction){
-            case e_UNKNOWN_PARAM_DIRECTION:
-            Serial.println("direction : e_UNKNOWN_PARAM_DIRECTION" );
+    void print()
+    {
+        Logger::log("ServiceParameters_set3");
+        Logger::log("buff: " + String((int)buff));
+        Logger::log("size: " + String((int)size));
+        Logger::log("additionalParam: " + String((int)additionalParam));
+        switch (direction)
+        {
+        case e_UNKNOWN_PARAM_DIRECTION:
+            Logger::log("direction : e_UNKNOWN_PARAM_DIRECTION");
             break;
-            case e_OUT_from_DEVICE:
-            Serial.println("direction : e_OUT_from_DEVICE" );
+        case e_OUT_from_DEVICE:
+            Logger::log("direction : e_OUT_from_DEVICE");
             break;
-            case e_IN_to_DEVICE:
-            Serial.println("direction : e_IN_to_DEVICE" );
+        case e_IN_to_DEVICE:
+            Logger::log("direction : e_IN_to_DEVICE");
             break;
         }
-        
     }
-}ServiceParameters_set3;
+} ServiceParameters_set3;
 
 struct DeviceDescription
 {
@@ -141,109 +144,150 @@ struct DeviceDescription
     uint8_t deviceId = -1;
     uint8_t roomId = 255;
     uint8_t isEnabled;
-    uint8_t customBytes [NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = { 0x00};
-    
+    uint8_t customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = {0x00};
+
     String deviceName;
 
-    DeviceDescription(){
+    DeviceDescription()
+    {
         memset(customBytes, 0x00, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     }
 
-    void print() {
-        //Serial.println(" ======DEVICE DESCRIPTION=============");
-        Serial.print("deviceType: " + String(deviceType) + " - ");
-        Serial.print("macAddress: " + String((int)macAddress) + " - ");
-        Serial.print("deviceId: " + String(deviceId) + " - ");
-        Serial.print("isEnabled: " + String(isEnabled) + " - ");
-        Serial.println("deviceName: " + deviceName);
-        Serial.println();
-        for(int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++) {
-            Serial.print(String(customBytes[i]) + " ");
-        }        
-        Serial.println();
+    void print()
+    {
+        char macStr[18];
+        snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                 (uint8_t)(macAddress >> 56), (uint8_t)(macAddress >> 48),
+                 (uint8_t)(macAddress >> 40), (uint8_t)(macAddress >> 32),
+                 (uint8_t)(macAddress >> 24), (uint8_t)(macAddress >> 16),
+                 (uint8_t)(macAddress >> 8), (uint8_t)(macAddress));
+        String devTypeStr;
+        switch (deviceType)
+        {
+        case type_ONOFFDEVICE:
+            devTypeStr = "ONOFFDEVICE";
+            break;
+        case type_LED_STRIP:
+            devTypeStr = "LED_STRIP";
+            break;
+        case type_TEMP_SENSOR:
+            devTypeStr = "TEMP_SENSOR";
+            break;
+        case type_LED_STRIP_SEGMENTED:
+            devTypeStr = "LED_STRIP_SEGMENTED";
+            break;
+        case type_DISTANCE_SENSOR:
+            devTypeStr = "DISTANCE_SENSOR";
+            break;
+        case type_HARDWARE_BUTTON:
+            devTypeStr = "HARDWARE_BUTTON";
+            break;
+        default:
+            devTypeStr = "UNKNOWN";
+            break;
         }
+        String out = "deviceType: {" + devTypeStr + "} | ";
+        out += "macAddress: " + String(macStr) + " | ";
+        out += "deviceId: " + String(deviceId) + " | ";
+        out += "isEnabled: " + String(isEnabled) + " | ";
+        out += "deviceName: " + deviceName + " | ";
+        out += "customBytes: ";
+        for (int i = 0; i < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; i++)
+        {
+            out += String(customBytes[i]) + " ";
+        }
+        Logger::log(out);
+    }
 
-    uint16_t getSize(){
+    uint16_t getSize()
+    {
         return (sizeof(deviceType) + sizeof(macAddress) + sizeof(deviceId) + sizeof(roomId) + sizeof(isEnabled) + DEVICE_NAME_MAX_LENGHT + NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     };
 
-    bool toByteArray(uint8_t* buffer, uint16_t size){
+    bool toByteArray(uint8_t *buffer, uint16_t size)
+    {
         uint16_t offset = 0;
-        if(buffer != nullptr && size == getSize()){
-            memcpy(&buffer[offset], &deviceType, sizeof(deviceType)); 
+        if (buffer != nullptr && size == getSize())
+        {
+            memcpy(&buffer[offset], &deviceType, sizeof(deviceType));
             offset += sizeof(deviceType);
 
-            memcpy(&buffer[offset], &macAddress, sizeof(macAddress)); 
+            memcpy(&buffer[offset], &macAddress, sizeof(macAddress));
             offset += sizeof(macAddress);
 
-            memcpy(&buffer[offset], &deviceId, sizeof(deviceId)); 
+            memcpy(&buffer[offset], &deviceId, sizeof(deviceId));
             offset += sizeof(deviceId);
 
-            memcpy(&buffer[offset], &roomId, sizeof(roomId)); 
+            memcpy(&buffer[offset], &roomId, sizeof(roomId));
             offset += sizeof(roomId);
 
-            memcpy(&buffer[offset], &isEnabled, sizeof(isEnabled)); 
+            memcpy(&buffer[offset], &isEnabled, sizeof(isEnabled));
             offset += sizeof(isEnabled);
 
             /* prepare empty space string value */
             memset(&buffer[offset], '\0', DEVICE_NAME_MAX_LENGHT);
-            if(deviceName.length() < DEVICE_NAME_MAX_LENGHT){
+            if (deviceName.length() < DEVICE_NAME_MAX_LENGHT)
+            {
                 deviceName.getBytes(&buffer[offset], DEVICE_NAME_MAX_LENGHT);
-            }else {
+            }
+            else
+            {
                 return false;
             }
             offset += DEVICE_NAME_MAX_LENGHT;
 
-            memcpy(&buffer[offset], customBytes, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION); 
+            memcpy(&buffer[offset], customBytes, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
             return true;
         }
         return false;
     }
 
-
-    bool fromByteArray(uint8_t* buffer, uint16_t size){
+    bool fromByteArray(uint8_t *buffer, uint16_t size)
+    {
         uint16_t offset = 0;
-        if(buffer != nullptr && size == getSize()){
-            memcpy(&deviceType, &buffer[offset], sizeof(deviceType)); 
+        if (buffer != nullptr && size == getSize())
+        {
+            memcpy(&deviceType, &buffer[offset], sizeof(deviceType));
             offset += sizeof(deviceType);
 
-            memcpy(&macAddress, &buffer[offset], sizeof(macAddress)); 
+            memcpy(&macAddress, &buffer[offset], sizeof(macAddress));
             offset += sizeof(macAddress);
 
-            memcpy(&deviceId, &buffer[offset], sizeof(deviceId)); 
+            memcpy(&deviceId, &buffer[offset], sizeof(deviceId));
             offset += sizeof(deviceId);
 
-            memcpy(&roomId, &buffer[offset], sizeof(roomId)); 
+            memcpy(&roomId, &buffer[offset], sizeof(roomId));
             offset += sizeof(roomId);
 
-            memcpy(&isEnabled, &buffer[offset], sizeof(isEnabled)); 
+            memcpy(&isEnabled, &buffer[offset], sizeof(isEnabled));
             offset += sizeof(isEnabled);
 
             /* prepare empty space string value */
-            deviceName = String((char*)&buffer[offset]);
-            if(deviceName.length() > DEVICE_NAME_MAX_LENGHT){
+            deviceName = String((char *)&buffer[offset]);
+            if (deviceName.length() > DEVICE_NAME_MAX_LENGHT)
+            {
                 return false;
             }
             offset += DEVICE_NAME_MAX_LENGHT;
 
-            memcpy(customBytes, &buffer[offset], NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION); 
+            memcpy(customBytes, &buffer[offset], NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
 
             return true;
         }
-        else {
-            Serial.println("Wrong buffer length");
+        else
+        {
+            Logger::log("Wrong buffer length");
         }
         return false;
     }
 };
 
-
 class Device
 {
 private:
     uint8_t DeviceIdentifier = 0xFF;
-    
+
 public:
     virtual void init() = 0;
     virtual void cyclic() = 0;
@@ -256,9 +300,6 @@ public:
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param) = 0;
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param) = 0;
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set3 param) = 0;
-   
 };
-
-
 
 #endif

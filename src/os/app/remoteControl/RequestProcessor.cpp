@@ -62,7 +62,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
     } else{/* Processing allready known request */
         
         /* Does message send retry count exceed maximum allowed number? */
-        if(currentRequest.getRequestSendCount() >= 4 ){
+        if(currentRequest.getRequestSendCount() >= 7 ){
             /* Max number reqests exceed , timeout request*/
             Logger::log("Request "+String((int)currentRequest.getRequestId())+" processing failed");
             /* clear the current request */
@@ -70,7 +70,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             return false;
         } else {
             /* Send repeat request, when time to resend is over */
-            if(millis() - lastSendTime > 1000){
+            if(millis() - lastSendTime > 2000){
                 Logger::log("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
                 MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);

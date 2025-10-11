@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <devices/device.hpp>
 #include <os/app/remoteControl/rcRequest.hpp>
+#include "os/Logger.hpp"
 #include <os/app/remoteControl/rcResponse.hpp>
 
 #define REQUEST_DATA_SIZE 30
@@ -52,18 +53,18 @@
 //     }
     
 //     void print() {
-//         Serial.println("### Request ###");
-//         Serial.println("requestId :" + String((int)requestId));
-//         Serial.println("macAddress: " + String(targetNodeMAC));
-//         Serial.println("targetDeviceId :" + String((int)targetDeviceId));
-//         Serial.println("type :" + String((int)type));
+//         Logger::log("### Request ###");
+//         Logger::log("requestId :" + String((int)requestId));
+//         Logger::log("macAddress: " + String(targetNodeMAC));
+//         Logger::log("targetDeviceId :" + String((int)targetDeviceId));
+//         Logger::log("type :" + String((int)type));
 //         for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
-//             Serial.print((int)data[i]);
+//             Logger::log((int)data[i]);
 //         }
-//         Serial.println("");
-//         Serial.println("requestSendCount :" + String((int)requestSendCount));      
-//         Serial.println("crc :" + String((int)crc));
-//         Serial.println("###############");
+//         Logger::log("");
+//         Logger::log("requestSendCount :" + String((int)requestSendCount));      
+//         Logger::log("crc :" + String((int)crc));
+//         Logger::log("###############");
 //     }
 
 // }RcRequest;
@@ -84,19 +85,19 @@
 //     }
 
 //     void print() {
-//         Serial.println("   Response ");
-//         Serial.println("responseId :" + String((int)responseId));
-//         Serial.println("macAddress: " + String(responseNodeMAC));
-//         Serial.println("requestType :" + String((int)requestType));
-//         Serial.println("responseType :" + String((int)responseType));
-//         Serial.print(" Payload : ");
+//         Logger::log("   Response ");
+//         Logger::log("responseId :" + String((int)responseId));
+//         Logger::log("macAddress: " + String(responseNodeMAC));
+//         Logger::log("requestType :" + String((int)requestType));
+//         Logger::log("responseType :" + String((int)responseType));
+//         Logger::log(" Payload : ");
 //         for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
-//             Serial.print((int)data[i]);
+//             Logger::log((int)data[i]);
 //         }
-//         Serial.println("");
+//         Logger::log("");
              
-//         Serial.println("crc :" + String((int)crc));
-//         Serial.println(" ");
+//         Logger::log("crc :" + String((int)crc));
+//         Logger::log(" ");
 //     }
 
 // }RcResponse;
@@ -115,19 +116,19 @@ typedef struct {
     }
 
     void print() {
-        Serial.println("   Response ");
-        Serial.println("responseId :" + String((int)responseId));
-        Serial.println("responceNodeMAC :" + String((int)responseNodeMAC));
-        Serial.println("requestType :" + String((int)requestType));
-        Serial.println("responseType :" + String((int)responseType));
-        Serial.print(" Payload : ");
+        Logger::log("   Response ");
+        Logger::log("responseId :" + String((int)responseId));
+        Logger::log("responceNodeMAC :" + String((int)responseNodeMAC));
+        Logger::log("requestType :" + String((int)requestType));
+        Logger::log("responseType :" + String((int)responseType));
+        String Payload = "";
         for(uint8_t i=0; i<REQUEST_DATA_SIZE; i++) {
-            Serial.print((int)data[i]);
+            Payload += String((int)data[i]);
         }
-        Serial.println("");
+        Logger::log(" Payload :" + Payload);
              
-        Serial.println("crc :" + String((int)crc));
-        Serial.println(" ");
+        Logger::log("crc :" + String((int)crc));
+        Logger::log(" ");
     }
 
 }RcResponseLong;

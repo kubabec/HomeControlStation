@@ -2,6 +2,7 @@
 #define CONFIG_PROVIDER_H
 #include <Arduino.h>
 #include <os/datacontainer/DataContainer.hpp>
+#include "os/Logger.hpp"
 
 
 #define SSID_LENGTH 30
@@ -31,15 +32,17 @@ typedef struct
 
     void serialPrint()
     {
-        Serial.println("<<<<< - - - - CONFIGURATION - - - - >>>>>");
-        Serial.println("isHttpServer : " + String(isHttpServer));
-        Serial.println("isRcServer : " + String(isRcServer));
-        Serial.println("isDefaultUserAdmin : " + String(isDefaultUserAdmin));
-        Serial.println("Type : " + String((int)nodeType));
-        Serial.println("network SSID : " + String(networkSSID));
-        Serial.println("network Password : " + String(networkPassword));
-        Serial.println("Panel Password : " + String(panelPassword));
-        Serial.println("<<<<< - - - - - - - - - - - - - - - >>>>>");
+        Logger::log(
+            "<<<<< - - - - CONFIGURATION - - - - >>>>> "
+            "isHttpServer: " + String(isHttpServer) + " "
+            "isRcServer: " + String(isRcServer) + " "
+            "isDefaultUserAdmin: " + String(isDefaultUserAdmin) + " "
+            "Type: " + String((int)nodeType) + " "
+            "network SSID: " + String(networkSSID) + " "
+            "network Password: " + String(networkPassword) + " "
+            "Panel Password: " + String(panelPassword) + " "
+            "<<<<< - - - - - - - - - - - - - - - >>>>>"
+        );
 
     }
 
@@ -55,7 +58,7 @@ typedef struct
         }
         else
         {
-            Serial.println("Invalid string length given for SSID!");
+            Logger::log("Invalid string length given for SSID!");
         }
     }
 
@@ -71,7 +74,7 @@ typedef struct
         }
         else
         {
-            Serial.println("Invalid string length given for Password!");
+            Logger::log("Invalid string length given for Password!");
         }
     }
 
@@ -87,7 +90,7 @@ typedef struct
         }
         else
         {
-            Serial.println("Invalid string length given for Password!");
+            Logger::log("Invalid string length given for Password!");
         }
     }
 }ConfigData;

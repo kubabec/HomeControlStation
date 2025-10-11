@@ -19,45 +19,48 @@ void DigitalEventReceiver::init()
     /* Allocate memory for NVM data */
     uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
     uint8_t offset = 0;
-    for (uint8_t blockID = e_BLOCK_DIGITAL_EVENT_1; blockID <= e_BLOCK_DIGITAL_EVENT_6; blockID++)
+    if (nvmData != nullptr)
     {
-        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
-        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
-            DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
-            (PersistentDatablockID)blockID, // Datablock ID
-            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
-        );
-
-        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
-        offset += PERSISTENT_DATABLOCK_SIZE;
-    }
-    // check if FIRST byte of NVM contains validity flag
-    if (nvmData[0] == NVM_VALID)
-    {
-        uint8_t numberOfElementsInNvm = nvmData[1];
-
-        // Are there any Event events saved in nvm?
-        if (numberOfElementsInNvm > 0)
+        for (uint8_t blockID = e_BLOCK_DIGITAL_EVENT_1; blockID <= e_BLOCK_DIGITAL_EVENT_6; blockID++)
         {
-            for (uint8_t i = 0; i < numberOfElementsInNvm; i++)
-            {
-                uint64_t EventUniqueId = 0x00;
-                DigitalEvent::Event event;
+            /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+            std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+                DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
+                (PersistentDatablockID)blockID, // Datablock ID
+                (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+            );
 
-                // Copy corresponding EventUniqueId
-                memcpy(&EventUniqueId, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event)))]), sizeof(uint64_t));
-
-                // Copy corresponding Event event
-                memcpy(&event, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event))) + sizeof(EventUniqueId)]), sizeof(event));
-
-                digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
-            }
-
-            Logger::log("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
+            /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+            offset += PERSISTENT_DATABLOCK_SIZE;
         }
-    }
+        // check if FIRST byte of NVM contains validity flag
+        if (nvmData[0] == NVM_VALID)
+        {
+            uint8_t numberOfElementsInNvm = nvmData[1];
 
-    free(nvmData);
+            // Are there any Event events saved in nvm?
+            if (numberOfElementsInNvm > 0)
+            {
+                for (uint8_t i = 0; i < numberOfElementsInNvm; i++)
+                {
+                    uint64_t EventUniqueId = 0x00;
+                    DigitalEvent::Event event;
+
+                    // Copy corresponding EventUniqueId
+                    memcpy(&EventUniqueId, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event)))]), sizeof(uint64_t));
+
+                    // Copy corresponding Event event
+                    memcpy(&event, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event))) + sizeof(EventUniqueId)]), sizeof(event));
+
+                    digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
+                }
+
+                Logger::log("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
+            }
+        }
+
+        free(nvmData);
+    }
 
     DataContainer::setSignalValue(SIG_DIGITAL_EVNT_MAPPING, digitalEventsMapping);
     DataContainer::setSignalValue(CBK_UPDATE_DIG_EVNT_TABLE, std::function<void(String &)>(updateDigitalEventMappingViaJson));
@@ -121,6 +124,11 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 action = obj["action"].as<uint8_t>();
                 requiredKeysCnt++;
             }
+            if (requiredKeysCnt < 4)
+            {
+                Logger::log("DigitalEventReceiver:// Missing keys in JSON object, skipping");
+                continue;
+            }
 
             if (digitalEventsMapping.size() < 25)
             {
@@ -140,6 +148,7 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 ev.affectedType = affectedType;
                 ev.affectedId = targetId;
 
+                Logger::log("DigitalEventReceiver://Adding mapping ID: " + String((int)id) + " " + " affectedType: " + String((int)ev.affectedType) + " " + " affectedId: " + String((int)ev.affectedId) + " " + " actionType: " + String((int)ev.actionType) + " ");
                 digitalEventsMapping.push_back({id, ev});
             }
         }
@@ -163,15 +172,18 @@ void DigitalEventReceiver::cyclic()
 
     if (pendingServiceCalls.size() > 0)
     {
+        Logger::log("DigitalEventReceiver:// Processing pending service call, queue size: " + String((int)pendingServiceCalls.size()));
         ServiceCallData &callData = pendingServiceCalls.front();
 
-        // Logger::log("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
+        Logger::log("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
         ServiceRequestErrorCode errorCode =
             std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(callData.deviceOrRoomId, callData.serviceType, callData.parameters);
 
         // Logger::log("Service error code : " + String((int)errorCode));
         if (errorCode != SERV_BUSY && errorCode != SERV_PENDING)
         {
+            String result = (errorCode == SERV_SUCCESS) ? "SUCCESS" : "FAILURE";
+            Logger::log("DigitalEventReceiver:// Service call completed with result: " + result);
             // Processing succeeded or failed, but for sure not queued
             pendingServiceCalls.pop();
             // Logger::log("x x x x Event processing completed");
@@ -181,6 +193,7 @@ void DigitalEventReceiver::cyclic()
 
 void DigitalEventReceiver::fireEvent(uint64_t eventId)
 {
+    Logger::log("DigitalEventReceiver:// Event with ID: " + String((unsigned long long)eventId) + " fired");
     // Push event to the queue
     eventsQueue.push(eventId);
 }
@@ -242,6 +255,7 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
             // Protection against repeated request fake activation
             if (transmissionIdentfier != lastReceivedTransmissionId)
             {
+                Logger::log("DigitalEventReceiver:// Received DIGITAL_EVENT_FIRED_MSG_ID for event ID: " + String((unsigned long long)triggeredEvent) + " with transmission ID: " + String((int)transmissionIdentfier));
                 lastReceivedTransmissionId = transmissionIdentfier;
                 fireEvent(triggeredEvent);
 

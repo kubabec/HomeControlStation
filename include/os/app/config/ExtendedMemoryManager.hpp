@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <os/datacontainer/DataContainer.hpp>
 #include <vector>
+#include "os/Logger.hpp"
 
 #define MAX_EXT_MEMORY_SIZE_TOTAL 2000 /* bytes */
 #define SLOTS_FOR_EXT_MEMORY_BUFFERS 10 /* number of slots for independent data pointers */
@@ -23,9 +24,9 @@ typedef struct{
     uint8_t* dataPtr = nullptr;
 
     void printExtMem(){
-        Serial.println("OwnerID: " + String((int)ownerDeviceId));
-        Serial.println("length: " + String((int)length));
-        Serial.println("dataPtr: " + String((int)dataPtr));
+        Logger::log("OwnerID: " + String((int)ownerDeviceId));
+        Logger::log("length: " + String((int)length));
+        Logger::log("dataPtr: " + String((int)dataPtr));
     }
 }ExtMemoryData;
 

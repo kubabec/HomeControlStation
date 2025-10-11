@@ -1,6 +1,7 @@
 #ifndef CONFIG_SLOT_DEFINITION_H
 #define CONFIG_SLOT_DEFINITION_H
 #include <Arduino.h>
+#include "os/Logger.hpp"
 
 /* Description of single configuration NVM slot */
 struct DeviceConfigSlotType
@@ -20,43 +21,31 @@ struct DeviceConfigSlotType
 
     void print()
     {
-        Serial.println("--> Config SLOT <--");
-        if(isActive){
-            Serial.println("isActive: YES ");
-        }else
-        {
-            Serial.println("isActive: NO ");
+        if(!isActive){
+            Logger::log("Config SLOT is not active");
+            return;
         }
-        
-        Serial.print("Device Type: "); 
+
+        String logMsg = "--> Config SLOT <-- | ";
+        logMsg += "isActive: " + String(isActive ? "YES" : "NO") + " | ";
+        logMsg += "Device Type: ";
         switch(deviceType)
         {
-            case 43:
-            Serial.println("ON/OFF");
-            break;
-
-            case 44:
-            Serial.println("LED STRIP");
-            break;
-
-            case 255:
-            Serial.println("Not configured");
-            break;
-
-            default: 
-            Serial.println("UNKNOWN");
-            break;
+            case 43: logMsg += "ON/OFF"; break;
+            case 44: logMsg += "LED STRIP"; break;
+            case 255: logMsg += "Not configured"; break;
+            default: logMsg += "UNKNOWN"; break;
         }
-        Serial.println("Device ID " + String(deviceId)); 
-        Serial.println("Name: " + String(deviceName));
-        Serial.println("PIN : " + String((int)pinNumber));
-        Serial.println("Room : " + String((int)roomId));
-        Serial.println("Extra data:");
-        for(int i = 0 ; i < 20; i ++)
+        logMsg += " | Device ID: " + String(deviceId);
+        logMsg += " | Name: " + String(deviceName);
+        logMsg += " | PIN: " + String((int)pinNumber);
+        logMsg += " | Room: " + String((int)roomId);
+        logMsg += " | Extra data: ";
+        for(int i = 0 ; i < 20; i++)
         {
-            Serial.print(String((int)customBytes[i]) + " ");
+            logMsg += String((int)customBytes[i]) + " ";
         }
-        Serial.println("");
+        Logger::log(logMsg);
     }
 
     bool isValid()

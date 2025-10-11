@@ -2,6 +2,7 @@
 #define REMOTE_DEVICES_MANAGER_H
 #include <Arduino.h>
 #include <os/datacontainer/DataContainer.hpp>
+#include "os/Logger.hpp"
 #include <map>
 
 #define MAX_EXTERNAL_NODES 24
@@ -12,8 +13,8 @@ struct RCTranslation {
     uint8_t onSourceNodeLocalId = 255;
 
     void print() {
-        Serial.println("MAC : " + String((int) + mac));
-        Serial.println(", " + String((int) onSourceNodeLocalId));
+        Logger::log("MAC : " + String((int) + mac));
+        Logger::log(", " + String((int) onSourceNodeLocalId));
     }
 
     bool isValid(){

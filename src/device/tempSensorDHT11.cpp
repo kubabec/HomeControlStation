@@ -24,12 +24,12 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     if (!isnan(t))
     {
         currentTemp = t;
-        Logger::log("Temp: " + String(currentTemp));
+        Logger::log("[Sensor '"+ deviceName+ "']Temp: " + String(currentTemp));
     }
     if (!isnan(h))
     {
         currentHumid = (int)h;
-        Logger::log("Humidity: " + String(currentHumid));
+        Logger::log("[Sensor '"+ deviceName+ "']Humidity: " + String(currentHumid));
     }
 }
 
@@ -77,7 +77,7 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
 
 void TempSensorDHT11DeviceType::temHumReading()
 {
-    if (millis() - lastDataUpdateTime > 4000)
+    if (millis() - lastDataUpdateTime > (1000 * 60)) // every 60 seconds
     {
         float h = dht->readHumidity();
         float t = dht->readTemperature();
@@ -89,7 +89,7 @@ void TempSensorDHT11DeviceType::temHumReading()
                 temHumSensError = 0;
                 currentTemp = t;
                 lastTemp = t;
-                Logger::log("Temperature: " + String(currentTemp));
+                Logger::log("[Sensor '"+ deviceName+ "']Temperature: " + String(currentTemp));
             }
             else
             {
@@ -98,13 +98,13 @@ void TempSensorDHT11DeviceType::temHumReading()
             if (!isnan(h))
             {
                 currentHumid = (int)h;
-                Logger::log("Humidity: " + String(currentHumid));
+                Logger::log("[Sensor '"+ deviceName+ "']Humidity: " + String(currentHumid));
             }
         }
         else
         {
             temHumSensError = 1;
-            Logger::log("Temperature and humidity sensor error");
+            Logger::log("[Sensor '"+ deviceName+ "']Temperature and humidity sensor error");
         }
 
         lastDataUpdateTime = millis();

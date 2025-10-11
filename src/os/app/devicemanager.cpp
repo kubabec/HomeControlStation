@@ -267,27 +267,28 @@ void DeviceManager::init()
 
     /*TESTCODE*/
 
-    for (auto device : devices)
-    {
-        DeviceDescription desc = device->getDeviceDescription();
-        uint8_t *memory = (uint8_t *)malloc(desc.getSize());
-        if (memory != nullptr)
-        {
-            desc.toByteArray(memory, desc.getSize());
-            desc.print();
-            Logger::log("Serialized DeviceDescription:");
-            for (uint16_t i = 0; i < desc.getSize(); i++)
-            {
-                Serial.print(String((int)memory[i]));
-            }
+    // for (auto device : devices)
+    // {
+    //     DeviceDescription desc = device->getDeviceDescription();
+    //     uint8_t *memory = (uint8_t *)malloc(desc.getSize());
+    //     if (memory != nullptr)
+    //     {
+    //         desc.toByteArray(memory, desc.getSize());
+    //         desc.print();
+    //         Logger::log("Serialized DeviceDescription:");
+    //         String out = "";
+    //         for (uint16_t i = 0; i < desc.getSize(); i++)
+    //         {
+    //             out += String((int)memory[i]);
+    //         }
+    //         Logger::log(out);
+    //         DeviceDescription desc2;
+    //         desc2.fromByteArray(memory, desc.getSize());
+    //         desc2.print();
+    //     }
 
-            DeviceDescription desc2;
-            desc2.fromByteArray(memory, desc.getSize());
-            desc2.print();
-        }
-
-        free(memory);
-    }
+    //     free(memory);
+    // }
     /*TESTCODE*/
 
     Logger::log("... done");
