@@ -185,6 +185,11 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
                      (uint8_t)(device.macAddress >> 8), (uint8_t)(device.macAddress));
             if (mappingOffset == 255)
             {
+                UserInterfaceNotification notif;
+                notif.title = "Error occured";
+                notif.body = "No free mapping slot for new node with MAC: " + String(macStr) + ". Device with local ID: " + String((int)device.deviceId) + " skipped.";
+                notif.type = UserInterfaceNotification::ERROR;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
                 Logger::log("RemoteDevicesManager:// No mapping offset available for device with local ID: " + String((int)device.deviceId) + ", MAC: " + String(macStr) + ", device skipped");
                 continue; /* skip this device, no mapping available */
             }
@@ -203,7 +208,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 
             /* Save translation {uniqueID, {node, device}} to internal map*/
 
-                        Logger::log("RemoteDevicesManager:// New device with local ID" + String((int)translation.onSourceNodeLocalId) + ", MAC: " + String(macStr) + ",  saved with ID" + String((int)uniqueRcId));
+            Logger::log("RemoteDevicesManager:// New device with local ID" + String((int)translation.onSourceNodeLocalId) + ", MAC: " + String(macStr) + ",  saved with ID" + String((int)uniqueRcId));
             currentIdMapping.insert({uniqueRcId, translation});
             uniqueRcId++;
         }
@@ -356,11 +361,25 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
                 responseNodeHash);
 
             currentRequestRespErrorCode = (response.getResponseType() == POSITIVE_RESP) ? SERV_SUCCESS : SERV_GENERAL_FAILURE;
-            const char* errorText = "UNKNOWN";
-            switch (currentRequestRespErrorCode) {
-                case SERV_SUCCESS: errorText = "SUCCESS"; break;
-                case SERV_GENERAL_FAILURE: errorText = "GENERAL_FAILURE"; break;
-                default : break;
+            const char *errorText = "UNKNOWN";
+            switch (currentRequestRespErrorCode)
+            {
+            case SERV_SUCCESS:
+                errorText = "SUCCESS";
+                break;
+            case SERV_GENERAL_FAILURE:
+                errorText = "GENERAL_FAILURE";
+                break;
+            default:
+                break;
+            }
+            if (currentRequestRespErrorCode != SERV_SUCCESS)
+            {
+                UserInterfaceNotification notif;
+                notif.title = "Problem occured";
+                notif.body = "Request to " + responseDeviceDescription.deviceName + " failed. Please try again.";
+                notif.type = UserInterfaceNotification::WARNING;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
             }
             Logger::log("RDM : //// Received response with error code: " + String(errorText));
         }
@@ -376,6 +395,13 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
     else if (response.getResponseType() == INVALID_REQ_RESP)
     {
         Logger::log("Invalid request received, returning GENERAL_FAILURE");
+
+        UserInterfaceNotification notif;
+        notif.title = "Problem occured";
+        notif.body = "No response from remote device. Please try again.";
+        notif.type = UserInterfaceNotification::WARNING;
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+
         requestProcessingState = RDM_REQUEST_FAILED;
     }
 

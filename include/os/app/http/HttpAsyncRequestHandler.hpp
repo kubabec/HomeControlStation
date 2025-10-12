@@ -76,6 +76,7 @@ class HTTPAsyncRequestHandler{
 
     static void createMainPageContentJson();
     static void createHashJson();
+    static void createNotificationCountJson();
     static void createNotificationListContentJson();
     static void createDeviceConfigurationJson();
     static void createRedirectToMainJson();

@@ -73,11 +73,14 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
   if(interfaceVisible){\
             try {\
                 const response = await fetch('/getPageContent');\
-                const [newData, hashObj] = await response.json();\
+                const [newData, hashObj, notificationCnt] = await response.json();\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
                     hash = hashObj.hash;\
                     renderRooms(currentData);\
+                }\
+                if(notificationCnt.ntcnt > 0){\
+                    getNotifications();\
                 }\
             } catch (error) {\
                 console.error('Error fetching data:', error);\
@@ -90,15 +93,20 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
 let hash = 0;\
     async function getHash(){\
   if(interfaceVisible){\
-        try {\
-            const response = await fetch('/getHash');\
-            const newHash = await response.json();\
-            if(newHash.hash != hash){\
-                hash = newHash.hash;\
-                fetchData();}\
-        } catch (error) {\
-            console.error('Error fetching hash:', error);\
-        }\
+  try {\
+      const response = await fetch('/getHash');\
+      const respJson = await response.json();\
+      const hashValue = respJson[0]?.hash;\
+      const ntcntValue = respJson[1]?.ntcnt;\
+      if(hashValue != hash){\
+          hash = hashValue;\
+          fetchData();}\
+      if(ntcntValue > 0){\
+          getNotifications();\
+      }\
+  } catch (error) {\
+      console.error('Error fetching hash:', error);\
+  }\
   }else {\
     renderRooms({});\
   }\

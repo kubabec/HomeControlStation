@@ -150,6 +150,12 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
 
                 Logger::log("DigitalEventReceiver://Adding mapping ID: " + String((int)id) + " " + " affectedType: " + String((int)ev.affectedType) + " " + " affectedId: " + String((int)ev.affectedId) + " " + " actionType: " + String((int)ev.actionType) + " ");
                 digitalEventsMapping.push_back({id, ev});
+            }else {
+                UserInterfaceNotification notif;
+                notif.title = "Problem occured";
+                notif.body = "Too many digital event mappings, maximum is 25. Some mappings have been skipped.";
+                notif.type = UserInterfaceNotification::ERROR;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
             }
         }
 
@@ -278,13 +284,22 @@ void DigitalEventReceiver::processEvents()
     if (eventsQueue.size() > 0)
     {
         uint64_t eventHappened = eventsQueue.front();
-
+        bool found = false;
         for (auto &mapping : digitalEventsMapping)
         {
             if (mapping.first == eventHappened)
             {
                 executeAction(mapping.second);
+                found = true;
             }
+        }
+
+        if(!found){
+            UserInterfaceNotification notif;
+                notif.title = "Unmapped Event";
+                notif.body = "Event with ID: " + String((unsigned long long)eventHappened) + " has been fired but there is no action mapped to it.";
+                notif.type = UserInterfaceNotification::INFO;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
 
         eventsQueue.pop();

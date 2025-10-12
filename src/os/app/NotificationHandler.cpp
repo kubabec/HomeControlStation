@@ -54,6 +54,7 @@ bool NotificationHandler::createNotification(UserInterfaceNotification& newNotif
         }
         
         notifications.push(newNotification);
+        Logger::log("NotificationHandler:// New notification: " + newNotification.toJson());
         isSuccessfullyCreated = true;
     }
     return isSuccessfullyCreated;
