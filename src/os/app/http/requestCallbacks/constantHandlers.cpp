@@ -146,8 +146,6 @@ void HomeLightHttpServer::constantHandler_devicesSetup(WiFiClient &client)
 
 void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient &client)
 {
-  std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(777);
-
   client.println("<div class=\"wrapper\">\
         <div class=\"header\">Room name mapping</div>");
 
