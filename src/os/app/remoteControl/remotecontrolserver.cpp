@@ -271,7 +271,7 @@ void RemoteControlServer::handleKeepAliveState()
 
     for (auto &node : remoteNodes)
     {
-        if (millis() - node.second.lastKeepAliveReceivedTime > (2 * TIME_TO_REPEAT_KEEP_ALIVE_REQEST))
+        if (millis() - node.second.lastKeepAliveReceivedTime > (4 * TIME_TO_REPEAT_KEEP_ALIVE_REQEST))
         {
             nodesToBeRemoved.push_back(node.first);
         }

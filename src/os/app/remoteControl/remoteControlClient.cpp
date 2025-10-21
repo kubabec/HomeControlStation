@@ -11,7 +11,7 @@ std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
 std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
 uint8_t RemoteControlClient::lastReceivedRequestId = 0xFF;
 unsigned long RemoteControlClient::lastMasterActivityTime = 0;
-MessageUDP::IPAddr RemoteControlClient::lastKnownMasterIp{0, 0, 0, 0};
+MessageUDP::IPAddr RemoteControlClient::lastKnownMasterIp{NETWORK_BROADCAST};
 Transaction RemoteControlClient::currentTransaction {};
 
 uint64_t RemoteControlClient::localNodeMACAddress;
@@ -65,8 +65,7 @@ void RemoteControlClient::processPendingTxData()
         /* Tx data waiting to be sent */
         if (millis() - lastTxSendTime > frameTransmissionDelay)
         {
-            NetworkDriver::sendBroadcast(pendingTxQueue.front());
-            // Logger::log("Sending broadcast with message id " + String((int)pendingTxQueue.front().getId()));
+            NetworkDriver::send(pendingTxQueue.front());
             pendingTxQueue.pop();
 
             lastTxSendTime = millis();
@@ -187,7 +186,7 @@ void RemoteControlClient::handleKeepAliveState()
 
 void RemoteControlClient::sendInitialDataResponse()
 {
-    MessageUDP initialDataResponse(RESPONSE_NODE_INITIAL_DATA, NETWORK_BROADCAST, 9001);
+    MessageUDP initialDataResponse(RESPONSE_NODE_INITIAL_DATA, lastKnownMasterIp, 9001);
 
     NodeInitialData initialData = {
         .macAddress = localNodeMACAddress,
@@ -228,7 +227,7 @@ void RemoteControlClient::sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue)
         for (DeviceDescription &deviceDescription : deviceDescriptionVector)
         {
             deviceDescription.macAddress = localNodeMACAddress;
-            MessageUDP detailedDataResponse(udpHeaderValue, NETWORK_BROADCAST, 9001);
+            MessageUDP detailedDataResponse(udpHeaderValue, lastKnownMasterIp, 9001);
 
             /* serialize device description to byte array */
             if (bufferForDeviceDescription == nullptr)
@@ -270,7 +269,7 @@ void RemoteControlClient::sendKeepAlive()
     // Logger::log(" Node Hash :" + String(keepAlive.nodeHash));
     // Logger::log("keepAlive.nodeHash : " + String((int)keepAlive.nodeHash ));
 
-    MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
+    MessageUDP keepAliveResponse(RESPONSE_KEEP_ALIVE, lastKnownMasterIp, 9001);
     keepAliveResponse.pushData((byte *)&keepAlive, sizeof(keepAlive));
 
     /* TX transmission will be handled in the available time from cyclic() context */
@@ -321,7 +320,7 @@ bool RemoteControlClient::processResponse()
             // Logger::log("!!! RemoteControlClient - processResponse - serializedResponse != nullptr - ");
             remoteControlResponse.toByteArray(serializedResponse, remoteControlResponse.getSize());
 
-            MessageUDP msg(RC_RESPONSE, NETWORK_BROADCAST, 9001);
+            MessageUDP msg(RC_RESPONSE, lastKnownMasterIp, 9001);
             // Logger::log("!!! RemoteControlClient - processResponse - msg - ");
             // Logger::log("Size of serializedResponse: " + String(remoteControlResponse.getSize()));
             msg.pushData((byte *)serializedResponse, remoteControlResponse.getSize());
