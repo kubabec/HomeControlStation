@@ -129,7 +129,7 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
         if (mappingSlotsForExternalNodes.at(i).isUsed &&
             mappingSlotsForExternalNodes.at(i).mac == nodeMAC)
         {
-            Logger::log("RemoteDevicesManager:// Existing mapping found for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
+            // Logger::log("RemoteDevicesManager:// Existing mapping found for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
             /* mapping found at offset 'i' */
             return i;
         }
@@ -147,7 +147,7 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
             mappingSlotsForExternalNodes.at(i).mac = nodeMAC;
 
             /* new slot found at offset 'i' */
-            Logger::log("RemoteDevicesManager:// New mapping created for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
+            // Logger::log("RemoteDevicesManager:// New mapping created for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
             return i;
         }
     }

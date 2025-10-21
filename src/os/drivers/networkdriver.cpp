@@ -160,7 +160,7 @@ bool NetworkDriver::send(MessageUDP &data)
     if (WiFiAdapter::isConnected())
     {
         // Logger::log("Sending data via UDP");
-        Logger::log("NetworkDriver:// Queuing UDP packet (MsgId : " + String((int)data.getId()) + ") to host " + data.getIPAddress().toString());
+        // Logger::log("NetworkDriver:// Queuing UDP packet (MsgId : " + String((int)data.getId()) + ") to host " + data.getIPAddress().toString());
         pendingToSendPackets.push(std::move(data));
         return true;
     }

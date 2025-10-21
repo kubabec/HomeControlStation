@@ -1,10 +1,10 @@
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include "os/Logger.hpp"
 
-long long requestInitialDataTimer = 0;
-long long requestDetailedDataTimer = 0;
-long long requestKeepAliveTimer = 0;
-long long initialDataExitTimer = 0;
+unsigned long requestInitialDataTimer = 0;
+unsigned long requestDetailedDataTimer = 0;
+unsigned long requestKeepAliveTimer = 0;
+unsigned long initialDataExitTimer = 0;
 
 std::map<uint64_t, RemoteNodeInformation> RemoteControlServer::remoteNodes;
 std::array<std::function<bool(RcResponse &)>, REQ_COUNT> RemoteControlServer::responseReceivers;
@@ -19,7 +19,10 @@ RequestProcessor RemoteControlServer::requestProcessor;
 uint64_t RemoteControlServer::detailedDataPendingNodeMAC;
 
 uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej statycznej poza klasą^^^^^^^^^^^^^^^^^^^^^^
-bool RemoteControlServer::slaveMonitoringBlockedDueToRequestProcessing = false;
+uint64_t RemoteControlServer::lastKeepAliveRequestTime = 0;
+
+#define KEEP_ALIVE_INTERVAL 2300               // 2,3s
+#define TIME_TO_REPEAT_DISCOVERY_REQUEST 9700 // 9,7s
 
 void RemoteControlServer::deinit()
 {
@@ -127,10 +130,6 @@ void RemoteControlServer::cyclic()
 
         // Logger::log("Pending request processing ongoing");
     }
-    else
-    {
-        slaveMonitoringBlockedDueToRequestProcessing = false;
-    }
 
     switch (currentState)
     {
@@ -143,62 +142,68 @@ void RemoteControlServer::cyclic()
         break;
 
     case STATE_KEEP_ALIVE:
-        if (!slaveMonitoringBlockedDueToRequestProcessing)
-        {
-            handleKeepAliveState();
-        }
+
+        handleKeepAliveState();
+
         break;
     }
 }
 
 void RemoteControlServer::requestNodeInitialData()
 {
-    Logger::log("{RCServer}Requesting initial data from nodes ...");
+    Logger::log("{DISCOVERY}Requesting initial data from nodes ...");
     static uint8_t msgCount = 0;
     MessageUDP msg(REQUEST_NODE_INITIAL_DATA, NETWORK_BROADCAST, 9001);
     msg.pushData(msgCount);
     NetworkDriver::sendBroadcast(msg);
-    // Logger::log("---> Wysylam REQUEST_NODE_INITIAL_DATA ---> ");
     msgCount++;
 }
-void RemoteControlServer::requestNodeDetailedData()
-{
-    Logger::log("{RCServer}Requesting detailed data from nodes ...");
-    MessageUDP msg(REQUEST_NODE_DETAILED_DATA, NETWORK_BROADCAST, 9001);
-    // Logger::log("---> Wysylam REQUEST_NODE_DETAILED_DATA ---> ");
-    NetworkDriver::sendBroadcast(msg);
-}
+
 void RemoteControlServer::requestKeepAliveData()
 {
-    Logger::log("{RCServer}Requesting keep alive from nodes ...");
-    MessageUDP msg(REQUEST_KEEP_ALIVE, NETWORK_BROADCAST, 9001);
-    NetworkDriver::sendBroadcast(msg);
+    // Find node for which we will send keep alive request
+    MessageUDP::IPAddr targetNodeIp{0, 0, 0, 0};
+    bool anyNeedToSendKeepAlive = false;
+
+    for (auto &node : remoteNodes)
+    {
+        if ((millis() - node.second.lastKeepAliveRequestedTime) > TIME_TO_REPEAT_KEEP_ALIVE_REQEST)
+        {
+            targetNodeIp = node.second.nodeIpAddress;
+            node.second.lastKeepAliveRequestedTime = millis();
+            anyNeedToSendKeepAlive = true;
+            break;
+        }
+    }
+
+    if (!anyNeedToSendKeepAlive)
+    {
+        return;
+    }
+
+    Logger::log("{RCServer}Requesting keep alive data from node IP : " + targetNodeIp.toString());
+    MessageUDP msg(REQUEST_KEEP_ALIVE, targetNodeIp, 9001);
+    NetworkDriver::send(msg);
 }
 // Funkcja obsługująca stan zadznia danych poczatkowych
 void RemoteControlServer::handleRequestNodeInitialDataState()
 {
-    // Sprawdzenie, czy minęło 2 sekundy od ostatniego żądania danych początkowych
-
-    if (abs(millis() - requestInitialDataTimer) > TIME_TO_REPEAT_INITIAL_DATA_REQEST)
+    if ((millis() - requestInitialDataTimer) > TIME_TO_REPEAT_INITIAL_DATA_REQEST)
     {
         requestNodeInitialData();
         requestInitialDataTimer = millis();
     }
 
-    if (abs(millis() - initialDataExitTimer) > TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED)
+    if ((millis() - initialDataExitTimer) > TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED)
     {
         currentState = STATE_REQUEST_NODE_DETAILED_DATA;
 
-        // Add every MAC to pending detailed data refresh queue
-        if (remoteNodes.size() > 0)
+        String discoveredIPs = "";
+        for (auto &node : remoteNodes)
         {
-            for (auto &node : remoteNodes)
-            {
-                Logger::log("Queuing detaled data for node IP : " + node.second.nodeIpAddress.toString());
-                triggerDDRefresh(node.first);
-            }
+            discoveredIPs += node.second.nodeIpAddress.toString() + " ";
         }
-
+        Logger::log("Switching to detailed data request state, discovered node IPs: " + discoveredIPs);
         initialDataExitTimer = millis();
     }
 }
@@ -249,19 +254,21 @@ void RemoteControlServer::handleRequestNodeDetailedDataState()
     }
     Logger::log("Handshake completed, list of node IPs: " + listOfNodeIps);
     currentState = STATE_KEEP_ALIVE;
-
 }
 
 // Funkcja obsługująca stan keep alive
 void RemoteControlServer::handleKeepAliveState()
 {
-    if (abs(millis() - requestKeepAliveTimer) > TIME_TO_REPEAT_KEEP_ALIVE_REQEST)
+    std::vector<uint64_t> nodesToBeRemoved;
+
+    // Keep some time distance between subsequent keep alive requests
+
+    if ((millis() - lastKeepAliveRequestTime) > KEEP_ALIVE_INTERVAL)
     {
         requestKeepAliveData();
-        requestKeepAliveTimer = millis();
+        lastKeepAliveRequestTime = millis();
     }
 
-    std::vector<uint64_t> nodesToBeRemoved;
     for (auto &node : remoteNodes)
     {
         if (millis() - node.second.lastKeepAliveReceivedTime > (6 * TIME_TO_REPEAT_KEEP_ALIVE_REQEST))
@@ -294,6 +301,13 @@ void RemoteControlServer::handleKeepAliveState()
 
         updateDeviceDescriptionSignal();
     }
+
+    static unsigned long lastDiscoveryRequestTime = 0;
+    if ((millis() - lastDiscoveryRequestTime) > TIME_TO_REPEAT_DISCOVERY_REQUEST)
+    {
+        requestNodeInitialData();
+        lastDiscoveryRequestTime = millis();
+    }
 }
 
 void RemoteControlServer::handleDetailedDataRefreshMech(std::vector<uint64_t> &nodesToBeRemoved)
@@ -301,15 +315,24 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector<uint64_t> &n
     if (detailedDataPendingNodeMAC == 0 && /* No refresh ongoing */
         !pendingDDRefreshNodeMACs.empty() /* There is at least some node waiting for refresh */)
     {
-        Logger::log("{RCServer}Starting detailed data refresh for node IP : " + remoteNodes.find(pendingDDRefreshNodeMACs.front())->second.nodeIpAddress.toString());
-        detailedDataPendingNodeMAC = pendingDDRefreshNodeMACs.front(); /* Start refresh for first in the queue */
-        pendingDDRefreshNodeMACs.pop();                                /* Remove already processed */
+        if (remoteNodes.find(pendingDDRefreshNodeMACs.front()) != remoteNodes.end())
+        {
+            Logger::log("{RCServer}Starting detailed data refresh for node IP : " + remoteNodes.find(pendingDDRefreshNodeMACs.front())->second.nodeIpAddress.toString());
+            detailedDataPendingNodeMAC = pendingDDRefreshNodeMACs.front(); /* Start refresh for first in the queue */
+            pendingDDRefreshNodeMACs.pop();                                /* Remove already processed */
 
-        remoteNodes.find(detailedDataPendingNodeMAC)->second.devicesCollection.clear(); // czyścimy wektor z urzadzeniami na danym MAC
+            remoteNodes.find(detailedDataPendingNodeMAC)->second.devicesCollection.clear(); // czyścimy wektor z urzadzeniami na danym MAC
+        }
+        else
+        {
+            // Node not found, remove from queue
+            Logger::log("{RCServer} Node for detailed data refresh not exists, removing from queue.");
+            pendingDDRefreshNodeMACs.pop();
+        }
     }
 
     /* Time snapshot to do not overload the network and pause between following frames */
-    static long lastDetailedDataRequestTime = 0;
+    static unsigned long lastDetailedDataRequestTime = 0;
     /* Timeout retry counter */
     static uint8_t detailedDataRefresh_retryCount = 0;
 
@@ -317,7 +340,7 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector<uint64_t> &n
     if (detailedDataPendingNodeMAC != 0)
     {
         /* Enough time passed since last request try? */
-        if (millis() - lastDetailedDataRequestTime > 3000)
+        if (millis() - lastDetailedDataRequestTime > 1000)
         {
             if (detailedDataRefresh_retryCount > 5)
             {
@@ -362,25 +385,20 @@ void RemoteControlServer::processUDPMessage(MessageUDP &msg)
 {
 
     // is handshake message ?
-    if (msg.getId() == RESPONSE_NODE_INITIAL_DATA && currentState == STATE_REQUEST_NODE_INITIAL_DATA)
+    if (msg.getId() == RESPONSE_NODE_INITIAL_DATA && (currentState == STATE_REQUEST_NODE_INITIAL_DATA || currentState == STATE_KEEP_ALIVE))
     {
         handleHandShakeCommunication(msg);
-        // Logger::log("<-RESPONSE_NODE_INITIAL_DATA");
     }
 
     if (msg.getId() == RESPONSE_KEEP_ALIVE && currentState == STATE_KEEP_ALIVE)
     {
-        if (!slaveMonitoringBlockedDueToRequestProcessing)
-        {
-            handleSlaveAliveMonitoring(msg);
-        }
-        // Logger::log("RESPONSE_KEEP_ALIVE");
+
+        handleSlaveAliveMonitoring(msg);
     }
 
     if (msg.getId() == RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE && (currentState == STATE_REQUEST_NODE_DETAILED_DATA || currentState == STATE_KEEP_ALIVE))
     {
         handleDetailedDataUpdate(msg);
-        // Logger::log("<-RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
     }
 
     /* Process response from the slave */
@@ -395,91 +413,35 @@ void RemoteControlServer::processUDPMessage(MessageUDP &msg)
 
 void RemoteControlServer::handleHandShakeCommunication(MessageUDP &msg)
 {
-    if (msg.getId() == RESPONSE_NODE_INITIAL_DATA)
+    // This discovery will work either in INITIAL or KEEP_ALIVE state
+    NodeInitialData receivedInitialData = getInitialDataFromPayload(msg);
+
+    if (receivedInitialData.isValid())
     {
-        // Logger::log("dostalismy msg i ID RESPONSE_NODE_INITIAL_DATA");
-        NodeInitialData receivedInitialData = getInitialDataFromPayload(msg);
-
-        if (receivedInitialData.isValid())
+        // czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
+        if (remoteNodes.find(receivedInitialData.macAddress) == remoteNodes.end())
         {
-            // Logger::log("Sprawdzamy czy node jest w mapie.......................");
-            // czy w mapie jest już node od ktorego dostalismy wiadomosc receivedInitialData
-            if (remoteNodes.find(receivedInitialData.macAddress) == remoteNodes.end())
-            {
-                // not found - brak info o node, dodajemy info do mapy
-                RemoteNodeInformation nodeInfo{
-                    .numberOfDevices = receivedInitialData.numberOfDevices,
-                    .nodeIpAddress = msg.getIPAddress(),
-                    .lastKnownNodeHash = receivedInitialData.nodeHash};
+            // not found - brak info o node, dodajemy info do mapy
+            RemoteNodeInformation nodeInfo{
+                .numberOfDevices = receivedInitialData.numberOfDevices,
+                .nodeIpAddress = msg.getIPAddress(),
+                .lastKnownNodeHash = receivedInitialData.nodeHash};
 
-                remoteNodes.insert({receivedInitialData.macAddress, nodeInfo});
-                updateNetworkNodesInformationSignal();
-                String ipString = String((int)nodeInfo.nodeIpAddress.octet1) + "." + String((int)nodeInfo.nodeIpAddress.octet2) + "." + String((int)nodeInfo.nodeIpAddress.octet3) + "." + String((int)nodeInfo.nodeIpAddress.octet4);
-                Logger::log("New Node Added {" + ipString + "}, current remote nodes content:");
-                for (auto &node : remoteNodes)
-                {                          // pętla iterująca przez wszystkie elementy w mapie remoteNodes
-                    node.second.printLn(); // node.second oznacza, że korzystamy z drugiego elementu pary z każdego wpisu.
-                }
-                // Logger::log("=========== Rozmiar mapy: " + String(RemoteControlServer::remoteNodes.size()));
-            }
-            else
-            {
-            }
-        }
-    }
-    else if (msg.getId() == RESPONSE_NODE_DETAILED_DATA)
-    {
-        DeviceDescription receivedDescription;
-        /* Size of payload (DeviceDescription only) and receivedDescription must be equal, otherwise message is incorrect */
-        if (msg.getPayload().size() == receivedDescription.getSize())
-        {
-            /* Try to deserialize DeviceDescription from received payload */
-            if (receivedDescription.fromByteArray(msg.getPayload().data(), receivedDescription.getSize()))
-            {
+            remoteNodes.insert({receivedInitialData.macAddress, nodeInfo});
+            updateNetworkNodesInformationSignal();
+            String ipString = String((int)nodeInfo.nodeIpAddress.octet1) + "." + String((int)nodeInfo.nodeIpAddress.octet2) + "." + String((int)nodeInfo.nodeIpAddress.octet3) + "." + String((int)nodeInfo.nodeIpAddress.octet4);
+            Logger::log("New Node discovered : {" + ipString + "}");
 
-                /* sprawdz czy jest w mapie Node dla ktorego dostalismy description*/
-                if (remoteNodes.find(receivedDescription.macAddress) == remoteNodes.end())
-                {
-                    // not found
-                    Logger::log("Received Node ID Not Found");
-                }
-                else
-                {
-                    // found
-                    /* do zmiennej collectionVecRef przypisujemy referencje do wlasciwej kolekcji (wektora)device'ow dla otrzymanego MAC */
-                    std::vector<DeviceDescription> &collectionVecRef = remoteNodes.find(receivedDescription.macAddress)->second.devicesCollection;
-                    bool isDeviceAlreadyInCollection = false;
-                    /* prawdz czy otrzymanego dvice nie ma juz w kolekcji*/
-                    for (auto &device : collectionVecRef)
-                    {
-                        if (device.deviceId == receivedDescription.deviceId)
-                        {
-                            isDeviceAlreadyInCollection = true;
-                            // Logger::log("Mam go w kolekcji");
-                            break;
-                        }
-                    }
-                    /* dodaj do kolekcji jesli nie istnieje*/
-                    if (!isDeviceAlreadyInCollection)
-                    {
-                        collectionVecRef.push_back(receivedDescription);
-                        // Logger::log("Dodaje do kolekcji");
-                    }
-                    else
-                    {
-                        Logger::log("Device allready PRESENT");
-                    }
-                }
-            }
-            else
-            {
-                Logger::log("RemoteControlServer:// Problem during DeviceDescription deserialization");
-            }
+            // Queue detailed data refresh for this node
+            triggerDDRefresh(receivedInitialData.macAddress);
         }
         else
         {
-            Logger::log("RemoteControlServer:// Invalid length of received DeviceDescription message");
         }
+    }
+    else
+    {
+        Logger::log("RemoteControlServer:// Invalid NodeInitialData received during handshake");
     }
 }
 
@@ -564,16 +526,9 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP &msg)
     if (payload.size() == sizeof(receivedKeepAlive))
     {
         memcpy(&receivedKeepAlive, &(payload.at(0)), sizeof(receivedKeepAlive)); // gdzie, skad, wielkosc
-        if (remoteNodes.find(receivedKeepAlive.mac) == remoteNodes.end())
+        // Do we know this node ?
+        if (remoteNodes.find(receivedKeepAlive.mac) != remoteNodes.end())
         {
-            // not found
-            remoteNodes.clear();
-            currentState = STATE_REQUEST_NODE_INITIAL_DATA;
-            Logger::log("Reinit started unknow received");
-        }
-        else
-        {
-            // found
             remoteNodes.find(receivedKeepAlive.mac)->second.lastKeepAliveReceivedTime = millis();
             auto &ip = remoteNodes.find(receivedKeepAlive.mac)->second.nodeIpAddress;
             String ipString = String((int)ip.octet1) + "." + String((int)ip.octet2) + "." + String((int)ip.octet3) + "." + String((int)ip.octet4);
@@ -583,9 +538,7 @@ void RemoteControlServer::handleSlaveAliveMonitoring(MessageUDP &msg)
             /* Node hash validation */
             if (remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash != receivedKeepAlive.nodeHash)
             {
-                // Logger::log("Old hash : " + String((int)remoteNodes.find(receivedKeepAlive.mac)->second.lastKnownNodeHash));
-                // Logger::log("New hash : " + String((int)receivedKeepAlive.nodeHash));
-                Logger::log("RCServer//: Detected slave state change, DD refresh start ...");
+                Logger::log("RCServer//: Detected slave state change, update triggered ...");
                 /* Detailed data collection refresh needed */
                 triggerDDRefresh(receivedKeepAlive.mac);
 
@@ -625,8 +578,6 @@ bool RemoteControlServer::processPendingRequest(RcRequest &request)
     {
         remoteNode.second.lastKeepAliveReceivedTime = millis();
     }
-
-    slaveMonitoringBlockedDueToRequestProcessing = true;
 
     // get target node IP based on MAC
     MessageUDP::IPAddr targetNodeIp{NETWORK_BROADCAST};
@@ -727,10 +678,8 @@ void RemoteControlServer::refreshRemoteNodeInfo(uint64_t macAddr)
     MessageUDP msg(REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE, nodeIp, 9001);
     msg.pushData((byte *)&macAddr, sizeof(uint64_t));
 
-    // NetworkDriver::sendBroadcast(msg);
-
     NetworkDriver::send(msg);
-    Logger::log("->RCS - wysylam o detailed data dla node, MAC:" + String(int(macAddr)));
+    // Logger::log("->RCS - wysylam o detailed data dla node, MAC:" + String(int(macAddr)));
     // msg.serialPrintMessageUDP(msg);
 }
 
