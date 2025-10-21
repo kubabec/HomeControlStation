@@ -409,6 +409,13 @@ void RemoteControlServer::processUDPMessage(MessageUDP &msg)
         processReceivedRcResponse(msg);
         // Logger::log("<-RC_RESPONSE");
     }
+
+    if(msg.getId() == DISCOVER_ME_MESSAGE && currentState == STATE_KEEP_ALIVE){
+        MessageUDP::IPAddr ip = msg.getIPAddress();
+        Logger::log("{RCServer} Received DISCOVER_ME_MESSAGE, sending discovery request to " + ip.toString());
+        MessageUDP msg(REQUEST_NODE_INITIAL_DATA, ip, 9001);
+        NetworkDriver::send(msg);
+    }
 }
 
 void RemoteControlServer::handleHandShakeCommunication(MessageUDP &msg)

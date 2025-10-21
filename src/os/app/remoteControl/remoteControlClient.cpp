@@ -10,6 +10,8 @@ std::array<std::function<bool(RcRequest &)>, REQ_COUNT> RemoteControlClient::req
 std::queue<RcResponse> RemoteControlClient::vecResponseMessage;
 std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
 uint8_t RemoteControlClient::lastReceivedRequestId = 0xFF;
+unsigned long RemoteControlClient::lastMasterActivityTime = 0;
+MessageUDP::IPAddr RemoteControlClient::lastKnownMasterIp{0, 0, 0, 0};
 
 uint64_t RemoteControlClient::localNodeMACAddress;
 
@@ -41,6 +43,15 @@ void RemoteControlClient::cyclic()
 
     processResponse();
     processPendingTxData();
+
+
+    if(millis() - lastMasterActivityTime > TIME_TO_ASK_FOR_DISCOVERY){
+        Logger::log("RemoteControlClient:// No master activity detected, asking for discovery ...");
+        MessageUDP discoverMeMsg(DISCOVER_ME_MESSAGE, NETWORK_BROADCAST, 9001);
+        NetworkDriver::sendBroadcast(discoverMeMsg);
+
+        lastMasterActivityTime = millis(); // reset timer after sending discovery
+    }
 }
 
 void RemoteControlClient::processPendingTxData()
@@ -62,6 +73,11 @@ void RemoteControlClient::processPendingTxData()
     }
 }
 
+void RemoteControlClient::updateLastKnownMasterIp(MessageUDP::IPAddr address){
+    lastMasterActivityTime = millis();
+    lastKnownMasterIp = address;
+}
+
 void RemoteControlClient::processUDPRequest(MessageUDP &msg)
 {
     switch (msg.getId())
@@ -69,6 +85,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP &msg)
     case RC_REQUEST:
         // Logger::log("-> Dostałem UDP type RC_REQUEST");
         Logger::log("RemoteControlClient:// Received RC_REQUEST message.");
+        updateLastKnownMasterIp(msg.getIPAddress());
         processGenericRequest(msg);
 
         break;
@@ -76,6 +93,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP &msg)
     case REQUEST_NODE_INITIAL_DATA:
         // Logger::log("-> Dostałem UDP REQUEST_NODE_INITIAL_DATA");
         Logger::log("RemoteControlClient:// Received REQUEST_NODE_INITIAL_DATA message.");
+        updateLastKnownMasterIp(msg.getIPAddress());
         sendInitialDataResponse();
 
         break;
@@ -83,6 +101,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP &msg)
     case REQUEST_KEEP_ALIVE:
         // Logger::log("-> Dostałem UDP REQUEST_KEEP_ALIVE");
         Logger::log("RemoteControlClient:// Received REQUEST_KEEP_ALIVE message.");
+        updateLastKnownMasterIp(msg.getIPAddress());
         sendKeepAlive();
         break;
 
@@ -90,6 +109,7 @@ void RemoteControlClient::processUDPRequest(MessageUDP &msg)
         // Logger::log("-> Dostałem UDP REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE");
         Logger::log("RemoteControlClient:// Received REQUEST_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE message.");
         sendDetailedDataResponse(RESPONSE_NODE_DETAILED_DATA_FROM_SPECIFIC_SLAVE);
+        updateLastKnownMasterIp(msg.getIPAddress());
         break;
 
     default:
@@ -123,7 +143,6 @@ void RemoteControlClient::processGenericRequest(MessageUDP &msg)
         {
             // We probably received repeated request, resend last response
             Logger::log("RemoteControlClient:// Repeated request received, resending last response. TODO");
-            
         }
     }
 }

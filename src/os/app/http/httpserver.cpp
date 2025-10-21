@@ -569,7 +569,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.1</p></footer>");
+              client.println("<footer><p>&copy; 2025 Home Control Station · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.2</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            

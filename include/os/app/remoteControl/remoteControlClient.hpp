@@ -9,7 +9,7 @@
 #include <os/app/remoteControl/rc_DataTypes.hpp>
 
 
-
+#define TIME_TO_ASK_FOR_DISCOVERY 13000 // 13s
 
 class RemoteControlClient 
 {
@@ -22,6 +22,8 @@ class RemoteControlClient
     static std::queue<RcResponse> vecResponseMessage; //vector containing the responses to the requests
     static std::queue<MessageUDP> pendingTxQueue;
     static uint8_t lastReceivedRequestId;
+    static unsigned long lastMasterActivityTime;
+    static MessageUDP::IPAddr lastKnownMasterIp;
 
 
     
@@ -36,6 +38,8 @@ class RemoteControlClient
     static void processGenericRequest(MessageUDP& msg);
     static bool processResponse();
     static void processPendingTxData();
+
+    static void updateLastKnownMasterIp(MessageUDP::IPAddr address);
     
 public:
     static void init();

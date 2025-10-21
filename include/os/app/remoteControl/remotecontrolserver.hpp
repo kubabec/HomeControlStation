@@ -9,10 +9,10 @@
 #include <os/app/remoteControl/ReqestProcessor.hpp>
 #include "os/Logger.hpp"
 
-#define TIME_TO_REPEAT_INITIAL_DATA_REQEST 500
+#define TIME_TO_REPEAT_INITIAL_DATA_REQEST 1200
 #define TIME_TO_REPEAT_DETAILED_DATA_REQEST 500
 #define TIME_TO_REPEAT_KEEP_ALIVE_REQEST 15000
-#define TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED 10000
+#define TIME_TO_SWITCH_FROM_INITIAL_TO_DETAILED 12000
 
 /* Typ danych opisujacy zadalnego Node*/
 typedef struct
