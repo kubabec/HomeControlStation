@@ -21,7 +21,7 @@ uint64_t RemoteControlServer::detailedDataPendingNodeMAC;
 uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej statycznej poza klasą^^^^^^^^^^^^^^^^^^^^^^
 uint64_t RemoteControlServer::lastKeepAliveRequestTime = 0;
 
-#define KEEP_ALIVE_INTERVAL 2300               // 2,3s
+#define KEEP_ALIVE_INTERVAL 2300              // 2,3s
 #define TIME_TO_REPEAT_DISCOVERY_REQUEST 9700 // 9,7s
 
 void RemoteControlServer::deinit()
@@ -271,7 +271,7 @@ void RemoteControlServer::handleKeepAliveState()
 
     for (auto &node : remoteNodes)
     {
-        if (millis() - node.second.lastKeepAliveReceivedTime > (6 * TIME_TO_REPEAT_KEEP_ALIVE_REQEST))
+        if (millis() - node.second.lastKeepAliveReceivedTime > (2 * TIME_TO_REPEAT_KEEP_ALIVE_REQEST))
         {
             nodesToBeRemoved.push_back(node.first);
         }
@@ -284,18 +284,23 @@ void RemoteControlServer::handleKeepAliveState()
     {
         for (auto MAC : nodesToBeRemoved)
         {
-            remoteNodes.erase(MAC);
-            char macStr[18];
-            snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
-                     (uint8_t)(MAC >> 56), (uint8_t)(MAC >> 48),
-                     (uint8_t)(MAC >> 40), (uint8_t)(MAC >> 32),
-                     (uint8_t)(MAC >> 24), (uint8_t)(MAC >> 16),
-                     (uint8_t)(MAC >> 8), (uint8_t)(MAC));
-            Logger::log("Removing Node due to lack of communication MAC : " + String(macStr));
-            UserInterfaceNotification notif;
-            notif.title = "Node disconnected";
-            notif.body = "Node with MAC" + String(MAC) + " disconnected.";
-            notif.type = UserInterfaceNotification::WARNING;
+            if (remoteNodes.find(MAC) != remoteNodes.end())
+            {
+                remoteNodes.erase(MAC);
+
+                char macStr[18];
+                snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                         (uint8_t)(MAC >> 56), (uint8_t)(MAC >> 48),
+                         (uint8_t)(MAC >> 40), (uint8_t)(MAC >> 32),
+                         (uint8_t)(MAC >> 24), (uint8_t)(MAC >> 16),
+                         (uint8_t)(MAC >> 8), (uint8_t)(MAC));
+                Logger::log("Removing Node due to lack of communication MAC : " + String(macStr));
+                UserInterfaceNotification notif;
+                notif.title = "Node disconnected";
+                notif.body = "Node with MAC" + String(MAC) + " disconnected.";
+                notif.type = UserInterfaceNotification::WARNING;
+            }
+
             // std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         }
 
@@ -357,6 +362,7 @@ void RemoteControlServer::handleDetailedDataRefreshMech(std::vector<uint64_t> &n
                 else
                 {
                     Logger::log("Removing slave due to detailed data refresh failure");
+                    nodesToBeRemoved.push_back(detailedDataPendingNodeMAC);
                 }
             }
             else
@@ -410,7 +416,8 @@ void RemoteControlServer::processUDPMessage(MessageUDP &msg)
         // Logger::log("<-RC_RESPONSE");
     }
 
-    if(msg.getId() == DISCOVER_ME_MESSAGE && currentState == STATE_KEEP_ALIVE){
+    if (msg.getId() == DISCOVER_ME_MESSAGE && currentState == STATE_KEEP_ALIVE)
+    {
         MessageUDP::IPAddr ip = msg.getIPAddress();
         Logger::log("{RCServer} Received DISCOVER_ME_MESSAGE, sending discovery request to " + ip.toString());
         MessageUDP msg(REQUEST_NODE_INITIAL_DATA, ip, 9001);
@@ -432,6 +439,8 @@ void RemoteControlServer::handleHandShakeCommunication(MessageUDP &msg)
             RemoteNodeInformation nodeInfo{
                 .numberOfDevices = receivedInitialData.numberOfDevices,
                 .nodeIpAddress = msg.getIPAddress(),
+                .lastKeepAliveRequestedTime = millis(),
+                .lastKeepAliveReceivedTime = millis(),
                 .lastKnownNodeHash = receivedInitialData.nodeHash};
 
             remoteNodes.insert({receivedInitialData.macAddress, nodeInfo});

@@ -68,7 +68,7 @@ bool UDPAdapter::send(MessageUDP &msg)
     // MessageUDP::serialPrintMessageUDP(msg);
 
     // Logger::log("Sending via WiFi!");
-    // Logger::log("UDPAdapter:// Sending UDP packet (MsgId : " + String((int)msg.getId()) + ") to host " + msg.getIPAddress().toString());
+    Logger::log("UDPAdapter:// Sending UDP packet (MsgId : " + String((int)msg.getId()) + ") to host " + msg.getIPAddress().toString());
     std::vector<uint8_t> &payloadRef = msg.getPayload();
     IPAddress receiverIP(
         msg.getIPAddress().octet1,

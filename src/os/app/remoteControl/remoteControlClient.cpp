@@ -12,6 +12,7 @@ std::queue<MessageUDP> RemoteControlClient::pendingTxQueue;
 uint8_t RemoteControlClient::lastReceivedRequestId = 0xFF;
 unsigned long RemoteControlClient::lastMasterActivityTime = 0;
 MessageUDP::IPAddr RemoteControlClient::lastKnownMasterIp{0, 0, 0, 0};
+Transaction RemoteControlClient::currentTransaction {};
 
 uint64_t RemoteControlClient::localNodeMACAddress;
 
@@ -130,6 +131,9 @@ void RemoteControlClient::processGenericRequest(MessageUDP &msg)
         {
             if (newRequest.getRequestType() >= REQ_FIRST && newRequest.getRequestType() < UNKNOWN_REQ)
             {
+                currentTransaction.request = newRequest;
+                currentTransaction.response.reset();
+
                 lastReceivedRequestId = newRequest.getRequestId();
                 // sprawdzenie czy istnieje funkcja w tablicy do obslugi danego typu requestu
                 if (requestReceivers.at(newRequest.getRequestType()))
@@ -142,7 +146,17 @@ void RemoteControlClient::processGenericRequest(MessageUDP &msg)
         else
         {
             // We probably received repeated request, resend last response
-            Logger::log("RemoteControlClient:// Repeated request received, resending last response. TODO");
+            if(currentTransaction.response.has_value()){
+                Logger::log("RemoteControlClient:// Repeated request received, resending last response.");
+                sendResponse(currentTransaction.response.value());
+            }else {
+                // Retry to ask the application for the responce once again
+                if (requestReceivers.at(newRequest.getRequestType()))
+                {
+                    // requestReceivers to tablica, newRequest.type to typ zadania, requestReceivers.at(newRequest.type) pobiera odpowiednią funkcję z tablicy requestReceivers na podstawie typu żądania.
+                    (requestReceivers.at(newRequest.getRequestType()))(newRequest);
+                }
+            }
         }
     }
 }
@@ -283,6 +297,12 @@ bool RemoteControlClient::registerRequestReceiver(RequestType request, std::func
 
 bool RemoteControlClient::sendResponse(RcResponse &response)
 {
+    if(currentTransaction.request.getRequestId() != response.getResponseId()){
+        Logger::log("RemoteControlClient:// Warning! Sending response with mismatched request ID!");
+    }else {
+        currentTransaction.response = response;
+    }
+
     vecResponseMessage.push(std::move(response));
 
     return true;
