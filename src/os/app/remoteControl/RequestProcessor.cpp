@@ -9,7 +9,7 @@ RequestProcessor::RequestProcessor() {
 }
 
 
-bool RequestProcessor::processReqest(RcRequest& newReqest) {
+bool RequestProcessor::processReqest(RcRequest& newReqest, MessageUDP::IPAddr targetNodeIp) {
     //new request asrrived
     //currentRequest.print();
     // Logger::log("Processing request with ID : " + String((int)newReqest.getRequestId()));
@@ -24,7 +24,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
         currentRequest = newReqest;
         
         /* Prepare UDP message with RC_REQUEST identifier */
-        MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
+        MessageUDP message(RC_REQUEST, targetNodeIp, 9001);
 
         // Logger::log("Constructing empty meesage completed");
 
@@ -47,7 +47,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             // Logger::log("Sending new request with ID "+String((int)currentRequest.getRequestId()));
             // currentRequest.print();
             /* Send UDP data */
-            NetworkDriver::sendBroadcast(message);
+            NetworkDriver::send(message);
 
             // Logger::log("Message sent");
             /* Increment request send counter for further entries of this function */
@@ -73,7 +73,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
             if(millis() - lastSendTime > 1000){
                 Logger::log("Sending repeat request for request "+String((int)currentRequest.getRequestId()));
                 /* Send repeat request */
-                MessageUDP message(RC_REQUEST,NETWORK_BROADCAST, 9001);
+                MessageUDP message(RC_REQUEST,targetNodeIp, 9001);
 
                 uint16_t reqestSize = currentRequest.getSize();
                 currentRequest.setRequestSendCount(currentRequest.getRequestSendCount() + 1);
@@ -84,7 +84,7 @@ bool RequestProcessor::processReqest(RcRequest& newReqest) {
                 currentRequest.toByteArray(dataBuffer, reqestSize);
                 
                 if(message.pushData((byte*)(dataBuffer),reqestSize)){
-                    NetworkDriver::sendBroadcast(message);
+                    NetworkDriver::send(message);
                     lastSendTime = millis();
                 }
                 else{

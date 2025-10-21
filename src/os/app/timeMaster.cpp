@@ -1,8 +1,8 @@
 #include <os/app/timeMaster.hpp>
 #include "os/Logger.hpp"
 
-#define NTP_RESYNC_TIME (5 * 60 * 1000) //5 minut
-#define HALF_NTP_RESYNC_TIME (NTP_RESYNC_TIME / 2) //2.5 minut
+#define NTP_RESYNC_TIME (5 * 60 * 1000)            // 5 minut
+#define HALF_NTP_RESYNC_TIME (NTP_RESYNC_TIME / 2) // 2.5 minut
 
 unsigned long TimeMaster::lastUpdateTime = 0;
 unsigned long TimeMaster::lastNTPTime = 0;
@@ -15,87 +15,105 @@ bool TimeMaster::startupTimeInitialized = false;
 WiFiUDP TimeMaster::ntpUDP;
 NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
 
-
-void TimeMaster::init() {
+void TimeMaster::init()
+{
     Logger::log("DeviceProvider init ...");
     RtcTime startupTime;
     DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(startupTime));
 
-
-    
     timeClient.begin();
     setTimeZone(1); // Ustawienie strefy czasowej na GMT+1
+    DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<RtcTime()>>(TimeMaster::getRtcTime));
 
-    
+
     // Próba synchronizacji z NTP
-    if (timeClient.update()) {
+    if (timeClient.update())
+    {
         updateNtpVariables();
         Logger::log("Synchronized with NTP!");
         DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(getRtcTime()));
         startupTimeInitialized = true; // Czas startowy został zainicjalizowany
-    } else {
+
+        UserInterfaceNotification notif;
+        notif.title = "SYSTEM RUNNING";
+        notif.body = "Welcome to Home Control Station!";
+        notif.type = UserInterfaceNotification::INFO;
+        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+    }
+    else
+    {
         // NTP nie działa - przechodzimy na freerunning
         ntpAvailable = false;
         Logger::log("NTP unavailable");
-    }    
-    DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<RtcTime()>>(TimeMaster::getRtcTime));
-     
+    }
+
     Logger::log("... done");
 }
 
-void TimeMaster::deinit() {
-    
+void TimeMaster::deinit()
+{
 }
 
 // Funkcja do cyklicznego wywoływania aktualizacji czasu
-void TimeMaster::cyclic() {
+void TimeMaster::cyclic()
+{
 
-    if(!wasNtpEverSynced && initialRetryCount < 60) {
-        if (timeClient.update()) {
+    if (!wasNtpEverSynced && initialRetryCount < 60)
+    {
+        if (timeClient.update())
+        {
             updateNtpVariables();
             initialRetryCount = 0; // Resetujemy licznik prób synchronizacji
 
             // Do only once after first successful NTP sync
-            if(!startupTimeInitialized) {
+            if (!startupTimeInitialized)
+            {
                 DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(getRtcTime()));
                 startupTimeInitialized = true; // Czas startowy został zainicjalizowany
+
+                UserInterfaceNotification notif;
+                notif.title = "SYSTEM RUNNING";
+                notif.body = "Welcome to Home Control Station!";
+                notif.type = UserInterfaceNotification::INFO;
+                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
             }
-        } else {
+        }
+        else
+        {
             initialRetryCount++;
         }
     }
 
-
-
     unsigned long now = millis();
 
-    if (now - lastUpdateTime >= NTP_RESYNC_TIME) {
+    if (now - lastUpdateTime >= NTP_RESYNC_TIME)
+    {
         Logger::log("NTP resyncing ...");
-        if (timeClient.update()) {
+        if (timeClient.update())
+        {
             updateNtpVariables();
-        } else {
+        }
+        else
+        {
             // Błąd synchronizacji NTP - tryb freerunning
-            
+
             ntpAvailable = false;
             lastUpdateTime = now - HALF_NTP_RESYNC_TIME;
-            
         }
-
-        
     }
 }
 
-
-RtcTime TimeMaster::getRtcTime() {
+RtcTime TimeMaster::getRtcTime()
+{
     time_t rawTime = TimeMaster::getEpochTime(); // Pobranie czasu Unix
-    struct tm *timeInfo = localtime(&rawTime);    // Konwersja na czas UTC
+    struct tm *timeInfo = localtime(&rawTime);   // Konwersja na czas UTC
 
     RtcTime rtcTime;
     rtcTime.sec = timeInfo->tm_sec;
     rtcTime.min = timeInfo->tm_min;
     rtcTime.hour = timeInfo->tm_hour;
     rtcTime.mday = timeInfo->tm_mday;
-    rtcTime.mon = timeInfo->tm_mon + 1; // Miesiące są indeksowane od 0
+    rtcTime.mon = timeInfo->tm_mon + 1;      // Miesiące są indeksowane od 0
     rtcTime.year = timeInfo->tm_year + 1900; // Rok od 1900
     rtcTime.wday = timeInfo->tm_wday;
     rtcTime.yday = timeInfo->tm_yday;
@@ -104,27 +122,26 @@ RtcTime TimeMaster::getRtcTime() {
     return rtcTime; // Zwracamy strukturę RtcTime
 }
 
-
 // Ustawienie przesunięcia strefy czasowej (w godzinach)
-void TimeMaster::setTimeZone(int timeZoneOffset) {
+void TimeMaster::setTimeZone(int timeZoneOffset)
+{
     TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 7200);
 }
 
-unsigned long TimeMaster::getEpochTime() {
+unsigned long TimeMaster::getEpochTime()
+{
     unsigned long elapsedMillis = millis() - lastMillis;
     return lastNTPTime + (elapsedMillis / 1000);
 }
 
-void TimeMaster::updateNtpVariables() {
+void TimeMaster::updateNtpVariables()
+{
     // Sukces synchronizacji NTP
     lastNTPTime = timeClient.getEpochTime();
     lastMillis = millis();
-    
+
     ntpAvailable = true;
     lastUpdateTime = millis();
-    wasNtpEverSynced = true; // NTP był kiedykolwiek zsynchronizowany 
-    Logger::log("NTP time updated: " + String(lastNTPTime));         
+    wasNtpEverSynced = true; // NTP był kiedykolwiek zsynchronizowany
+    Logger::log("NTP time updated: " + String(lastNTPTime));
 }
-    
- 
-

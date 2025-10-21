@@ -3,6 +3,7 @@
 
 #include <os/app/remoteControl/rc_dataTypes.hpp>
 #include <os/app/remoteControl/RC_publicDataTypes.hpp>
+#include <os/tools/messageUDP.hpp>
 
 
 class RequestProcessor
@@ -14,7 +15,7 @@ class RequestProcessor
 
 public:
    RequestProcessor();
-   bool processReqest(RcRequest& newReqest);
+   bool processReqest(RcRequest& newReqest, MessageUDP::IPAddr targetNodeIp);
    //void setCurrentRequest(RcRequest& newReqest);
 
 };
