@@ -9,7 +9,7 @@
 #include <os/app/remoteControl/rc_DataTypes.hpp>
 #include <optional>
 
-#define TIME_TO_ASK_FOR_DISCOVERY 13000 // 13s
+#define TIME_TO_ASK_FOR_DISCOVERY 45000 // 45s
 typedef struct
 {
     RcRequest request;

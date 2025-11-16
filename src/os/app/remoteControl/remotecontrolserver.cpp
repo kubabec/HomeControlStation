@@ -22,7 +22,7 @@ uint8_t RemoteControlServer::requestIdCounter = 0; // Inicjalizacja zmiennej sta
 uint64_t RemoteControlServer::lastKeepAliveRequestTime = 0;
 
 #define KEEP_ALIVE_INTERVAL 2300              // 2,3s
-#define TIME_TO_REPEAT_DISCOVERY_REQUEST 9700 // 9,7s
+#define TIME_TO_REPEAT_DISCOVERY_REQUEST 30000 // 30s
 
 void RemoteControlServer::deinit()
 {

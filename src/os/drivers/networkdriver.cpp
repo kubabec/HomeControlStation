@@ -24,6 +24,8 @@ void NetworkDriver::init()
 {
     Logger::log("NetworkDriver init ...");
 
+    WiFiAdapter::init();
+
     /* Try to access device configuration to extract WiFi credentials */
     try
     {
@@ -47,7 +49,6 @@ void NetworkDriver::init()
     }
     catch (const std::bad_any_cast &e)
     {
-        // WiFiAdapter::connectToNetwork( "", "");
         Logger::log("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
         WiFiAdapter::createAccessPoint();
     }
@@ -108,26 +109,13 @@ void NetworkDriver::cyclic()
     // Update WiFi Adapter to be updated with connection lost status
     WiFiAdapter::task();
 
-    if (networkCredentialsAvailable)
-    { /* we shall monitor the connection in order to detect the failure*/
-        static long long lastRetryTime = 0;
-        if (!WiFiAdapter::isConnected())
-        { /* We are not connected, but shall be as credentials are known */
-            if (abs(millis() - lastRetryTime > 10000))
-            {
-                NodeConfiguration config = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-                WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword, false);
-                lastRetryTime = millis();
-            }
-        }
-    }
-
     /*******     UDP communication section       ******/
     // Update UDP task to be able to receive UDP packets
     UDPAdapter::task();
 
     if (UDPAdapter::sendingAllowed())
     {
+        static uint8_t retryCount = 0;
         // Send one pending packet per cyclic
         if (pendingToSendPackets.size() > 0)
         {
@@ -135,10 +123,16 @@ void NetworkDriver::cyclic()
             if (UDPAdapter::send(pendingToSendPackets.front()))
             {
                 pendingToSendPackets.pop();
+                retryCount = 0;
             }
             else
             {
                 Logger::log("NetworkDriver:// Sending UDP packet (MsgId : " + String((int)pendingToSendPackets.front().getId()) + ") to host " + pendingToSendPackets.front().getIPAddress().toString() + " failed.");
+                retryCount ++;
+                if(retryCount > 5){
+                    pendingToSendPackets.pop();
+                    retryCount = 0;
+                }
             }
         }
     }

@@ -3,6 +3,7 @@
 #include <os/CyclicProfiler.hpp>
 
 void setup() {
+  delay(1000);
   Serial.begin(115200);
   randomSeed(analogRead(0));
   OperatingSystem::init();

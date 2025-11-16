@@ -48,7 +48,6 @@ void OTA::init(const String hostname, const String password)
     ArduinoOTA.setMdnsEnabled(false);
     ArduinoOTA.begin();
     Logger::log("OTA Ready");
-    Serial.print("IP address: ");
     Logger::log(WiFi.localIP().toString());
 }
 
