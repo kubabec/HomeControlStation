@@ -6,7 +6,7 @@
 #include <vector>
 #include "os/Logger.hpp"
 
-#define MAX_EXT_MEMORY_SIZE_TOTAL 2000 /* bytes */
+#define MAX_EXT_MEMORY_SIZE_TOTAL 1900 /* bytes */
 #define SLOTS_FOR_EXT_MEMORY_BUFFERS 10 /* number of slots for independent data pointers */
 
 typedef struct{

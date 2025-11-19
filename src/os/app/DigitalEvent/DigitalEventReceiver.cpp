@@ -7,6 +7,7 @@ std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
 std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;
 
 uint8_t DigitalEventReceiver::lastReceivedTransmissionId = 0;
+long DigitalEventReceiver::lastEventOccurrenceTime{0};
 
 const uint8_t NVM_VALID = 0xCD;
 
@@ -199,9 +200,16 @@ void DigitalEventReceiver::cyclic()
 
 void DigitalEventReceiver::fireEvent(uint64_t eventId)
 {
+    if((millis() - lastEventOccurrenceTime) < 1000){
+        Logger::log("DigitalEventReceiver:// Ignoring event fire request due to debounce time");
+        return;
+    }
+
     Logger::log("DigitalEventReceiver:// Event with ID: " + String((unsigned long long)eventId) + " fired");
     // Push event to the queue
     eventsQueue.push(eventId);
+
+    lastEventOccurrenceTime = millis();
 }
 
 void DigitalEventReceiver::deinit()

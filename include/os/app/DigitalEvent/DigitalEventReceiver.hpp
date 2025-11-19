@@ -21,6 +21,7 @@ class DigitalEventReceiver
     static std::queue<ServiceCallData> pendingServiceCalls;
 
     static uint8_t lastReceivedTransmissionId;
+    static long lastEventOccurrenceTime;
 
 public:
     static void init();

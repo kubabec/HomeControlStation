@@ -21,6 +21,8 @@
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/timeMaster.hpp>
 
+#include <os/HwDependency/RFManager.hpp>
+
 
 class   OperatingSystem
 {

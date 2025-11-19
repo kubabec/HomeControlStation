@@ -63,7 +63,9 @@ typedef enum
     e_BLOCK_DIGITAL_EVENT_4,
     e_BLOCK_DIGITAL_EVENT_5,
     e_BLOCK_DIGITAL_EVENT_6,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DIGITAL_EVENT_6,
+    e_BLOCK_RFMANAGER_1,
+    e_BLOCK_RFMANAGER_2,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_RFMANAGER_2,
     e_NUMBER_OF_PERSISTENT_BLOCKS = (e_PERSISTENT_BLOCK_LAST + 1)
 }PersistentDatablockID;
 
@@ -144,6 +146,12 @@ typedef struct{
     std::function<uint8_t(void)> getActiveNotificationsCount;
     std::function<UserInterfaceNotification(void)> getOldestNotification;
 }UINotificationsControlAPI;
+
+struct RFButtonsControlAPI{
+    std::function<void()> startLearningMode;
+    std::function<void()> resetConnectedButtons;
+    std::function<void(uint32_t)> deleteConnectedButton;
+};
 
 
 typedef struct

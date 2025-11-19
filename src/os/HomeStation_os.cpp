@@ -99,6 +99,7 @@ void OperatingSystem::init()
 
     DeviceProvider::init();
     TimeMaster::init();
+    RFManager::init();
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig =
@@ -151,6 +152,7 @@ void OperatingSystem::task50ms()
 {
     CyclicProfiler::call("NotificationHandler", NotificationHandler::cyclic);
     CyclicProfiler::call("ExtendedMemoryManager", ExtendedMemoryManager::cyclic);
+    CyclicProfiler::call("RFManager", RFManager::cyclic);
 
     if (resetPending)
     {
@@ -250,6 +252,9 @@ void OperatingSystem::saveNvmData()
     }
     ExtendedMemoryManager::flushNvmData();
     ConfigProvider::flushNvmData();
+
+    DigitalEventReceiver::deinit();
+    RFManager::deinit();
 }
 
 void OperatingSystem::performReset()
@@ -276,6 +281,7 @@ void OperatingSystem::performReset()
     }
 
     NetworkDriver::deinit();
+    RFManager::deinit();
 
     NotificationHandler::deinit();
     TimeMaster::deinit();
