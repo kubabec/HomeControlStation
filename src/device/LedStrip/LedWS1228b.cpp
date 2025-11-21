@@ -418,6 +418,12 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param)
 {
+    if(ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+    {
+        Logger::log("Ongoing animation in progress, service request cannot be processed");
+        return SERV_SUCCESS;
+    }
+
     switch (serviceType)
     {
     case DEVSERVICE_STATE_SWITCH:
@@ -487,6 +493,12 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param)
 {
+    if(ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+    {
+        Logger::log("Ongoing animation in progress, service request cannot be processed");
+        return SERV_SUCCESS;
+    }
+
     switch (serviceType)
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
