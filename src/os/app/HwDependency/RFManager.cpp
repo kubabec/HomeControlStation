@@ -111,10 +111,10 @@ void RFManager::evaluateButtonEvent()
     uint64_t systemDigitalEventId = currentReceptionEvent.buttonUniqueNumber;
 
     // Check if button was clicked only once
-    if (currentReceptionEvent.clickCount == 1)
+    if (currentReceptionEvent.clickCount > 0)
     {
         // Check if button was clicked or long pressed
-        if ((currentReceptionEvent.endTime - currentReceptionEvent.startTime) < 500)
+        if ((currentReceptionEvent.endTime - currentReceptionEvent.startTime) < 250)
         {
             // Single click event
             systemDigitalEventId += 1; // offset for single click
@@ -126,12 +126,6 @@ void RFManager::evaluateButtonEvent()
             systemDigitalEventId += 2; // offset for long press
             Logger::log("RFManager:// Long press event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
         }
-    }
-    else
-    {
-        // Multiple clicks event
-        systemDigitalEventId += 3;
-        Logger::log("RFManager:// Multiple clicks event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber) + ", clicks: " + String((int)currentReceptionEvent.clickCount));
     }
 
     std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(systemDigitalEventId);
@@ -172,6 +166,7 @@ void RFManager::handleIdleState()
             currentReceptionEvent.clickCount++;
             currentReceptionEvent.constantReception = false;
             currentReceptionEvent.endTime = millis();
+            
         }
     }
 
@@ -205,7 +200,34 @@ void RFManager::cyclic()
 void RFManager::deinit()
 {
 #ifdef HAS_RF_RECEIVER
-    // saveConnectedButtons();
+    uint16_t sizeOfNvm = (e_BLOCK_RFMANAGER_2 - e_BLOCK_RFMANAGER_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
+    /* Allocate memory for NVM data */
+    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+
+    if(nvmData == nullptr){
+        Logger::log("RFManager:// Unable to allocate memory for NVM data saving!");
+        return;
+    }
+
+    saveConnectedButtons(nvmData, sizeOfNvm);
+
+
+    uint8_t offset = 0;
+    for (uint8_t blockID = e_BLOCK_RFMANAGER_1; blockID <= e_BLOCK_RFMANAGER_2; blockID++)
+    {
+        /* call GET_NVM_DATABLOCK for current datablock to read NVM data */
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK))(
+            (PersistentDatablockID)blockID, // Datablock ID
+            (uint8_t *)&nvmData[offset]     // local memory buffer for datablock data
+        );
+
+        /* Shift the offset, that next datablock will be written next to previous in 'nvmData' */
+        offset += PERSISTENT_DATABLOCK_SIZE;
+    }
+
+    /* release heap buffer */
+    free(nvmData);
 #endif
 }
 

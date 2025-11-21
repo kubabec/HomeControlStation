@@ -629,14 +629,6 @@ transform: rotate(360deg);\
 display: flex;\
 align-items: center;\
 }\
-.device-icon {\
-width: 32px;\
-height: 32px;\
-margin-left:-10px;\
-margin-top:5px;\
-margin-right: 12px;\
-position:absolute;\
-}\
 footer {\
 	text-align: center;\
 	font-size: 11px;\

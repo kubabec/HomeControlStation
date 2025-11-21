@@ -381,7 +381,7 @@ void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
             if (device.roomId == action.affectedId)
             {
                 // Found at least 1 device enabled in target ROOM
-                if (device.isEnabled)
+                if (device.isEnabled == 1)
                 {
                     isRoomOn = 1;
                     break;

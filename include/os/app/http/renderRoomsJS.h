@@ -11,7 +11,7 @@ const tempSensorType = 45;\
 const segLedStripType = 46;\
 const distSensType = 47;\
 \
-function generateCommonDevInterface(deviceContainer, deviceId, deviceName, favIconNumber, status) {\
+function generateCommonDevInterface(deviceContainer, deviceId, deviceName, status) {\
     const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
     const loadingOverlay = document.createElement('div');\
     loadingOverlay.className = 'loading-overlay';\
@@ -20,14 +20,6 @@ function generateCommonDevInterface(deviceContainer, deviceId, deviceName, favIc
     spinner.className = 'spinner';\
     loadingOverlay.appendChild(spinner);\
     deviceContainer.appendChild(loadingOverlay);\
-\
-    const faviconImageMain = document.createElement('div');\
-    faviconImageMain.className = 'device-left';\
-    const faviconImg = document.createElement('img');\
-    faviconImg.className = 'device-icon';\
-    faviconImg.src = faviconUrl + `${favIconNumber}.png?raw=true`;\
-    faviconImageMain.appendChild(faviconImg);\
-    deviceContainer.appendChild(faviconImageMain);\
 \
     const header = document.createElement('div');\
     header.className = 'header';\
@@ -72,19 +64,19 @@ function renderRooms(data) {\
             deviceContainer.id = `container${device.id}`;\
                 \
             if(device.devType == onOffType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, 1, device.status);\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateOnOffWidget(deviceContainer, device);\
             }else if(device.devType == ledStripType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateLedStripWidget(deviceContainer, device);\
             }else if(device.devType == distSensType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateDistSensWidget(deviceContainer, device);\             
             }else if(device.devType == tempSensorType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, 3, device.status);\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateTempWidget(deviceContainer, device);\
             } else if(device.devType == segLedStripType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, 2, device.status);\
+                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateSegLedWidget(deviceContainer, device);\       
             }else{\
                 const header = document.createElement('div');\
