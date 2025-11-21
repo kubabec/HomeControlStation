@@ -72,7 +72,7 @@ void ConfigProvider::init()
         emptyConfiguration.networkCredentialsAvailable = false;
         emptyConfiguration.nodeType = 255;
 
-        emptyConfiguration.panelPassword = "user";
+        emptyConfiguration.panelPassword = "admin";
         
         /* Write DEFAULT configuration to DataContainer */
         // Obsolete signal to be removed
@@ -161,7 +161,7 @@ String ConfigProvider::getConfigJson(){
     /* Values initialization */
     String isHttpServerActive = configRamMirror.isHttpServer == true ? "true" : "false";
     String isRcServerActive = configRamMirror.isRcServer == true ? "true" : "false";
-    String hasUserAdminRights = configRamMirror.isDefaultUserAdmin == true ? "true" : "false";
+    String hasUserAdminRights = "true";
     String nodeType = String((int)configRamMirror.nodeType);
     String networkSSID = String(configRamMirror.networkSSID);
     String networkPassword = String(configRamMirror.networkPassword);
@@ -193,7 +193,6 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     
     String isHttpServerActive       = String(doc["NodeConfig"][0]["isHttpActive"]);
     String isRcServerActive         = String(doc["NodeConfig"][0]["isRcServer"]);
-    String hasUserAdminRights       = String(doc["NodeConfig"][0]["isUsrAdmin"]);
     String nodeType                 = String(doc["NodeConfig"][0]["nodeType"]);
     String networkSSID              = String(doc["NodeConfig"][0]["ssid"]);
     String networkPassword          = String(doc["NodeConfig"][0]["wifiPass"]);
@@ -208,9 +207,8 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     if(isNotNull(isRcServerActive)){
         configRamMirror.isRcServer = isRcServerActive == "true" ? 1 : 0;
     }
-    if(isNotNull(hasUserAdminRights)){
-        configRamMirror.isDefaultUserAdmin = hasUserAdminRights == "true" ? 1 : 0;
-    }
+    configRamMirror.isDefaultUserAdmin = true;
+    
     if(isNotNull(nodeType)){
         configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
     }
@@ -254,19 +252,18 @@ bool ConfigProvider::setConfigViaString(String& configString)
 
             String isHttpServerActive       = String("yes" /*doc["httpActive"]*/);
             String isRcServerActive         = String(doc["rcServerActive"]);
-            String hasUserAdminRights       = String(doc["usrAdmin"]);
             String nodeType                 = String(doc["type"]);
             String networkSSID              = String(doc["network"]);
             String networkPassword          = String(doc["netPwd"]);
             String panelPassword            = String(doc["cfgPwd"]);
 
-            if(isHttpServerActive.length() > 0 && isRcServerActive.length() > 0 && hasUserAdminRights.length() > 0 &&
+            if(isHttpServerActive.length() > 0 && isRcServerActive.length() > 0 &&
                nodeType.length() > 0 && networkSSID.length() > 0 && panelPassword.length() > 0 ) {
                 /* Some of configs are only allowed to be changed in Service mode */
                 if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
                     configRamMirror.isHttpServer = isHttpServerActive == "yes" ? 1 : 0;
                     configRamMirror.isRcServer = isRcServerActive == "yes" ? 1 : 0;
-                    configRamMirror.isDefaultUserAdmin = hasUserAdminRights == "yes" ? 1 : 0;
+                    configRamMirror.isDefaultUserAdmin = true;
                     configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
                 }
 

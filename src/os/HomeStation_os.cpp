@@ -384,19 +384,9 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
 void OperatingSystem::requestSecurityAccessLevelChangeViaString(String password)
 {
     NodeConfiguration currentConfig = std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if (password == "admin")
-    {
-        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
-    }
-    else if (password == currentConfig.panelPassword)
+    if (password == currentConfig.panelPassword)
     { /* check is password for the user matches */
-        SecurityAccessLevelType userRights = e_ACCESS_LEVEL_AUTH_USER;
-
-        if (currentConfig.isDefaultUserAdmin)
-        { /* verify if default user can have admin rights */
-            userRights = e_ACCESS_LEVEL_SERVICE_MODE;
-        }
-        changeSecurityAccessLevel(userRights);
+        changeSecurityAccessLevel(e_ACCESS_LEVEL_SERVICE_MODE);
     }
     else
     {
@@ -427,13 +417,6 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
     {
     case e_ACCESS_LEVEL_NONE:
         Logger::log("e_ACCESS_LEVEL_NONE");
-        break;
-
-    case e_ACCESS_LEVEL_AUTH_USER:
-        Logger::log("e_ACCESS_LEVEL_AUTH_USER");
-        notif.type = UserInterfaceNotification::INFO;
-        notif.body = "Device is unlocked to authorized user level and will be automatically locked.";
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
         break;
 
     case e_ACCESS_LEVEL_SERVICE_MODE:

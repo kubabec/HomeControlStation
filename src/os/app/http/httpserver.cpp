@@ -78,10 +78,10 @@ std::vector<String> parameterizedAsyncRequests = {
 
 std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>> constantRequestHandlers = {
   {HomeLightHttpServer::constantHandler_mainPage, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::constantHandler_configPage, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_resetDevice, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_devicesSetup, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::constantHandler_roomAssignment, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
@@ -90,7 +90,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
-  {HomeLightHttpServer::parameterizedHandler_newConfigApply, e_ACCESS_LEVEL_AUTH_USER},
+  {HomeLightHttpServer::parameterizedHandler_newConfigApply, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_roomNameMappingApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledStripColor, e_ACCESS_LEVEL_NONE},
@@ -1056,21 +1056,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       client.println(yesNotSelected);
       client.println(noSelected);
     }
-    client.println("</select></label>");
-
-    /* Does user have admin rights to make configuration changes */
-    client.println("<label>User is admin:<select name=\"isUserAsAdmin\">");
-    if(currentConfig.isDefaultUserAdmin)
-    {
-      client.println(yesSelected);
-      client.println(noNotSelected);
-    }else
-    {
-      client.println(yesNotSelected);
-      client.println(noSelected);
-    }
-    client.println("</select></label>");
-    
+    client.println("</select></label>");  
 
     /* Device type  */
     const std::map<uint8_t, String> typeToNameMappings = {
@@ -1104,7 +1090,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" name=\"Password\"></label>");
 
   /* Network Password */
-  client.println("<label>User Password:<input value=\"");
+  client.println("<label>Panel Password:<input value=\"");
   client.println(currentConfig.panelPassword);
   client.println("\" type=\"text\" name=\"UserPassword\"></label>");
 

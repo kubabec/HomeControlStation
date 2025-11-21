@@ -112,7 +112,6 @@ typedef struct{
 typedef enum
 {
     e_ACCESS_LEVEL_NONE = 10,
-    e_ACCESS_LEVEL_AUTH_USER,
     e_ACCESS_LEVEL_SERVICE_MODE
 }SecurityAccessLevelType;
 
