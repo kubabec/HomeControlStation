@@ -797,10 +797,12 @@ content: '';\
 display: inline-block;\
 }\
 .icon-btn.on::before {\
-content: '\\23FB';\
+content: 'ON';\
+font-size:1.3rem;\
 }\
 .icon-btn.off::before {\
-content: '\\23FB';\
+content: 'OFF';\
+font-size:1.3rem;\
 text-shadow: 0 0 20px rgba(0,255,0,1);\
 color:#0df90d;\
 }\

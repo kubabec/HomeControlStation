@@ -725,8 +725,6 @@ function updateLocalDateTime(initialDateTime, elementId = 'currentDateTime') {\
     updateDateTime();\
     return setInterval(updateDateTime, 1000);\
 }\
-\
-\
 </script>";
 
 #endif

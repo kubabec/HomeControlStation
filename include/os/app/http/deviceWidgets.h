@@ -104,58 +104,6 @@ function generateTempWidget(deviceContainer, device) {\
     }\
     deviceContainer.appendChild(temperatureContainer);\
 }\
-function generateSegLedWidget(deviceContainer, device) {\
-    const segCnt = device.segCount;\
-    for(let i = 0; i < segCnt; i++) {\
-        const colorPicker = document.createElement('div');\
-        colorPicker.className = 'color-picker';\
-        colorPicker.classList.add('segColDisp');\
-        const colorDisplay = document.createElement('div');\
-        colorDisplay.className = `color-display`;\
-        colorDisplay.style.backgroundColor = device.colors[i];\
-        const tog = document.createElement('div');\
-        tog.classList.add('switch');\
-        if(device.segments[i] == 1){\
-            tog.classList.add('on');\
-            colorDisplay.classList.add('on');\
-        }\
-        tog.classList.add('segLedTog');\
-        tog.addEventListener('click', () => {\
-         tog.classList.toggle('on');\
-         const isOn = tog.classList.contains('on');\
-         asyncSegSwitch(device.id, i, isOn);\
-        });\
-        const tmb = document.createElement('div');\
-        tmb.classList.add('segThumb');\
-        tog.appendChild(tmb);\
-        \
-        colorPicker.appendChild(colorDisplay);\
-        deviceContainer.appendChild(colorPicker);\
-        deviceContainer.appendChild(tog);\
-    };\
-    const btnContainer = document.createElement('div');\
-    btnContainer.className = 'button-container';\
-\
-    const button = document.createElement('a');\
-    if(device.status == 'on') {\
-        button.className ='icon-btn off';\ 
-    } else {\
-        button.className ='icon-btn on';\ 
-    }\
-\
-    var switchValue = 0;\
-    if(device.status == 'off'){\
-        switchValue = 1;\
-    }\
-    button.onclick = () => asyncDeviceStateSwitch(device.id, switchValue);\
-    button.id = `switchBtn${device.id}`;\
-\
-    const buttonMore = document.createElement('a');\
-    buttonMore.className ='icon-btn settings';\
-    btnContainer.appendChild(buttonMore);\
-    btnContainer.appendChild(button);\
-    deviceContainer.appendChild(btnContainer);\
-}\
 \
 ";
 #endif

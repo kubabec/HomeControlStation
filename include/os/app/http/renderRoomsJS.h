@@ -75,9 +75,6 @@ function renderRooms(data) {\
             }else if(device.devType == tempSensorType){\
                 generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
                 generateTempWidget(deviceContainer, device);\
-            } else if(device.devType == segLedStripType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
-                generateSegLedWidget(deviceContainer, device);\       
             }else{\
                 const header = document.createElement('div');\
                 header.className = 'header';\
@@ -105,6 +102,7 @@ function renderRooms(data) {\
     listOfHumidWidgets = [];\
     listOfHumidValues = [];\
     listOfTempValues = [];\
+    fixPwrBtn();\
 }\
 </script>";
 
