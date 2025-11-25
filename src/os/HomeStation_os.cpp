@@ -331,7 +331,6 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
                 DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
         hash += configuration.isHttpServer;
         hash += configuration.isRcServer;
-        hash += configuration.isDefaultUserAdmin;
         hash += configuration.networkCredentialsAvailable;
         hash += configuration.nodeType;
         for (uint8_t idx = 0; idx < configuration.networkSSID.length(); idx++)

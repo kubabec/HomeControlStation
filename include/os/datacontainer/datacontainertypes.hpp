@@ -23,7 +23,6 @@ enum RequestProcessingState {
 typedef struct {
     bool isHttpServer = 1;
     bool isRcServer = 1;
-    bool isDefaultUserAdmin = 0;
     bool networkCredentialsAvailable = false;
     uint8_t nodeType = 0;
     String networkSSID = "";

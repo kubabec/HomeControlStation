@@ -12,22 +12,22 @@ typedef struct
     uint8_t safeShutdownFlag = 255;
     uint8_t isHttpServer = 0;
     uint8_t isRcServer = 0;
-    uint8_t isDefaultUserAdmin = 1;
     uint8_t nodeType = 255;
     char networkSSID[SSID_LENGTH] = {'\0'};
     char networkPassword[PASSWORD_LENGTH] = {'\0'};
     char panelPassword[PASSWORD_LENGTH] = {'\0'};
+    uint8_t reserved[150]; // Future usecase reservation
 
     uint16_t getSize()
     {
         return sizeof(uint8_t)  + //isHttpServer
             sizeof(uint8_t) + //isRcServer
-            sizeof(uint8_t) + //isDefaultUserAdmin
             sizeof(uint8_t) + //safeShutdownFlag
             sizeof(uint8_t) + //nodeType
             SSID_LENGTH + // networkSSID
             PASSWORD_LENGTH + // Password
-            PASSWORD_LENGTH; // user password
+            PASSWORD_LENGTH + // user password
+            sizeof(reserved); // reserved
     }
 
     void serialPrint()
@@ -36,7 +36,6 @@ typedef struct
             "<<<<< - - - - CONFIGURATION - - - - >>>>> "
             "isHttpServer: " + String(isHttpServer) + " "
             "isRcServer: " + String(isRcServer) + " "
-            "isDefaultUserAdmin: " + String(isDefaultUserAdmin) + " "
             "Type: " + String((int)nodeType) + " "
             "network SSID: " + String(networkSSID) + " "
             "network Password: " + String(networkPassword) + " "

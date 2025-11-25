@@ -17,7 +17,7 @@ void PersistentMemoryAccess::init(uint16_t eepromSize)
         eepromSize +
         sizeof(int);
 
-    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 1900);
+    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 1750);
     if(eepromInitializedSuccessfully){
         standardDataEepromSize = finalSize;
     }
@@ -129,7 +129,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
-    uint16_t eepromSize2 = standardDataEepromSize + 1900;
+    uint16_t eepromSize2 = standardDataEepromSize + 1750;
     Logger::log("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
     for(uint16_t i = 0; i < eepromSize2; i ++){
         EEPROM.write(i, 0);

@@ -30,8 +30,6 @@ enum RFManagerState{
 
 struct RFReceptionEvent{
     uint32_t buttonUniqueNumber{0};
-    uint8_t clickCount{0};
-    bool constantReception{false};
     long startTime{0};
     long endTime{0};
 };
@@ -40,13 +38,14 @@ struct RFReceptionEvent{
 #define RF_BUTTONS_CLICK_WHILE_LEARNING 3
 #define TIMEOUT_RF_BUTTON_LEARNING_MS 30000
 #define TIME_BETWEEN_EVENTS_MS 2000
-#define BUTTON_EVENT_DURATION_MS 450
+#define TIME_FOR_LONG_PRESS_MS 600
+#define TIME_TO_COMPLETE_EVENT 200
 
 class RFManager
 {
     static RFManagerState internalState;
-    static long learningStateStartTime;
-    static long lastEventCompletionTime;
+    static unsigned long learningStateStartTime;
+    static unsigned long lastEventCompletionTime;
     static std::set<RFButtonInfo> connectedButtons;
     static RFReceptionEvent currentReceptionEvent;
 

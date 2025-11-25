@@ -7,8 +7,8 @@
 RFManagerState RFManager::internalState{e_RF_IDLE};
 std::set<RFButtonInfo> RFManager::connectedButtons;
 RFReceptionEvent RFManager::currentReceptionEvent;
-long RFManager::learningStateStartTime{0};
-long RFManager::lastEventCompletionTime{0};
+unsigned long RFManager::learningStateStartTime{0};
+unsigned long RFManager::lastEventCompletionTime{0};
 
 RCSwitch mySwitch = RCSwitch();
 const uint8_t RX_PIN = 4;
@@ -110,22 +110,18 @@ void RFManager::evaluateButtonEvent()
 {
     uint64_t systemDigitalEventId = currentReceptionEvent.buttonUniqueNumber;
 
-    // Check if button was clicked only once
-    if (currentReceptionEvent.clickCount > 0)
+    // Check if button was clicked or long pressed
+    if ((currentReceptionEvent.endTime - currentReceptionEvent.startTime) < 250)
     {
-        // Check if button was clicked or long pressed
-        if ((currentReceptionEvent.endTime - currentReceptionEvent.startTime) < 250)
-        {
-            // Single click event
-            systemDigitalEventId += 1; // offset for single click
-            Logger::log("RFManager:// Single click event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
-        }
-        else
-        {
-            // Long press event
-            systemDigitalEventId += 2; // offset for long press
-            Logger::log("RFManager:// Long press event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
-        }
+        // Single click event
+        systemDigitalEventId += 1; // offset for single click
+        Logger::log("RFManager:// Single click event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
+    }
+    else
+    {
+        // Long press event
+        systemDigitalEventId += 2; // offset for long press
+        Logger::log("RFManager:// Long press event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
     }
 
     std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(systemDigitalEventId);
@@ -133,6 +129,15 @@ void RFManager::evaluateButtonEvent()
 
 void RFManager::handleIdleState()
 {
+    static bool lastReceptionState = false;
+    static uint8_t completionCounter = 0;
+
+    if ((millis() - lastEventCompletionTime) < TIME_BETWEEN_EVENTS_MS)
+    {
+        // Prevent handling new events too quickly after last one
+        return;
+    }
+
     RFButtonInfo receivedButton = receiveButtonSignal();
     if (receivedButton.buttonUniqueNumber != 0)
     {
@@ -154,28 +159,49 @@ void RFManager::handleIdleState()
                 currentReceptionEvent.startTime = millis();
             }
 
-            // Keep constant reception flag to detect transition while signal stops only once
-            currentReceptionEvent.constantReception = true;
+            lastReceptionState = true;
         }
     }
     else
     {
-        // Signal stopped, increase amount of clicks if within time window
-        if (currentReceptionEvent.buttonUniqueNumber != 0 && currentReceptionEvent.constantReception)
-        {
-            currentReceptionEvent.clickCount++;
-            currentReceptionEvent.constantReception = false;
-            currentReceptionEvent.endTime = millis();
-            
-        }
-    }
 
-    // Handle button event completion
-    if (currentReceptionEvent.buttonUniqueNumber != 0 && (millis() - currentReceptionEvent.startTime) >= BUTTON_EVENT_DURATION_MS)
-    {
-        evaluateButtonEvent();
-        resetReceptionEvent();
-        lastEventCompletionTime = millis();
+        // Signal stopped, increase amount of clicks if within time window
+        if (currentReceptionEvent.buttonUniqueNumber != 0)
+        {
+            if (lastReceptionState)
+            {
+                currentReceptionEvent.endTime = millis();
+                lastReceptionState = false;
+            }
+            else
+            {
+                completionCounter++;
+            }
+
+            if (completionCounter >= 5)
+            {
+                // calculate duration of the press
+                long pressDuration = currentReceptionEvent.endTime - currentReceptionEvent.startTime;
+                Logger::log("RFManager:// Button event ended. Duration: " + String((long)pressDuration) + " ms");
+
+                uint64_t systemDigitalEventId = currentReceptionEvent.buttonUniqueNumber;
+                if (pressDuration < TIME_FOR_LONG_PRESS_MS)
+                {
+                    // Short press, wait for possible next press
+                    systemDigitalEventId += 1;
+                }
+                else
+                {
+                    // Long press, evaluate immediately
+                    systemDigitalEventId += 2;
+                }
+
+                resetReceptionEvent();
+                completionCounter = 0;
+                lastEventCompletionTime = millis();
+                std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(systemDigitalEventId);
+            }
+        }
     }
 }
 
@@ -188,10 +214,7 @@ void RFManager::cyclic()
         handleLearningState();
         break;
     case e_RF_IDLE:
-        if ((millis() - lastEventCompletionTime) > TIME_BETWEEN_EVENTS_MS)
-        {
-            handleIdleState();
-        }
+        handleIdleState();
         break;
     }
 #endif
@@ -204,13 +227,13 @@ void RFManager::deinit()
     /* Allocate memory for NVM data */
     uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
 
-    if(nvmData == nullptr){
+    if (nvmData == nullptr)
+    {
         Logger::log("RFManager:// Unable to allocate memory for NVM data saving!");
         return;
     }
 
     saveConnectedButtons(nvmData, sizeOfNvm);
-
 
     uint8_t offset = 0;
     for (uint8_t blockID = e_BLOCK_RFMANAGER_1; blockID <= e_BLOCK_RFMANAGER_2; blockID++)
@@ -304,10 +327,8 @@ RFButtonInfo RFManager::receiveButtonSignal()
 void RFManager::resetReceptionEvent()
 {
     currentReceptionEvent.buttonUniqueNumber = 0;
-    currentReceptionEvent.clickCount = 0;
     currentReceptionEvent.startTime = 0;
     currentReceptionEvent.endTime = 0;
-    currentReceptionEvent.constantReception = false;
 }
 
 void RFManager::resetConnectedButtons()

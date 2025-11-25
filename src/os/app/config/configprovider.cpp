@@ -8,7 +8,7 @@
 
 
 
-ConfigData ConfigProvider::configRamMirror = {255, 0, 0, 1, 255, "\0", "\0", "\0"};
+ConfigData ConfigProvider::configRamMirror = {255, 1, 1, 255, "\0", "\0", "\0"};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
@@ -19,19 +19,6 @@ void ConfigProvider::init()
     totalNvmSize = configRamMirror.getSize() + PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize();
 
     PersistentMemoryAccess::init(totalNvmSize);
-
-/* TEST BLOCK TO SAVE EEPROM DATA ONCE */
-    // eraseDatablockMemory();
-
-    // configRamMirror.isHttpServer = true;
-    // configRamMirror.isRcServer = true;
-    // String ssid("Orange_Swiatlowod_DA2C");
-    // String pwd("2FYXFG6MAGVZ");
-    // configRamMirror.setSSID(ssid);
-    // configRamMirror.setPassword(pwd);
-
-    // saveRamMirrorToNvm();
-/* TEST BLOCK TO SAVE EEPROM DATA ONCE */
 
 
     if(readRamMirrorFromNvm())
@@ -68,7 +55,6 @@ void ConfigProvider::init()
         // Master device as default;
         emptyConfiguration.isHttpServer = true;
         emptyConfiguration.isRcServer = true;
-        emptyConfiguration.isDefaultUserAdmin = true;
         emptyConfiguration.networkCredentialsAvailable = false;
         emptyConfiguration.nodeType = 255;
 
@@ -127,7 +113,6 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.isHttpServer = configRamMirror.isHttpServer;
     validConfiguration.isRcServer = configRamMirror.isRcServer;
     validConfiguration.networkSSID = String(configRamMirror.networkSSID);
-    validConfiguration.isDefaultUserAdmin = configRamMirror.isDefaultUserAdmin;
     validConfiguration.networkPassword = String(configRamMirror.networkPassword);
     validConfiguration.nodeType = configRamMirror.nodeType;
     validConfiguration.panelPassword = String(configRamMirror.panelPassword);
@@ -207,7 +192,6 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     if(isNotNull(isRcServerActive)){
         configRamMirror.isRcServer = isRcServerActive == "true" ? 1 : 0;
     }
-    configRamMirror.isDefaultUserAdmin = true;
     
     if(isNotNull(nodeType)){
         configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
@@ -263,7 +247,6 @@ bool ConfigProvider::setConfigViaString(String& configString)
                 if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
                     configRamMirror.isHttpServer = isHttpServerActive == "yes" ? 1 : 0;
                     configRamMirror.isRcServer = isRcServerActive == "yes" ? 1 : 0;
-                    configRamMirror.isDefaultUserAdmin = true;
                     configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
                 }
 
