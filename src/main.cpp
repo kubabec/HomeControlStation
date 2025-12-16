@@ -2,8 +2,14 @@
 #include <os/HomeStation_os.hpp>
 #include <os/CyclicProfiler.hpp>
 
+#include "esp_system.h"
+
+#include "esp_task_wdt.h"
+
+
 void setup() {
-  delay(1000);
+  esp_task_wdt_init(5, true);
+  esp_task_wdt_add(NULL);
   Serial.begin(115200);
   randomSeed(analogRead(0));
   OperatingSystem::init();
@@ -11,6 +17,8 @@ void setup() {
 }
 
 void loop() {
+
+  esp_task_wdt_reset();
   static unsigned long next2ms   = 0;
   static unsigned long next10ms   = 0;
   static unsigned long next20ms   = 0;
