@@ -40,25 +40,25 @@ void Logger::processMessage(String &message)
 
 void Logger::log(String message)
 {
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        // Process all queued messages first
-        while(!offlineLogQueue.empty())
-        {
-            String queuedMessage = offlineLogQueue.front();
-            offlineLogQueue.pop();
-            processMessage(queuedMessage);
-            delay(15);
-        }
+    // if (WiFi.status() == WL_CONNECTED)
+    // {
+    //     // Process all queued messages first
+    //     while(!offlineLogQueue.empty())
+    //     {
+    //         String queuedMessage = offlineLogQueue.front();
+    //         offlineLogQueue.pop();
+    //         processMessage(queuedMessage);
+    //         delay(15);
+    //     }
 
-        // Process current message
-        processMessage(message);
-    }
-    else
-    {
-        // Queue the message for later processing
-        offlineLogQueue.push(message);
-    }
+    //     // Process current message
+    //     processMessage(message);
+    // }
+    // else
+    // {
+    //     // Queue the message for later processing
+    //     offlineLogQueue.push(message);
+    // }
 
-    Serial.println(message);
+    // Serial.println(message);
 }
