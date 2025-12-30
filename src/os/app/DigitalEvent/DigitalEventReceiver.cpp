@@ -274,9 +274,9 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
                 fireEvent(triggeredEvent);
 
                 // Send back the handling confirmation
-                MessageUDP msg(DIGITAL_EVENT_CONFIRMED_MSG_ID, NETWORK_BROADCAST, 9001);
-                msg.pushData((uint8_t *)&triggeredEvent, sizeof(uint64_t));
-                NetworkDriver::sendBroadcast(msg);
+                MessageUDP confirmationMessage(DIGITAL_EVENT_CONFIRMED_MSG_ID, msg.getIPAddress(), 9001);
+                confirmationMessage.pushData((uint8_t *)&triggeredEvent, sizeof(uint64_t));
+                NetworkDriver::send(confirmationMessage);
             }
         }
         else

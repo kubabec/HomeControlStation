@@ -446,6 +446,8 @@ void OperatingSystem::detectHwMassEraseRequest()
     if (digitalRead(0) == 0)
     { /* Button is pressed */
         activationTimeCounter++;
+        // // trigger event TESTCODE
+        // std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(5432);
     }
     else
     {

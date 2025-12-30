@@ -7,6 +7,7 @@ bool WiFiAdapter::isConnectedFlag = false;
 bool WiFiAdapter::connectionInitialized = false;
 String WiFiAdapter::mSsid{"none"};
 String WiFiAdapter::mPassword{"none"};
+NetworkStatus WiFiAdapter::currentStatus = DISCONNECTED_FROM_NETWORK;
 
 const unsigned long reconnectDelayMs = 1000; // starting retry delay (1s)
 unsigned long nextReconnectAt = 3000;        // kiedy spróbować ponownie (millis)
@@ -35,7 +36,8 @@ void WiFiAdapter::updateDataContainerIpAddress()
     memcpy((uint8_t *)&ip + 2, &WiFi.localIP()[2], 1);
     memcpy((uint8_t *)&ip + 3, &WiFi.localIP()[3], 1);
 
-    if(ip != 0){
+    if (ip != 0)
+    {
         ipStr = WiFi.localIP().toString();
     }
 
@@ -53,6 +55,7 @@ void WiFiAdapter::WiFiEvent(WiFiEvent_t event)
     {
     case SYSTEM_EVENT_STA_GOT_IP:
     {
+        currentStatus = CONNECTED_TO_NETWORK;
         Logger::log("WiFiAdapter://Connected.");
         updateDataContainerIpAddress();
 
@@ -71,6 +74,7 @@ void WiFiAdapter::WiFiEvent(WiFiEvent_t event)
 
     case SYSTEM_EVENT_STA_DISCONNECTED:
     {
+        currentStatus = DISCONNECTED_FROM_NETWORK;
         Logger::log("WiFi: DISCONNECTED");
         isConnectedFlag = false;
         nextReconnectAt = millis() + reconnectDelayMs;
@@ -150,6 +154,7 @@ void WiFiAdapter::manualStatusCheck()
         updateDataContainerIpAddress();
 
         isConnectedFlag = true;
+        currentStatus = CONNECTED_TO_NETWORK;
         nextReconnectAt = 0;
     }
     else if (!isNowConnected && isConnectedFlag)
@@ -157,6 +162,7 @@ void WiFiAdapter::manualStatusCheck()
         // utrata połączenia wykryta przez polling
         Logger::log("WiFi: Connection lost");
         isConnectedFlag = false;
+        currentStatus = DISCONNECTED_FROM_NETWORK;
         nextReconnectAt = now + reconnectDelayMs;
     }
 }
@@ -190,6 +196,11 @@ void WiFiAdapter::task()
     }
 }
 
+NetworkStatus WiFiAdapter::getNetworkStatus()
+{
+    return currentStatus;
+}
+
 String WiFiAdapter::getIpString()
 {
     return WiFi.localIP().toString();
@@ -197,8 +208,8 @@ String WiFiAdapter::getIpString()
 
 void WiFiAdapter::createAccessPoint()
 {
+    currentStatus = ACCESS_POINT_MODE;
     String ssid = "ESP32_HomeStation";
-    ;
     String macAddres = WiFi.macAddress();
     String lastMacFourDigits = macAddres.substring(macAddres.length() - 5);
     String ssidWithMac = ssid + "_" + lastMacFourDigits;
@@ -224,7 +235,7 @@ void WiFiAdapter::createAccessPoint()
 
     enableMDNSResponder();
 
-    delay(1000);
+    delay(500);
 }
 
 void WiFiAdapter::enableMDNSResponder()

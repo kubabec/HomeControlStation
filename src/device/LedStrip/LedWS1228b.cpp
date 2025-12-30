@@ -418,7 +418,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param)
 {
-    if(ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+    if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
     {
         Logger::log("Ongoing animation in progress, service request cannot be processed");
         return SERV_SUCCESS;
@@ -430,22 +430,28 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_STATE_SWITCH, param.a: " + String((int)param.a));
         if (param.a == 1)
         {
-            stripOn();
-            isOn = true;
+            if (!isOn)
+            {
+                stripOn();
+                isOn = true;
+            }
         }
         else
         {
-            if (liveAnimation != nullptr)
+            if (isOn)
             {
-                m_queuedAction = [this]()
-                { this->stripOff(); };
-                stopLiveAnimation();
+                if (liveAnimation != nullptr)
+                {
+                    m_queuedAction = [this]()
+                    { this->stripOff(); };
+                    stopLiveAnimation();
+                }
+                else
+                {
+                    stripOff();
+                }
+                isOn = false;
             }
-            else
-            {
-                stripOff();
-            }
-            isOn = false;
         }
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_STATE_SWITCH completed");
         return SERV_SUCCESS;
@@ -493,7 +499,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param)
 {
-    if(ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+    if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
     {
         Logger::log("Ongoing animation in progress, service request cannot be processed");
         return SERV_SUCCESS;

@@ -11,6 +11,7 @@ bool NetworkDriver::networkCredentialsAvailable = false;
 std::vector<int> NetworkDriver::packetRanges;
 std::queue<MessageUDP> NetworkDriver::pendingToSendPackets;
 std::vector<std::function<void(MessageUDP &)>> NetworkDriver::packetReceivers;
+std::function<void(void)> NetworkDriver::pendingPacketsBehavior;
 
 void dummyTobeRemoved(MessageUDP &data)
 {
@@ -86,6 +87,11 @@ void NetworkDriver::init()
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);
     packetReceivers.push_back(dummyTobeRemoved);
 
+    pendingPacketsBehavior = []()
+    {
+        dropPendingPackets();
+    };
+
     // esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
     uint64_t _chipmacid = 0LL;
     esp_efuse_mac_get_default((uint8_t *)(&_chipmacid));
@@ -103,16 +109,13 @@ void NetworkDriver::init()
     Logger::log("... done");
 }
 
-void NetworkDriver::cyclic()
+void NetworkDriver::dropPendingPackets()
 {
-    /*******     WiFi connection section       ******/
-    // Update WiFi Adapter to be updated with connection lost status
-    WiFiAdapter::task();
+    pendingToSendPackets = std::queue<MessageUDP>();
+}
 
-    /*******     UDP communication section       ******/
-    // Update UDP task to be able to receive UDP packets
-    UDPAdapter::task();
-
+void NetworkDriver::sendPendingPackets()
+{
     if (UDPAdapter::sendingAllowed())
     {
         static uint8_t retryCount = 0;
@@ -128,17 +131,52 @@ void NetworkDriver::cyclic()
             else
             {
                 Logger::log("NetworkDriver:// Sending UDP packet (MsgId : " + String((int)pendingToSendPackets.front().getId()) + ") to host " + pendingToSendPackets.front().getIPAddress().toString() + " failed.");
-                retryCount ++;
-                if(retryCount > 5){
+                retryCount++;
+                if (retryCount > 5)
+                {
                     pendingToSendPackets.pop();
                     retryCount = 0;
                 }
             }
         }
     }
+}
+
+void NetworkDriver::cyclic()
+{
+    /*******     WiFi connection section       ******/
+    // Update WiFi Adapter to be updated with connection lost status
+    WiFiAdapter::task();
+
+    /*******     UDP communication section       ******/
+    // Update UDP task to be able to receive UDP packets
+    UDPAdapter::task();
+
+    pendingPacketsBehavior();
 
     // Update OTA task to be able to process OTA requests
     OTA::cyclic();
+
+
+    static unsigned long lastNetworkStatusCheckTime = 0;
+    const unsigned long NETWORK_STATUS_CHECK_INTERVAL = 5000; // ms
+    if (millis() - lastNetworkStatusCheckTime > NETWORK_STATUS_CHECK_INTERVAL)
+    {
+        lastNetworkStatusCheckTime = millis();
+        NetworkStatus currentStatus = WiFiAdapter::getNetworkStatus();
+        if(currentStatus == CONNECTED_TO_NETWORK){
+            pendingPacketsBehavior = []()
+            {
+                sendPendingPackets();
+            };
+        }else {
+            pendingPacketsBehavior = []()
+            {
+                dropPendingPackets();
+            };
+        }
+       
+    }    
 }
 
 /*This function is called when new UDP packet arrived*/

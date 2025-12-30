@@ -2,6 +2,8 @@
 #include "os/datacontainer/DataContainer.hpp"
 #include "os/Logger.hpp"
 
+
+#include "esp_task_wdt.h"
 void OTA::init(const String hostname, const String password)
 {
     // Port defaults to 3232
@@ -14,6 +16,8 @@ void OTA::init(const String hostname, const String password)
     ArduinoOTA.setPassword(password.c_str());
 
     ArduinoOTA.onStart([]() {
+        // Disable watchdog to avoid reset during OTA
+        esp_task_wdt_delete(NULL); // disable watchdog during OTA update
         String type;
         if (ArduinoOTA.getCommand() == U_FLASH)
             type = "sketch";

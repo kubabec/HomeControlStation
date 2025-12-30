@@ -29,6 +29,7 @@ void RemoteControlClient::init()
 
     currentState = STATE_NODE_INITIAL_DATA;
     localNodeMACAddress = std::any_cast<uint64_t>(DataContainer::getSignalValue(SIG_MAC_ADDRESS));
+    updateLastKnownMasterIp(NETWORK_BROADCAST);
 
     Logger::log("... done");
 }
@@ -76,6 +77,7 @@ void RemoteControlClient::processPendingTxData()
 void RemoteControlClient::updateLastKnownMasterIp(MessageUDP::IPAddr address){
     lastMasterActivityTime = millis();
     lastKnownMasterIp = address;
+    DataContainer::setSignalValue(SIG_LAST_KNOWN_MASTER_IP_ADDR, lastKnownMasterIp);
 }
 
 void RemoteControlClient::processUDPRequest(MessageUDP &msg)

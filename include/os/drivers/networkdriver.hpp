@@ -23,6 +23,8 @@ class NetworkDriver
 
     static void mapReceivedPacketToInternalReceiver(MessageUDP& packet);
 
+    static std::function<void(void)> pendingPacketsBehavior;
+
     // Packet ID to callback function mapping
 
     static std::vector<int> packetRanges;
@@ -36,6 +38,9 @@ public:
     static void udpReceive(MessageUDP data);
     static bool send(MessageUDP& data);
     static bool sendBroadcast(MessageUDP& data);
+
+    static void dropPendingPackets();
+    static void sendPendingPackets();
 
     static void runIpDetectionTrick(String ssid, String pwd);
     
