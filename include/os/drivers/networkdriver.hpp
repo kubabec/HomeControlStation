@@ -39,8 +39,6 @@ public:
     static bool send(MessageUDP& data);
     static bool sendBroadcast(MessageUDP& data);
 
-    static void dropPendingPackets();
-    static void sendPendingPackets();
 
     static void runIpDetectionTrick(String ssid, String pwd);
     
