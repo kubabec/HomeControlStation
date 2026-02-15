@@ -98,10 +98,28 @@ void NetworkDriver::init()
         DataContainer::setSignalValue(SIG_MAC_ADDRESS, static_cast<uint64_t>(_chipmacid));
     }
 
+    DataContainer::setSignalValue(CBK_RECONNECT_WIFI, static_cast<std::function<void()>>(NetworkDriver::networkReconnect));
+
     // OTA initialization
     OTA::init("HomeControlStation-" + String((uint32_t)_chipmacid, HEX), "HCS2025");
 
     Logger::log("... done");
+}
+
+void NetworkDriver::networkReconnect()
+{
+    std::any nodeConfiguration = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
+    NodeConfiguration config = std::any_cast<NodeConfiguration>(nodeConfiguration);
+    networkCredentialsAvailable = config.networkCredentialsAvailable;
+    // Ensure both ssid and password are configured
+    if (networkCredentialsAvailable && config.networkSSID != "" && config.networkPassword != "")
+    {
+        WiFiAdapter::reconnect(config.networkSSID, config.networkPassword);
+    }
+    else
+    {
+        Logger::log("Unable to reconnect, wifi not configured");
+    }
 }
 
 void NetworkDriver::cyclic()

@@ -40,6 +40,9 @@ private:
     static unsigned long updateInterval; // Interwał aktualizacji (1 minuta)
     static void updateNtpVariables(); // Funkcja do aktualizacji zmiennych NTP
 
+
+    static uint8_t timeSyncFailureCount;
+
     
     
 };

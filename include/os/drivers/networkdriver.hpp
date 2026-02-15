@@ -39,6 +39,8 @@ public:
     static bool send(MessageUDP& data);
     static bool sendBroadcast(MessageUDP& data);
 
+    static void networkReconnect();
+
 
     static void runIpDetectionTrick(String ssid, String pwd);
     

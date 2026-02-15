@@ -11,6 +11,7 @@ bool TimeMaster::ntpAvailable = false;
 uint8_t TimeMaster::initialRetryCount = 0; // Licznik prób synchronizacji NTP
 bool TimeMaster::wasNtpEverSynced = false;
 bool TimeMaster::startupTimeInitialized = false;
+uint8_t TimeMaster::timeSyncFailureCount = 0;
 
 WiFiUDP TimeMaster::ntpUDP;
 NTPClient TimeMaster::timeClient(ntpUDP, "pool.ntp.org", 3600);
@@ -24,7 +25,6 @@ void TimeMaster::init()
     timeClient.begin();
     setTimeZone(1); // Ustawienie strefy czasowej na GMT+1
     DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<RtcTime()>>(TimeMaster::getRtcTime));
-
 
     // Próba synchronizacji z NTP
     if (timeClient.update())
@@ -92,10 +92,25 @@ void TimeMaster::cyclic()
         if (timeClient.update())
         {
             updateNtpVariables();
+            timeSyncFailureCount = 0;
         }
         else
         {
             // Błąd synchronizacji NTP - tryb freerunning
+            timeSyncFailureCount++;
+
+            // Try to reconnect the WiFi when 3x times time sync failed
+            if (timeSyncFailureCount == 3)
+            {
+                timeSyncFailureCount = 0;
+                try
+                {
+                    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RECONNECT_WIFI))();
+                }
+                catch (std::bad_any_cast ex)
+                {
+                }
+            }
 
             ntpAvailable = false;
             lastUpdateTime = now - HALF_NTP_RESYNC_TIME;

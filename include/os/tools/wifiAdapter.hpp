@@ -28,6 +28,7 @@ public:
     static void connectToNetwork(const String ssid, const String password, bool activeWait);
     static void disconnect();
     static bool isConnected();
+    static void reconnect(String& ssid, String& pwd);
 
     static void createAccessPoint();
     static String getIpString();

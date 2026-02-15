@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 47
+#define NUMBER_OF_SIGNALS 48
 enum Signal
 {
     /* Type: bool , somme description */
@@ -102,6 +102,8 @@ enum Signal
 
     SIG_RF_BUTTONS_CTRL_API,
 
-    SIG_LAST_KNOWN_MASTER_IP_ADDR
+    SIG_LAST_KNOWN_MASTER_IP_ADDR,
+
+    CBK_RECONNECT_WIFI
 };
 #endif

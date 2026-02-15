@@ -106,6 +106,8 @@ void WiFiAdapter::connectToNetwork(const String ssid, const String password, boo
     connectionInitialized = true;
     // Logger::log("Network " + ssid+ " with password " + password + " connection try " + String(retryCount));
     Logger::log("WiFiAdapter://Attempting WiFi connection to network " + ssid);
+    WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
     if (WiFi.status() != WL_CONNECTED)
     {
         WiFi.begin(ssid, password);
@@ -165,6 +167,18 @@ void WiFiAdapter::manualStatusCheck()
         currentStatus = DISCONNECTED_FROM_NETWORK;
         nextReconnectAt = now + reconnectDelayMs;
     }
+}
+
+void WiFiAdapter::reconnect(String &ssid, String &pwd)
+{
+    Logger::log("Reconnect WiFi...");
+
+    WiFi.disconnect(true); // true = czyści stare dane
+    delay(500);
+    WiFi.mode(WIFI_OFF); // pełny reset modułu WiFi
+    delay(500);
+
+    connectToNetwork(ssid, pwd, true);
 }
 
 void WiFiAdapter::handleReconnection()
