@@ -65,7 +65,8 @@ void RFManager::handleLearningState()
         notif.title = "RF Button learning expired";
         notif.body = "Learning mode for RF buttons has expired due to timeout, no buttons were learned.";
         notif.type = UserInterfaceNotification::WARNING;
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+        // Cannot be used since SafeReset
+        // std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
     }
 
     RFButtonInfo receivedButton = receiveButtonSignal();

@@ -19,6 +19,7 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/app/config/ExtendedMemoryManager.hpp>
+#include <os/app/SafeResetManager.hpp>
 #include <os/app/timeMaster.hpp>
 
 #include <os/HwDependency/RFManager.hpp>

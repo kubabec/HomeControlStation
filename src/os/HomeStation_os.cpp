@@ -100,6 +100,7 @@ void OperatingSystem::init()
     DeviceProvider::init();
     TimeMaster::init();
     RFManager::init();
+    SafeResetManager::init();
 
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig =
@@ -169,6 +170,7 @@ void OperatingSystem::task50ms()
 
 void OperatingSystem::task100ms()
 {
+    SafeResetManager::cyclic();
     if (isHttpServerRunning)
     {
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
