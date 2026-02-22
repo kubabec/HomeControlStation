@@ -136,41 +136,38 @@ void DeviceProvider::updateDeviceDescriptionSignal()
 
     std::vector<DeviceDescription> deviceDescriptionsTotal;
 
-    try
     {
-        // Pobieranie i przetwarzanie lokalnych urządzeń
-
-        std::any newLocalDeviceDescriptionVector = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION);
-        std::vector<DeviceDescription> localDeviceDescriptionVector = (std::any_cast<std::vector<DeviceDescription>>(newLocalDeviceDescriptionVector));
-
-        /* No need to change unique id for local devices as it is remembered based on pins configuration */
-        for (auto device : localDeviceDescriptionVector)
+        std::any localAny{DataContainer::getSignalValue(SIG_LOCAL_COLLECTION)};
+        if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
         {
-            DeviceTranslationDetails translationDetails = {
-                .originalID = device.deviceId,
-                .isLocal = true};
-            // Logger::log("Local device id: " + String((int)device.deviceId));
+            std::vector<DeviceDescription> localDeviceDescriptionVector = *p;
 
-            deviceDescriptionsTotal.push_back(device);
-            uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t, DeviceTranslationDetails>{device.deviceId, translationDetails});
+            /* No need to change unique id for local devices as it is remembered based on pins configuration */
+            for (auto device : localDeviceDescriptionVector)
+            {
+                DeviceTranslationDetails translationDetails = {
+                    .originalID = device.deviceId,
+                    .isLocal = true};
+                // Logger::log("Local device id: " + String((int)device.deviceId));
+
+                deviceDescriptionsTotal.push_back(device);
+                uniqueDeviceIdToNormalDeviceIdMap.insert(std::pair<uint8_t, DeviceTranslationDetails>{device.deviceId, translationDetails});
+            }
         }
-    }
-    catch (const std::bad_any_cast &e)
-    {
+        else
+        {
+        }
     }
 
     if (isRCServer)
     {
-        try
+        std::any localAnyRemote{DataContainer::getSignalValue(SIG_REMOTE_COLLECTION)};
+        if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAnyRemote))
         {
-            // Pobieranie i przetwarzanie zdalnych urządzeń
-
-            std::any newRemoteDescriptionVector = DataContainer::getSignalValue(SIG_REMOTE_COLLECTION);
-            std::vector<DeviceDescription> remoteDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(newRemoteDescriptionVector);
+            std::vector<DeviceDescription> remoteDescriptionVector = *p;
 
             for (auto device : remoteDescriptionVector)
             {
-
                 DeviceTranslationDetails translationDetails = {
                     .originalID = device.deviceId,
                     .isLocal = false};
@@ -179,7 +176,7 @@ void DeviceProvider::updateDeviceDescriptionSignal()
                 uniqueDeviceIdToNormalDeviceIdMap.insert({device.deviceId, translationDetails});
             }
         }
-        catch (const std::bad_any_cast &e)
+        else
         {
         }
     }
@@ -453,23 +450,24 @@ ServiceRequestErrorCode DeviceProvider::service(
         Logger::log("DeviceProvider:// param.a: " + String((int)param.a));
         Logger::log("DeviceProvider:// deviceId: " + String((int)deviceId));
 
-        try
         {
-            std::vector<DeviceDescription> devicesVector =
-                std::any_cast<std::vector<DeviceDescription>>(
-                    DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-            for (auto &device : devicesVector)
+            std::any localAny{DataContainer::getSignalValue(SIG_DEVICE_COLLECTION)};
+            if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
             {
-                if (device.roomId == deviceId)
+                std::vector<DeviceDescription> devicesVector = *p;
+                for (auto &device : devicesVector)
                 {
-                    roomStateChangeDeviceIdQueue.push(device.deviceId);
+                    if (device.roomId == deviceId)
+                    {
+                        roomStateChangeDeviceIdQueue.push(device.deviceId);
+                    }
                 }
+                requestedRoomState = (bool)param.a;
             }
-            requestedRoomState = (bool)param.a;
-        }
-        catch (std::bad_any_cast ex)
-        {
-            Logger::log("DeviceProvider:// Error during device collection casting");
+            else
+            {
+                Logger::log("DeviceProvider:// Error during device collection casting");
+            }
         }
 
         return SERV_SUCCESS;

@@ -231,11 +231,12 @@ String getHexColor(uint8_t r, uint8_t g, uint8_t b)
 void HTTPAsyncRequestHandler::createHashJson()
 {
     uint16_t hash = 0;
-    try
+    std::any localAny = DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH);
+    if (auto p = std::any_cast<uint16_t>(&localAny))
     {
-        hash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH));
+        hash = *p;
     }
-    catch (std::bad_any_cast ex)
+    else
     {
         Logger::log("HTTPAsyncRequestHandler: Error while getting hash from DataContainer");
     }
@@ -248,11 +249,12 @@ void HTTPAsyncRequestHandler::createHashJson()
 void HTTPAsyncRequestHandler::createNotificationCountJson()
 {
     uint8_t count = 0;
-    try
+    std::any localAny = DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL);
+    if (auto p = std::any_cast<UINotificationsControlAPI>(&localAny))
     {
-        count = std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).getActiveNotificationsCount();
+        count = p->getActiveNotificationsCount();
     }
-    catch (std::bad_any_cast ex)
+    else
     {
         Logger::log("HTTPAsyncRequestHandler: unable to get notifications.");
     }

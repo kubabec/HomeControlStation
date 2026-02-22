@@ -259,9 +259,13 @@ void HomeLightHttpServer::init()
   DataContainer::subscribe(SIG_DEVICE_COLLECTION, HomeLightHttpServer::onDeviceDescriptionChange);
 
   DataContainer::subscribe(SIG_SECURITY_ACCESS_LEVEL, [](std::any signal){
-    try{
-      secAccessLevel = std::any_cast<SecurityAccessLevelType>(signal);
-    }catch (std::bad_any_cast ex){ }
+    if (auto p = std::any_cast<SecurityAccessLevelType>(&signal))
+    {
+      secAccessLevel = *p;
+    }
+    else
+    {
+    }
   });
 
   /* Get IP address from DataContainer to have it for further client redirections */
@@ -997,8 +1001,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   const String yesSelected = "<option selected=\"selected\" value=\"yes\">Yes</option>";
   const String noSelected = "<option selected=\"selected\" value=\"no\">No</option>";
 
-  try {
-      auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));        
+  std::any localAny = DataContainer::getSignalValue(CBK_GET_CURRENT_TIME);
+  if (auto p = std::any_cast<std::function<RtcTime()>>(&localAny)) {
+      auto getTimeCallback = *p;
       String currentTime = getTimeCallback().toString(); // Get the current time as a string
 
     client.printf("<div class=\"current-time\">System time: <span id=\"currentDateTime\">%s</span></div>\n", currentTime.c_str());
@@ -1013,8 +1018,8 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     client.println("});");
     client.println("</script>");
   } 
-  catch(const std::bad_any_cast& e) {
-    Serial.printf("Błąd typu: %s. Oczekiwano: std::string\n", e.what());
+  else {
+    Serial.printf("Błąd typu. Oczekiwano: std::function<RtcTime()>\n");
     client.println("<div class=\"error\">Błąd odczytu czasu</div>");
   }
 

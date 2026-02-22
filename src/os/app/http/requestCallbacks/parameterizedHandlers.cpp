@@ -88,11 +88,12 @@ void HomeLightHttpServer::parameterizedHandler_newDigEvntTab(String &request, Wi
   {
     escapeSpecialCharsInJson(request);
     request.replace("/newDigEvntTab&", "");
-    try
+    std::any localAny = DataContainer::getSignalValue(CBK_UPDATE_DIG_EVNT_TABLE);
+    if (auto p = std::any_cast<std::function<void(String &)>>(&localAny))
     {
-      std::any_cast<std::function<void(String &)>>(DataContainer::getSignalValue(CBK_UPDATE_DIG_EVNT_TABLE))(request);
+      (*p)(request);
     }
-    catch (std::bad_any_cast ex)
+    else
     {
     }
   }
@@ -103,13 +104,13 @@ void HomeLightHttpServer::parameterizedHandler_passwordApply(String &request, Wi
 
   Logger::log("Password apply processing");
   request = request.substring(String("passwordApply").length());
-  try
+  std::any localAny = DataContainer::getSignalValue(CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING);
+  if (auto p = std::any_cast<std::function<void(String)>>(&localAny))
   {
     /* Request Security access level change in OS via received password */
-    std::any_cast<std::function<void(String)>>(
-        DataContainer::getSignalValue(CBK_SECURITY_ACCESS_LEVEL_CHANGE_VIA_STRING))(request);
+    (*p)(request);
   }
-  catch (std::bad_any_cast ex)
+  else
   {
   }
 

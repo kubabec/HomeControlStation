@@ -226,17 +226,25 @@ void HomeLightHttpServer::constantHandler_roomAssignment(WiFiClient &client)
 void HomeLightHttpServer::constantHandler_massErase(WiFiClient &client)
 {
   /* Erase flash callback */
-  try
+  std::any localAnyMassErase = DataContainer::getSignalValue(CBK_MASS_ERASE);
+  if (auto p = std::any_cast<std::function<void(void)>>(&localAnyMassErase))
   {
     Logger::log("Erasing flash!");
     /* erase flash */
-    std::any_cast<std::function<void(void)>>(DataContainer::getSignalValue(CBK_MASS_ERASE))();
+    (*p)();
     /* redirect */
     client.println("<meta http-equiv='refresh' content='0; url=http://" + ipAddressString + "'>");
     /* restart */
-    std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
+    std::any localAny = DataContainer::getSignalValue(CBK_RESET_DEVICE);
+    if (auto p2 = std::any_cast<std::function<void(uint16_t)>>(&localAny))
+    {
+      (*p2)(1000);
+    }
+    else
+    {
+    }
   }
-  catch (std::bad_any_cast ex)
+  else
   {
   }
 }
@@ -251,9 +259,10 @@ void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)
   client.println("<div class=\"wrapper\">\
         <div class=\"header\">Network inspection view</div>");
 
-  try
+  std::any localAny = DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO);
+  if (auto p = std::any_cast<std::vector<NetworkNodeInfo>>(&localAny))
   {
-    std::vector<NetworkNodeInfo> networkNodes = std::any_cast<std::vector<NetworkNodeInfo>>(DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO));
+    std::vector<NetworkNodeInfo> networkNodes = *p;
     client.println("<table class=\"table-graphite\">");
     client.println("<thead><tr><th>Type</th><th>IP</th><th>Web interface</th></tr></thead>");
     client.println("<tbody>");
@@ -267,7 +276,7 @@ void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)
 
     client.println("</table>");
   }
-  catch (std::bad_any_cast ex)
+  else
   {
     client.println("<div>Data not available.</div>");
   }

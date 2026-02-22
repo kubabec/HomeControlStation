@@ -741,9 +741,10 @@ void RemoteControlServer::updateSlaveInformation(DeviceDescription &deviceDescri
 void RemoteControlServer::updateNetworkNodesInformationSignal()
 {
     std::vector<NetworkNodeInfo> networkNodes;
-    try
+    std::any localAny = DataContainer::getSignalValue(SIG_IP_ADDRESS);
+    if (auto p = std::any_cast<uint32_t>(&localAny))
     {
-        uint32_t localIpAddress = std::any_cast<uint32_t>(DataContainer::getSignalValue(SIG_IP_ADDRESS));
+        uint32_t localIpAddress = *p;
 
         NetworkNodeInfo localNodeInfo;
         localNodeInfo.nodeType = NetworkNodeInfo::NodeType::Master;
@@ -755,9 +756,9 @@ void RemoteControlServer::updateNetworkNodesInformationSignal()
             ip[3]};
         networkNodes.push_back(localNodeInfo);
     }
-    catch (const std::bad_any_cast &e)
+    else
     {
-        Logger::log("Error: " + String(e.what()));
+        Logger::log("Error: Unable to get IP address from DataContainer");
         // return;
     }
 

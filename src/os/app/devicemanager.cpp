@@ -406,9 +406,13 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
                                              ([&](uint64_t eventId)
                                               {
                                                   // Fire event
-                                                  try{
-                                                  std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(eventId);
-                                                  }catch (std::bad_any_cast ex){
+                                                  std::any localAny = DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT);
+                                                  if (auto p = std::any_cast<std::function<void(uint64_t)>>(&localAny))
+                                                  {
+                                                    (*p)(eventId);
+                                                  }
+                                                  else
+                                                  {
                                                     
                                                   } }));
                 isValidDeviceGiven = true;
@@ -906,14 +910,14 @@ RtcTime DeviceManager::getRtcTimeWrapper()
     will be passed to specific device type as a constructor parameter */
     RtcTime retTimeVal;
 
-    try
+    std::any localAny = DataContainer::getSignalValue(CBK_GET_CURRENT_TIME);
+    if (auto p = std::any_cast<std::function<RtcTime()>>(&localAny))
     {
-        auto getTimeCallback = std::any_cast<std::function<RtcTime()>>(DataContainer::getSignalValue(CBK_GET_CURRENT_TIME));
-        retTimeVal = getTimeCallback();
+        retTimeVal = (*p)();
 
         /* TODO: map currentTime to device-friendly type and change this function to return this value */
     }
-    catch (std::bad_any_cast ex)
+    else
     {
     }
 

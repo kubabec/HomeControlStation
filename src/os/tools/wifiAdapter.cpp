@@ -53,7 +53,11 @@ void WiFiAdapter::WiFiEvent(WiFiEvent_t event)
 {
     switch (event)
     {
+#ifdef SUPERMINI
+    case IP_EVENT_STA_GOT_IP:
+#else
     case SYSTEM_EVENT_STA_GOT_IP:
+#endif
     {
         currentStatus = CONNECTED_TO_NETWORK;
         Logger::log("WiFiAdapter://Connected.");
@@ -71,8 +75,11 @@ void WiFiAdapter::WiFiEvent(WiFiEvent_t event)
         nextReconnectAt = 0;
         break;
     }
-
+#ifdef SUPERMINI
+    case WIFI_EVENT_STA_DISCONNECTED:
+#else
     case SYSTEM_EVENT_STA_DISCONNECTED:
+#endif
     {
         currentStatus = DISCONNECTED_FROM_NETWORK;
         Logger::log("WiFi: DISCONNECTED");
@@ -225,7 +232,11 @@ void WiFiAdapter::createAccessPoint()
     currentStatus = ACCESS_POINT_MODE;
     String ssid = "ESP32_HomeStation";
     String macAddres = WiFi.macAddress();
+#ifdef SUPERMINI
+    String lastMacFourDigits = String("12:34");
+#else 
     String lastMacFourDigits = macAddres.substring(macAddres.length() - 5);
+#endif
     String ssidWithMac = ssid + "_" + lastMacFourDigits;
 
     WiFi.mode(WIFI_AP);

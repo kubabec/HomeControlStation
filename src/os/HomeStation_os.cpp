@@ -324,51 +324,53 @@ uint16_t OperatingSystem::calculateRuntimeNodeHash()
     // hash += uniqueLifecycleId;
 
     /* Get configuration */
-    try
     {
-        NodeConfiguration configuration =
-            std::any_cast<NodeConfiguration>(
-                DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-        hash += configuration.isHttpServer;
-        hash += configuration.isRcServer;
-        hash += configuration.networkCredentialsAvailable;
-        hash += configuration.nodeType;
-        for (uint8_t idx = 0; idx < configuration.networkSSID.length(); idx++)
+        std::any localAny{DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)};
+        if (auto p = std::any_cast<NodeConfiguration>(&localAny))
         {
-            hash += configuration.networkSSID.charAt(idx);
+            NodeConfiguration configuration = *p;
+            hash += configuration.isHttpServer;
+            hash += configuration.isRcServer;
+            hash += configuration.networkCredentialsAvailable;
+            hash += configuration.nodeType;
+            for (uint8_t idx = 0; idx < configuration.networkSSID.length(); idx++)
+            {
+                hash += configuration.networkSSID.charAt(idx);
+            }
+            for (uint8_t idx = 0; idx < configuration.networkPassword.length(); idx++)
+            {
+                hash += configuration.networkPassword.charAt(idx);
+            }
         }
-        for (uint8_t idx = 0; idx < configuration.networkPassword.length(); idx++)
+        else
         {
-            hash += configuration.networkPassword.charAt(idx);
         }
-    }
-    catch (std::bad_any_cast ex)
-    {
     }
 
     /* Get devices data */
-    try
     {
-        std::vector<DeviceDescription> devicesVector =
-            std::any_cast<std::vector<DeviceDescription>>(
-                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-        for (auto &device : devicesVector)
+        std::any localAny{DataContainer::getSignalValue(SIG_DEVICE_COLLECTION)};
+        if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
         {
-            hash += device.deviceId;
-            hash += device.macAddress;
-            hash += device.isEnabled;
-            for (uint8_t idx = 0; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; idx++)
+            std::vector<DeviceDescription> devicesVector = *p;
+            for (auto &device : devicesVector)
             {
-                hash += device.customBytes[idx];
-            }
-            for (uint8_t idx = 0; idx < device.deviceName.length(); idx++)
-            {
-                hash += device.deviceName.charAt(idx);
+                hash += device.deviceId;
+                hash += device.macAddress;
+                hash += device.isEnabled;
+                for (uint8_t idx = 0; idx < NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION; idx++)
+                {
+                    hash += device.customBytes[idx];
+                }
+                for (uint8_t idx = 0; idx < device.deviceName.length(); idx++)
+                {
+                    hash += device.deviceName.charAt(idx);
+                }
             }
         }
-    }
-    catch (std::bad_any_cast ex)
-    {
+        else
+        {
+        }
     }
 
     // Logger::log("Hash : " + String((int)hash));

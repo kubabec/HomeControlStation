@@ -2,6 +2,9 @@
 #include "os/datacontainer/DataContainer.hpp"
 #include "os/Logger.hpp"
 
+#ifdef SUPERMINI
+#include <WiFi.h>
+#endif
 
 #include "esp_task_wdt.h"
 void OTA::init(const String hostname, const String password)

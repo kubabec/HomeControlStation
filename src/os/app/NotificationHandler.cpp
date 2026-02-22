@@ -41,15 +41,14 @@ bool NotificationHandler::createNotification(UserInterfaceNotification& newNotif
     bool isSuccessfullyCreated = false;
     if(notifications.size() < MAX_NUMBER_OF_NOTIFICATIONS) {
         
-        try {
-            auto timeCallback = std::any_cast<std::function<RtcTime()>>(
-                DataContainer::getSignalValue(CBK_GET_CURRENT_TIME)
-            );
+        std::any localAny = DataContainer::getSignalValue(CBK_GET_CURRENT_TIME);
+        if (auto p = std::any_cast<std::function<RtcTime()>>(&localAny)) {
+            auto timeCallback = *p;
                         
             String dateTime = timeCallback().toString(); // Get the current time as a string
             newNotification.time = dateTime;
             
-        } catch (std::bad_any_cast& e) {
+        } else {
             newNotification.time = "1970-01-01 00:00:00";
         }
         

@@ -158,9 +158,9 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
 
 void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
 {
-    try
+    if (auto p = std::any_cast<std::vector<DeviceDescription>>(&remoteDevices))
     {
-        remoteDevicesCollection = std::any_cast<std::vector<DeviceDescription>>(remoteDevices);
+        remoteDevicesCollection = *p;
 
         currentIdMapping.clear();
 
@@ -199,7 +199,6 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
             RCTranslation translation = {
                 .mac = device.macAddress,
                 .onSourceNodeLocalId = device.deviceId};
-            // Logger::log("New device with local ID" + String((int)device.deviceId) + ", MAC: "+String((int)translation.mac)+",  saved with ID" + String((int)uniqueRcId));
 
             /* Replace original ID with our new Unique */
             device.deviceId = uniqueRcId;
@@ -218,7 +217,7 @@ void RemoteDevicesManager::tunnelDataUpdate(std::any remoteDevices)
         // Logger::log("->RCS - Ustawienie sygnalu w Data Container");
         // printTranslationMap();
     }
-    catch (std::bad_any_cast ex)
+    else
     {
     }
 }
@@ -427,27 +426,29 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
             /* TODO */
             request.pushData(serviceCall_NoParams); // 0 - no params, 1 - set1 ...
 
-            try
             {
-                /* Pass request for processing to RCServer */
-                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest &)>>(
-                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+                std::any localAny{DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST)};
+                if (auto p = std::any_cast<std::function<uint8_t(RcRequest &)>>(&localAny))
+                {
+                    /* Pass request for processing to RCServer */
+                    awaitingResponseId = (*p)(request);
 
-                /* Update current new request fingerprint */
-                currentRequestFingerprint = {
-                    .deviceId = deviceId,
-                    .serviceName = serviceType,
-                    .overloading = serviceCall_NoParams};
+                    /* Update current new request fingerprint */
+                    currentRequestFingerprint = {
+                        .deviceId = deviceId,
+                        .serviceName = serviceType,
+                        .overloading = serviceCall_NoParams};
 
-                /* Change request processing state to IN PROGRESS, this state will be
-                set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
-                requestProcessingState = RDM_REQUEST_IN_PROGRESS;
+                    /* Change request processing state to IN PROGRESS, this state will be
+                    set back to RDM_REQUEST_COMPLETED in response reception callback, when it will arrive */
+                    requestProcessingState = RDM_REQUEST_IN_PROGRESS;
 
-                /* RDM starts to wait for the response */
-                return SERV_PENDING;
-            }
-            catch (std::bad_any_cast ex)
-            {
+                    /* RDM starts to wait for the response */
+                    return SERV_PENDING;
+                }
+                else
+                {
+                }
             }
         }
     }
@@ -504,11 +505,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
             request.pushData((uint8_t *)&param, sizeof(param));
             /* TODO */
 
-            try
+            std::any localAny = DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST);
+            if (auto p = std::any_cast<std::function<uint8_t(RcRequest &)>>(&localAny))
             {
                 /* Pass request for processing to RCServer */
-                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest &)>>(
-                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+                awaitingResponseId = (*p)(request);
 
                 /* Update current new request fingerprint */
                 currentRequestFingerprint = {
@@ -523,7 +524,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 /* RDM starts to wait for the response */
                 return SERV_PENDING;
             }
-            catch (std::bad_any_cast ex)
+            else
             {
             }
         }
@@ -582,11 +583,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
             request.pushData((uint8_t *)&param, sizeof(param));
             /* TODO */
 
-            try
+            std::any localAny = DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST);
+            if (auto p = std::any_cast<std::function<uint8_t(RcRequest &)>>(&localAny))
             {
                 /* Pass request for processing to RCServer */
-                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest &)>>(
-                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+                awaitingResponseId = (*p)(request);
 
                 /* Update current new request fingerprint */
                 currentRequestFingerprint = {
@@ -601,7 +602,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 /* RDM starts to wait for the response */
                 return SERV_PENDING;
             }
-            catch (std::bad_any_cast ex)
+            else
             {
             }
         }
@@ -664,11 +665,11 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 request.pushData((byte *)param.buff, param.size);
             }
 
-            try
+            std::any localAny = DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST);
+            if (auto p = std::any_cast<std::function<uint8_t(RcRequest &)>>(&localAny))
             {
                 /* Pass request for processing to RCServer */
-                awaitingResponseId = std::any_cast<std::function<uint8_t(RcRequest &)>>(
-                    DataContainer::getSignalValue(CBK_CREATE_RC_REQUEST))(request);
+                awaitingResponseId = (*p)(request);
 
                 /* Update current new request fingerprint */
                 currentRequestFingerprint = {
@@ -689,7 +690,7 @@ ServiceRequestErrorCode RemoteDevicesManager::service(
                 /* RDM starts to wait for the response */
                 return SERV_PENDING;
             }
-            catch (std::bad_any_cast ex)
+            else
             {
             }
         }

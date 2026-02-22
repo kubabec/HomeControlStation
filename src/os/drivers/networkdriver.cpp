@@ -3,6 +3,9 @@
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <esp_wifi.h>
+#ifdef SUPERMINI
+#include <esp_mac.h>
+#endif
 #include <os/drivers/ota.hpp>
 #include "os/Logger.hpp"
 
@@ -28,30 +31,32 @@ void NetworkDriver::init()
     WiFiAdapter::init();
 
     /* Try to access device configuration to extract WiFi credentials */
-    try
     {
         std::any nodeConfiguration = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
-        NodeConfiguration config = std::any_cast<NodeConfiguration>(nodeConfiguration);
-        networkCredentialsAvailable = config.networkCredentialsAvailable;
-
-        // Is config valid?
-        if (networkCredentialsAvailable)
+        if (auto p = std::any_cast<NodeConfiguration>(&nodeConfiguration))
         {
-            /* Try connect to known network with active wait flag */
-            WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword, true);
+            NodeConfiguration config = *p;
+            networkCredentialsAvailable = config.networkCredentialsAvailable;
+
+            // Is config valid?
+            if (networkCredentialsAvailable)
+            {
+                /* Try connect to known network with active wait flag */
+                WiFiAdapter::connectToNetwork(config.networkSSID, config.networkPassword, true);
+            }
+            else
+            {
+                // Connect to defaults
+                /* Host accesspoint */
+                Logger::log("Starting AP due to invalid WiFi credentials");
+                WiFiAdapter::createAccessPoint();
+            }
         }
         else
         {
-            // Connect to defaults
-            /* Host accesspoint */
-            Logger::log("Starting AP due to invalid WiFi credentials");
+            Logger::log("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
             WiFiAdapter::createAccessPoint();
         }
-    }
-    catch (const std::bad_any_cast &e)
-    {
-        Logger::log("Starting AP due to SIG_DEVICE_CONFIGURATION unreachable");
-        WiFiAdapter::createAccessPoint();
     }
 
     /*******     UDP communication section       ******/
@@ -89,7 +94,15 @@ void NetworkDriver::init()
 
     // esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
     uint64_t _chipmacid = 0LL;
+#ifdef SUPERMINI
+// WiFi.macAddress((uint8_t *)(&_chipmacid));
+// LOGGER::log("MAC address: " + String((long)_chipmacid));
+// fix MAC issue
+_chipmacid = 1234567LL;
+    // _chipmacid = ESP.getEfuseMac();
+#else
     esp_efuse_mac_get_default((uint8_t *)(&_chipmacid));
+#endif
 
     Logger::log(String((long)_chipmacid));
 
@@ -189,37 +202,39 @@ bool NetworkDriver::sendBroadcast(MessageUDP &data)
 {
     MessageUDP::IPAddr ipRef = data.getIPAddress();
 
-    try
     {
-        uint32_t deviceIP = std::any_cast<uint32_t>(
-            DataContainer::getSignalValue(SIG_IP_ADDRESS));
-        uint8_t *ip = (uint8_t *)&deviceIP;
-
-        ipRef.octet1 = ip[0];
-        ipRef.octet2 = ip[1];
-        ipRef.octet3 = ip[2];
-
-        // Workaround for Iphone network
-        if (ip[0] != 172)
+        std::any localAny{DataContainer::getSignalValue(SIG_IP_ADDRESS)};
+        if (auto p = std::any_cast<uint32_t>(&localAny))
         {
-            ipRef.octet4 = 255;
+            uint32_t deviceIP = *p;
+            uint8_t *ip = (uint8_t *)&deviceIP;
+
+            ipRef.octet1 = ip[0];
+            ipRef.octet2 = ip[1];
+            ipRef.octet3 = ip[2];
+
+            // Workaround for Iphone network
+            if (ip[0] != 172)
+            {
+                ipRef.octet4 = 255;
+            }
+            else
+            {
+                ipRef.octet4 = 15;
+            }
+
+            data.setIpAddress(ipRef);
+            // Logger::log("Sending broadcast to " + String((uint8_t)ipRef.octet1) +
+            // "." + String((uint8_t)ipRef.octet2) +
+            // "." + String((uint8_t)ipRef.octet3) +
+            // "." + String((uint8_t)ipRef.octet4));
+            return send(data);
         }
         else
         {
-            ipRef.octet4 = 15;
+            Logger::log("Broadcasting UDP failed, no IP address available!");
+            return false;
         }
-
-        data.setIpAddress(ipRef);
-        // Logger::log("Sending broadcast to " + String((uint8_t)ipRef.octet1) +
-        // "." + String((uint8_t)ipRef.octet2) +
-        // "." + String((uint8_t)ipRef.octet3) +
-        // "." + String((uint8_t)ipRef.octet4));
-        return send(data);
-    }
-    catch (const std::bad_any_cast &e)
-    {
-        Logger::log("Broadcasting UDP failed, no IP address available!");
-        return false;
     }
 }
 

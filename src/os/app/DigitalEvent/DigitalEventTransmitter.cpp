@@ -78,9 +78,10 @@ void DigitalEventTransmitter::deinit()
 
 void DigitalEventTransmitter::fireEvent(uint64_t eventId)
 {
-    try
+    std::any localAny{DataContainer::getSignalValue(SIG_LAST_KNOWN_MASTER_IP_ADDR)};
+    if (auto p = std::any_cast<MessageUDP::IPAddr>(&localAny))
     {
-        MessageUDP::IPAddr masterDirectIp = std::any_cast<MessageUDP::IPAddr>(DataContainer::getSignalValue(SIG_LAST_KNOWN_MASTER_IP_ADDR));
+        MessageUDP::IPAddr masterDirectIp = *p;
         MessageUDP msg(DIGITAL_EVENT_FIRED_MSG_ID, masterDirectIp, 9001);
         msg.pushData((uint8_t *)&transmissionIdentifier, sizeof(uint8_t));
         msg.pushData((uint8_t *)&eventId, sizeof(uint64_t));
@@ -92,7 +93,7 @@ void DigitalEventTransmitter::fireEvent(uint64_t eventId)
                             String((unsigned int)masterDirectIp.octet3) + "." +
                             String((unsigned int)masterDirectIp.octet4));
     }
-    catch (const std::bad_any_cast &e)
+    else
     {
         Serial.println("DigitalEventTransmitter:// No known master IP address, cannot fire event.");
         MessageUDP msg(DIGITAL_EVENT_FIRED_MSG_ID, NETWORK_BROADCAST, 9001);

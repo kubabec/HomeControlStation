@@ -195,14 +195,14 @@ void RemoteControlClient::sendInitialDataResponse()
         .nodeHash = std::any_cast<uint16_t>(DataContainer::getSignalValue(SIG_RUNTIME_NODE_HASH)),
         .numberOfDevices = 0};
 
-    try
+    std::any localAny = DataContainer::getSignalValue(SIG_DEVICE_COLLECTION);
+    if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
     {
-
-        std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+        std::vector<DeviceDescription> deviceDescriptionVector = *p;
         /* Paste number of Slave devices */
         initialData.numberOfDevices = deviceDescriptionVector.size();
     }
-    catch (const std::bad_any_cast &e)
+    else
     {
     }
 
@@ -221,9 +221,9 @@ void RemoteControlClient::sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue)
 {
     std::any deviceCollection = DataContainer::getSignalValue(SIG_DEVICE_COLLECTION);
 
-    try
+    if (auto p = std::any_cast<std::vector<DeviceDescription>>(&deviceCollection))
     {
-        std::vector<DeviceDescription> deviceDescriptionVector = std::any_cast<std::vector<DeviceDescription>>(deviceCollection);
+        std::vector<DeviceDescription> deviceDescriptionVector = *p;
 
         uint8_t *bufferForDeviceDescription = nullptr;
         for (DeviceDescription &deviceDescription : deviceDescriptionVector)
@@ -256,7 +256,7 @@ void RemoteControlClient::sendDetailedDataResponse(UdpFrames_RCS udpHeaderValue)
             free(bufferForDeviceDescription);
         }
     }
-    catch (const std::bad_any_cast &e)
+    else
     {
     }
 }

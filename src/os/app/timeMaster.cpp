@@ -103,12 +103,15 @@ void TimeMaster::cyclic()
             if (timeSyncFailureCount == 3)
             {
                 timeSyncFailureCount = 0;
-                try
                 {
-                    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RECONNECT_WIFI))();
-                }
-                catch (std::bad_any_cast ex)
-                {
+                    std::any localAny{DataContainer::getSignalValue(CBK_RECONNECT_WIFI)};
+                    if (auto p = std::any_cast<std::function<void()>>(&localAny))
+                    {
+                        (*p)();
+                    }
+                    else
+                    {
+                    }
                 }
             }
 
