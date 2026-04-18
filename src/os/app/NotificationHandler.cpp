@@ -3,27 +3,25 @@
 
 std::queue<UserInterfaceNotification> NotificationHandler::notifications;
 
-void NotificationHandler::init(){
+void NotificationHandler::init()
+{
     Logger::log("NotificationHandler init ...");
 
     DataContainer::setSignalValue(SIG_UI_NOTIFICATIONS_CONTROL, static_cast<UINotificationsControlAPI>(UINotificationsControlAPI{
-        .createNotification = createNotification,
-        .getActiveNotificationsCount = getActiveNotificationsCount,
-        .getOldestNotification = getOldestNotification
-    }));
-
+                                                                    .createNotification = createNotification,
+                                                                    .getActiveNotificationsCount = getActiveNotificationsCount,
+                                                                    .getOldestNotification = getOldestNotification}));
 
     Logger::log("... done");
 }
 
-void NotificationHandler::cyclic(){
-    
+void NotificationHandler::cyclic()
+{
 }
 
-void NotificationHandler::deinit(){
-
+void NotificationHandler::deinit()
+{
 }
-
 
 // bool NotificationHandler::createNotification(UserInterfaceNotification& newNotification)
 // {
@@ -31,36 +29,42 @@ void NotificationHandler::deinit(){
 //     if(notifications.size() < MAX_NUMBER_OF_NOTIFICATIONS)
 //     {
 //         notifications.push(newNotification);
-//         isSuccessfullyCreated = true;      
+//         isSuccessfullyCreated = true;
 //     }
 
 //     return isSuccessfullyCreated;
 // }
 
-bool NotificationHandler::createNotification(UserInterfaceNotification& newNotification) {
+bool NotificationHandler::createNotification(UserInterfaceNotification &newNotification)
+{
+#ifndef SUPPORT_NOTIFICATION
+    return true;
+#else
     bool isSuccessfullyCreated = false;
-    if(notifications.size() < MAX_NUMBER_OF_NOTIFICATIONS) {
-        
+    if (notifications.size() < MAX_NUMBER_OF_NOTIFICATIONS)
+    {
+
         std::any localAny = DataContainer::getSignalValue(CBK_GET_CURRENT_TIME);
-        if (auto p = std::any_cast<std::function<RtcTime()>>(&localAny)) {
+        if (auto p = std::any_cast<std::function<RtcTime()>>(&localAny))
+        {
             auto timeCallback = *p;
-                        
+
             String dateTime = timeCallback().toString(); // Get the current time as a string
             newNotification.time = dateTime;
-            
-        } else {
+        }
+        else
+        {
             newNotification.time = "1970-01-01 00:00:00";
         }
-        
+
         notifications.push(newNotification);
         Logger::log("NotificationHandler:// New notification: " + newNotification.toJson());
         isSuccessfullyCreated = true;
     }
     return isSuccessfullyCreated;
+
+#endif
 }
-
-
-
 
 uint8_t NotificationHandler::getActiveNotificationsCount()
 {
@@ -70,7 +74,8 @@ uint8_t NotificationHandler::getActiveNotificationsCount()
 UserInterfaceNotification NotificationHandler::getOldestNotification()
 {
     UserInterfaceNotification retVal;
-    if(getActiveNotificationsCount() > 0){
+    if (getActiveNotificationsCount() > 0)
+    {
         retVal = notifications.front();
         notifications.pop();
     }
