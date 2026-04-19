@@ -2,6 +2,7 @@
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+#include <os/app/display/DisplayServer.hpp>
 #include <esp_wifi.h>
 #ifdef SUPERMINI
 #include <esp_mac.h>
@@ -87,6 +88,10 @@ void NetworkDriver::init()
     {
         packetRanges.push_back(DIGITAL_BUTTON_RANGE);
         packetReceivers.push_back(DigitalEventReceiver::receiveUDP);
+
+
+        packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
+        packetReceivers.push_back(DisplayServer::receiveUDP);
     }
 
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);

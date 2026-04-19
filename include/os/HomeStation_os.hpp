@@ -21,6 +21,7 @@
 #include <os/app/config/ExtendedMemoryManager.hpp>
 #include <os/app/SafeResetManager.hpp>
 #include <os/app/timeMaster.hpp>
+#include <os/app/display/DisplayServer.hpp>
 
 #include <os/HwDependency/RFManager.hpp>
 

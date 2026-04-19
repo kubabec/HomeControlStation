@@ -90,6 +90,7 @@ void OperatingSystem::init()
         RemoteControlServer::init();
         RemoteDevicesManager::init();
         DigitalEventReceiver::init();
+        DisplayServer::init();
     }
     else
     {
@@ -147,6 +148,7 @@ void OperatingSystem::task10ms()
 
 void OperatingSystem::task20ms()
 {
+    CyclicProfiler::call("DisplayServer", DisplayServer::cyclic);
 }
 
 void OperatingSystem::task50ms()
@@ -268,6 +270,7 @@ void OperatingSystem::performReset()
         RemoteDevicesManager::deinit();
         RemoteControlServer::deinit();
         DigitalEventReceiver::deinit();
+        DisplayServer::deinit();
     }
     else
     {
