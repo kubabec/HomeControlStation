@@ -1,0 +1,71 @@
+var datacontainertypes_8hpp =
+[
+    [ "ConfigSlotsDataType", "structConfigSlotsDataType.html", "structConfigSlotsDataType" ],
+    [ "DeviceConfigManipulationAPI", "structDeviceConfigManipulationAPI.html", "structDeviceConfigManipulationAPI" ],
+    [ "DeviceServicesAPI", "structDeviceServicesAPI.html", "structDeviceServicesAPI" ],
+    [ "ExtendedMemoryCtrlAPI", "structExtendedMemoryCtrlAPI.html", "structExtendedMemoryCtrlAPI" ],
+    [ "NetworkNodeInfo", "structNetworkNodeInfo.html", "structNetworkNodeInfo" ],
+    [ "NodeConfiguration", "structNodeConfiguration.html", "structNodeConfiguration" ],
+    [ "PersistentDataBlock", "structPersistentDataBlock.html", "structPersistentDataBlock" ],
+    [ "RFButtonsControlAPI", "structRFButtonsControlAPI.html", "structRFButtonsControlAPI" ],
+    [ "ServiceInformation", "structServiceInformation.html", "structServiceInformation" ],
+    [ "SystemErrorType", "structSystemErrorType.html", "structSystemErrorType" ],
+    [ "UINotificationsControlAPI", "structUINotificationsControlAPI.html", "structUINotificationsControlAPI" ],
+    [ "UserInterfaceNotification", "structUserInterfaceNotification.html", "structUserInterfaceNotification" ],
+    [ "NUMBER_OF_CONFIG_SLOTS", "datacontainertypes_8hpp.html#ac3d98dbef116359490d60108fbc455b0", null ],
+    [ "PERSISTENT_DATABLOCK_SIZE", "datacontainertypes_8hpp.html#a762799e1dd238f750906efaf0853812a", null ],
+    [ "DigitalEvent::ActionType", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170", [
+      [ "DigitalEvent::ON", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a4c70268a9468353da108b11ffe135980", null ],
+      [ "DigitalEvent::OFF", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a2b903c410ef8147354d4bc909fb85604", null ],
+      [ "DigitalEvent::TOGGLE", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a850d3cc071850f0910ea73abf5d95baa", null ]
+    ] ],
+    [ "DigitalEvent::AffectedType", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0", [
+      [ "DigitalEvent::ROOM", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a62c49e46befbccd092c63cf31015113e", null ],
+      [ "DigitalEvent::DEVICE", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a2a392ba76123bb1863423602d70d587b", null ]
+    ] ],
+    [ "PersistentDatablockID", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48", [
+      [ "e_PERSISTENT_BLOCK_FIRST", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a2bebec921baa90c0e3bad1179ce086e2", null ],
+      [ "e_BLOCK_DEVICE_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a7742f5cb5202af03c75420a4dd404e4c", null ],
+      [ "e_BLOCK_DEVICE_2", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a347f739dfa9993f10ab5c07f15f87fc8", null ],
+      [ "e_BLOCK_DEVICE_3", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48aab69af4f47d3824e7bf8e232f8dd5144", null ],
+      [ "e_BLOCK_DEVICE_4", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a8682417e1553878b19f5157c893dee57", null ],
+      [ "e_BLOCK_DEVICE_5", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48aaedc5106c3330bbe887050dbec7c226a", null ],
+      [ "e_BLOCK_DEVICE_6", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a36a8fcae5e8d3ee7e6f5369487af785f", null ],
+      [ "e_BLOCK_HTTP_FIRST", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48ae839c406e5aadbda17dbc2d2580df85e", null ],
+      [ "e_BLOCK_HTTP_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a11d6f7bfa3d9723853dc8cf83d9a0818", null ],
+      [ "e_BLOCK_HTTP_2", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a95fe329945eaae8b900904836b0ae608", null ],
+      [ "e_BLOCK_HTTP_3", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a7f693e542b79739e3c44f380e98e9a87", null ],
+      [ "e_BLOCK_HTTP_4", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48aa41276166d1e990da48e79bb364f50b5", null ],
+      [ "e_BLOCK_HTTP_5", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a20d69b9b869984feacc71d0fa338d508", null ],
+      [ "e_BLOCK_HTTP_6", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48ac6798c4d7f3b1623605df0277013bb96", null ],
+      [ "e_BLOCK_HTTP_7", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a3dd321b5e31a8d2804a8ecc986fe2f07", null ],
+      [ "e_BLOCK_HTTP_8", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a16173b74f0b0acb54729ec36cf1081c1", null ],
+      [ "e_BLOCK_HTTP_LAST", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48ada3033dd5441b0a23a973eb8ad9e51b1", null ],
+      [ "e_BLOCK_EXT_MEMORY_METADATA", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a5fdf7fae18a3fe69a891df58593f564e", null ],
+      [ "e_BLOCK_RDM_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a08d97a87cbacaf5206725bc492440a84", null ],
+      [ "e_BLOCK_RDM_2", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a0759869611e893a8a047861034f206e3", null ],
+      [ "e_BLOCK_RDM_3", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a68a6db775287e112d43f3a7afb57b5e8", null ],
+      [ "e_BLOCK_RDM_4", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a0416feb29fe831460e2ab0765839ef5d", null ],
+      [ "e_BLOCK_RDM_5", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48ad004d3f3b470dd258462c884a1f5b5df", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48ac76908a6c88a14348e479f7b7e42a7b7", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_2", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a5e550c013d3f8cf6e7c780f9dde18139", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_3", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48afcddff64492e12831dc35f345a7e38c7", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_4", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a6815f46766fe3da24a557fdc91a87671", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_5", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a4ade37280d5daf387f2a42437170032c", null ],
+      [ "e_BLOCK_DIGITAL_EVENT_6", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48add6fe8368ccebf3344c8fca6b83a85d5", null ],
+      [ "e_BLOCK_RFMANAGER_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a2731641413c232f306428a09ebdc1030", null ],
+      [ "e_BLOCK_RFMANAGER_2", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a6a883976d46fb7df65b444c6fc77cb5f", null ],
+      [ "e_PERSISTENT_BLOCK_LAST", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a0a4c8baeebab959d78910990b67b5836", null ],
+      [ "e_NUMBER_OF_PERSISTENT_BLOCKS", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a0da9199ef5c0895e7a8ccc9e80af2dc6", null ]
+    ] ],
+    [ "RequestProcessingState", "datacontainertypes_8hpp.html#a056874975fd16fb39bf4dd639a675762", [
+      [ "eNO_REQUEST", "datacontainertypes_8hpp.html#a056874975fd16fb39bf4dd639a675762a6a02bcef1619f0d00896705a50f8481d", null ],
+      [ "eREQUEST_PENDING", "datacontainertypes_8hpp.html#a056874975fd16fb39bf4dd639a675762ae587f33ddbccc13af64207635730a881", null ],
+      [ "eREQUEST_COMPLETED", "datacontainertypes_8hpp.html#a056874975fd16fb39bf4dd639a675762a94e8f6cde06dd46e2ec475dbcbb5d82c", null ]
+    ] ],
+    [ "SecurityAccessLevelType", "datacontainertypes_8hpp.html#a50a624b41b1ab08096f2ebc8e680327b", [
+      [ "e_ACCESS_LEVEL_NONE", "datacontainertypes_8hpp.html#a50a624b41b1ab08096f2ebc8e680327bac330a5b50b92f8db02a425bc3afcf8b2", null ],
+      [ "e_ACCESS_LEVEL_SERVICE_MODE", "datacontainertypes_8hpp.html#a50a624b41b1ab08096f2ebc8e680327ba8c1e96ed57cd344aafeb89ec8eee0c2b", null ]
+    ] ],
+    [ "DigitalEvent::__attribute__", "namespaceDigitalEvent.html#ad53a4fbe154c87bc52471aed6488c316", null ]
+];

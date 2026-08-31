@@ -2,6 +2,12 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/http/HttpAsyncRequestHandler.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 HTTPAsyncRequestHandler::AsyncHttpRequest HTTPAsyncRequestHandler::currentRequest;
 String HTTPAsyncRequestHandler::jsonResponse = "";
 std::map<uint8_t, String> *HTTPAsyncRequestHandler::roomMapping_ptr = nullptr;

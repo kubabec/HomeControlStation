@@ -4,6 +4,12 @@
 #include "os/Logger.hpp"
 #include "esp_heap_caps.h"
 
+/**
+ * @file src/os/app/remoteControl/remoteControlClient.cpp
+ * @brief Remote-control protocol implementation for the Home Control Station.
+ */
+
+
 static ClientState currentState;
 std::queue<MessageUDP> RemoteControlClient::receivedBuffer;
 std::array<std::function<bool(RcRequest &)>, REQ_COUNT> RemoteControlClient::requestReceivers;

@@ -1,3 +1,8 @@
+/**
+ * @file src/os/app/timeMaster.cpp
+ * @brief Implementation of the Home Control Station runtime logic.
+ */
+
 #include <os/app/timeMaster.hpp>
 #include "os/Logger.hpp"
 

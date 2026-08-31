@@ -1,6 +1,12 @@
 #ifndef TEMP_GAUGE_CSS_H
 #define TEMP_GAUGE_CSS_H
 
+/**
+ * @file include/os/app/http/tempGauge/tempGaugeCSS.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 
 const char* tempGaugeCSS = "\
 <style>\

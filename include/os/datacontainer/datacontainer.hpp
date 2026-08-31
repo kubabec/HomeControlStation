@@ -11,6 +11,10 @@
 #include <Arduino.h>
 #include "DataContainerTypes.hpp"
 #include "Signals.hpp"
+/**
+ * @class DataContainer
+ * @brief Stores the shared runtime data and exposes accessors used by the service layer.
+ */
 
 
 class DataContainer

@@ -1,6 +1,10 @@
 #ifndef FADE_OUT_H
 #define FADE_OUT_H
 #include "ILedAnimation.hpp"
+/**
+ * @class FadeOutAnimation
+ * @brief Implements the Fade Out Animation behavior.
+ */
 
 class FadeOutAnimation : public ILedAnimation
 {

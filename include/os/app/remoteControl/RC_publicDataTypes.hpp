@@ -11,6 +11,12 @@
 #define REQEST_SIZE (REQUEST_DATA_SIZE + 13)
 #define RESPONSE_DATA_SIZE_LONG 100
 
+/**
+ * @file include/os/app/remoteControl/RC_publicDataTypes.hpp
+ * @brief Remote-control request and response definitions for the Home Control Station.
+ */
+
+
 
 
 // typedef struct {

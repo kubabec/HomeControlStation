@@ -2,6 +2,10 @@
 #ifndef ILED_ANIMATION_H
 #define ILED_ANIMATION_H
 #include "devices/AdvancedControls.hpp"
+/**
+ * @class ILedAnimation
+ * @brief Implements the I Led Animation behavior.
+ */
 
 class ILedAnimation {
 protected:

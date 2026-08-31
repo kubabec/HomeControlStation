@@ -1,6 +1,12 @@
 #include <os/app/NotificationHandler.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/NotificationHandler.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
+
 std::queue<UserInterfaceNotification> NotificationHandler::notifications;
 
 void NotificationHandler::init()

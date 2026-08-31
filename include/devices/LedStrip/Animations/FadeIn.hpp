@@ -1,6 +1,10 @@
 #ifndef FADE_IN_H
 #define FADE_IN_H
 #include "ILedAnimation.hpp"
+/**
+ * @class FadeInAnimation
+ * @brief Implements the Fade In Animation behavior.
+ */
 
 class FadeInAnimation : public ILedAnimation
 {

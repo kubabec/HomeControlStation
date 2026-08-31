@@ -4,6 +4,10 @@
 #include "Arduino.h"
 #include <functional>
 #include <queue>
+/**
+ * @class HwButton
+ * @brief Implements the Hw Button behavior.
+ */
 
 class HwButton : public Device {
     private:

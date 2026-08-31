@@ -1,6 +1,12 @@
 #include <os/app/RemoteDevicesManager.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/RemoteDevicesManager.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
+
 std::vector<DeviceDescription> RemoteDevicesManager::remoteDevicesCollection;
 std::map<uint8_t, RCTranslation> RemoteDevicesManager::currentIdMapping;
 std::array<ExternalNodeMapping, MAX_EXTERNAL_NODES> RemoteDevicesManager::mappingSlotsForExternalNodes;

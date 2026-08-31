@@ -4,6 +4,10 @@
 #include "ILedAnimation.hpp"
 
 // RollOutAnimation: gradually lights LEDs from off to target colors, skipping fully off targets
+/**
+ * @class RollOutAnimation
+ * @brief Implements the Roll Out Animation behavior.
+ */
 class RollOutAnimation : public ILedAnimation {
 public:
     RollOutAnimation(LedColor* mainStripPtr, uint16_t ledsCount, Direction dir = Direction::LeftToRight);

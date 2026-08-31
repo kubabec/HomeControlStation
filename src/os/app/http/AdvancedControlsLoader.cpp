@@ -5,6 +5,12 @@
 #define ONOFF_ADV_CONTROLS_SIZE 100
 #define TEMPSENSOR_ADV_CONTROLS_SIZE 50
 
+/**
+ * @file src/os/app/http/AdvancedControlsLoader.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 uint8_t* AdvancedControlsLoader::currentAdvancedControls = nullptr;
 DeviceDescription AdvancedControlsLoader::currentlyRequestedDeviceDescription = {};
 String AdvancedControlsLoader::currentRequestJS = "";

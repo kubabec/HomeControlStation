@@ -3,6 +3,12 @@
 #include <Arduino.h>
 #include "deviceWidgets.h"
 
+/**
+ * @file include/os/app/http/renderRoomsJS.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 const String renderRoomsJS = "\
 <script>" + deviceWidgetsJS +
 "const onOffType = 43;\

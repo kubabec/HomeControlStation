@@ -1,3 +1,11 @@
+/**
+ * @file main.cpp
+ * @brief Entry point of the HomeControlStation firmware.
+ *
+ * @details The setup() routine initializes the watchdog, serial port, and the
+ * operating system. The loop() method then dispatches scheduled maintenance
+ * tasks to the central runtime at fixed intervals.
+ */
 #include <Arduino.h>
 #include <os/HomeStation_os.hpp>
 #include <os/CyclicProfiler.hpp>

@@ -1,9 +1,18 @@
+/**
+ * @file include/os/datacontainer/NvmConfigSlotDefinition.hpp
+ * @brief Operating-system runtime and networking support for the Home Control Station.
+ */
+
 #ifndef CONFIG_SLOT_DEFINITION_H
 #define CONFIG_SLOT_DEFINITION_H
 #include <Arduino.h>
 #include "os/Logger.hpp"
 
 /* Description of single configuration NVM slot */
+/**
+ * @class DeviceConfigSlotType
+ * @brief Represents the Device Config Slot Type data structure.
+ */
 struct DeviceConfigSlotType
 {
     bool isActive = false;            /* 1 byte */

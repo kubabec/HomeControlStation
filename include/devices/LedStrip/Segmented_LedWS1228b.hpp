@@ -9,12 +9,20 @@
 #include "Animations/FadeOut.hpp"
 
 #include "Arduino.h"
+/**
+ * @class SegmentData
+ * @brief Represents the Segment Data data structure.
+ */
 
 struct SegmentData {
     LedColor* current = nullptr;
     LedColor* savedSlot1 = nullptr;
     LedColor* savedSlot2 = nullptr;   
 };
+/**
+ * @class SegLedWS1228bDeviceType
+ * @brief Implements the Seg Led W S1228b Device Type behavior.
+ */
 
 class SegLedWS1228bDeviceType : public Device {
     enum LedStripContentIndex{

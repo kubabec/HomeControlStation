@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <cmath>
 #include "ILedAnimation.hpp"
+/**
+ * @class WaveInAnimation
+ * @brief Implements the Wave In Animation behavior.
+ */
 
 class WaveInAnimation : public ILedAnimation {
 public:

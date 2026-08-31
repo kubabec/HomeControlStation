@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <cmath>
 #include "ILedAnimation.hpp"
+/**
+ * @class BounceInAnimation
+ * @brief Implements the Bounce In Animation behavior.
+ */
 
 class BounceInAnimation : public ILedAnimation {
 public:

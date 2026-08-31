@@ -1,6 +1,12 @@
 #ifndef STYLE_H
 #define STYLE_H
 
+/**
+ * @file include/os/app/http/style.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 
 const char* style_css = " \
 <style>\

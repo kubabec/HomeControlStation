@@ -2,6 +2,12 @@
 #include <iostream>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/remoteControl/rcResponse.cpp
+ * @brief Remote-control protocol implementation for the Home Control Station.
+ */
+
+
 
 
 RcResponse::RcResponse(){};

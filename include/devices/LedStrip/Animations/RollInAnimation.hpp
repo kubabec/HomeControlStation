@@ -4,6 +4,10 @@
 #include "ILedAnimation.hpp"
 
 // RollInAnimation: gradually lights LEDs from off to target colors, skipping fully off targets
+/**
+ * @class RollInAnimation
+ * @brief Implements the Roll In Animation behavior.
+ */
 class RollInAnimation : public ILedAnimation {
 public:
     RollInAnimation(LedColor* mainStripPtr, uint16_t ledsCount, Direction dir = Direction::LeftToRight);

@@ -1,6 +1,12 @@
 #include <os/tools/MessageUDP.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/messageUDP.cpp
+ * @brief Utility implementations used by the Home Control Station OS.
+ */
+
+
 MessageUDP::MessageUDP()
 {
     /* Initialize as empty message with unknown type */

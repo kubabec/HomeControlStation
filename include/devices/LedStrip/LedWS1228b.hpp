@@ -19,6 +19,10 @@
 #include "Arduino.h"
 
 #define DEFAULT_TICKS_TO_ANIMATE 3 // 3 * 10ms = 30ms for animation processing
+/**
+ * @class LedWS1228bDeviceType
+ * @brief Implements the Led W S1228b Device Type behavior.
+ */
 
 
 class LedWS1228bDeviceType : public Device {

@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <cmath>
 #include "ILedAnimation.hpp"
+/**
+ * @class SparkleInAnimation
+ * @brief Implements the Sparkle In Animation behavior.
+ */
 
 class SparkleInAnimation : public ILedAnimation {
 public:

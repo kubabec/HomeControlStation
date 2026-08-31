@@ -1,6 +1,12 @@
 #include <os/tools/UdpAdapter.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/udpAdapter.cpp
+ * @brief Utility implementations used by the Home Control Station OS.
+ */
+
+
 const unsigned int UDPAdapter::senderPort = 9001;
 const char *UDPAdapter::broadcastIP = "192.168.1.255";
 WiFiUDP UDPAdapter::udp;

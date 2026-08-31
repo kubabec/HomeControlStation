@@ -1,5 +1,11 @@
 #include "os/app/display/DeviceDescriptionPacker.hpp"
 
+/**
+ * @file src/os/app/display/DeviceDescriptionPacker.cpp
+ * @brief Display and packing logic for the Home Control Station UI.
+ */
+
+
 std::vector<std::vector<DeviceDescription>> DeviceDescriptionPacker::packDeviceDescriptions(
     const std::vector<DeviceDescription>& devices)
 {

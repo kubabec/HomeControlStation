@@ -3,6 +3,12 @@
 #include <ESPmDNS.h>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/wifiAdapter.cpp
+ * @brief Utility implementations used by the Home Control Station OS.
+ */
+
+
 bool WiFiAdapter::isConnectedFlag = false;
 bool WiFiAdapter::connectionInitialized = false;
 String WiFiAdapter::mSsid{"none"};

@@ -10,6 +10,12 @@
 #include <os/drivers/ota.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/drivers/networkdriver.cpp
+ * @brief Driver implementations for the Home Control Station OS.
+ */
+
+
 bool NetworkDriver::networkCredentialsAvailable = false;
 
 std::vector<int> NetworkDriver::packetRanges;

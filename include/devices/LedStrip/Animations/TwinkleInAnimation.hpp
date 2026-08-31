@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <cmath>
 #include "ILedAnimation.hpp"
+/**
+ * @class TwinkleInAnimation
+ * @brief Implements the Twinkle In Animation behavior.
+ */
 
 class TwinkleInAnimation : public ILedAnimation {
 public:

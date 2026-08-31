@@ -2,6 +2,12 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
+/**
+ * @file src/os/Logger.cpp
+ * @brief Core operating-system implementation for the Home Control Station.
+ */
+
+
 WiFiUDP udp;
 
 std::queue<String> Logger::offlineLogQueue;

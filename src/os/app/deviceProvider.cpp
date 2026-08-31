@@ -3,6 +3,12 @@
 #include "esp_heap_caps.h"
 
 #define MINIMAL_PAYLOAD_SIZE 2
+
+/**
+ * @file src/os/app/deviceProvider.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
 // #include "deviceProvider.hpp"
 //  mapa do przechowywania unikalnych ID i powiazania lokalnych ID + info ot tym czy jest to urzadzenie lokalne czy zadalne (tzn na slave ESP)
 std::map<uint8_t, DeviceTranslationDetails> DeviceProvider::uniqueDeviceIdToNormalDeviceIdMap;

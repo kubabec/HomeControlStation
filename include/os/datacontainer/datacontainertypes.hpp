@@ -1,3 +1,8 @@
+/**
+ * @file include/os/datacontainer/datacontainertypes.hpp
+ * @brief Operating-system runtime and networking support for the Home Control Station.
+ */
+
 #ifndef DATA_CONTAINER_TYPES_H
 #define DATA_CONTAINER_TYPES_H
 
@@ -144,6 +149,10 @@ typedef struct{
     std::function<uint8_t(void)> getActiveNotificationsCount;
     std::function<UserInterfaceNotification(void)> getOldestNotification;
 }UINotificationsControlAPI;
+/**
+ * @class RFButtonsControlAPI
+ * @brief Represents the R F Buttons Control A P I data structure.
+ */
 
 struct RFButtonsControlAPI{
     std::function<void()> startLearningMode;
@@ -158,6 +167,10 @@ typedef struct
     std::function<String()> getDeviceCfgJson;
     std::function<bool(JsonDocument&)> loadConfigFromFile;
 }DeviceConfigManipulationAPI;
+/**
+ * @class NetworkNodeInfo
+ * @brief Represents the Network Node Info data structure.
+ */
 
 struct NetworkNodeInfo{
     enum NodeType{
@@ -167,6 +180,10 @@ struct NetworkNodeInfo{
     } nodeType;
     MessageUDP::IPAddr nodeIP;
 };
+/**
+ * @class ServiceInformation
+ * @brief Represents the Service Information data structure.
+ */
 
 struct ServiceInformation{
     uint32_t ramTotal = 0;

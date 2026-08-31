@@ -1,6 +1,12 @@
 #include <os/app/SafeResetManager.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/SafeResetManager.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
+
 const long long SafeResetManager::RESET_DELAY{1000 * 60 * 60 * 30}; // 30h in ms
 const uint8_t SafeResetManager::morningStartHour{7};
 const uint8_t SafeResetManager::morningEndHour{9};

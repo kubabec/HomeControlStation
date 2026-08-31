@@ -4,6 +4,10 @@
 #include <map>
 #include <devices/device.hpp>
 #include <os/datacontainer/DataContainer.hpp>
+/**
+ * @class AdvancedControlsLoader
+ * @brief Loads the advanced-control definitions used by the dashboard and device pages.
+ */
 
 
 class AdvancedControlsLoader{

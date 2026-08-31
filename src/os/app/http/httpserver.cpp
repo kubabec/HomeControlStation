@@ -11,6 +11,12 @@
 #include "build_info.h"
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/http/httpserver.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 
 WiFiServer HomeLightHttpServer::server(80);
 WiFiClient client;

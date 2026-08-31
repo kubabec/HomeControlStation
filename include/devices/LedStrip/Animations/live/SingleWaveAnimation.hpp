@@ -9,6 +9,10 @@
 #include <algorithm>
 
 // 1. ILiveAnimation – interfejs dla animacji "żyjących"
+/**
+ * @class ILiveAnimation
+ * @brief Implements the I Live Animation behavior.
+ */
 class ILiveAnimation {
 protected:
     uint16_t ledsCount = 0;
@@ -50,6 +54,10 @@ protected:
 };
 
 // 2. SingleWaveAnimation – przesuwa blok średniego koloru na tle przyciemnionych oryginałów bez zmiany wyłączonych
+/**
+ * @class SingleWaveAnimation
+ * @brief Implements the Single Wave Animation behavior.
+ */
 class SingleWaveAnimation : public ILiveAnimation {
 public:
     enum class Direction { LeftToRight, RightToLeft };
@@ -136,6 +144,10 @@ private:
 };
 
 // 3. SmoothWaveAnimation – łagodna fala z sinusoidalnym wygładzaniem krawędzi, bez psucia zero
+/**
+ * @class SmoothWaveAnimation
+ * @brief Implements the Smooth Wave Animation behavior.
+ */
 class SmoothWaveAnimation : public ILiveAnimation {
 public:
     enum class Direction { LeftToRight, RightToLeft };
@@ -221,6 +233,10 @@ private:
         }
     }
 };
+/**
+ * @class Config
+ * @brief Represents the Config data structure.
+ */
 
 struct Config {
         uint8_t maxBursts = 15;    // liczba burstów
@@ -230,6 +246,10 @@ struct Config {
     };
 
 // 4. ComplexSequenceAnimation – maszyna stanów: fade-out, random fade-in/out cycles, then sliding fragment
+/**
+ * @class ComplexSequenceAnimation
+ * @brief Implements the Complex Sequence Animation behavior.
+ */
 class ComplexSequenceAnimation : public ILiveAnimation {
 public:
     Config cfg;
@@ -275,6 +295,10 @@ private:
     uint8_t collapseStep = 0;
 
     // RandomCycle
+/**
+ * @class Burst
+ * @brief Represents the Burst data structure.
+ */
     struct Burst { int idx; uint8_t step; uint16_t hold; bool held; };
     std::vector<Burst> bursts;
     uint8_t burstsIssued = 0;

@@ -1,3 +1,8 @@
+/**
+ * @file include/os/app/config/configprovider.hpp
+ * @brief Operating-system runtime and networking support for the Home Control Station.
+ */
+
 #ifndef CONFIG_PROVIDER_H
 #define CONFIG_PROVIDER_H
 #include <Arduino.h>
@@ -7,6 +12,10 @@
 
 #define SSID_LENGTH 30
 #define PASSWORD_LENGTH 30
+/**
+ * @struct ConfigData
+ * @brief Runtime image of the node configuration stored in NVM.
+ */
 typedef struct
 {
     uint8_t safeShutdownFlag = 255;
@@ -29,8 +38,9 @@ typedef struct
             PASSWORD_LENGTH + // user password
             sizeof(reserved); // reserved
     }
-
-    void serialPrint()
+    /**
+     * Prints the configuration to the logger for debugging.
+     */    void serialPrint()
     {
         Logger::log(
             "<<<<< - - - - CONFIGURATION - - - - >>>>> "
@@ -45,6 +55,10 @@ typedef struct
 
     }
 
+    /**
+     * Stores a network SSID into the configuration block.
+     * @param str SSID string to write.
+     */
     void setSSID(String& str)
     {
         const char* c_str = str.c_str();
@@ -61,6 +75,10 @@ typedef struct
         }
     }
 
+    /**
+     * Stores a Wi-Fi password into the configuration block.
+     * @param str Password string to write.
+     */
     void setPassword(String& str)
     {
         const char* c_str = str.c_str();
@@ -77,6 +95,10 @@ typedef struct
         }
     }
 
+    /**
+     * Stores the web-panel password into the configuration block.
+     * @param str Panel password string to write.
+     */
     void setPanelPassword(String& str)
     {
         const char* c_str = str.c_str();
@@ -93,10 +115,10 @@ typedef struct
         }
     }
 }ConfigData;
-
-
-
-
+/**
+ * @class ConfigProvider
+ * @brief Manages the persisted configuration mirror and exposes it to the rest of the OS.
+ */
 
 class ConfigProvider 
 {

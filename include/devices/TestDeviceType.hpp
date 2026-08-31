@@ -2,6 +2,10 @@
 #define TEST_DEVICE_TYPE_H
 #include "devices/Device.hpp"
 #include "Arduino.h"
+/**
+ * @class TestDeviceType
+ * @brief Implements the Test Device Type behavior.
+ */
 
 class TestDeviceType : public Device {
 

@@ -1,6 +1,12 @@
 #include <os/tools/ExtendedDataAllocator.hpp>
 #include "os/Logger.hpp"    
 
+/**
+ * @file src/os/tools/ExtendedDataAllocator.cpp
+ * @brief Utility implementations used by the Home Control Station OS.
+ */
+
+
 
 ExtendedData ExtendedDataAllocator::createNewExtendedData(uint16_t length){
     /* Try to allocate memory for new data */

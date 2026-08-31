@@ -3,6 +3,12 @@
 #include <os/Logger.hpp>
 #include <ArduinoJson.h>
 
+/**
+ * @file src/os/app/devicemanager.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
+
 std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = {};
 #ifdef LED_STRIP_SUPPORTED
 std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};

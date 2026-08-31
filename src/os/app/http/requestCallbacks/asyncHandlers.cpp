@@ -1,6 +1,12 @@
 #include <os/app/http/httpserver.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/http/requestCallbacks/asyncHandlers.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 void HomeLightHttpServer::parameterizedHandler_newSetupJson(String &request, WiFiClient &client)
 {
   /* Call CBK_SET_CONFIG_VIA_STRING function with "header" parameter */

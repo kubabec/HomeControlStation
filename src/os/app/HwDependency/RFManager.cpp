@@ -4,6 +4,12 @@
 
 #define NVM_DATA_VALID_FLAG 179
 
+/**
+ * @file src/os/app/HwDependency/RFManager.cpp
+ * @brief Application-layer runtime implementation for the Home Control Station.
+ */
+
+
 RFManagerState RFManager::internalState{e_RF_IDLE};
 std::set<RFButtonInfo> RFManager::connectedButtons;
 RFReceptionEvent RFManager::currentReceptionEvent;

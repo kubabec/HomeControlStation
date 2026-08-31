@@ -3,6 +3,12 @@
 
 #include <EEPROM.h>
 
+/**
+ * @file src/os/app/config/persistentMemoryAccess.cpp
+ * @brief Configuration persistence and runtime configuration logic for the Home Control Station.
+ */
+
+
 const uint8_t START_OF_DATA = 0b10101010;
 const uint8_t END_OF_DATA = 0b01010101;
 

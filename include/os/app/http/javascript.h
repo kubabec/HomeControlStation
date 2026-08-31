@@ -1,6 +1,12 @@
 #ifndef JAVASCRIPT_H
 #define JAVASCRIPT_H
 
+/**
+ * @file include/os/app/http/javascript.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 
 const char* javascript = "\
 <script>\

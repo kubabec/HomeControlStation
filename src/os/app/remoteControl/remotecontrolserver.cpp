@@ -1,6 +1,12 @@
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/remoteControl/remotecontrolserver.cpp
+ * @brief Remote-control protocol implementation for the Home Control Station.
+ */
+
+
 unsigned long requestInitialDataTimer = 0;
 unsigned long requestDetailedDataTimer = 0;
 unsigned long requestKeepAliveTimer = 0;

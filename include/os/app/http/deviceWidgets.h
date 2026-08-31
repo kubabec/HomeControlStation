@@ -2,6 +2,12 @@
 #define RENDER_ROOMS_WIDGETS_JS_H
 #include <Arduino.h>
 
+/**
+ * @file include/os/app/http/deviceWidgets.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 const String deviceWidgetsJS = "\
 function generateOnOffWidget(deviceContainer, device) {\
     const btnContainer = document.createElement('div');\

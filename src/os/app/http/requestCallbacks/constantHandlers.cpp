@@ -2,6 +2,12 @@
 #include "os/Logger.hpp"
 #include <Esp.h>
 
+/**
+ * @file src/os/app/http/requestCallbacks/constantHandlers.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
 {
   client.println("<div id=\"rooms\"></div>");

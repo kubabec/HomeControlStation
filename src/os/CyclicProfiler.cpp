@@ -1,5 +1,11 @@
 #include <os/CyclicProfiler.hpp>
 
+/**
+ * @file src/os/CyclicProfiler.cpp
+ * @brief Core operating-system implementation for the Home Control Station.
+ */
+
+
 
   using FuncPtr = void(*)();
 

@@ -2,6 +2,12 @@
 
 #include "os/drivers/networkdriver.hpp"
 
+/**
+ * @file src/os/app/display/DisplayServer.cpp
+ * @brief Display and packing logic for the Home Control Station UI.
+ */
+
+
 std::vector<Display> DisplayServer::knownDisplays;
 unsigned long DisplayServer::lastDiscoveryTime = 0;
 std::queue<MessageUDP> DisplayServer::receptionUdpQueue;

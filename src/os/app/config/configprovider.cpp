@@ -6,6 +6,12 @@
 #include "os/datacontainer/datacontainertypes.hpp"
 #include <Regexp.h>
 
+/**
+ * @file src/os/app/config/configprovider.cpp
+ * @brief Configuration persistence and runtime configuration logic for the Home Control Station.
+ */
+
+
 
 
 ConfigData ConfigProvider::configRamMirror = {255, 1, 1, 255, "\0", "\0", "\0"};

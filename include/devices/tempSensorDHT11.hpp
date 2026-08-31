@@ -1,3 +1,7 @@
+/**
+ * @file tempSensorDHT11.hpp
+ * @brief Temperature and humidity sensor implementation based on the DHT11 device.
+ */
 #ifndef TEMP_SENSOR_DHT11_TYPE_H
 #define TEMP_SENSOR_DHT11_TYPE_H
 #include <SystemDefinition.hpp>
@@ -9,55 +13,131 @@
 #include <DHT.h>
 #include <vector>
 
+/**
+ * @class TempSensorDHT11DeviceType
+ * @brief Reads and stores temperature and humidity values for the control station.
+ */
 class TempSensorDHT11DeviceType : public Device
 {
+    /** Stores a single temperature/humidity sample together with a timestamp. */
     struct SensorReading{
+        /** Temperature in degrees Celsius. */
         float temperature;
+        /** Relative humidity in percent. */
         float humidity;
+        /** Measurement time. */
         RtcTime timestamp;
     };
 
-    bool isOn = true; // stan urzadzenia
+    /** Indicates whether the sensor is currently enabled. */
+    bool isOn = true;
+    /** GPIO pin connected to the DHT sensor. */
     int pinNumber;
+    /** System ID of the device. */
     uint8_t deviceId;
+    /** Human-readable name used in the UI. */
     String deviceName;
+    /** Room index of the sensor. */
     uint8_t roomId;
+    /** Latest measured temperature. */
     float currentTemp = 255.f;
+    /** Latest measured humidity percentage. */
     uint8_t currentHumid = 255;
-    uint8_t temHumSensError = 0; // blad czujnika temperatury i wilgotnosci 0 - czujnik dziala poprawnie, 1 - nie dziala
+    /** Error status for the temperature/humidity sensor. */
+    uint8_t temHumSensError = 0;
+    /** Previous temperature value retained for comparisons. */
     float lastTemp = 0;
 
-    const size_t MAX_ENTRIES = 288; // 3 dni x 4 pomiary/godz.
-    // const unsigned long TIME_STORE_PERIOD = 15 * 60 * 1000; // Zapis do vectora co 15 minut w ms
-    const unsigned long TIME_STORE_PERIOD = 30 * 1000; // Zapis do vectora co 30 s dla testowania
+    /** Maximum number of historical entries retained in memory. */
+    const size_t MAX_ENTRIES = 288;
+    /** Sampling interval for the sensor history log. */
+    const unsigned long TIME_STORE_PERIOD = 30 * 1000;
+    /** Last time a sensor update was performed. */
     unsigned long lastDataUpdateTime = 0;
+    /** Last timestamp when data was stored into the history buffer. */
     unsigned long lastStoredTime = 0;
+    /** Last timestamp when the sensor check was evaluated. */
     unsigned long lastCheckedTime = 0;
+    /** Minute value of the last logged record. */
     uint8_t lastLoggedMinute = 255;
 
-  
+    /** Concrete DHT sensor object used for reading the environment. */
     DHT *dht = nullptr;
+    /** Callback used to obtain the current system time. */
     std::function<RtcTime(void)> getTime;
-    virtual void temHumReading(); // odczyt wilgotnosci i temperatury z sensora DHT
-    virtual void printSensorData(float temp, float humid, SensorReading reading); // wypisuje zawarrosc vectora z danymi zebranymi przez sensor DH!
-    virtual void dhtSensorRecords(); // zapisuje dane z sensora DHT do vectora
+    /** Reads raw temperature and humidity from the DHT sensor. */
+    virtual void temHumReading();
+    /** Converts the last reading into a serializable log entry. */
+    virtual void printSensorData(float temp, float humid, SensorReading reading);
+    /** Stores a new sample into the historical sensor buffer. */
+    virtual void dhtSensorRecords();
     
+    /** History list storing the recorded sensor samples. */
     std::vector<SensorReading> sensorData;
     
-
 public:
+    /**
+     * @brief Constructs the DHT11-based sensor from persisted configuration.
+     * @param nvmData Persisted device configuration.
+     * @param getTimeCallback Callback returning the current RTC time.
+     */
     TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData, std::function<RtcTime(void)> getTimeCallback);
 
+    /**
+     * @brief Initializes the DHT sensor and its internal storage buffers.
+     */
     virtual void init();
+    /**
+     * @brief Executes the periodic sensor acquisition loop.
+     */
     virtual void cyclic();
+    /**
+     * @brief Returns the runtime sensor identifier.
+     * @return Device identifier value.
+     */
     virtual uint8_t getDeviceIdentifier();
+    /**
+     * @brief Returns the environment sensor type.
+     * @return Device type code for the DHT11 sensor.
+     */
     virtual uint8_t getDeviceType();
+    /**
+     * @brief Produces the sensor metadata used by the runtime.
+     * @return Device description snapshot.
+     */
     virtual DeviceDescription getDeviceDescription();
+    /**
+     * @brief Reports the size of persistent extended memory used by the device.
+     * @return Number of bytes reserved by the sensor state.
+     */
     virtual uint16_t getExtendedMemoryLength();
 
+    /**
+     * @brief Executes a general service request for the sensor.
+     * @param serviceType Requested command.
+     * @return Result of the service execution.
+     */
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
+    /**
+     * @brief Executes a single-value service request for the sensor.
+     * @param serviceType Requested command.
+     * @param param Parameter payload.
+     * @return Result of the service execution.
+     */
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
+    /**
+     * @brief Executes a floating-point request for the sensor.
+     * @param serviceType Requested command.
+     * @param param Parameter payload.
+     * @return Result of the service execution.
+     */
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);
+    /**
+     * @brief Executes a raw-buffer service request for the sensor.
+     * @param serviceType Requested command.
+     * @param param Parameter payload.
+     * @return Result of the service execution.
+     */
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set3 param);
 };
 
