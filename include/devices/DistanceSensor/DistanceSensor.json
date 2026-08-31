@@ -37,8 +37,8 @@
       { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
     ],
     "customBytes": [
-      { "name": "txPin", "type": "uint8", "offset": 2, "size": 1, "widget": "gpio-select" },
-      { "name": "rxPin", "type": "uint8", "offset": 3, "size": 1, "widget": "gpio-select" }
+      { "name": "txPin", "type": "uint8", "label": "Pin Tx", "fieldId": "pinTx", "htmlType": "gpio-select", "offset": 2, "size": 1, "widget": "gpio-select" },
+      { "name": "rxPin", "type": "uint8", "label": "Pin Rx", "fieldId": "pinRx", "htmlType": "gpio-select", "offset": 3, "size": 1, "widget": "gpio-select" }
     ]
   },
   "services": [

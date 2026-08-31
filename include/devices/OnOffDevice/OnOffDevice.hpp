@@ -112,8 +112,8 @@ public:
      */
     int getBrightnessStep();
     /**
-     * @brief Returns the duration assigned to one brightness step.
-     * @return Step duration in milliseconds.
+        * @brief Returns the duration calculated during the last brightness request.
+        * @return Calculated step duration in milliseconds; uninitialized until `changeBrightness()` runs.
      */
     int getBrightnessStepDuration();
     /**
@@ -127,12 +127,12 @@ public:
      */
     int getBrightnessLevelTarget();
     /**
-     * @brief Sets the duration of a timed light activation.
-     * @param requestedLightDuration Duration in milliseconds.
+        * @brief Sets the stored timed-light duration.
+        * @param requestedLightDuration Duration in seconds, converted to milliseconds internally.
      */
     void setLightDurationTimerMS(int requestedLightDuration);
     /**
-     * @brief Processes the active timer and disables the output when the interval expires.
+        * @brief Reserved handler for timed deactivation; currently performs no action.
      */
     void timerHandler();
     /**

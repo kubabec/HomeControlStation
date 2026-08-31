@@ -4,7 +4,7 @@
 
 /**
  * @file src/os/Logger.cpp
- * @brief Logging utilities: UDP broadcast and offline queuing for system logs.
+ * @brief UDP logging helper implementation with a disabled public log sink.
  */
 
 

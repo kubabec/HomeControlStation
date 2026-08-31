@@ -1,6 +1,6 @@
 /**
  * @file tempSensorDHT11.hpp
- * @brief Temperature and humidity sensor implementation based on the DHT11 device.
+ * @brief Temperature and humidity sensor implementation using a DHT22 device.
  */
 #ifndef TEMP_SENSOR_DHT11_TYPE_H
 #define TEMP_SENSOR_DHT11_TYPE_H
@@ -48,9 +48,9 @@ class TempSensorDHT11DeviceType : public Device
     /** Previous temperature value retained for comparisons. */
     float lastTemp = 0;
 
-    /** Maximum number of historical entries retained in memory. */
+    /** Maximum number of entries retained when history recording is enabled. */
     const size_t MAX_ENTRIES = 288;
-    /** Sampling interval for the sensor history log. */
+    /** Minimum interval between history-recording checks. */
     const unsigned long TIME_STORE_PERIOD = 30 * 1000;
     /** Last time a sensor update was performed. */
     unsigned long lastDataUpdateTime = 0;
@@ -72,19 +72,22 @@ class TempSensorDHT11DeviceType : public Device
     /** Stores a new sample into the historical sensor buffer. */
     virtual void dhtSensorRecords();
     
-    /** History list storing the recorded sensor samples. */
+    /** History list used when sensor-recording support is enabled. */
     std::vector<SensorReading> sensorData;
     
 public:
     /**
-     * @brief Constructs the DHT11-based sensor from persisted configuration.
+        * @brief Constructs the DHT22-based sensor from persisted configuration.
      * @param nvmData Persisted device configuration.
      * @param getTimeCallback Callback returning the current RTC time.
      */
     TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData, std::function<RtcTime(void)> getTimeCallback);
 
     /**
-     * @brief Initializes the DHT sensor and its internal storage buffers.
+        * @brief Performs device initialization.
+        *
+        * The current implementation performs no additional initialization because
+        * the DHT sensor is initialized by the constructor.
      */
     virtual void init();
     /**
@@ -98,7 +101,7 @@ public:
     virtual uint8_t getDeviceIdentifier();
     /**
      * @brief Returns the environment sensor type.
-     * @return Device type code for the DHT11 sensor.
+        * @return Device type code for the temperature sensor.
      */
     virtual uint8_t getDeviceType();
     /**

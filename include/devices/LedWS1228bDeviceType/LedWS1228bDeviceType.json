@@ -40,10 +40,10 @@
       { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
     ],
     "customBytes": [
-      { "name": "physicalLedCount", "type": "uint16", "offset": 0, "size": 2, "minimum": 1, "byteOrder": "native", "widget": "number" },
-      { "name": "reverseOrder", "type": "boolean", "offset": 2, "size": 1, "widget": "checkbox" },
-      { "name": "currentLimit", "type": "uint8", "offset": 3, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
-      { "name": "currentLimitSafetyCopy", "type": "uint8", "offset": 19, "size": 1, "widget": null, "mustEqual": "currentLimit" }
+      { "name": "physicalLedCount", "type": "uint16", "label": "LEDs num.", "fieldId": "ledsCount", "htmlType": "number", "offset": 0, "size": 2, "minimum": 1, "byteOrder": "native", "widget": "number" },
+      { "name": "reverseOrder", "type": "boolean", "label": "Sides flip", "fieldId": "ledsSideFlip", "htmlType": "select", "offset": 2, "size": 1, "widget": "checkbox", "options": [{"value": 0, "label": "Not inversed"}, {"value": 1, "label": "Inversed"}] },
+      { "name": "currentLimit", "type": "uint8", "label": "Current limiter", "fieldId": "curLim", "htmlType": "range", "offset": 3, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
+      { "name": "currentLimitSafetyCopy", "type": "uint8", "label": "Current limiter copy", "fieldId": "currentLimitSafetyCopy", "htmlType": "hidden", "offset": 19, "size": 1, "widget": null, "mustEqual": "currentLimit" }
     ]
   },
   "services": [

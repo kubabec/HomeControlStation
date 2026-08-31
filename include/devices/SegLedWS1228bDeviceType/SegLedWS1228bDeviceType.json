@@ -39,9 +39,9 @@
       { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
     ],
     "customBytes": [
-      { "name": "currentLimit", "type": "uint8", "offset": 0, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
-      { "name": "segmentLedCounts", "type": "uint8[5]", "offset": 5, "size": 5, "minimum": 1, "maximum": 100, "widget": "number-array", "terminator": 0 },
-      { "name": "segmentReverseOrder", "type": "boolean[5]", "offset": 10, "size": 5, "widget": "checkbox-array" }
+      { "name": "currentLimit", "type": "uint8", "label": "Current limiter", "fieldId": "SegcurLimVal", "htmlType": "range", "offset": 0, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
+      { "name": "segmentLedCounts", "type": "uint8[5]", "label": "Segment counts", "fieldId": "segmentLedCounts", "htmlType": "segment-array", "offset": 5, "size": 5, "minimum": 1, "maximum": 100, "widget": "number-array", "arrayLength": 5, "terminator": 0 },
+      { "name": "segmentReverseOrder", "type": "boolean[5]", "label": "Segment inversion", "fieldId": "segmentReverseOrder", "htmlType": "segment-array", "offset": 10, "size": 5, "widget": null, "arrayLength": 5, "role": "companion-values-for:segmentLedCounts" }
     ]
   },
   "services": [

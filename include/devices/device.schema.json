@@ -26,7 +26,17 @@
         "name": { "type": "string", "minLength": 1 },
         "className": { "type": "string", "minLength": 1 },
         "enumSymbol": { "type": ["string", "null"] },
-        "enumValue": { "type": "integer", "minimum": 0, "maximum": 255 }
+        "enumValue": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "httpConfig": {
+          "type": "object",
+          "properties": {
+            "group": { "type": "string" },
+            "displayName": { "type": "string" },
+            "renderer": { "type": "string" },
+            "configWidget": { "type": "string" }
+          },
+          "additionalProperties": true
+        }
       },
       "additionalProperties": false
     },
@@ -173,6 +183,9 @@
       "properties": {
         "name": { "type": "string" },
         "type": { "type": "string" },
+        "label": { "type": "string" },
+        "fieldId": { "type": "string" },
+        "htmlType": { "type": "string" },
         "offset": { "type": "integer", "minimum": 0 },
         "size": { "type": "integer", "minimum": 1 },
         "source": { "type": "string" },
@@ -180,7 +193,23 @@
         "minimum": { "type": "number" },
         "maximum": { "type": "number" },
         "default": {},
-        "widget": { "type": ["string", "null"] }
+        "widget": { "type": ["string", "null"] },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["value", "label"],
+            "properties": {
+              "value": {},
+              "label": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "arrayLength": { "type": "integer", "minimum": 1 },
+        "segmentCount": { "type": "integer", "minimum": 1 },
+        "zeroMeans": { "type": "string" },
+        "mustEqual": { "type": "string" }
       },
       "additionalProperties": true
     },

@@ -50,10 +50,10 @@
       { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
     ],
     "customBytes": [
-      { "name": "brightnessSupported", "type": "boolean", "offset": 0, "size": 1, "default": true, "widget": "checkbox" },
-      { "name": "activationState", "type": "enum", "offset": 1, "size": 1, "default": 0, "values": { "0": "activeLow", "1": "activeHigh" }, "widget": "select" },
-      { "name": "minimumPwm", "type": "uint8", "offset": 2, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" },
-      { "name": "maximumPwm", "type": "uint8", "offset": 3, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" }
+      { "name": "brightnessSupported", "type": "boolean", "label": "Brightness support", "fieldId": "brightnessSupported", "htmlType": "select", "offset": 0, "size": 1, "default": true, "widget": "checkbox", "options": [{"value": 0, "label": "No"}, {"value": 1, "label": "Yes"}] },
+      { "name": "activationState", "type": "enum", "label": "Active state", "fieldId": "activationState", "htmlType": "select", "offset": 1, "size": 1, "default": 0, "values": { "0": "activeLow", "1": "activeHigh" }, "widget": "select", "options": [{"value": 0, "label": "LOW (0)"}, {"value": 1, "label": "HIGH (1)"}] },
+      { "name": "minimumPwm", "type": "uint8", "label": "Min PWM", "fieldId": "pwmMin", "htmlType": "range", "offset": 2, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" },
+      { "name": "maximumPwm", "type": "uint8", "label": "Max PWM", "fieldId": "pwmMax", "htmlType": "range", "offset": 3, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" }
     ]
   },
   "services": [

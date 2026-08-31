@@ -1,6 +1,6 @@
 /**
  * @file Logger.hpp
- * @brief Central log sink for firmware diagnosis and operational trace output.
+ * @brief Logging interface whose public output is currently disabled.
  */
 #ifndef LOGGER_H
 #define LOGGER_H
@@ -10,14 +10,14 @@
 
 /**
  * @class Logger
- * @brief Simplifies asynchronous, buffered logging for runtime diagnostics.
+ * @brief Provides the firmware logging API.
  *
- * The logger stores incoming messages in a queue and flushes them to the
- * configured serial interface when the runtime can process them.
+ * The current `log()` implementation drops messages without queuing or
+ * emitting them.
  */
 class Logger
 {
-    /** Queue holding messages received while the system is temporarily offline. */
+    /** Queue reserved for messages received while the system is offline. */
     static std::queue <String> offlineLogQueue;
     /** Monotonic counter used to track emitted log entries. */
     static long logCounter;
@@ -25,8 +25,8 @@ class Logger
     static void processMessage(String& message);
 public:
     /**
-     * @brief Logs a message to the active diagnostic channel.
-     * @param message Text payload to be queued and emitted.
+        * @brief Accepts a diagnostic message without emitting it.
+        * @param message Text payload currently discarded by the disabled logger.
      */
     static void log(String message);
 
