@@ -1,4 +1,4 @@
-#include "devices/TestDeviceType.hpp"
+#include "devices/TestDeviceType/TestDeviceType.hpp"
 
 void TestDeviceType::init(){
 }

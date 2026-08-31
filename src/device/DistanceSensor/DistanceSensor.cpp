@@ -1,4 +1,4 @@
-#include "devices/distanceSensor.hpp"
+#include "devices/DistanceSensor/DistanceSensor.hpp"
 
 DistanceSensor::DistanceSensor(){
    

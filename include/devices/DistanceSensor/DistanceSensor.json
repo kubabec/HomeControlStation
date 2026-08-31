@@ -1,0 +1,92 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "DistanceSensor",
+    "className": "DistanceSensor",
+    "enumSymbol": "type_DISTANCE_SENSOR",
+    "enumValue": 47
+  },
+  "implementation": {
+    "header": "include/devices/DistanceSensor/DistanceSensor.hpp",
+    "source": "src/device/DistanceSensor/DistanceSensor.cpp",
+    "buildGuard": "DISTANCE_SENSOR_SUPPORTED",
+    "dependencies": ["Arduino GPIO"],
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::distanceSensorsDevices",
+      "includedInDeviceCollection": true
+    }
+  },
+  "lifecycle": {
+    "init": { "actions": [] },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "every_manager_cycle",
+        "internalTasks": []
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" },
+      { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "txPin", "type": "uint8", "offset": 2, "size": 1, "widget": "gpio-select" },
+      { "name": "rxPin", "type": "uint8", "offset": 3, "size": 1, "widget": "gpio-select" }
+    ]
+  },
+  "services": [
+    {
+      "name": "DEVSERVICE_ENABLE",
+      "overload": "serviceCall_NoParams",
+      "status": "placeholder",
+      "parameters": []
+    },
+    {
+      "name": "DEVSERVICE_DISABLE",
+      "overload": "serviceCall_NoParams",
+      "status": "placeholder",
+      "parameters": []
+    },
+    {
+      "name": "DEVSERVICE_SET_DATA",
+      "overload": "serviceCall_1",
+      "status": "placeholder",
+      "parameters": [
+        { "name": "data", "type": "uint8", "source": "ServiceParameters_set1.a" }
+      ]
+    }
+  ],
+  "state": {
+    "enabledSemantics": "always true",
+    "descriptionCustomBytes": [
+      { "name": "distance", "type": "uint8", "offset": 0, "size": 1, "unit": "centimeters", "default": 100 }
+    ],
+    "httpFields": [
+      { "name": "dist", "type": "uint8", "source": "customBytes[0]", "unit": "centimeters" }
+    ]
+  },
+  "ui": {
+    "roomWidget": "generateDistSensWidget",
+    "controls": [],
+    "readouts": [
+      { "name": "distance", "widget": "numeric-label", "source": "dist", "unit": "centimeters" }
+    ]
+  },
+  "extendedMemory": {
+    "required": false,
+    "size": 0
+  },
+  "limitations": [
+    "No sensor initialization or sampling is implemented.",
+    "The reported distance is the constant value 100 centimeters.",
+    "Configured txPin and rxPin bytes are not consumed by the class.",
+    "Placeholder service branches do not return an explicit success code."
+  ]
+}

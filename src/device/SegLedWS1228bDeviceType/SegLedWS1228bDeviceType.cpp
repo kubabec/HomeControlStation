@@ -1,4 +1,4 @@
-#include "devices/LedStrip/Segmented_LedWS1228b.hpp"
+#include "devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp"
 #ifdef LED_STRIP_SUPPORTED
 const uint8_t maxVirtualLeds = 100;
 

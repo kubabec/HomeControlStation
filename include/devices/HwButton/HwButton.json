@@ -1,0 +1,71 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "HardwareButton",
+    "className": "HwButton",
+    "enumSymbol": "type_HARDWARE_BUTTON",
+    "enumValue": 48
+  },
+  "implementation": {
+    "header": "include/devices/HwButton/HwButton.hpp",
+    "source": "src/device/HwButton/HwButton.cpp",
+    "buildGuard": null,
+    "dependencies": ["Arduino GPIO interrupts", "digital-event callback"],
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::hardwareButtons",
+      "includedInDeviceCollection": false,
+      "reason": "initialized and updated separately; not published to room UI"
+    }
+  },
+  "lifecycle": {
+    "init": {
+      "actions": ["configure INPUT_PULLUP", "attach CHANGE interrupt"]
+    },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "every_manager_cycle",
+        "internalTasks": [
+          { "name": "queued edge processing", "cadence": "every cycle" },
+          { "name": "gesture evaluation window", "intervalMs": 800 }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" }
+    ],
+    "customBytes": [
+      { "name": "activeHigh", "type": "boolean", "offset": 0, "size": 1, "widget": "checkbox" },
+      { "name": "localDeviceIdToToggle", "type": "uint16", "offset": 1, "size": 2, "byteOrder": "native", "widget": "device-select" },
+      { "name": "doubleClickEventId", "type": "uint64", "offset": 3, "size": 8, "byteOrder": "native", "widget": "event-select" },
+      { "name": "longPressEventId", "type": "uint64", "offset": 11, "size": 8, "byteOrder": "native", "widget": "event-select" },
+      { "name": "remoteSinglePressEventId", "type": "uint64", "offset": 19, "size": 8, "byteOrder": "native", "widget": "event-select", "constructor": "remote-only overload" }
+    ]
+  },
+  "services": [],
+  "state": {
+    "enabledSemantics": "alwaysOn",
+    "descriptionCustomBytes": [],
+    "httpFields": []
+  },
+  "ui": {
+    "roomWidget": null,
+    "controls": [],
+    "readouts": []
+  },
+  "extendedMemory": {
+    "required": false,
+    "size": 0
+  },
+  "limitations": [
+    "The hardware button is intentionally excluded from the common Device collection and room UI.",
+    "The remote-only constructor reads an 8-byte single-press event ID starting at custom byte 19, beyond the current 20-byte configuration buffer; DeviceManager does not use this constructor.",
+    "The interrupt handler pushes into std::queue, whose interrupt-safety depends on the target runtime."
+  ]
+}

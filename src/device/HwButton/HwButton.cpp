@@ -1,4 +1,4 @@
-#include "devices/CustomHardware/HwButton.hpp"
+#include "devices/HwButton/HwButton.hpp"
 #include "os/Logger.hpp"
 
 void ICACHE_RAM_ATTR HwButton::interruptRouter(void *arg)
