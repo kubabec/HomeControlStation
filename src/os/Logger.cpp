@@ -4,7 +4,7 @@
 
 /**
  * @file src/os/Logger.cpp
- * @brief Core operating-system implementation for the Home Control Station.
+ * @brief Logging utilities: UDP broadcast and offline queuing for system logs.
  */
 
 

@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classDisplay.h
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the <a class="el" href="classDisplay.html" title="Implements the Display behavior.">Display</a> behavior.  
+<p>Represents a display endpoint discovered by the station and tracked for periodic refresh.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="Display_8hpp_source.html">Display.hpp</a>&gt;</code></p>
@@ -122,18 +122,25 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classDisplay.h
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a60fec3eb6f87e7c1e89b9df7d7c75bc0" id="r_a60fec3eb6f87e7c1e89b9df7d7c75bc0"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a60fec3eb6f87e7c1e89b9df7d7c75bc0">Display</a> (<a class="el" href="structDisplayInfo.html">DisplayInfo</a> info)</td></tr>
+<tr class="memdesc:a60fec3eb6f87e7c1e89b9df7d7c75bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a display descriptor from the discovered display metadata.  <br /></td></tr>
 <tr class="memitem:ad2a323f8bb04d1486e1df7d92af50ecb" id="r_ad2a323f8bb04d1486e1df7d92af50ecb"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#ad2a323f8bb04d1486e1df7d92af50ecb">getDisplayDataHash</a> ()</td></tr>
+<tr class="memdesc:ad2a323f8bb04d1486e1df7d92af50ecb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the hash of the latest display data snapshot.  <br /></td></tr>
 <tr class="memitem:ad97fe9fc02db53cdf888076048a02d38" id="r_ad97fe9fc02db53cdf888076048a02d38"><td class="memItemLeft">unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#ad97fe9fc02db53cdf888076048a02d38">getLastDataUpdateTime</a> ()</td></tr>
+<tr class="memdesc:ad97fe9fc02db53cdf888076048a02d38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the timestamp of the most recent data refresh received from this display.  <br /></td></tr>
 <tr class="memitem:a97f44f15f28597d1d1c0b6852c6973b9" id="r_a97f44f15f28597d1d1c0b6852c6973b9"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a97f44f15f28597d1d1c0b6852c6973b9">operator==</a> (const <a class="el" href="classDisplay.html">Display</a> &amp;other) const</td></tr>
+<tr class="memdesc:a97f44f15f28597d1d1c0b6852c6973b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares two display entries by their network identity.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a78cae962b9dae6c837a7cff280416368" id="r_a78cae962b9dae6c837a7cff280416368"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#a78cae962b9dae6c837a7cff280416368">displayDataHash</a> = 0</td></tr>
+<tr class="memdesc:a78cae962b9dae6c837a7cff280416368"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hash of the last known display-data payload used to detect changes.  <br /></td></tr>
 <tr class="memitem:a8fef33de2438e25e7708af57f0dfc02d" id="r_a8fef33de2438e25e7708af57f0dfc02d"><td class="memItemLeft"><a class="el" href="structDisplayInfo.html">DisplayInfo</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8fef33de2438e25e7708af57f0dfc02d">info</a></td></tr>
+<tr class="memdesc:a8fef33de2438e25e7708af57f0dfc02d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metadata describing the display address, size, and network location.  <br /></td></tr>
 <tr class="memitem:ab3429013ecf39fddf1579aad5e28af24" id="r_ab3429013ecf39fddf1579aad5e28af24"><td class="memItemLeft">unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#ab3429013ecf39fddf1579aad5e28af24">lastDataUpdateTime</a> = 0</td></tr>
+<tr class="memdesc:ab3429013ecf39fddf1579aad5e28af24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Time of the most recent payload update received from the display.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the <a class="el" href="classDisplay.html" title="Implements the Display behavior.">Display</a> behavior. </p>
+<div class="textblock"><p>Represents a display endpoint discovered by the station and tracked for periodic refresh. </p>
 
 <p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00010">10</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -152,9 +159,17 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates a display descriptor from the discovered display metadata. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>Network and display information describing the endpoint. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Display_8cpp_source.html#l00009">9</a> of file <a class="el" href="Display_8cpp_source.html">Display.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00025">info</a>.</p>
+<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00052">info</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="Display_8cpp_source.html#l00013">operator==()</a>.</p>
 
@@ -176,9 +191,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the hash of the latest display data snapshot. </p>
+<dl class="section return"><dt>Returns</dt><dd>Hash used to detect changes in the display payload. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Display_8cpp_source.html#l00024">24</a> of file <a class="el" href="Display_8cpp_source.html">Display.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00024">displayDataHash</a>.</p>
+<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00047">displayDataHash</a>.</p>
 
 </div>
 </div>
@@ -197,9 +215,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the timestamp of the most recent data refresh received from this display. </p>
+<dl class="section return"><dt>Returns</dt><dd>Last data update time in milliseconds. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Display_8cpp_source.html#l00019">19</a> of file <a class="el" href="Display_8cpp_source.html">Display.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00023">lastDataUpdateTime</a>.</p>
+<p class="reference">References <a class="el" href="Display_8hpp_source.html#l00042">lastDataUpdateTime</a>.</p>
 
 </div>
 </div>
@@ -218,9 +239,18 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Compares two display entries by their network identity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>Other display to compare with. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when both displays refer to the same display endpoint. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Display_8cpp_source.html#l00013">13</a> of file <a class="el" href="Display_8cpp_source.html">Display.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="Display_8cpp_source.html#l00009">Display()</a>, <a class="el" href="Display_8hpp_source.html#l00025">info</a>, and <a class="el" href="DisplayDatatypes_8hpp_source.html#l00019">DisplayInfo::macAddress</a>.</p>
+<p class="reference">References <a class="el" href="Display_8cpp_source.html#l00009">Display()</a>, <a class="el" href="Display_8hpp_source.html#l00052">info</a>, and <a class="el" href="DisplayDatatypes_8hpp_source.html#l00021">DisplayInfo::macAddress</a>.</p>
 
 </div>
 </div>
@@ -245,7 +275,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00024">24</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
+<p>Hash of the last known display-data payload used to detect changes. </p>
+
+<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00047">47</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="Display_8cpp_source.html#l00024">getDisplayDataHash()</a>.</p>
 
@@ -271,7 +303,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00025">25</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
+<p>Metadata describing the display address, size, and network location. </p>
+
+<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00052">52</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="Display_8cpp_source.html#l00009">Display()</a>, and <a class="el" href="Display_8cpp_source.html#l00013">operator==()</a>.</p>
 
@@ -297,7 +331,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00023">23</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
+<p>Time of the most recent payload update received from the display. </p>
+
+<p class="definition">Definition at line <a class="el" href="Display_8hpp_source.html#l00042">42</a> of file <a class="el" href="Display_8hpp_source.html">Display.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="Display_8cpp_source.html#l00019">getLastDataUpdateTime()</a>.</p>
 

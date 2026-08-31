@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRcRespons
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Rc Response behavior.  
+<p>Encodes the response packet returned by a remote node to a pending request.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>&gt;</code></p>
@@ -122,37 +122,62 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRcRespons
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0fac497b0403f9388d78b001ab538a12" id="r_a0fac497b0403f9388d78b001ab538a12"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0fac497b0403f9388d78b001ab538a12">RcResponse</a> ()</td></tr>
+<tr class="memdesc:a0fac497b0403f9388d78b001ab538a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor creating an empty response object.  <br /></td></tr>
 <tr class="memitem:ad3fd1a40a13a6dacded3b934c030fd2b" id="r_ad3fd1a40a13a6dacded3b934c030fd2b"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad3fd1a40a13a6dacded3b934c030fd2b">RcResponse</a> (uint8_t respId, uint64_t respNodeMAC, uint8_t reqType, uint8_t respType)</td></tr>
+<tr class="memdesc:ad3fd1a40a13a6dacded3b934c030fd2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a response for a specific request and destination node.  <br /></td></tr>
 <tr class="memitem:af06ecf11f394aac5bed91ee7357f0c3b" id="r_af06ecf11f394aac5bed91ee7357f0c3b"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#af06ecf11f394aac5bed91ee7357f0c3b">calculateCrc</a> ()</td></tr>
+<tr class="memdesc:af06ecf11f394aac5bed91ee7357f0c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recomputes the CRC value for the response object.  <br /></td></tr>
 <tr class="memitem:a60844f6f4ec290bab5e1310fec1baaf4" id="r_a60844f6f4ec290bab5e1310fec1baaf4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a60844f6f4ec290bab5e1310fec1baaf4">fromByteArray</a> (uint8_t *buffer, uint16_t size)</td></tr>
+<tr class="memdesc:a60844f6f4ec290bab5e1310fec1baaf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserializes a response packet from a raw byte array.  <br /></td></tr>
 <tr class="memitem:a8de8a5eaf29c9851bd616227c20e8169" id="r_a8de8a5eaf29c9851bd616227c20e8169"><td class="memItemLeft">std::vector&lt; uint8_t &gt; &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a8de8a5eaf29c9851bd616227c20e8169">getData</a> ()</td></tr>
+<tr class="memdesc:a8de8a5eaf29c9851bd616227c20e8169"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the payload data stored in the response.  <br /></td></tr>
 <tr class="memitem:a5439837be5997ccf1fcb6058e702964c" id="r_a5439837be5997ccf1fcb6058e702964c"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a5439837be5997ccf1fcb6058e702964c">getRequestType</a> ()</td></tr>
+<tr class="memdesc:a5439837be5997ccf1fcb6058e702964c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the original request type encoded in the response.  <br /></td></tr>
 <tr class="memitem:a321348e5b9815176a316ddc11d768243" id="r_a321348e5b9815176a316ddc11d768243"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a321348e5b9815176a316ddc11d768243">getResponseId</a> ()</td></tr>
+<tr class="memdesc:a321348e5b9815176a316ddc11d768243"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the response identifier.  <br /></td></tr>
 <tr class="memitem:ad64cff7dc49aaeea857a766e7164e176" id="r_ad64cff7dc49aaeea857a766e7164e176"><td class="memItemLeft">uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#ad64cff7dc49aaeea857a766e7164e176">getResponseNodeMAC</a> ()</td></tr>
+<tr class="memdesc:ad64cff7dc49aaeea857a766e7164e176"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the MAC address of the responding node.  <br /></td></tr>
 <tr class="memitem:aa0446d39b96aa45ab66f27cfaf3f5856" id="r_aa0446d39b96aa45ab66f27cfaf3f5856"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#aa0446d39b96aa45ab66f27cfaf3f5856">getResponseType</a> ()</td></tr>
+<tr class="memdesc:aa0446d39b96aa45ab66f27cfaf3f5856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the response classification.  <br /></td></tr>
 <tr class="memitem:ad826bc4dffad0c437e33d1cab7ad4117" id="r_ad826bc4dffad0c437e33d1cab7ad4117"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#ad826bc4dffad0c437e33d1cab7ad4117">getSize</a> ()</td></tr>
+<tr class="memdesc:ad826bc4dffad0c437e33d1cab7ad4117"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the serialized size of the response in bytes.  <br /></td></tr>
 <tr class="memitem:a1e6315fb58ca88a507654b8c850f8372" id="r_a1e6315fb58ca88a507654b8c850f8372"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a1e6315fb58ca88a507654b8c850f8372">isValid</a> ()</td></tr>
+<tr class="memdesc:a1e6315fb58ca88a507654b8c850f8372"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validates the current response object.  <br /></td></tr>
 <tr class="memitem:aff40581409165de535ac3fddab7e8d31" id="r_aff40581409165de535ac3fddab7e8d31"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aff40581409165de535ac3fddab7e8d31">print</a> ()</td></tr>
+<tr class="memdesc:aff40581409165de535ac3fddab7e8d31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the response structure for debugging and traffic inspection.  <br /></td></tr>
 <tr class="memitem:ac86d4bea0746b741ca800b6fb622a433" id="r_ac86d4bea0746b741ca800b6fb622a433"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac86d4bea0746b741ca800b6fb622a433">pushData</a> (uint8_t *data, uint16_t size)</td></tr>
+<tr class="memdesc:ac86d4bea0746b741ca800b6fb622a433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Appends a raw byte buffer to the response payload.  <br /></td></tr>
 <tr class="memitem:ac5a3d688e6ca6a7156875ac289762da8" id="r_ac5a3d688e6ca6a7156875ac289762da8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac5a3d688e6ca6a7156875ac289762da8">pushData</a> (uint8_t byte)</td></tr>
+<tr class="memdesc:ac5a3d688e6ca6a7156875ac289762da8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Appends a single payload byte to the response.  <br /></td></tr>
 <tr class="memitem:ad5bce889f2585d2320f924cbb99373ca" id="r_ad5bce889f2585d2320f924cbb99373ca"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad5bce889f2585d2320f924cbb99373ca">setRequestType</a> (uint8_t reqType)</td></tr>
+<tr class="memdesc:ad5bce889f2585d2320f924cbb99373ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the original request type associated with the response.  <br /></td></tr>
 <tr class="memitem:a17451df1355b21fd248e1daf8e764747" id="r_a17451df1355b21fd248e1daf8e764747"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a17451df1355b21fd248e1daf8e764747">setResponseId</a> (uint8_t id)</td></tr>
+<tr class="memdesc:a17451df1355b21fd248e1daf8e764747"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the response ID used for matching the request/response pair.  <br /></td></tr>
 <tr class="memitem:a7db1e914bbb947d7b6f5a5f00a735896" id="r_a7db1e914bbb947d7b6f5a5f00a735896"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7db1e914bbb947d7b6f5a5f00a735896">setResponseType</a> (uint8_t respType)</td></tr>
+<tr class="memdesc:a7db1e914bbb947d7b6f5a5f00a735896"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the response-type classification.  <br /></td></tr>
 <tr class="memitem:a9de314b28bc9545f91425c813b7d349b" id="r_a9de314b28bc9545f91425c813b7d349b"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9de314b28bc9545f91425c813b7d349b">toByteArray</a> (uint8_t *buffer, uint16_t size)</td></tr>
+<tr class="memdesc:a9de314b28bc9545f91425c813b7d349b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializes the response into a raw byte array.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a63e3f642c89a49d16b49d0a02429fb52" id="r_a63e3f642c89a49d16b49d0a02429fb52"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#a63e3f642c89a49d16b49d0a02429fb52">crc</a></td></tr>
+<tr class="memdesc:a63e3f642c89a49d16b49d0a02429fb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">CRC value computed for the response body.  <br /></td></tr>
 <tr class="memitem:a5e84f250ee6a320b6470c19ccb61bbc3" id="r_a5e84f250ee6a320b6470c19ccb61bbc3"><td class="memItemLeft">std::vector&lt; uint8_t &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a5e84f250ee6a320b6470c19ccb61bbc3">data</a></td></tr>
+<tr class="memdesc:a5e84f250ee6a320b6470c19ccb61bbc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw payload bytes returned by the remote device or protocol layer.  <br /></td></tr>
 <tr class="memitem:af10f2151a25850624067042339df68c3" id="r_af10f2151a25850624067042339df68c3"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#af10f2151a25850624067042339df68c3">requestType</a> = <a class="el" href="rcRequest_8hpp.html#ae10b07f2d0feb103db7fe4cfd192e5afa280fd0988d2e70bd4fc2cadae012491f">UNKNOWN_REQ</a></td></tr>
+<tr class="memdesc:af10f2151a25850624067042339df68c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of request that triggered this response.  <br /></td></tr>
 <tr class="memitem:a2a1c1cdb73e692c3181bc9f865e00132" id="r_a2a1c1cdb73e692c3181bc9f865e00132"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a2a1c1cdb73e692c3181bc9f865e00132">responseId</a></td></tr>
+<tr class="memdesc:a2a1c1cdb73e692c3181bc9f865e00132"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifier assigned to this response so it can be matched to the originating request.  <br /></td></tr>
 <tr class="memitem:aa415ed956e70a5d82bebca30455d9ed0" id="r_aa415ed956e70a5d82bebca30455d9ed0"><td class="memItemLeft">uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#aa415ed956e70a5d82bebca30455d9ed0">responseNodeMAC</a></td></tr>
+<tr class="memdesc:aa415ed956e70a5d82bebca30455d9ed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">MAC address of the node that generated the response.  <br /></td></tr>
 <tr class="memitem:a36dd120b3baf31b63b45c42a76465aa8" id="r_a36dd120b3baf31b63b45c42a76465aa8"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a36dd120b3baf31b63b45c42a76465aa8">responseType</a> = <a class="el" href="rcResponse_8hpp.html#af5055605e320b3f9ea9fa330b57604e7a00c22670cde290c73c1bc704841fd4be">UNKNOWN_RESP</a></td></tr>
+<tr class="memdesc:a36dd120b3baf31b63b45c42a76465aa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Category of the response, such as positive, negative, or invalid request.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Rc Response behavior. </p>
+<div class="textblock"><p>Encodes the response packet returned by a remote node to a pending request. </p>
+<p>The response contains the originating node, the original request type, the response class, and raw payload bytes that allow the caller to determine whether the remote service succeeded and which data was produced. </p>
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00023">23</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00026">26</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0fac497b0403f9388d78b001ab538a12" name="a0fac497b0403f9388d78b001ab538a12"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0fac497b0403f9388d78b001ab538a12">&#9670;&#160;</a></span>RcResponse() <span class="overload">[1/2]</span></h2>
@@ -168,6 +193,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Default constructor creating an empty response object. </p>
 
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00013">13</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
@@ -202,9 +229,20 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates a response for a specific request and destination node. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">respId</td><td>Response identifier. </td></tr>
+    <tr><td class="paramname">respNodeMAC</td><td>MAC address of the responding node. </td></tr>
+    <tr><td class="paramname">reqType</td><td>Original request type. </td></tr>
+    <tr><td class="paramname">respType</td><td>Response category. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00014">14</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 </div>
 </div>
@@ -224,9 +262,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Recomputes the CRC value for the response object. </p>
+<dl class="section return"><dt>Returns</dt><dd>Newly calculated CRC value. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00138">138</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00153">isValid()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -251,9 +292,19 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Deserializes a response packet from a raw byte array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td>Source bytes containing a serialized response. </td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes in the source buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when parsing succeeded; false on malformed input. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00075">75</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00030">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>, <a class="el" href="rcRequest_8hpp_source.html#l00007">RC_REQUEST_MIN_SIZE</a>, <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00055">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>, <a class="el" href="rcRequest_8hpp_source.html#l00007">RC_REQUEST_MIN_SIZE</a>, <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00615">RemoteControlServer::processReceivedRcResponse()</a>.</p>
 
@@ -274,9 +325,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the payload data stored in the response. </p>
+<dl class="section return"><dt>Returns</dt><dd>Mutable payload vector. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00024">24</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00298">RemoteDevicesManager::handleService3Response()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">RemoteDevicesManager::receiveResponse()</a>.</p>
 
@@ -297,9 +351,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the original request type encoded in the response. </p>
+<dl class="section return"><dt>Returns</dt><dd>Type of request that produced this response. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00020">20</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00087">RemoteControlServer::cyclic()</a>, and <a class="el" href="remotecontrolserver_8cpp_source.html#l00615">RemoteControlServer::processReceivedRcResponse()</a>.</p>
 
@@ -320,9 +377,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the response identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>Response ID. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00018">18</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00615">RemoteControlServer::processReceivedRcResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">RemoteDevicesManager::receiveResponse()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00305">RemoteControlClient::sendResponse()</a>.</p>
 
@@ -343,9 +403,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the MAC address of the responding node. </p>
+<dl class="section return"><dt>Returns</dt><dd>Responding node MAC address. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00019">19</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">RemoteDevicesManager::receiveResponse()</a>.</p>
 
@@ -366,9 +429,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the response classification. </p>
+<dl class="section return"><dt>Returns</dt><dd>Response category such as positive or invalid request. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00023">23</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">RemoteDevicesManager::receiveResponse()</a>.</p>
 
@@ -389,9 +455,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the serialized size of the response in bytes. </p>
+<dl class="section return"><dt>Returns</dt><dd>Byte count required for the response packet. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00027">27</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00030">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00055">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00318">RemoteControlClient::processResponse()</a>.</p>
 
@@ -412,9 +481,12 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Validates the current response object. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when the response fields and CRC are coherent; false otherwise. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00153">153</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00030">crc</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00055">crc</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00615">RemoteControlServer::processReceivedRcResponse()</a>.</p>
 
@@ -435,9 +507,11 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Prints the response structure for debugging and traffic inspection. </p>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00035">35</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00030">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00055">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 </div>
 </div>
@@ -460,9 +534,18 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Appends a raw byte buffer to the response payload. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>Buffer to append. </td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes in the buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00069">69</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>.</p>
 
 </div>
 </div>
@@ -481,9 +564,17 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Appends a single payload byte to the response. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">byte</td><td>Byte to append. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00064">64</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="deviceProvider_8cpp_source.html#l00567">DeviceProvider::addDeviceDescriptionToResponsePayload()</a>, and <a class="el" href="deviceProvider_8cpp_source.html#l00212">DeviceProvider::handelService3Request()</a>.</p>
 
@@ -504,9 +595,17 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets the original request type associated with the response. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqType</td><td>Original request category. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00059">59</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>.</p>
 
 </div>
 </div>
@@ -525,9 +624,17 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets the response ID used for matching the request/response pair. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>New response identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00054">54</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>.</p>
 
 </div>
 </div>
@@ -546,9 +653,17 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets the response-type classification. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">respType</td><td>Response category. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00160">160</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="deviceProvider_8cpp_source.html#l00212">DeviceProvider::handelService3Request()</a>, and <a class="el" href="deviceProvider_8cpp_source.html#l00320">DeviceProvider::receiveRequest()</a>.</p>
 
@@ -573,9 +688,19 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Serializes the response into a raw byte array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td>Destination buffer for the serialized response. </td></tr>
+    <tr><td class="paramname">size</td><td>Available size in the destination buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the response could be encoded successfully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="rcResponse_8cpp_source.html#l00112">112</a> of file <a class="el" href="rcResponse_8cpp_source.html">rcResponse.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00029">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00027">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00025">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00026">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00028">responseType</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00055">crc</a>, <a class="el" href="rcResponse_8hpp_source.html#l00050">data</a>, <a class="el" href="rcResponse_8hpp_source.html#l00040">requestType</a>, <a class="el" href="rcResponse_8hpp_source.html#l00030">responseId</a>, <a class="el" href="rcResponse_8hpp_source.html#l00035">responseNodeMAC</a>, and <a class="el" href="rcResponse_8hpp_source.html#l00045">responseType</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00318">RemoteControlClient::processResponse()</a>.</p>
 
@@ -602,7 +727,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00030">30</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>CRC value computed for the response body. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00055">55</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00153">isValid()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -628,7 +755,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00029">29</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>Raw payload bytes returned by the remote device or protocol layer. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00050">50</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00024">getData()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00069">pushData()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00064">pushData()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -654,7 +783,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00027">27</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>Type of request that triggered this response. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00040">40</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00014">RcResponse()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00020">getRequestType()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00059">setRequestType()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -680,7 +811,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00025">25</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>Identifier assigned to this response so it can be matched to the originating request. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00030">30</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00014">RcResponse()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00018">getResponseId()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00054">setResponseId()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -706,7 +839,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00026">26</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>MAC address of the node that generated the response. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00035">35</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00014">RcResponse()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00019">getResponseNodeMAC()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 
@@ -732,7 +867,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00028">28</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
+<p>Category of the response, such as positive, negative, or invalid request. </p>
+
+<p class="definition">Definition at line <a class="el" href="rcResponse_8hpp_source.html#l00045">45</a> of file <a class="el" href="rcResponse_8hpp_source.html">rcResponse.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="rcResponse_8cpp_source.html#l00014">RcResponse()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00138">calculateCrc()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00075">fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00023">getResponseType()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00027">getSize()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00035">print()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00160">setResponseType()</a>, and <a class="el" href="rcResponse_8cpp_source.html#l00112">toByteArray()</a>.</p>
 

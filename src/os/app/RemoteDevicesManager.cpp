@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/app/RemoteDevicesManager.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief Manages discovery, mapping and communication with external remote devices.
  */
 
 

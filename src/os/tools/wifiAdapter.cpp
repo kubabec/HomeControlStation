@@ -5,7 +5,7 @@
 
 /**
  * @file src/os/tools/wifiAdapter.cpp
- * @brief Utility implementations used by the Home Control Station OS.
+ * @brief WiFi adapter: connection management, mDNS responder, and DataContainer IP updates.
  */
 
 

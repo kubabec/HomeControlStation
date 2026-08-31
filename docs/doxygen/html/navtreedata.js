@@ -75,7 +75,7 @@ var NAVTREEINDEX =
 "classTwinkleInAnimation.html#ae55a3cbe1cb3db16dd2ea27f275511c7",
 "functions_j.html",
 "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea75742edaa6eb8c92d22ddf764847331c",
-"structServiceParameters__set2.html#a183c1349854511402e39c902c806917e"
+"structServiceParameters__set2.html#a13c12ef08b5b5e4a6c8503e73c6f7622"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

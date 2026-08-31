@@ -2,7 +2,7 @@
 
 /**
  * @file src/os/datacontainer/datacontainer.cpp
- * @brief Core operating-system implementation for the Home Control Station.
+ * @brief Data container: persistent storage and signal registry for runtime communication.
  */
 
 

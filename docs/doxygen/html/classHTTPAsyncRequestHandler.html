@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classHTTPAsync
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the H T T P Async Request Handler behavior.  
+<p>Manages asynchronous page and device requests served by the HTTP UI layer.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>&gt;</code></p>
@@ -122,42 +122,66 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classHTTPAsync
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:AsyncHttpRequest" id="r_AsyncHttpRequest"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html">AsyncHttpRequest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Container describing the active async HTTP request and its timing metadata.  <a href="structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad28f5098355a1f141077a228e94f4861" id="r_ad28f5098355a1f141077a228e94f4861"><td class="memItemLeft">static <a class="el" href="HttpAsyncRequestHandler_8hpp.html#a5be90f01766c5b0992aed84e923364c8">HttpErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad28f5098355a1f141077a228e94f4861">createRequest</a> (<a class="el" href="HttpAsyncRequestHandler_8hpp.html#ad895f32645faa6ed34deee86bcd3b892">AsyncRequestType</a> requestType, uint8_t *requestParamsPtr, uint16_t paramsLength)</td></tr>
+<tr class="memdesc:ad28f5098355a1f141077a228e94f4861"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queues a new async request for processing.  <br /></td></tr>
 <tr class="memitem:abfcda8ff7c1950ffd06b95347f6191b5" id="r_abfcda8ff7c1950ffd06b95347f6191b5"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#abfcda8ff7c1950ffd06b95347f6191b5">getJsonResponse</a> ()</td></tr>
+<tr class="memdesc:abfcda8ff7c1950ffd06b95347f6191b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the JSON response prepared by the async request handler.  <br /></td></tr>
 <tr class="memitem:a5405b938acbe3d462e13610a4b4f5d72" id="r_a5405b938acbe3d462e13610a4b4f5d72"><td class="memItemLeft">static <a class="el" href="HttpAsyncRequestHandler_8hpp.html#acd59cb757fb13f9dfaa6b753c2c65f64">AsyncRequestState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5405b938acbe3d462e13610a4b4f5d72">getProcessingState</a> ()</td></tr>
+<tr class="memdesc:a5405b938acbe3d462e13610a4b4f5d72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the processing state of the active async request.  <br /></td></tr>
 <tr class="memitem:a4d9d2a20215938d7723d1d8117f94a22" id="r_a4d9d2a20215938d7723d1d8117f94a22"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4d9d2a20215938d7723d1d8117f94a22">init</a> (std::map&lt; uint8_t, String &gt; *roomMapping, std::map&lt; uint8_t, std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> * &gt; &gt; *deviceToRoomMappingList)</td></tr>
+<tr class="memdesc:a4d9d2a20215938d7723d1d8117f94a22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the handler with the room and device-to-room mapping tables.  <br /></td></tr>
 <tr class="memitem:a489f51899ac4e8266b9f78da524e7c27" id="r_a489f51899ac4e8266b9f78da524e7c27"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a489f51899ac4e8266b9f78da524e7c27">mainFunction</a> ()</td></tr>
+<tr class="memdesc:a489f51899ac4e8266b9f78da524e7c27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the handler main loop and advances the request state machine.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a5a8d207c1a037d215546f10b2ef92a0e" id="r_a5a8d207c1a037d215546f10b2ef92a0e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a5a8d207c1a037d215546f10b2ef92a0e">createDeviceConfigurationJson</a> ()</td></tr>
+<tr class="memdesc:a5a8d207c1a037d215546f10b2ef92a0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON containing the device configuration snapshot.  <br /></td></tr>
 <tr class="memitem:a42ddfd29a798d9a7fbf808d7efdc27ad" id="r_a42ddfd29a798d9a7fbf808d7efdc27ad"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a42ddfd29a798d9a7fbf808d7efdc27ad">createExtendedControls</a> ()</td></tr>
+<tr class="memdesc:a42ddfd29a798d9a7fbf808d7efdc27ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON containing the extended controls UI section.  <br /></td></tr>
 <tr class="memitem:a0d088a31eb802a9bc9638ae6067a059f" id="r_a0d088a31eb802a9bc9638ae6067a059f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0d088a31eb802a9bc9638ae6067a059f">createHashJson</a> ()</td></tr>
+<tr class="memdesc:a0d088a31eb802a9bc9638ae6067a059f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON describing the page hash used by the client to invalidate stale UI data.  <br /></td></tr>
 <tr class="memitem:aaee7f30cef737c09b85429f4c2e94696" id="r_aaee7f30cef737c09b85429f4c2e94696"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aaee7f30cef737c09b85429f4c2e94696">createJsonResponse</a> ()</td></tr>
+<tr class="memdesc:aaee7f30cef737c09b85429f4c2e94696"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the JSON payload that will be returned to the requester.  <br /></td></tr>
 <tr class="memitem:a2e24a40600b78e4c95ac0921243b0622" id="r_a2e24a40600b78e4c95ac0921243b0622"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2e24a40600b78e4c95ac0921243b0622">createMainPageContentJson</a> ()</td></tr>
+<tr class="memdesc:a2e24a40600b78e4c95ac0921243b0622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON representing the main page content.  <br /></td></tr>
 <tr class="memitem:a0e3af3cb858b6abf108236175a0be7f2" id="r_a0e3af3cb858b6abf108236175a0be7f2"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0e3af3cb858b6abf108236175a0be7f2">createNotificationCountJson</a> ()</td></tr>
+<tr class="memdesc:a0e3af3cb858b6abf108236175a0be7f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON containing the notification count used by the dashboard.  <br /></td></tr>
 <tr class="memitem:a7615383e133bce7378823edcc3c8602f" id="r_a7615383e133bce7378823edcc3c8602f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a7615383e133bce7378823edcc3c8602f">createNotificationListContentJson</a> ()</td></tr>
+<tr class="memdesc:a7615383e133bce7378823edcc3c8602f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON containing the notification list for the client.  <br /></td></tr>
 <tr class="memitem:a4e764c7d205e4ce159fe5c8603c9bc36" id="r_a4e764c7d205e4ce159fe5c8603c9bc36"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4e764c7d205e4ce159fe5c8603c9bc36">createRedirectToMainJson</a> ()</td></tr>
+<tr class="memdesc:a4e764c7d205e4ce159fe5c8603c9bc36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON redirecting the client back to the main page.  <br /></td></tr>
 <tr class="memitem:acab57e7dcf52fdfbcfa90ee88d1ac713" id="r_acab57e7dcf52fdfbcfa90ee88d1ac713"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#acab57e7dcf52fdfbcfa90ee88d1ac713">createServiceCall</a> ()</td></tr>
+<tr class="memdesc:acab57e7dcf52fdfbcfa90ee88d1ac713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produces a device-service call payload for async execution.  <br /></td></tr>
 <tr class="memitem:ad9da6b26f4cc2ee2e5c1b79623696922" id="r_ad9da6b26f4cc2ee2e5c1b79623696922"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad9da6b26f4cc2ee2e5c1b79623696922">createSystemDetailsJson</a> ()</td></tr>
+<tr class="memdesc:ad9da6b26f4cc2ee2e5c1b79623696922"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON exposing system details for UI display.  <br /></td></tr>
 <tr class="memitem:a66f7e1225a1a45c7a64756b166509d38" id="r_a66f7e1225a1a45c7a64756b166509d38"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a66f7e1225a1a45c7a64756b166509d38">currentRequestClear</a> ()</td></tr>
+<tr class="memdesc:a66f7e1225a1a45c7a64756b166509d38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the current request state after completion or cancellation.  <br /></td></tr>
 <tr class="memitem:a9d1e1821b9db4df178725603627947bc" id="r_a9d1e1821b9db4df178725603627947bc"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a9d1e1821b9db4df178725603627947bc">downloadAdvancedControls</a> ()</td></tr>
+<tr class="memdesc:a9d1e1821b9db4df178725603627947bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the advanced-control UI data for the front-end.  <br /></td></tr>
 <tr class="memitem:a657d0cb592740893a038734f6b919967" id="r_a657d0cb592740893a038734f6b919967"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a657d0cb592740893a038734f6b919967">processRequest</a> ()</td></tr>
+<tr class="memdesc:a657d0cb592740893a038734f6b919967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the active async request and prepares the response payload.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a622e23e608edbf4efd89e407d03f3ef4" id="r_a622e23e608edbf4efd89e407d03f3ef4"><td class="memItemLeft">static <a class="el" href="structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html">AsyncHttpRequest</a>&#160;</td><td class="memItemRight"><a class="el" href="#a622e23e608edbf4efd89e407d03f3ef4">currentRequest</a></td></tr>
+<tr class="memdesc:a622e23e608edbf4efd89e407d03f3ef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Active async request currently being processed by the handler.  <br /></td></tr>
 <tr class="memitem:a96ab01c5e3acea69b330d4b1868cbd27" id="r_a96ab01c5e3acea69b330d4b1868cbd27"><td class="memItemLeft">static std::map&lt; uint8_t, std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> * &gt; &gt; *&#160;</td><td class="memItemRight"><a class="el" href="#a96ab01c5e3acea69b330d4b1868cbd27">deviceToRoomMappingList_ptr</a> = nullptr</td></tr>
+<tr class="memdesc:a96ab01c5e3acea69b330d4b1868cbd27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device-to-room mapping list used by the async UI responses.  <br /></td></tr>
 <tr class="memitem:a9b9d23fa8e76e06429455a337a8b35e1" id="r_a9b9d23fa8e76e06429455a337a8b35e1"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#a9b9d23fa8e76e06429455a337a8b35e1">jsonResponse</a> = &quot;&quot;</td></tr>
+<tr class="memdesc:a9b9d23fa8e76e06429455a337a8b35e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON payload created for the asynchronous response.  <br /></td></tr>
 <tr class="memitem:ae87a1788848ae3c7d2aecf4596afb794" id="r_ae87a1788848ae3c7d2aecf4596afb794"><td class="memItemLeft">static std::map&lt; uint8_t, String &gt; *&#160;</td><td class="memItemRight"><a class="el" href="#ae87a1788848ae3c7d2aecf4596afb794">roomMapping_ptr</a> = nullptr</td></tr>
+<tr class="memdesc:ae87a1788848ae3c7d2aecf4596afb794"><td class="mdescLeft">&#160;</td><td class="mdescRight">Room-name mapping used while building UI replies.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the H T T P Async Request Handler behavior. </p>
+<div class="textblock"><p>Manages asynchronous page and device requests served by the HTTP UI layer. </p>
+<p>The handler stores the current request, decides which payload to generate, and returns the final JSON response used by the front-end to refresh the dashboard without forcing a full page reload. </p>
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00057">57</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">60</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a5a8d207c1a037d215546f10b2ef92a0e" name="a5a8d207c1a037d215546f10b2ef92a0e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5a8d207c1a037d215546f10b2ef92a0e">&#9670;&#160;</a></span>createDeviceConfigurationJson()</h2>
@@ -182,9 +206,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON containing the device configuration snapshot. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00442">442</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00091">CBK_GET_ROOMS_CFG_JSON</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, <a class="el" href="signals_8hpp_source.html#l00030">SIG_SET_CONFIG_VIA_JSON_STRING</a>, and <a class="el" href="signals_8hpp_source.html#l00082">SIG_SET_DEVICES_CONFIG_VIA_JSON</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00091">CBK_GET_ROOMS_CFG_JSON</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, <a class="el" href="signals_8hpp_source.html#l00030">SIG_SET_CONFIG_VIA_JSON_STRING</a>, and <a class="el" href="signals_8hpp_source.html#l00082">SIG_SET_DEVICES_CONFIG_VIA_JSON</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -213,9 +239,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON containing the extended controls UI section. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00453">453</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00639">AdvancedControlsLoader::getOutpuJavaScript()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00639">AdvancedControlsLoader::getOutpuJavaScript()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -244,9 +272,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON describing the page hash used by the client to invalidate stale UI data. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">237</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>.</p>
 
@@ -275,9 +305,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Generates the JSON payload that will be returned to the requester. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">463</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00047">ASYNC_DOWNLOAD_CONFIGURATION</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00049">ASYNC_GET_ADVANCED_CONTROLS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00044">ASYNC_GET_HASH</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00046">ASYNC_GET_NOTIFICATION_LIST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00043">ASYNC_GET_PAGE_CONTENT</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00045">ASYNC_GET_SYSTEM_DETAILS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00048">ASYNC_REDIRECT_TO_MAIN_PAGE</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00042">ASYNC_TYPE_DEVICE_SERVICE_CALL</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00442">createDeviceConfigurationJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00453">createExtendedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">createHashJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">createNotificationCountJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00416">createNotificationListContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00458">createRedirectToMainJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00398">createSystemDetailsJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00047">ASYNC_DOWNLOAD_CONFIGURATION</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00049">ASYNC_GET_ADVANCED_CONTROLS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00044">ASYNC_GET_HASH</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00046">ASYNC_GET_NOTIFICATION_LIST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00043">ASYNC_GET_PAGE_CONTENT</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00045">ASYNC_GET_SYSTEM_DETAILS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00048">ASYNC_REDIRECT_TO_MAIN_PAGE</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00042">ASYNC_TYPE_DEVICE_SERVICE_CALL</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00442">createDeviceConfigurationJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00453">createExtendedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">createHashJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">createNotificationCountJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00416">createNotificationListContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00458">createRedirectToMainJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00398">createSystemDetailsJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00521">getJsonResponse()</a>.</p>
 
@@ -306,9 +338,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON representing the main page content. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">273</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">createHashJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">createNotificationCountJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00079">deviceToRoomMappingList_ptr</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00227">getHexColor()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00075">type_DISTANCE_SENSOR</a>, <a class="el" href="device_8hpp_source.html#l00072">type_LED_STRIP</a>, <a class="el" href="device_8hpp_source.html#l00074">type_LED_STRIP_SEGMENTED</a>, and <a class="el" href="device_8hpp_source.html#l00073">type_TEMP_SENSOR</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">createHashJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">createNotificationCountJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00115">deviceToRoomMappingList_ptr</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00227">getHexColor()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00075">type_DISTANCE_SENSOR</a>, <a class="el" href="device_8hpp_source.html#l00072">type_LED_STRIP</a>, <a class="el" href="device_8hpp_source.html#l00074">type_LED_STRIP_SEGMENTED</a>, and <a class="el" href="device_8hpp_source.html#l00073">type_TEMP_SENSOR</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -337,9 +371,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON containing the notification count used by the dashboard. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">255</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>.</p>
 
@@ -368,9 +404,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON containing the notification list for the client. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00416">416</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00135">UserInterfaceNotification::toJson()</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00135">UserInterfaceNotification::toJson()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -399,9 +437,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON redirecting the client back to the main page. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00458">458</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -439,9 +479,20 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Queues a new async request for processing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">requestType</td><td>Type of asynchronous action to process. </td></tr>
+    <tr><td class="paramname">requestParamsPtr</td><td>Pointer to the related request parameters. </td></tr>
+    <tr><td class="paramname">paramsLength</td><td>Number of bytes in the parameter buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Result code describing whether the request was accepted. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">28</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00032">ASYNC_NO_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00026">e_HTTP_BUSY</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00024">e_HTTP_OK</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00015">MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00061">HTTPAsyncRequestHandler::AsyncHttpRequest::receivedTime</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00032">ASYNC_NO_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00026">e_HTTP_BUSY</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00024">e_HTTP_OK</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00015">MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00073">HTTPAsyncRequestHandler::AsyncHttpRequest::receivedTime</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="asyncHandlers_8cpp_source.html#l00482">HomeLightHttpServer::constantHandler_asyncGetNotifications()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00477">HomeLightHttpServer::constantHandler_asyncGetPageContent()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00454">HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00016">HomeLightHttpServer::parameterizedHandler_deviceSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00442">HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00417">HomeLightHttpServer::parameterizedHandler_getExtendedControls()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00412">HomeLightHttpServer::parameterizedHandler_getHash()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00382">HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00041">HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00232">HomeLightHttpServer::parameterizedHandler_roomStateChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00285">HomeLightHttpServer::parameterizedHandler_roomToggle()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00350">HomeLightHttpServer::parameterizedHandler_segmentStateSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00087">HomeLightHttpServer::parameterizedHandler_setStripColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00169">HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory()</a>, and <a class="el" href="asyncHandlers_8cpp_source.html#l00200">HomeLightHttpServer::parameterizedHandler_stripSaveCurrent()</a>.</p>
 
@@ -470,9 +521,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Produces a device-service call payload for async execution. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">69</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00170">ServiceParameters_set3::additionalParam</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="device_8hpp_source.html#l00166">ServiceParameters_set3::buff</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00010">DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00013">DYNAMIC_REQUEST_ADDITIONAL_PARAM_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00012">DYNAMIC_REQUEST_DIRECTION_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00011">DYNAMIC_REQUEST_MEMORY_LENGTH_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00014">DYNAMIC_REQUEST_START_OF_DATA_IDX</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="device_8hpp_source.html#l00016">SERVICE_NAME_INDEX</a>, <a class="el" href="device_8hpp_source.html#l00015">SERVICE_OVERLOADING_FUNCTION_INDEX</a>, <a class="el" href="device_8hpp_source.html#l00024">serviceCall_1</a>, <a class="el" href="device_8hpp_source.html#l00025">serviceCall_2</a>, <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>, <a class="el" href="device_8hpp_source.html#l00023">serviceCall_NoParams</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, <a class="el" href="device_8hpp_source.html#l00168">ServiceParameters_set3::size</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00170">ServiceParameters_set3::additionalParam</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="device_8hpp_source.html#l00166">ServiceParameters_set3::buff</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00010">DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00013">DYNAMIC_REQUEST_ADDITIONAL_PARAM_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00012">DYNAMIC_REQUEST_DIRECTION_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00011">DYNAMIC_REQUEST_MEMORY_LENGTH_IDX</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00014">DYNAMIC_REQUEST_START_OF_DATA_IDX</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="device_8hpp_source.html#l00016">SERVICE_NAME_INDEX</a>, <a class="el" href="device_8hpp_source.html#l00015">SERVICE_OVERLOADING_FUNCTION_INDEX</a>, <a class="el" href="device_8hpp_source.html#l00024">serviceCall_1</a>, <a class="el" href="device_8hpp_source.html#l00025">serviceCall_2</a>, <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>, <a class="el" href="device_8hpp_source.html#l00023">serviceCall_NoParams</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, <a class="el" href="device_8hpp_source.html#l00168">ServiceParameters_set3::size</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">processRequest()</a>.</p>
 
@@ -501,9 +554,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates JSON exposing system details for UI display. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00398">398</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00093">CBK_DISPLAY_RAM_USAGE</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00192">ServiceInformation::coreTemperature</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00190">ServiceInformation::ramFree</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00093">CBK_DISPLAY_RAM_USAGE</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00192">ServiceInformation::coreTemperature</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00190">ServiceInformation::ramFree</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>.</p>
 
@@ -532,9 +587,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Clears the current request state after completion or cancellation. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">60</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00032">ASYNC_NO_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00015">MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00061">HTTPAsyncRequestHandler::AsyncHttpRequest::receivedTime</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00032">ASYNC_NO_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00015">MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00073">HTTPAsyncRequestHandler::AsyncHttpRequest::receivedTime</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00521">getJsonResponse()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00016">init()</a>.</p>
 
@@ -563,9 +620,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Downloads the advanced-control UI data for the front-end. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">147</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">AdvancedControlsLoader::loadAdvancedControlsToJavaScript()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00041">ASYNC_TYPE_INVALID</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">AdvancedControlsLoader::loadAdvancedControlsToJavaScript()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">HTTPAsyncRequestHandler::AsyncHttpRequest::requestData</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">processRequest()</a>.</p>
 
@@ -594,9 +653,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the JSON response prepared by the async request handler. </p>
+<dl class="section return"><dt>Returns</dt><dd>Completed JSON payload ready to send to the client. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00521">521</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">currentRequestClear()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">jsonResponse</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">currentRequestClear()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">jsonResponse</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00134">HomeLightHttpServer::cyclic()</a>.</p>
 
@@ -625,9 +687,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the processing state of the active async request. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current request state. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00181">181</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00134">HomeLightHttpServer::cyclic()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00527">HomeLightHttpServer::handleClientRequest()</a>.</p>
 
@@ -660,9 +725,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the handler with the room and device-to-room mapping tables. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">roomMapping</td><td>Pointer to the room-name mapping table. </td></tr>
+    <tr><td class="paramname">deviceToRoomMappingList</td><td>Pointer to the device-room assignment table. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00016">16</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00079">deviceToRoomMappingList_ptr</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">roomMapping_ptr</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00115">deviceToRoomMappingList_ptr</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00110">roomMapping_ptr</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00222">HomeLightHttpServer::init()</a>.</p>
 
@@ -691,9 +765,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Runs the handler main loop and advances the request state machine. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00511">511</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">processRequest()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00034">ASYNC_REQUEST_PROCESSING</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">processRequest()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00134">HomeLightHttpServer::cyclic()</a>.</p>
 
@@ -722,9 +798,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Executes the active async request and prepares the response payload. </p>
+
 <p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">186</a> of file <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html">HttpAsyncRequestHandler.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00047">ASYNC_DOWNLOAD_CONFIGURATION</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00049">ASYNC_GET_ADVANCED_CONTROLS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00044">ASYNC_GET_HASH</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00046">ASYNC_GET_NOTIFICATION_LIST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00043">ASYNC_GET_PAGE_CONTENT</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00045">ASYNC_GET_SYSTEM_DETAILS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00048">ASYNC_REDIRECT_TO_MAIN_PAGE</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00042">ASYNC_TYPE_DEVICE_SERVICE_CALL</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
+<p class="reference">References <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00047">ASYNC_DOWNLOAD_CONFIGURATION</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00049">ASYNC_GET_ADVANCED_CONTROLS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00044">ASYNC_GET_HASH</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00046">ASYNC_GET_NOTIFICATION_LIST</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00043">ASYNC_GET_PAGE_CONTENT</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00045">ASYNC_GET_SYSTEM_DETAILS</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00048">ASYNC_REDIRECT_TO_MAIN_PAGE</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00035">ASYNC_REQUEST_COMPLETED</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00042">ASYNC_TYPE_DEVICE_SERVICE_CALL</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">currentRequest</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">HTTPAsyncRequestHandler::AsyncHttpRequest::state</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">HTTPAsyncRequestHandler::AsyncHttpRequest::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00511">mainFunction()</a>.</p>
 
@@ -751,7 +829,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00076">76</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Active async request currently being processed by the handler. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00100">100</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00181">getProcessingState()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00511">mainFunction()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">processRequest()</a>.</p>
 
@@ -777,7 +857,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00079">79</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Device-to-room mapping list used by the async UI responses. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00115">115</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00016">init()</a>.</p>
 
@@ -803,7 +885,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00077">77</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>JSON payload created for the asynchronous response. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00105">105</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00442">createDeviceConfigurationJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00453">createExtendedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00237">createHashJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00273">createMainPageContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00255">createNotificationCountJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00416">createNotificationListContentJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00458">createRedirectToMainJson()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00398">createSystemDetailsJson()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00521">getJsonResponse()</a>.</p>
 
@@ -829,7 +913,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">78</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Room-name mapping used while building UI replies. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00110">110</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00016">init()</a>.</p>
 

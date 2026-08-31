@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/tools/udpAdapter.cpp
- * @brief Utility implementations used by the Home Control Station OS.
+ * @brief UDP adapter: send/receive MessageUDP packets and deliver to registered callbacks.
  */
 
 

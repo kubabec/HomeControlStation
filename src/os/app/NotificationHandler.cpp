@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/app/NotificationHandler.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief Notification dispatch: stores and exposes UI notifications for display and retrieval.
  */
 
 

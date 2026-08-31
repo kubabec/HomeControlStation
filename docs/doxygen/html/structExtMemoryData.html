@@ -114,21 +114,29 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structExtMemor
 </div><!--header-->
 <div class="contents">
 
+<p>Runtime information describing a single extended-memory allocation owned by a device.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad5ea518767d4f8f1327727021c6b14ec" id="r_ad5ea518767d4f8f1327727021c6b14ec"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad5ea518767d4f8f1327727021c6b14ec">printExtMem</a> ()</td></tr>
+<tr class="memdesc:ad5ea518767d4f8f1327727021c6b14ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs the current allocation metadata for debugging.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a489ce682689d03cfb2e2577a645f1af4" id="r_a489ce682689d03cfb2e2577a645f1af4"><td class="memItemLeft">uint8_t *&#160;</td><td class="memItemRight"><a class="el" href="#a489ce682689d03cfb2e2577a645f1af4">dataPtr</a> = nullptr</td></tr>
+<tr class="memdesc:a489ce682689d03cfb2e2577a645f1af4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the memory region associated with the device payload.  <br /></td></tr>
 <tr class="memitem:aeb060d85bfd140b09e687257dc4c256a" id="r_aeb060d85bfd140b09e687257dc4c256a"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#aeb060d85bfd140b09e687257dc4c256a">length</a> = 0</td></tr>
+<tr class="memdesc:aeb060d85bfd140b09e687257dc4c256a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bytes currently assigned to this allocation.  <br /></td></tr>
 <tr class="memitem:a7ad15b23e3e5052898c958dc0b4fb580" id="r_a7ad15b23e3e5052898c958dc0b4fb580"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a7ad15b23e3e5052898c958dc0b4fb580">ownerDeviceId</a> = 0xff</td></tr>
+<tr class="memdesc:a7ad15b23e3e5052898c958dc0b4fb580"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier that owns the allocation.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00027">27</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<div class="textblock"><p>Runtime information describing a single extended-memory allocation owned by a device. </p>
+
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00039">39</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="ad5ea518767d4f8f1327727021c6b14ec" name="ad5ea518767d4f8f1327727021c6b14ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad5ea518767d4f8f1327727021c6b14ec">&#9670;&#160;</a></span>printExtMem()</h2>
@@ -153,9 +161,11 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00032">32</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Logs the current allocation metadata for debugging. </p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00030">dataPtr</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00029">length</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00028">ownerDeviceId</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00058">58</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00053">dataPtr</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00048">length</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00043">ownerDeviceId</a>.</p>
 
 </div>
 </div>
@@ -172,9 +182,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00030">30</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Pointer to the memory region associated with the device payload. </p>
 
-<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00032">printExtMem()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00053">53</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00058">printExtMem()</a>.</p>
 
 </div>
 </div>
@@ -190,9 +202,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00029">29</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Number of bytes currently assigned to this allocation. </p>
 
-<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00032">printExtMem()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">ExtendedMemoryManager::restoreExtMemoryFromNvm()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00048">48</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00058">printExtMem()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">ExtendedMemoryManager::restoreExtMemoryFromNvm()</a>.</p>
 
 </div>
 </div>
@@ -208,9 +222,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00028">28</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier that owns the allocation. </p>
 
-<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00032">printExtMem()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00043">43</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00058">printExtMem()</a>.</p>
 
 </div>
 </div>

@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classExtendedM
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Extended Memory Manager behavior.  
+<p>Allocates and tracks extra memory used for large device payloads or extended runtime data.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>&gt;</code></p>
@@ -122,29 +122,42 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classExtendedM
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a70105d1322ddfcfa46df85d67b23d54a" id="r_a70105d1322ddfcfa46df85d67b23d54a"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a70105d1322ddfcfa46df85d67b23d54a">cyclic</a> ()</td></tr>
+<tr class="memdesc:a70105d1322ddfcfa46df85d67b23d54a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs periodic maintenance for the allocator and its persisted state.  <br /></td></tr>
 <tr class="memitem:a0ef56432f37b016862175043290205e1" id="r_a0ef56432f37b016862175043290205e1"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0ef56432f37b016862175043290205e1">deinit</a> ()</td></tr>
+<tr class="memdesc:a0ef56432f37b016862175043290205e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases runtime resources attached to the extended-memory manager.  <br /></td></tr>
 <tr class="memitem:a5ad3a023d9b7d77499ba4b7f4253029a" id="r_a5ad3a023d9b7d77499ba4b7f4253029a"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a5ad3a023d9b7d77499ba4b7f4253029a">flushNvmData</a> ()</td></tr>
+<tr class="memdesc:a5ad3a023d9b7d77499ba4b7f4253029a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes the current memory metadata back to the persistent store.  <br /></td></tr>
 <tr class="memitem:aac99a3bf956fe7817c39bb7dc514ce13" id="r_aac99a3bf956fe7817c39bb7dc514ce13"><td class="memItemLeft">static uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#aac99a3bf956fe7817c39bb7dc514ce13">getCurrentMemoryUsage</a> ()</td></tr>
+<tr class="memdesc:aac99a3bf956fe7817c39bb7dc514ce13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of bytes currently used by all allocations.  <br /></td></tr>
 <tr class="memitem:ab4dc1cb4b7a68259b29983bc5ceaf43c" id="r_ab4dc1cb4b7a68259b29983bc5ceaf43c"><td class="memItemLeft">static uint8_t *&#160;</td><td class="memItemRight"><a class="el" href="#ab4dc1cb4b7a68259b29983bc5ceaf43c">getExtMemoryPtrByDeviceId</a> (uint8_t deviceId, uint16_t *extMemoryLengthPtr)</td></tr>
+<tr class="memdesc:ab4dc1cb4b7a68259b29983bc5ceaf43c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pointer to the extended-memory region associated with a device.  <br /></td></tr>
 <tr class="memitem:ad5d13a0f1be388ed35b87a3547dfbcfd" id="r_ad5d13a0f1be388ed35b87a3547dfbcfd"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad5d13a0f1be388ed35b87a3547dfbcfd">init</a> ()</td></tr>
+<tr class="memdesc:ad5d13a0f1be388ed35b87a3547dfbcfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the allocation tracker and restores the persisted metadata.  <br /></td></tr>
 <tr class="memitem:afcb444fbec673cc2edb4b12109caf732" id="r_afcb444fbec673cc2edb4b12109caf732"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#afcb444fbec673cc2edb4b12109caf732">releaseExtendedMemorySpace</a> (uint8_t deviceId)</td></tr>
+<tr class="memdesc:afcb444fbec673cc2edb4b12109caf732"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the extended-memory block associated with the given device.  <br /></td></tr>
 <tr class="memitem:ab94743fdbe8cbf9c8f68461798b51736" id="r_ab94743fdbe8cbf9c8f68461798b51736"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#ab94743fdbe8cbf9c8f68461798b51736">requestNewExtendedMemorySpace</a> (uint8_t deviceId, uint16_t spaceSize)</td></tr>
+<tr class="memdesc:ab94743fdbe8cbf9c8f68461798b51736"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates a memory block for the given device and required size.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a419119bc998961e7db3bd28b39b9478f" id="r_a419119bc998961e7db3bd28b39b9478f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a419119bc998961e7db3bd28b39b9478f">restoreExtMemoryFromNvm</a> ()</td></tr>
+<tr class="memdesc:a419119bc998961e7db3bd28b39b9478f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores the extended-memory allocation state from NVM at startup.  <br /></td></tr>
 <tr class="memitem:a7753cb2efe48d4535339afc6f8cf8815" id="r_a7753cb2efe48d4535339afc6f8cf8815"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage</a> ()</td></tr>
+<tr class="memdesc:a7753cb2efe48d4535339afc6f8cf8815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recalculates the current memory usage based on the active allocation container.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a6f8879e45a97e2a8f43db3389f6b191f" id="r_a6f8879e45a97e2a8f43db3389f6b191f"><td class="memItemLeft">static std::vector&lt; <a class="el" href="structExtMemoryData.html">ExtMemoryData</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a6f8879e45a97e2a8f43db3389f6b191f">extMemoryContainer</a></td></tr>
+<tr class="memdesc:a6f8879e45a97e2a8f43db3389f6b191f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runtime container holding the active extended-memory allocations.  <br /></td></tr>
 <tr class="memitem:a93dc1e595b765c5209068ba00db1d538" id="r_a93dc1e595b765c5209068ba00db1d538"><td class="memItemLeft">static uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#a93dc1e595b765c5209068ba00db1d538">extMemoryInUse</a></td></tr>
+<tr class="memdesc:a93dc1e595b765c5209068ba00db1d538"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total amount of extended memory currently in use across all device slots.  <br /></td></tr>
 <tr class="memitem:abad9d8990a0658bece7abba03fe0abb1" id="r_abad9d8990a0658bece7abba03fe0abb1"><td class="memItemLeft">static <a class="el" href="structExtMemoryMetadataType.html">ExtMemoryMetadataType</a>&#160;</td><td class="memItemRight"><a class="el" href="#abad9d8990a0658bece7abba03fe0abb1">extMemoryMetadata</a></td></tr>
+<tr class="memdesc:abad9d8990a0658bece7abba03fe0abb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metadata describing how much extra memory each device has reserved.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Extended Memory Manager behavior. </p>
+<div class="textblock"><p>Allocates and tracks extra memory used for large device payloads or extended runtime data. </p>
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00044">44</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00069">69</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a70105d1322ddfcfa46df85d67b23d54a" name="a70105d1322ddfcfa46df85d67b23d54a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a70105d1322ddfcfa46df85d67b23d54a">&#9670;&#160;</a></span>cyclic()</h2>
@@ -168,6 +181,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Runs periodic maintenance for the allocator and its persisted state. </p>
 
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00060">60</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
@@ -197,6 +212,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Releases runtime resources attached to the extended-memory manager. </p>
 
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00099">99</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
@@ -229,9 +246,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Flushes the current memory metadata back to the persistent store. </p>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00064">64</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00036">CBK_SET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00058">e_BLOCK_EXT_MEMORY_METADATA</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00047">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">extMemoryMetadata</a>, <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00181">PersistentMemoryAccess::flushExtendedMemory()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00173">PersistentMemoryAccess::writeExtendedMemory()</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00036">CBK_SET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00058">e_BLOCK_EXT_MEMORY_METADATA</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00083">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">extMemoryMetadata</a>, <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00181">PersistentMemoryAccess::flushExtendedMemory()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00173">PersistentMemoryAccess::writeExtendedMemory()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00099">deinit()</a>, <a class="el" href="HomeStation__os_8cpp_source.html#l00256">OperatingSystem::saveNvmData()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -260,9 +279,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the total number of bytes currently used by all allocations. </p>
+<dl class="section return"><dt>Returns</dt><dd>Present extended-memory usage in bytes. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00190">190</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00046">extMemoryInUse</a>.</p>
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00078">extMemoryInUse</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -295,9 +317,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the pointer to the extended-memory region associated with a device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier to query. </td></tr>
+    <tr><td class="paramname">extMemoryLengthPtr</td><td>Output pointer receiving the size of the returned memory block. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the raw buffer or nullptr when no allocation exists. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00171">171</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00047">extMemoryContainer</a>.</p>
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00083">extMemoryContainer</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -326,9 +358,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the allocation tracker and restores the persisted metadata. </p>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">17</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00058">e_BLOCK_EXT_MEMORY_METADATA</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00047">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00046">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">extMemoryMetadata</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00113">ExtendedMemoryCtrlAPI::getCurrentMemoryUsage</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00190">getCurrentMemoryUsage()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00112">ExtendedMemoryCtrlAPI::getExtMemoryPtrByDeviceId</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00171">getExtMemoryPtrByDeviceId()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00020">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00111">ExtendedMemoryCtrlAPI::releaseExtendedMemorySpace</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00163">releaseExtendedMemorySpace()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00110">ExtendedMemoryCtrlAPI::requestNewExtendedMemorySpace</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">requestNewExtendedMemorySpace()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00080">SIG_EXT_MEM_CTRL_API</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00010">SLOTS_FOR_EXT_MEMORY_BUFFERS</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00058">e_BLOCK_EXT_MEMORY_METADATA</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00083">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00078">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">extMemoryMetadata</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00113">ExtendedMemoryCtrlAPI::getCurrentMemoryUsage</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00190">getCurrentMemoryUsage()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00112">ExtendedMemoryCtrlAPI::getExtMemoryPtrByDeviceId</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00171">getExtMemoryPtrByDeviceId()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00026">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00111">ExtendedMemoryCtrlAPI::releaseExtendedMemorySpace</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00163">releaseExtendedMemorySpace()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00110">ExtendedMemoryCtrlAPI::requestNewExtendedMemorySpace</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">requestNewExtendedMemorySpace()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00080">SIG_EXT_MEM_CTRL_API</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00010">SLOTS_FOR_EXT_MEMORY_BUFFERS</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -357,9 +391,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Frees the extended-memory block associated with the given device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier whose memory should be released. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00163">163</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">extMemoryMetadata</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00020">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>.</p>
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">extMemoryMetadata</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00026">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -392,9 +434,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Allocates a memory block for the given device and required size. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier requesting the allocation. </td></tr>
+    <tr><td class="paramname">spaceSize</td><td>Number of bytes required by the device payload. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when memory was reserved successfully; false when the request exceeds available space. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">144</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00046">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">extMemoryMetadata</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00009">MAX_EXT_MEMORY_SIZE_TOTAL</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00020">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>.</p>
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00078">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">extMemoryMetadata</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00009">MAX_EXT_MEMORY_SIZE_TOTAL</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00026">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -423,9 +475,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Restores the extended-memory allocation state from NVM at startup. </p>
+
 <p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">104</a> of file <a class="el" href="ExtendedMemoryManager_8cpp_source.html">ExtendedMemoryManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00047">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00046">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">extMemoryMetadata</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00029">ExtMemoryData::length</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00020">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>, <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00150">PersistentMemoryAccess::readExtendedMemoryWithOffset()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00010">SLOTS_FOR_EXT_MEMORY_BUFFERS</a>.</p>
+<p class="reference">References <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00083">extMemoryContainer</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00078">extMemoryInUse</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">extMemoryMetadata</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00048">ExtMemoryData::length</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00026">ExtMemoryMetadataType::memoryPerDeviceSlotNeeded</a>, <a class="el" href="persistentMemoryAccess_8cpp_source.html#l00150">PersistentMemoryAccess::readExtendedMemoryWithOffset()</a>, and <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00010">SLOTS_FOR_EXT_MEMORY_BUFFERS</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="#a7753cb2efe48d4535339afc6f8cf8815">updateCurrentExtMemoryUsage()</a>.</p>
 
@@ -454,6 +508,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Recalculates the current memory usage based on the active allocation container. </p>
+
 <p class="reference">References <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00060">cyclic()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00099">deinit()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00064">flushNvmData()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00190">getCurrentMemoryUsage()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00171">getExtMemoryPtrByDeviceId()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00163">releaseExtendedMemorySpace()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">requestNewExtendedMemorySpace()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>.</p>
 
 </div>
@@ -479,7 +535,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00047">47</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Runtime container holding the active extended-memory allocations. </p>
+
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00083">83</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00064">flushNvmData()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00171">getExtMemoryPtrByDeviceId()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>.</p>
 
@@ -505,7 +563,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00046">46</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Total amount of extended memory currently in use across all device slots. </p>
+
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00078">78</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00190">getCurrentMemoryUsage()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">requestNewExtendedMemorySpace()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>.</p>
 
@@ -531,7 +591,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00045">45</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
+<p>Metadata describing how much extra memory each device has reserved. </p>
+
+<p class="definition">Definition at line <a class="el" href="ExtendedMemoryManager_8hpp_source.html#l00073">73</a> of file <a class="el" href="ExtendedMemoryManager_8hpp_source.html">ExtendedMemoryManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00064">flushNvmData()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00017">init()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00163">releaseExtendedMemorySpace()</a>, <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00144">requestNewExtendedMemorySpace()</a>, and <a class="el" href="ExtendedMemoryManager_8cpp_source.html#l00104">restoreExtMemoryFromNvm()</a>.</p>
 

@@ -4,6 +4,7 @@ var searchData=
   ['extendeddataallocator_1',['ExtendedDataAllocator',['../classExtendedDataAllocator.html',1,'']]],
   ['extendedmemoryctrlapi_2',['ExtendedMemoryCtrlAPI',['../structExtendedMemoryCtrlAPI.html',1,'']]],
   ['extendedmemorymanager_3',['ExtendedMemoryManager',['../classExtendedMemoryManager.html',1,'']]],
-  ['extmemorydata_4',['ExtMemoryData',['../structExtMemoryData.html',1,'']]],
-  ['extmemorymetadatatype_5',['ExtMemoryMetadataType',['../structExtMemoryMetadataType.html',1,'']]]
+  ['externalnodemapping_4',['ExternalNodeMapping',['../structExternalNodeMapping.html',1,'']]],
+  ['extmemorydata_5',['ExtMemoryData',['../structExtMemoryData.html',1,'']]],
+  ['extmemorymetadatatype_6',['ExtMemoryMetadataType',['../structExtMemoryMetadataType.html',1,'']]]
 ];

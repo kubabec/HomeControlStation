@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classUDPAdapte
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the U D P Adapter behavior.  
+<p>Handles raw UDP traffic and forwards incoming frames to registered callbacks.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>&gt;</code></p>
@@ -122,23 +122,34 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classUDPAdapte
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a0e05820ab1066fc9ed422400d23094e1" id="r_a0e05820ab1066fc9ed422400d23094e1"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0e05820ab1066fc9ed422400d23094e1">init</a> ()</td></tr>
+<tr class="memdesc:a0e05820ab1066fc9ed422400d23094e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the UDP socket and configures the network listener.  <br /></td></tr>
 <tr class="memitem:a2e3a79d42cb5f2746fd7da9c9a76e1ce" id="r_a2e3a79d42cb5f2746fd7da9c9a76e1ce"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2e3a79d42cb5f2746fd7da9c9a76e1ce">registerOnUdpReceiveCallback</a> (std::function&lt; void(<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;)&gt; callback)</td></tr>
+<tr class="memdesc:a2e3a79d42cb5f2746fd7da9c9a76e1ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a callback that will receive incoming UDP messages.  <br /></td></tr>
 <tr class="memitem:aecd129cc8a41f927fd958acb22c6a63d" id="r_aecd129cc8a41f927fd958acb22c6a63d"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#aecd129cc8a41f927fd958acb22c6a63d">send</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;msg)</td></tr>
+<tr class="memdesc:aecd129cc8a41f927fd958acb22c6a63d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a <a class="el" href="classMessageUDP.html" title="Wraps a UDP payload together with routing metadata needed by the Home Control Station.">MessageUDP</a> packet over the current network interface.  <br /></td></tr>
 <tr class="memitem:a833b046673259f0424526b5e0e4ca4f5" id="r_a833b046673259f0424526b5e0e4ca4f5"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a833b046673259f0424526b5e0e4ca4f5">sendingAllowed</a> ()</td></tr>
+<tr class="memdesc:a833b046673259f0424526b5e0e4ca4f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the send-rate limiter allows another transmission.  <br /></td></tr>
 <tr class="memitem:a64878880e301e861adcc9251ad8eb83f" id="r_a64878880e301e861adcc9251ad8eb83f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a64878880e301e861adcc9251ad8eb83f">task</a> ()</td></tr>
+<tr class="memdesc:a64878880e301e861adcc9251ad8eb83f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the periodic UDP maintenance loop and checks for incoming packets.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a6c901725cd612c9ec1b21a11374ff2a4" id="r_a6c901725cd612c9ec1b21a11374ff2a4"><td class="memItemLeft">static const char *&#160;</td><td class="memItemRight"><a class="el" href="#a6c901725cd612c9ec1b21a11374ff2a4">broadcastIP</a> = &quot;192.168.1.255&quot;</td></tr>
+<tr class="memdesc:a6c901725cd612c9ec1b21a11374ff2a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Broadcast address used for LAN-wide delivery.  <br /></td></tr>
 <tr class="memitem:a05b0b4f97357e129ff06598590c65f9c" id="r_a05b0b4f97357e129ff06598590c65f9c"><td class="memItemLeft">static long&#160;</td><td class="memItemRight"><a class="el" href="#a05b0b4f97357e129ff06598590c65f9c">lastSendTime</a> = 0</td></tr>
+<tr class="memdesc:a05b0b4f97357e129ff06598590c65f9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp of the last outbound transmission used to throttle flooding.  <br /></td></tr>
 <tr class="memitem:a9d4ba8fca1e8259682e4301cd5c118e0" id="r_a9d4ba8fca1e8259682e4301cd5c118e0"><td class="memItemLeft">static std::function&lt; void(<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;)&gt;&#160;</td><td class="memItemRight"><a class="el" href="#a9d4ba8fca1e8259682e4301cd5c118e0">onReceiveCallback</a></td></tr>
+<tr class="memdesc:a9d4ba8fca1e8259682e4301cd5c118e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback invoked when a UDP message is received by the adapter.  <br /></td></tr>
 <tr class="memitem:ac31d1eef34cc2119a1e7ce0fe8aef666" id="r_ac31d1eef34cc2119a1e7ce0fe8aef666"><td class="memItemLeft">static const unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#ac31d1eef34cc2119a1e7ce0fe8aef666">senderPort</a> = 9001</td></tr>
+<tr class="memdesc:ac31d1eef34cc2119a1e7ce0fe8aef666"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local port used by the sender socket.  <br /></td></tr>
 <tr class="memitem:a158cfbb56282c0176c6c72f3e016ac0e" id="r_a158cfbb56282c0176c6c72f3e016ac0e"><td class="memItemLeft">static WiFiUDP&#160;</td><td class="memItemRight"><a class="el" href="#a158cfbb56282c0176c6c72f3e016ac0e">udp</a></td></tr>
+<tr class="memdesc:a158cfbb56282c0176c6c72f3e016ac0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">WiFiUDP socket instance used by the adapter.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the U D P Adapter behavior. </p>
+<div class="textblock"><p>Handles raw UDP traffic and forwards incoming frames to registered callbacks. </p>
+<p>The adapter exposes a simple send/receive API above the WiFiUDP socket so the other OS components can exchange messages without managing socket details directly. </p>
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00012">12</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00015">15</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a0e05820ab1066fc9ed422400d23094e1" name="a0e05820ab1066fc9ed422400d23094e1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e05820ab1066fc9ed422400d23094e1">&#9670;&#160;</a></span>init()</h2>
@@ -163,9 +174,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the UDP socket and configures the network listener. </p>
+
 <p class="definition">Definition at line <a class="el" href="udpAdapter_8cpp_source.html#l00016">16</a> of file <a class="el" href="udpAdapter_8cpp_source.html">udpAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00017">udp</a>.</p>
+<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00030">udp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>.</p>
 
@@ -194,9 +207,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Registers a callback that will receive incoming UDP messages. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Function called for each received packet. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="udpAdapter_8cpp_source.html#l00122">122</a> of file <a class="el" href="udpAdapter_8cpp_source.html">udpAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00020">onReceiveCallback</a>.</p>
+<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00040">onReceiveCallback</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>.</p>
 
@@ -225,9 +246,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a <a class="el" href="classMessageUDP.html" title="Wraps a UDP payload together with routing metadata needed by the Home Control Station.">MessageUDP</a> packet over the current network interface. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>Message to transmit. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the packet was queued or sent successfully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="udpAdapter_8cpp_source.html#l00071">71</a> of file <a class="el" href="udpAdapter_8cpp_source.html">udpAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00349">MessageUDP::getIPAddress()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00344">MessageUDP::getPort()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00143">MessageUDP::getSize()</a>, <a class="el" href="udpAdapter_8hpp_source.html#l00018">lastSendTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00021">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00022">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00023">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00024">MessageUDP::IPAddr::octet4</a>, <a class="el" href="messageUDP_8cpp_source.html#l00156">MessageUDP::toByteArray()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00039">MessageUDP::IPAddr::toString()</a>, and <a class="el" href="udpAdapter_8hpp_source.html#l00017">udp</a>.</p>
+<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00349">MessageUDP::getIPAddress()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00344">MessageUDP::getPort()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00143">MessageUDP::getSize()</a>, <a class="el" href="udpAdapter_8hpp_source.html#l00035">lastSendTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00027">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00042">MessageUDP::IPAddr::octet4</a>, <a class="el" href="messageUDP_8cpp_source.html#l00156">MessageUDP::toByteArray()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00066">MessageUDP::IPAddr::toString()</a>, and <a class="el" href="udpAdapter_8hpp_source.html#l00030">udp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00149">NetworkDriver::cyclic()</a>.</p>
 
@@ -256,9 +286,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether the send-rate limiter allows another transmission. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when a packet can be sent now; false when the rate limit blocks it. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="udpAdapter_8cpp_source.html#l00021">21</a> of file <a class="el" href="udpAdapter_8cpp_source.html">udpAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00018">lastSendTime</a>.</p>
+<p class="reference">References <a class="el" href="udpAdapter_8hpp_source.html#l00035">lastSendTime</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00149">NetworkDriver::cyclic()</a>.</p>
 
@@ -287,9 +320,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Performs the periodic UDP maintenance loop and checks for incoming packets. </p>
+
 <p class="definition">Definition at line <a class="el" href="udpAdapter_8cpp_source.html#l00035">35</a> of file <a class="el" href="udpAdapter_8cpp_source.html">udpAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00185">MessageUDP::fromUint8Vector()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00149">MessageUDP::isValid()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="udpAdapter_8hpp_source.html#l00020">onReceiveCallback</a>, <a class="el" href="messageUDP_8cpp_source.html#l00044">MessageUDP::setIpAddress()</a>, and <a class="el" href="udpAdapter_8hpp_source.html#l00017">udp</a>.</p>
+<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00185">MessageUDP::fromUint8Vector()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00149">MessageUDP::isValid()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="udpAdapter_8hpp_source.html#l00040">onReceiveCallback</a>, <a class="el" href="messageUDP_8cpp_source.html#l00044">MessageUDP::setIpAddress()</a>, and <a class="el" href="udpAdapter_8hpp_source.html#l00030">udp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00149">NetworkDriver::cyclic()</a>.</p>
 
@@ -316,7 +351,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00016">16</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p>Broadcast address used for LAN-wide delivery. </p>
+
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00025">25</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +377,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00018">18</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p>Timestamp of the last outbound transmission used to throttle flooding. </p>
+
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00035">35</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="udpAdapter_8cpp_source.html#l00071">send()</a>, and <a class="el" href="udpAdapter_8cpp_source.html#l00021">sendingAllowed()</a>.</p>
 
@@ -366,7 +405,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00020">20</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p>Callback invoked when a UDP message is received by the adapter. </p>
+
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00040">40</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="udpAdapter_8cpp_source.html#l00122">registerOnUdpReceiveCallback()</a>, and <a class="el" href="udpAdapter_8cpp_source.html#l00035">task()</a>.</p>
 
@@ -392,7 +433,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00015">15</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p>Local port used by the sender socket. </p>
+
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00020">20</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +459,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00017">17</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
+<p>WiFiUDP socket instance used by the adapter. </p>
+
+<p class="definition">Definition at line <a class="el" href="udpAdapter_8hpp_source.html#l00030">30</a> of file <a class="el" href="udpAdapter_8hpp_source.html">udpAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="udpAdapter_8cpp_source.html#l00016">init()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">send()</a>, and <a class="el" href="udpAdapter_8cpp_source.html#l00035">task()</a>.</p>
 

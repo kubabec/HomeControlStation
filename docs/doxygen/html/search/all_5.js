@@ -85,10 +85,11 @@ var searchData=
   ['extendedmemorymanager_2ecpp_82',['ExtendedMemoryManager.cpp',['../ExtendedMemoryManager_8cpp.html',1,'']]],
   ['extendedmemorymanager_2ehpp_83',['ExtendedMemoryManager.hpp',['../ExtendedMemoryManager_8hpp.html',1,'']]],
   ['extendedmemorypointer_84',['extendedMemoryPointer',['../classLedWS1228bDeviceType.html#ac3e9f0f1a424775e6003442b244b3b33',1,'LedWS1228bDeviceType::extendedMemoryPointer'],['../classSegLedWS1228bDeviceType.html#ae9934ed1afb7875519c006e7b429568f',1,'SegLedWS1228bDeviceType::extendedMemoryPointer']]],
-  ['extmemorycontainer_85',['extMemoryContainer',['../classExtendedMemoryManager.html#a6f8879e45a97e2a8f43db3389f6b191f',1,'ExtendedMemoryManager']]],
-  ['extmemorydata_86',['ExtMemoryData',['../structExtMemoryData.html',1,'']]],
-  ['extmemoryinuse_87',['extMemoryInUse',['../classExtendedMemoryManager.html#a93dc1e595b765c5209068ba00db1d538',1,'ExtendedMemoryManager']]],
-  ['extmemorymetadata_88',['extMemoryMetadata',['../classExtendedMemoryManager.html#abad9d8990a0658bece7abba03fe0abb1',1,'ExtendedMemoryManager']]],
-  ['extmemorymetadatatype_89',['ExtMemoryMetadataType',['../structExtMemoryMetadataType.html',1,'']]],
-  ['extractdeviceinstancebasedonnvmdata_90',['extractDeviceInstanceBasedOnNvmData',['../classDeviceManager.html#acc7c90ea6c943f89203ffdda9520abb1',1,'DeviceManager']]]
+  ['externalnodemapping_85',['ExternalNodeMapping',['../structExternalNodeMapping.html',1,'']]],
+  ['extmemorycontainer_86',['extMemoryContainer',['../classExtendedMemoryManager.html#a6f8879e45a97e2a8f43db3389f6b191f',1,'ExtendedMemoryManager']]],
+  ['extmemorydata_87',['ExtMemoryData',['../structExtMemoryData.html',1,'']]],
+  ['extmemoryinuse_88',['extMemoryInUse',['../classExtendedMemoryManager.html#a93dc1e595b765c5209068ba00db1d538',1,'ExtendedMemoryManager']]],
+  ['extmemorymetadata_89',['extMemoryMetadata',['../classExtendedMemoryManager.html#abad9d8990a0658bece7abba03fe0abb1',1,'ExtendedMemoryManager']]],
+  ['extmemorymetadatatype_90',['ExtMemoryMetadataType',['../structExtMemoryMetadataType.html',1,'']]],
+  ['extractdeviceinstancebasedonnvmdata_91',['extractDeviceInstanceBasedOnNvmData',['../classDeviceManager.html#acc7c90ea6c943f89203ffdda9520abb1',1,'DeviceManager']]]
 ];

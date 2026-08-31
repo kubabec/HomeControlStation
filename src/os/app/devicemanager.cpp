@@ -5,7 +5,7 @@
 
 /**
  * @file src/os/app/devicemanager.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief Device manager: restores devices from NVM, manages lifecycle and service dispatch.
  */
 
 

@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classWiFiAdapt
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Wi Fi Adapter behavior.  
+<p>Wraps ESP32 Wi-Fi lifecycle management for the Home Control Station.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>&gt;</code></p>
@@ -122,36 +122,57 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classWiFiAdapt
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a81efe2728b837179b851239aace90ee9" id="r_a81efe2728b837179b851239aace90ee9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a81efe2728b837179b851239aace90ee9">connectToNetwork</a> (const String ssid, const String password, bool activeWait)</td></tr>
+<tr class="memdesc:a81efe2728b837179b851239aace90ee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects the adapter to the target SSID using the supplied password.  <br /></td></tr>
 <tr class="memitem:a0e923990a3abe1cdaec0ac6321de893e" id="r_a0e923990a3abe1cdaec0ac6321de893e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0e923990a3abe1cdaec0ac6321de893e">createAccessPoint</a> ()</td></tr>
+<tr class="memdesc:a0e923990a3abe1cdaec0ac6321de893e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the ESP32 access point mode so other devices can connect to the station.  <br /></td></tr>
 <tr class="memitem:a4eba15a5dd06533016a67cf320dac329" id="r_a4eba15a5dd06533016a67cf320dac329"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4eba15a5dd06533016a67cf320dac329">disconnect</a> ()</td></tr>
+<tr class="memdesc:a4eba15a5dd06533016a67cf320dac329"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects the adapter from the current station or access-point mode.  <br /></td></tr>
 <tr class="memitem:a8369386f2781da0a6850636f571ba7c3" id="r_a8369386f2781da0a6850636f571ba7c3"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8369386f2781da0a6850636f571ba7c3">enableMDNSResponder</a> ()</td></tr>
+<tr class="memdesc:a8369386f2781da0a6850636f571ba7c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables the multicast DNS responder so the node can be discovered by name on the LAN.  <br /></td></tr>
 <tr class="memitem:af9090fcff3f604990cce3fe2f4e9c39e" id="r_af9090fcff3f604990cce3fe2f4e9c39e"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#af9090fcff3f604990cce3fe2f4e9c39e">getIpString</a> ()</td></tr>
+<tr class="memdesc:af9090fcff3f604990cce3fe2f4e9c39e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current IPv4 string of the ESP32 interface.  <br /></td></tr>
 <tr class="memitem:a1403b76f008cd8f455f3bb6d52e33303" id="r_a1403b76f008cd8f455f3bb6d52e33303"><td class="memItemLeft">static <a class="el" href="wifiAdapter_8hpp.html#afbfc456845719ac215946bb2b05eb2df">NetworkStatus</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1403b76f008cd8f455f3bb6d52e33303">getNetworkStatus</a> ()</td></tr>
+<tr class="memdesc:a1403b76f008cd8f455f3bb6d52e33303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the high-level status reported by the adapter.  <br /></td></tr>
 <tr class="memitem:a1866e51ffcef3af32df35f6cada499c8" id="r_a1866e51ffcef3af32df35f6cada499c8"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a1866e51ffcef3af32df35f6cada499c8">init</a> ()</td></tr>
+<tr class="memdesc:a1866e51ffcef3af32df35f6cada499c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Wi-Fi adapter and sets up the event-handling and startup logic.  <br /></td></tr>
 <tr class="memitem:aba4ab3834039a4ab0f94ce0bbbc79261" id="r_aba4ab3834039a4ab0f94ce0bbbc79261"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#aba4ab3834039a4ab0f94ce0bbbc79261">isConnected</a> ()</td></tr>
+<tr class="memdesc:aba4ab3834039a4ab0f94ce0bbbc79261"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports whether the ESP32 Wi-Fi interface is connected to a network at the moment.  <br /></td></tr>
 <tr class="memitem:ad785bb8d034b32371be630a8ae2c34ae" id="r_ad785bb8d034b32371be630a8ae2c34ae"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad785bb8d034b32371be630a8ae2c34ae">reconnect</a> (String &amp;ssid, String &amp;pwd)</td></tr>
+<tr class="memdesc:ad785bb8d034b32371be630a8ae2c34ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reconnects using a new SSID and password pair.  <br /></td></tr>
 <tr class="memitem:a6a961ba9a9a2813330ca45584396e352" id="r_a6a961ba9a9a2813330ca45584396e352"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a6a961ba9a9a2813330ca45584396e352">task</a> ()</td></tr>
+<tr class="memdesc:a6a961ba9a9a2813330ca45584396e352"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the task loop for the Wi-Fi adapter.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a221370670363eabe94cbe4c4bf5a81d6" id="r_a221370670363eabe94cbe4c4bf5a81d6"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a221370670363eabe94cbe4c4bf5a81d6">handleReconnection</a> ()</td></tr>
+<tr class="memdesc:a221370670363eabe94cbe4c4bf5a81d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs reconnect logic after a lost connection or authentication failure.  <br /></td></tr>
 <tr class="memitem:abbeb36a1aad320ea055d2febc50b6de9" id="r_abbeb36a1aad320ea055d2febc50b6de9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#abbeb36a1aad320ea055d2febc50b6de9">manualStatusCheck</a> ()</td></tr>
+<tr class="memdesc:abbeb36a1aad320ea055d2febc50b6de9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls the current connection state and updates the adapter if the ESP32 reports drift.  <br /></td></tr>
 <tr class="memitem:a886b83f3ebb60a4d135f968127f5ac87" id="r_a886b83f3ebb60a4d135f968127f5ac87"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a886b83f3ebb60a4d135f968127f5ac87">updateDataContainerIpAddress</a> ()</td></tr>
+<tr class="memdesc:a886b83f3ebb60a4d135f968127f5ac87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Publishes the current IP address into the shared data container for other OS components.  <br /></td></tr>
 <tr class="memitem:a267e2444ebd9b4a8c96ac53bdefd0720" id="r_a267e2444ebd9b4a8c96ac53bdefd0720"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a267e2444ebd9b4a8c96ac53bdefd0720">waitForConnection500ms</a> ()</td></tr>
+<tr class="memdesc:a267e2444ebd9b4a8c96ac53bdefd0720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pauses execution briefly to let the ESP32 finish establishing a Wi-Fi connection.  <br /></td></tr>
 <tr class="memitem:ada433ffbbbd42383a6d14e1866a506ca" id="r_ada433ffbbbd42383a6d14e1866a506ca"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ada433ffbbbd42383a6d14e1866a506ca">WiFiEvent</a> (WiFiEvent_t event)</td></tr>
+<tr class="memdesc:ada433ffbbbd42383a6d14e1866a506ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles ESP32 Wi-Fi event notifications and updates the adapter state accordingly.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a363d8332668aa5425403600a196815ca" id="r_a363d8332668aa5425403600a196815ca"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a363d8332668aa5425403600a196815ca">connectionInitialized</a> = false</td></tr>
+<tr class="memdesc:a363d8332668aa5425403600a196815ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">true once the Wi-Fi service has completed its initial setup and event handlers.  <br /></td></tr>
 <tr class="memitem:adf632a1efe3b6bbca94e9eb9f6425f20" id="r_adf632a1efe3b6bbca94e9eb9f6425f20"><td class="memItemLeft">static <a class="el" href="wifiAdapter_8hpp.html#afbfc456845719ac215946bb2b05eb2df">NetworkStatus</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf632a1efe3b6bbca94e9eb9f6425f20">currentStatus</a> = <a class="el" href="wifiAdapter_8hpp.html#afbfc456845719ac215946bb2b05eb2dfad9a05bcd4d72156df90ad3e711397c45">DISCONNECTED_FROM_NETWORK</a></td></tr>
+<tr class="memdesc:adf632a1efe3b6bbca94e9eb9f6425f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current abstraction-level network state tracked by the adapter.  <br /></td></tr>
 <tr class="memitem:a0d832d85710ab3e5c20653842a0e3bc1" id="r_a0d832d85710ab3e5c20653842a0e3bc1"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a0d832d85710ab3e5c20653842a0e3bc1">isConnectedFlag</a> = false</td></tr>
+<tr class="memdesc:a0d832d85710ab3e5c20653842a0e3bc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">true when the adapter believes the Wi-Fi interface is currently connected.  <br /></td></tr>
 <tr class="memitem:a4be20fc9bf561eb9a97e25c709632e35" id="r_a4be20fc9bf561eb9a97e25c709632e35"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#a4be20fc9bf561eb9a97e25c709632e35">mPassword</a> {&quot;none&quot;}</td></tr>
+<tr class="memdesc:a4be20fc9bf561eb9a97e25c709632e35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Password currently associated with the station connection attempt.  <br /></td></tr>
 <tr class="memitem:a5eab29dea5f1f3043f434d32d49beb7b" id="r_a5eab29dea5f1f3043f434d32d49beb7b"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#a5eab29dea5f1f3043f434d32d49beb7b">mSsid</a> {&quot;none&quot;}</td></tr>
+<tr class="memdesc:a5eab29dea5f1f3043f434d32d49beb7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">SSID currently configured for the station connection attempt.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Wi Fi Adapter behavior. </p>
+<div class="textblock"><p>Wraps ESP32 Wi-Fi lifecycle management for the Home Control Station. </p>
+<p>The adapter handles network connection, reconnection, access-point creation, and state reporting for the rest of the OS. It also updates the shared data container with the current network IP. </p>
 
-<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00016">16</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00032">32</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a81efe2728b837179b851239aace90ee9" name="a81efe2728b837179b851239aace90ee9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81efe2728b837179b851239aace90ee9">&#9670;&#160;</a></span>connectToNetwork()</h2>
@@ -185,9 +206,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Connects the adapter to the target SSID using the supplied password. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ssid</td><td>Network name to join. </td></tr>
+    <tr><td class="paramname">password</td><td>Network key used for authentication. </td></tr>
+    <tr><td class="paramname">activeWait</td><td>true when the caller wants blocking wait until the connection is available. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00115">115</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00020">connectionInitialized</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00030">NodeConfiguration::isRcServer</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00015">mPassword</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00014">mSsid</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00023">waitForConnection500ms()</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00051">connectionInitialized</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00030">NodeConfiguration::isRcServer</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00015">mPassword</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00014">mSsid</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00023">waitForConnection500ms()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00185">reconnect()</a>.</p>
 
@@ -216,9 +247,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Starts the ESP32 access point mode so other devices can connect to the station. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00236">236</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00007">ACCESS_POINT_MODE</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00021">currentStatus</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00034">SIG_IP_ADDRESS</a>, and <a class="el" href="signals_8hpp_source.html#l00032">SIG_IP_ADDRESS_STRING</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00014">ACCESS_POINT_MODE</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00056">currentStatus</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00034">SIG_IP_ADDRESS</a>, and <a class="el" href="signals_8hpp_source.html#l00032">SIG_IP_ADDRESS_STRING</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>.</p>
 
@@ -247,9 +280,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Disconnects the adapter from the current station or access-point mode. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00144">144</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>.</p>
 
 </div>
 </div>
@@ -275,6 +310,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Enables the multicast DNS responder so the node can be discovered by name on the LAN. </p>
 
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00272">272</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
@@ -307,6 +344,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the current IPv4 string of the ESP32 interface. </p>
+<dl class="section return"><dt>Returns</dt><dd>IP address formatted as a dotted string, or an empty string when unavailable. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00231">231</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
 </div>
@@ -334,9 +374,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the high-level status reported by the adapter. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current adapter state as a <a class="el" href="wifiAdapter_8hpp.html#afbfc456845719ac215946bb2b05eb2df" title="High-level runtime state of the device Wi-Fi interface.">NetworkStatus</a> enum. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00226">226</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00021">currentStatus</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00056">currentStatus</a>.</p>
 
 </div>
 </div>
@@ -363,9 +406,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Performs reconnect logic after a lost connection or authentication failure. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00197">197</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00015">mPassword</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00014">mSsid</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00015">mPassword</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00014">mSsid</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00213">task()</a>.</p>
 
@@ -394,9 +439,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the Wi-Fi adapter and sets up the event-handling and startup logic. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00102">102</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>.</p>
 
@@ -425,9 +472,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reports whether the ESP32 Wi-Fi interface is connected to a network at the moment. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when the interface is connected; false otherwise. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00153">153</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>.</p>
 
@@ -456,9 +506,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Polls the current connection state and updates the adapter if the ESP32 reports drift. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00158">158</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00008">CONNECTED_TO_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00021">currentStatus</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00009">DISCONNECTED_FROM_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00021">lastStatusCheck</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00018">CONNECTED_TO_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00056">currentStatus</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00022">DISCONNECTED_FROM_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00021">lastStatusCheck</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00115">connectToNetwork()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00213">task()</a>.</p>
 
@@ -491,6 +543,15 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reconnects using a new SSID and password pair. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ssid</td><td>Replacement network name. </td></tr>
+    <tr><td class="paramname">pwd</td><td>Replacement password. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00185">185</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="wifiAdapter_8cpp_source.html#l00115">connectToNetwork()</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
@@ -522,9 +583,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Runs the task loop for the Wi-Fi adapter. </p>
+<p>Intended to be used by the scheduler. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00213">213</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00020">connectionInitialized</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00197">handleReconnection()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00021">lastStatusCheck</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00020">statusCheckInterval</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00051">connectionInitialized</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00197">handleReconnection()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00021">lastStatusCheck</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00020">statusCheckInterval</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00149">NetworkDriver::cyclic()</a>.</p>
 
@@ -552,6 +616,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Publishes the current IP address into the shared data container for other OS components. </p>
 
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00036">36</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
@@ -584,6 +650,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Pauses execution briefly to let the ESP32 finish establishing a Wi-Fi connection. </p>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00023">23</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00115">connectToNetwork()</a>.</p>
@@ -613,9 +681,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Handles ESP32 Wi-Fi event notifications and updates the adapter state accordingly. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">event</td><td>Event type emitted by the ESP-IDF Wi-Fi stack. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8cpp_source.html#l00058">58</a> of file <a class="el" href="wifiAdapter_8cpp_source.html">wifiAdapter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00008">CONNECTED_TO_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00021">currentStatus</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00009">DISCONNECTED_FROM_NETWORK</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00017">isConnectedFlag</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00030">NodeConfiguration::isRcServer</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8hpp_source.html#l00018">CONNECTED_TO_NETWORK</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00056">currentStatus</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00022">DISCONNECTED_FROM_NETWORK</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00272">enableMDNSResponder()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="wifiAdapter_8hpp_source.html#l00036">isConnectedFlag</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00030">NodeConfiguration::isRcServer</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00019">nextReconnectAt</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00018">reconnectDelayMs</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00036">updateDataContainerIpAddress()</a>.</p>
 
 </div>
 </div>
@@ -640,7 +716,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00020">20</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
+<p>true once the Wi-Fi service has completed its initial setup and event handlers. </p>
+
+<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00051">51</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00115">connectToNetwork()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00213">task()</a>.</p>
 
@@ -666,7 +744,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00021">21</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
+<p>Current abstraction-level network state tracked by the adapter. </p>
+
+<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00056">56</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00236">createAccessPoint()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00226">getNetworkStatus()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00058">WiFiEvent()</a>.</p>
 
@@ -692,7 +772,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00017">17</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
+<p>true when the adapter believes the Wi-Fi interface is currently connected. </p>
+
+<p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00036">36</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wifiAdapter_8cpp_source.html#l00144">disconnect()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00197">handleReconnection()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00102">init()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00153">isConnected()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00158">manualStatusCheck()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00058">WiFiEvent()</a>.</p>
 
@@ -717,6 +799,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Password currently associated with the station connection attempt. </p>
 
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00015">15</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 
@@ -743,6 +827,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>SSID currently configured for the station connection attempt. </p>
 
 <p class="definition">Definition at line <a class="el" href="wifiAdapter_8hpp_source.html#l00014">14</a> of file <a class="el" href="wifiAdapter_8hpp_source.html">wifiAdapter.hpp</a>.</p>
 

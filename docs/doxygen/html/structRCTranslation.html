@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>HomeControlStation: RCTranslation Class Reference</title>
+<title>HomeControlStation: RCTranslation Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="codefolding.js"></script>
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structRCTransl
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">RCTranslation Class Reference</div></div>
+  <div class="headertitle"><div class="title">RCTranslation Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Represents the R C Translation data structure.  
+<p>Maps an internal device identifier on the remote node to the target node MAC address.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>&gt;</code></p>
@@ -122,15 +122,19 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structRCTransl
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af6ed5fab6d1896a791913f4214863e92" id="r_af6ed5fab6d1896a791913f4214863e92"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#af6ed5fab6d1896a791913f4214863e92">isValid</a> ()</td></tr>
+<tr class="memdesc:af6ed5fab6d1896a791913f4214863e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the translation describes a valid remote-device mapping.  <br /></td></tr>
 <tr class="memitem:ad263932de438fc18b3144be5dac66029" id="r_ad263932de438fc18b3144be5dac66029"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad263932de438fc18b3144be5dac66029">print</a> ()</td></tr>
+<tr class="memdesc:ad263932de438fc18b3144be5dac66029"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs the translation in a human-readable format for debugging.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ab5adf031b945ab9bb14390e66582e5e1" id="r_ab5adf031b945ab9bb14390e66582e5e1"><td class="memItemLeft">uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#ab5adf031b945ab9bb14390e66582e5e1">mac</a> = 0LL</td></tr>
+<tr class="memdesc:ab5adf031b945ab9bb14390e66582e5e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">MAC address of the remote node that owns the device.  <br /></td></tr>
 <tr class="memitem:a248201d145c15d6544ff3db4f0cacd7b" id="r_a248201d145c15d6544ff3db4f0cacd7b"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a248201d145c15d6544ff3db4f0cacd7b">onSourceNodeLocalId</a> = 255</td></tr>
+<tr class="memdesc:a248201d145c15d6544ff3db4f0cacd7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local device identifier as seen on the remote node.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents the R C Translation data structure. </p>
+<div class="textblock"><p>Maps an internal device identifier on the remote node to the target node MAC address. </p>
 
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00013">13</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
@@ -157,9 +161,12 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">24</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Checks whether the translation describes a valid remote-device mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when both the MAC and the local ID are valid; false otherwise. </dd></dl>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">mac</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">onSourceNodeLocalId</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">36</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">mac</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">onSourceNodeLocalId</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">RemoteDevicesManager::service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">RemoteDevicesManager::service()</a>.</p>
 
@@ -188,9 +195,11 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00019">19</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Logs the translation in a human-readable format for debugging. </p>
 
-<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">mac</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">onSourceNodeLocalId</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00027">27</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">mac</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">onSourceNodeLocalId</a>.</p>
 
 </div>
 </div>
@@ -207,9 +216,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">15</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>MAC address of the remote node that owns the device. </p>
 
-<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00019">print()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">RemoteDevicesManager::service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">RemoteDevicesManager::service()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">17</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00027">print()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">RemoteDevicesManager::service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">RemoteDevicesManager::service()</a>.</p>
 
 </div>
 </div>
@@ -225,13 +236,15 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">17</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Local device identifier as seen on the remote node. </p>
 
-<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00019">print()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">RemoteDevicesManager::service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">RemoteDevicesManager::tunnelDataUpdate()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">22</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00027">print()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">RemoteDevicesManager::service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">RemoteDevicesManager::service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">RemoteDevicesManager::tunnelDataUpdate()</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/os/app/<a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a></li>
 </ul>
 </div><!-- contents -->

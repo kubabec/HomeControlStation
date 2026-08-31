@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>HomeControlStation: MessageUDP::IPAddr Class Reference</title>
+<title>HomeControlStation: MessageUDP::IPAddr Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="codefolding.js"></script>
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structMessageU
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">MessageUDP::IPAddr Class Reference</div></div>
+  <div class="headertitle"><div class="title">MessageUDP::IPAddr Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Represents the I P Addr data structure.  
+<p>IPv4 address representation used by the UDP transport layer.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>&gt;</code></p>
@@ -122,19 +122,25 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structMessageU
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a05bd56939b31d41f333997b22fdddc1c" id="r_a05bd56939b31d41f333997b22fdddc1c"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a05bd56939b31d41f333997b22fdddc1c">operator==</a> (const <a class="el" href="structMessageUDP_1_1IPAddr.html">IPAddr</a> &amp;rhv)</td></tr>
+<tr class="memdesc:a05bd56939b31d41f333997b22fdddc1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares two IPv4 addresses for equality.  <br /></td></tr>
 <tr class="memitem:a500c172d240a0991b7a9ddda387a7c73" id="r_a500c172d240a0991b7a9ddda387a7c73"><td class="memItemLeft">String&#160;</td><td class="memItemRight"><a class="el" href="#a500c172d240a0991b7a9ddda387a7c73">toString</a> ()</td></tr>
+<tr class="memdesc:a500c172d240a0991b7a9ddda387a7c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats the IP address as a dotted-decimal string.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a0ad90f4b49e9504870a2a56a7decaa38" id="r_a0ad90f4b49e9504870a2a56a7decaa38"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a0ad90f4b49e9504870a2a56a7decaa38">octet1</a></td></tr>
+<tr class="memdesc:a0ad90f4b49e9504870a2a56a7decaa38"><td class="mdescLeft">&#160;</td><td class="mdescRight">First octet of the IPv4 address.  <br /></td></tr>
 <tr class="memitem:aafb30c905f5660d90588c97c990258d4" id="r_aafb30c905f5660d90588c97c990258d4"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#aafb30c905f5660d90588c97c990258d4">octet2</a></td></tr>
+<tr class="memdesc:aafb30c905f5660d90588c97c990258d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Second octet of the IPv4 address.  <br /></td></tr>
 <tr class="memitem:a5b26f0f0dfc1d047977ee2535588f36d" id="r_a5b26f0f0dfc1d047977ee2535588f36d"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a5b26f0f0dfc1d047977ee2535588f36d">octet3</a></td></tr>
+<tr class="memdesc:a5b26f0f0dfc1d047977ee2535588f36d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Third octet of the IPv4 address.  <br /></td></tr>
 <tr class="memitem:a0330617aa1e0ce7d26fab8ee4f9cce8a" id="r_a0330617aa1e0ce7d26fab8ee4f9cce8a"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a0330617aa1e0ce7d26fab8ee4f9cce8a">octet4</a></td></tr>
+<tr class="memdesc:a0330617aa1e0ce7d26fab8ee4f9cce8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fourth octet of the IPv4 address.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents the I P Addr data structure. </p>
+<div class="textblock"><p>IPv4 address representation used by the UDP transport layer. </p>
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00019">19</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00022">22</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a05bd56939b31d41f333997b22fdddc1c" name="a05bd56939b31d41f333997b22fdddc1c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a05bd56939b31d41f333997b22fdddc1c">&#9670;&#160;</a></span>operator==()</h2>
@@ -159,9 +165,18 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00026">26</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>Compares two IPv4 addresses for equality. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rhv</td><td>Right-hand value to compare. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when all octets match. </dd></dl>
 
-<p class="reference">References <a class="el" href="messageUDP_8hpp_source.html#l00021">octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00022">octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00023">octet3</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00024">octet4</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00049">49</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="messageUDP_8hpp_source.html#l00027">octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">octet3</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00042">octet4</a>.</p>
 
 </div>
 </div>
@@ -188,9 +203,12 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00039">39</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>Formats the IP address as a dotted-decimal string. </p>
+<dl class="section return"><dt>Returns</dt><dd>IPv4 string suitable for logs or UI output. </dd></dl>
 
-<p class="reference">References <a class="el" href="messageUDP_8hpp_source.html#l00021">octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00022">octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00023">octet3</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00024">octet4</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00066">66</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="messageUDP_8hpp_source.html#l00027">octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">octet3</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00042">octet4</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00396">RemoteControlServer::processUDPMessage()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00168">RemoteControlServer::requestKeepAliveData()</a>, and <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>.</p>
 
@@ -209,9 +227,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00021">21</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>First octet of the IPv4 address. </p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00026">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00034">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00039">toString()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00027">27</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00049">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00066">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00066">toString()</a>.</p>
 
 </div>
 </div>
@@ -227,9 +247,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00022">22</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>Second octet of the IPv4 address. </p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00026">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00034">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00039">toString()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00032">32</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00049">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00066">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00066">toString()</a>.</p>
 
 </div>
 </div>
@@ -245,9 +267,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00023">23</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>Third octet of the IPv4 address. </p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00026">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00034">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00039">toString()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00037">37</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00049">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00066">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00066">toString()</a>.</p>
 
 </div>
 </div>
@@ -263,13 +287,15 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00024">24</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+<p>Fourth octet of the IPv4 address. </p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00026">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00034">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00039">toString()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="messageUDP_8hpp_source.html#l00042">42</a> of file <a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00324">RemoteControlServer::handleDetailedDataRefreshMech()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00434">RemoteControlServer::handleHandShakeCommunication()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00049">operator==()</a>, <a class="el" href="remotecontrolserver_8hpp_source.html#l00066">RemoteNodeInformation::printLn()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00256">MessageUDP::serialPrintMessageUDP()</a>, and <a class="el" href="messageUDP_8hpp_source.html#l00066">toString()</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/os/tools/<a class="el" href="messageUDP_8hpp_source.html">messageUDP.hpp</a></li>
 </ul>
 </div><!-- contents -->

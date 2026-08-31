@@ -5,7 +5,7 @@
 
 /**
  * @file src/os/HomeStation_os.cpp
- * @brief Core operating-system implementation for the Home Control Station.
+ * @brief Main OS loop, scheduler and lifecycle management for the Home Control Station.
  */
 
 

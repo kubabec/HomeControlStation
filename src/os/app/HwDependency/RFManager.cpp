@@ -6,7 +6,7 @@
 
 /**
  * @file src/os/app/HwDependency/RFManager.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief RF manager: learns RF buttons, handles receptions, and fires digital events.
  */
 
 

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>HomeControlStation: DeviceTranslationDetails Class Reference</title>
+<title>HomeControlStation: DeviceTranslationDetails Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="codefolding.js"></script>
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structDeviceTr
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">DeviceTranslationDetails Class Reference</div></div>
+  <div class="headertitle"><div class="title">DeviceTranslationDetails Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Represents the <a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> Translation Details data structure.  
+<p>Maps a unique runtime device identifier to the original device ID and its origin.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>&gt;</code></p>
@@ -122,12 +122,15 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structDeviceTr
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a67acd79a5d73da858ac965a4e4e70926" id="r_a67acd79a5d73da858ac965a4e4e70926"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a67acd79a5d73da858ac965a4e4e70926">isLocal</a> = true</td></tr>
+<tr class="memdesc:a67acd79a5d73da858ac965a4e4e70926"><td class="mdescLeft">&#160;</td><td class="mdescRight">true when the device is managed locally; false when it belongs to a remote node.  <br /></td></tr>
 <tr class="memitem:af708769ed85c44e8cbc05635e94f344f" id="r_af708769ed85c44e8cbc05635e94f344f"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#af708769ed85c44e8cbc05635e94f344f">originalID</a> = 255</td></tr>
+<tr class="memdesc:af708769ed85c44e8cbc05635e94f344f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Original identifier used by the device on its native node.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents the <a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> Translation Details data structure. </p>
+<div class="textblock"><p>Maps a unique runtime device identifier to the original device ID and its origin. </p>
+<p>This structure is used when the system exposes a combined local/remote device collection but has to keep track whether a logical device belongs to the current node or to a remote node. </p>
 
-<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00015">15</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00018">18</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a67acd79a5d73da858ac965a4e4e70926" name="a67acd79a5d73da858ac965a4e4e70926"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67acd79a5d73da858ac965a4e4e70926">&#9670;&#160;</a></span>isLocal</h2>
@@ -141,7 +144,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00017">17</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
+<p>true when the device is managed locally; false when it belongs to a remote node. </p>
+
+<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00027">27</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="deviceProvider_8cpp_source.html#l00194">DeviceProvider::printIdMap()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00320">DeviceProvider::receiveRequest()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00419">DeviceProvider::service()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00448">DeviceProvider::service()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00507">DeviceProvider::service()</a>, and <a class="el" href="deviceProvider_8cpp_source.html#l00537">DeviceProvider::service()</a>.</p>
 
@@ -159,13 +164,15 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00016">16</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
+<p>Original identifier used by the device on its native node. </p>
+
+<p class="definition">Definition at line <a class="el" href="deviceProvider_8hpp_source.html#l00022">22</a> of file <a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="deviceProvider_8cpp_source.html#l00212">DeviceProvider::handelService3Request()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00194">DeviceProvider::printIdMap()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00320">DeviceProvider::receiveRequest()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00419">DeviceProvider::service()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00448">DeviceProvider::service()</a>, <a class="el" href="deviceProvider_8cpp_source.html#l00507">DeviceProvider::service()</a>, and <a class="el" href="deviceProvider_8cpp_source.html#l00537">DeviceProvider::service()</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/os/app/<a class="el" href="deviceProvider_8hpp_source.html">deviceProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->

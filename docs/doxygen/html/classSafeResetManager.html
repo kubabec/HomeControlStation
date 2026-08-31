@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classSafeReset
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Safe Reset Manager behavior.  
+<p>Protects the system from unintended resets during periods when the installation is active.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>&gt;</code></p>
@@ -122,24 +122,33 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classSafeReset
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a82dafcd5b51837aee362f9924cae8e7d" id="r_a82dafcd5b51837aee362f9924cae8e7d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a82dafcd5b51837aee362f9924cae8e7d">cyclic</a> ()</td></tr>
+<tr class="memdesc:a82dafcd5b51837aee362f9924cae8e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the periodic safety check and executes the reset callback only when all conditions are met.  <br /></td></tr>
 <tr class="memitem:a8c15b39c357f20f8430d18f0f1f0fe96" id="r_a8c15b39c357f20f8430d18f0f1f0fe96"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8c15b39c357f20f8430d18f0f1f0fe96">deinit</a> ()</td></tr>
+<tr class="memdesc:a8c15b39c357f20f8430d18f0f1f0fe96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases any runtime state owned by the reset manager.  <br /></td></tr>
 <tr class="memitem:a0d9317eb08b78dbbb69549784358fa2e" id="r_a0d9317eb08b78dbbb69549784358fa2e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0d9317eb08b78dbbb69549784358fa2e">init</a> ()</td></tr>
+<tr class="memdesc:a0d9317eb08b78dbbb69549784358fa2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the reset manager and prepares its runtime state.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:ab4b2d2a5961359db69c762af38982f34" id="r_ab4b2d2a5961359db69c762af38982f34"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#ab4b2d2a5961359db69c762af38982f34">isMorning</a> ()</td></tr>
+<tr class="memdesc:ab4b2d2a5961359db69c762af38982f34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the current time falls inside the configured morning maintenance window.  <br /></td></tr>
 <tr class="memitem:abe422adb03a60fc8074481d1905f3c90" id="r_abe422adb03a60fc8074481d1905f3c90"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#abe422adb03a60fc8074481d1905f3c90">localDevicesConditionFilled</a> ()</td></tr>
+<tr class="memdesc:abe422adb03a60fc8074481d1905f3c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies that no local device is still marked as enabled before allowing a reset.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a21c7728cd0ac88ded2fe2976b91323af" id="r_a21c7728cd0ac88ded2fe2976b91323af"><td class="memItemLeft">static const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a21c7728cd0ac88ded2fe2976b91323af">morningEndHour</a> {9}</td></tr>
+<tr class="memdesc:a21c7728cd0ac88ded2fe2976b91323af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exclusive end hour of the allowed maintenance window for a scheduled reset.  <br /></td></tr>
 <tr class="memitem:a365b3f2fd3dd7dee0112e9afa6aeee3c" id="r_a365b3f2fd3dd7dee0112e9afa6aeee3c"><td class="memItemLeft">static const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a365b3f2fd3dd7dee0112e9afa6aeee3c">morningStartHour</a> {7}</td></tr>
+<tr class="memdesc:a365b3f2fd3dd7dee0112e9afa6aeee3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Earliest hour of the allowed maintenance window for a scheduled reset.  <br /></td></tr>
 <tr class="memitem:adec6b6bf31f982f66fc5f72ab5b098ee" id="r_adec6b6bf31f982f66fc5f72ab5b098ee"><td class="memItemLeft">static const long long&#160;</td><td class="memItemRight"><a class="el" href="#adec6b6bf31f982f66fc5f72ab5b098ee">RESET_DELAY</a> {1000 * 60 * 60 * 30}</td></tr>
+<tr class="memdesc:adec6b6bf31f982f66fc5f72ab5b098ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delay before a reset is considered safe.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Safe Reset Manager behavior. </p>
+<div class="textblock"><p>Protects the system from unintended resets during periods when the installation is active. </p>
+<p>The manager waits for a long cooldown window and then checks whether the system is in the configured morning maintenance interval and whether no local device is still active. If both conditions are true, it triggers the reset callback registered inside the data container. </p>
 
-<p class="definition">Definition at line <a class="el" href="SafeResetManager_8hpp_source.html#l00010">10</a> of file <a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SafeResetManager_8hpp_source.html#l00014">14</a> of file <a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a82dafcd5b51837aee362f9924cae8e7d" name="a82dafcd5b51837aee362f9924cae8e7d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a82dafcd5b51837aee362f9924cae8e7d">&#9670;&#160;</a></span>cyclic()</h2>
@@ -163,6 +172,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Runs the periodic safety check and executes the reset callback only when all conditions are met. </p>
 
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8cpp_source.html#l00021">21</a> of file <a class="el" href="SafeResetManager_8cpp_source.html">SafeResetManager.cpp</a>.</p>
 
@@ -195,6 +206,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Releases any runtime state owned by the reset manager. </p>
+
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8cpp_source.html#l00041">41</a> of file <a class="el" href="SafeResetManager_8cpp_source.html">SafeResetManager.cpp</a>.</p>
 
 </div>
@@ -221,6 +234,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initializes the reset manager and prepares its runtime state. </p>
 
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8cpp_source.html#l00014">14</a> of file <a class="el" href="SafeResetManager_8cpp_source.html">SafeResetManager.cpp</a>.</p>
 
@@ -253,6 +268,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether the current time falls inside the configured morning maintenance window. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when the clock is in the allowed reset interval; otherwise false. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8cpp_source.html#l00045">45</a> of file <a class="el" href="SafeResetManager_8cpp_source.html">SafeResetManager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="signals_8hpp_source.html#l00087">CBK_GET_CURRENT_TIME</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="device_8hpp_source.html#l00091">RtcTime::hour</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="SafeResetManager_8hpp_source.html#l00012">morningEndHour</a>, <a class="el" href="SafeResetManager_8hpp_source.html#l00011">morningStartHour</a>, and <a class="el" href="device_8hpp_source.html#l00097">RtcTime::year</a>.</p>
@@ -284,6 +302,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Verifies that no local device is still marked as enabled before allowing a reset. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when the local device collection is considered safe for reset; otherwise false. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8cpp_source.html#l00070">70</a> of file <a class="el" href="SafeResetManager_8cpp_source.html">SafeResetManager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="signals_8hpp_source.html#l00018">SIG_LOCAL_COLLECTION</a>.</p>
@@ -313,6 +334,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Exclusive end hour of the allowed maintenance window for a scheduled reset. </p>
+
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8hpp_source.html#l00012">12</a> of file <a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="SafeResetManager_8cpp_source.html#l00045">isMorning()</a>.</p>
@@ -339,6 +362,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Earliest hour of the allowed maintenance window for a scheduled reset. </p>
+
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8hpp_source.html#l00011">11</a> of file <a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="SafeResetManager_8cpp_source.html#l00045">isMorning()</a>.</p>
@@ -364,6 +389,9 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Delay before a reset is considered safe. </p>
+<p>The value is intentionally long so the node does not reboot repeatedly when the system is still servicing devices. </p>
 
 <p class="definition">Definition at line <a class="el" href="SafeResetManager_8hpp_source.html#l00010">10</a> of file <a class="el" href="SafeResetManager_8hpp_source.html">SafeResetManager.hpp</a>.</p>
 

@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRequestPr
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Request Processor behavior.  
+<p>Translates RC requests into outgoing UDP messages and tracks their delivery lifecycle.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>&gt;</code></p>
@@ -122,18 +122,24 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRequestPr
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a52a7733b2fc94e70af655ad0923a0060" id="r_a52a7733b2fc94e70af655ad0923a0060"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a52a7733b2fc94e70af655ad0923a0060">RequestProcessor</a> ()</td></tr>
+<tr class="memdesc:a52a7733b2fc94e70af655ad0923a0060"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
 <tr class="memitem:a8950a8da97b545ff838bc1a86642c33c" id="r_a8950a8da97b545ff838bc1a86642c33c"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a8950a8da97b545ff838bc1a86642c33c">processReqest</a> (<a class="el" href="classRcRequest.html">RcRequest</a> &amp;newReqest, <a class="el" href="structMessageUDP_1_1IPAddr.html">MessageUDP::IPAddr</a> targetNodeIp)</td></tr>
+<tr class="memdesc:a8950a8da97b545ff838bc1a86642c33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes a new request by preparing it for transmission to the target node and UDP address.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aa6fe24b1e637a416d274d88b9f488006" id="r_aa6fe24b1e637a416d274d88b9f488006"><td class="memItemLeft"><a class="el" href="classRcRequest.html">RcRequest</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa6fe24b1e637a416d274d88b9f488006">currentRequest</a></td></tr>
+<tr class="memdesc:aa6fe24b1e637a416d274d88b9f488006"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request currently being processed by the RC protocol layer.  <br /></td></tr>
 <tr class="memitem:a379db07c2db38ce2d1e1d3bbd1a5da70" id="r_a379db07c2db38ce2d1e1d3bbd1a5da70"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a379db07c2db38ce2d1e1d3bbd1a5da70">isProcessingStarted</a> = false</td></tr>
+<tr class="memdesc:a379db07c2db38ce2d1e1d3bbd1a5da70"><td class="mdescLeft">&#160;</td><td class="mdescRight">true once the processing state for the current request has started.  <br /></td></tr>
 <tr class="memitem:a612454289334dffbb7555381bd607444" id="r_a612454289334dffbb7555381bd607444"><td class="memItemLeft">unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a612454289334dffbb7555381bd607444">lastSendTime</a> = 0</td></tr>
+<tr class="memdesc:a612454289334dffbb7555381bd607444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp of the most recent send attempt for the current request.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Request Processor behavior. </p>
+<div class="textblock"><p>Translates RC requests into outgoing UDP messages and tracks their delivery lifecycle. </p>
+<p>The processor keeps the currently active request object, manages retry timing, and sends the message to the target node once the request is ready to be transmitted. </p>
 
-<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00013">13</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00015">15</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a52a7733b2fc94e70af655ad0923a0060" name="a52a7733b2fc94e70af655ad0923a0060"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a52a7733b2fc94e70af655ad0923a0060">&#9670;&#160;</a></span>RequestProcessor()</h2>
@@ -149,6 +155,8 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Default constructor. </p>
 
 <p class="definition">Definition at line <a class="el" href="RequestProcessor_8cpp_source.html#l00012">12</a> of file <a class="el" href="RequestProcessor_8cpp_source.html">RequestProcessor.cpp</a>.</p>
 
@@ -174,9 +182,19 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Processes a new request by preparing it for transmission to the target node and UDP address. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newReqest</td><td>Request object to dispatch. </td></tr>
+    <tr><td class="paramname">targetNodeIp</td><td>IP address of the destination node. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the request was accepted and sent or queued successfully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RequestProcessor_8cpp_source.html#l00018">18</a> of file <a class="el" href="RequestProcessor_8cpp_source.html">RequestProcessor.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcRequest_8cpp_source.html#l00134">RcRequest::calculateCrc()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00156">RcRequest::clear()</a>, <a class="el" href="ReqestProcessor_8hpp_source.html#l00015">currentRequest</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00171">RcRequest::getRequestSendCount()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00046">RcRequest::getSize()</a>, <a class="el" href="ReqestProcessor_8hpp_source.html#l00016">lastSendTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00020">RC_REQUEST</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00166">RcRequest::setRequestSendCount()</a>, and <a class="el" href="rcRequest_8cpp_source.html#l00107">RcRequest::toByteArray()</a>.</p>
+<p class="reference">References <a class="el" href="rcRequest_8cpp_source.html#l00134">RcRequest::calculateCrc()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00156">RcRequest::clear()</a>, <a class="el" href="ReqestProcessor_8hpp_source.html#l00020">currentRequest</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00171">RcRequest::getRequestSendCount()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00046">RcRequest::getSize()</a>, <a class="el" href="ReqestProcessor_8hpp_source.html#l00025">lastSendTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00020">RC_REQUEST</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00166">RcRequest::setRequestSendCount()</a>, and <a class="el" href="rcRequest_8cpp_source.html#l00107">RcRequest::toByteArray()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remotecontrolserver_8cpp_source.html#l00596">RemoteControlServer::processPendingRequest()</a>.</p>
 
@@ -203,7 +221,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00015">15</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
+<p>Request currently being processed by the RC protocol layer. </p>
+
+<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00020">20</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RequestProcessor_8cpp_source.html#l00018">processReqest()</a>.</p>
 
@@ -229,7 +249,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00018">18</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
+<p>true once the processing state for the current request has started. </p>
+
+<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00030">30</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +275,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00016">16</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
+<p>Timestamp of the most recent send attempt for the current request. </p>
+
+<p class="definition">Definition at line <a class="el" href="ReqestProcessor_8hpp_source.html#l00025">25</a> of file <a class="el" href="ReqestProcessor_8hpp_source.html">ReqestProcessor.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RequestProcessor_8cpp_source.html#l00018">processReqest()</a>.</p>
 

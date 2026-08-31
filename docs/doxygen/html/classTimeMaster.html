@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classTimeMaste
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Time Master behavior.  
+<p>Synchronizes the system clock with NTP and exposes time in both epoch and RTC formats.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>&gt;</code></p>
@@ -122,34 +122,53 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classTimeMaste
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:afc9b64c74c0aa0ab798f68f9ff5ec2b0" id="r_afc9b64c74c0aa0ab798f68f9ff5ec2b0"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#afc9b64c74c0aa0ab798f68f9ff5ec2b0">cyclic</a> ()</td></tr>
+<tr class="memdesc:afc9b64c74c0aa0ab798f68f9ff5ec2b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the periodic time update cycle, refreshing NTP values when the configured interval expires.  <br /></td></tr>
 <tr class="memitem:aab7a075b0e4fcf201afab3af0c42341c" id="r_aab7a075b0e4fcf201afab3af0c42341c"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aab7a075b0e4fcf201afab3af0c42341c">deinit</a> ()</td></tr>
+<tr class="memdesc:aab7a075b0e4fcf201afab3af0c42341c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the NTP client and clears the runtime state used by the time service.  <br /></td></tr>
 <tr class="memitem:a573ad003314f4a094eb88877c205ae62" id="r_a573ad003314f4a094eb88877c205ae62"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a573ad003314f4a094eb88877c205ae62">getEpochTime</a> ()</td></tr>
+<tr class="memdesc:a573ad003314f4a094eb88877c205ae62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current Unix epoch timestamp.  <br /></td></tr>
 <tr class="memitem:a7120552e5e1b47caca89cd06c8a07764" id="r_a7120552e5e1b47caca89cd06c8a07764"><td class="memItemLeft">static <a class="el" href="structRtcTime.html">RtcTime</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7120552e5e1b47caca89cd06c8a07764">getRtcTime</a> ()</td></tr>
+<tr class="memdesc:a7120552e5e1b47caca89cd06c8a07764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the current epoch time into the application-specific RTC structure.  <br /></td></tr>
 <tr class="memitem:a806fe45aa5bf87bb0f2ed1e9206757ae" id="r_a806fe45aa5bf87bb0f2ed1e9206757ae"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a806fe45aa5bf87bb0f2ed1e9206757ae">init</a> ()</td></tr>
+<tr class="memdesc:a806fe45aa5bf87bb0f2ed1e9206757ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the NTP client and prepares the time-sync subsystem.  <br /></td></tr>
 <tr class="memitem:a0bfec395595cc63b554553ca35a40ca8" id="r_a0bfec395595cc63b554553ca35a40ca8"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0bfec395595cc63b554553ca35a40ca8">setTimeZone</a> (int timeZoneOffset)</td></tr>
+<tr class="memdesc:a0bfec395595cc63b554553ca35a40ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configures the system timezone offset used by the time conversion logic.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:aa0c36e25cb092bad234b7eea2e741bf1" id="r_aa0c36e25cb092bad234b7eea2e741bf1"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa0c36e25cb092bad234b7eea2e741bf1">updateNtpVariables</a> ()</td></tr>
+<tr class="memdesc:aa0c36e25cb092bad234b7eea2e741bf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refreshes internal state variables based on the current NTP status and elapsed time.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a94af886c8a09e17230c50ca12ed238f8" id="r_a94af886c8a09e17230c50ca12ed238f8"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a94af886c8a09e17230c50ca12ed238f8">initialRetryCount</a> = 0</td></tr>
+<tr class="memdesc:a94af886c8a09e17230c50ca12ed238f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of failed NTP synchronization attempts already recorded.  <br /></td></tr>
 <tr class="memitem:a8216b237371acd87e7b92c45e79c0c52" id="r_a8216b237371acd87e7b92c45e79c0c52"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a8216b237371acd87e7b92c45e79c0c52">lastMillis</a> = 0</td></tr>
+<tr class="memdesc:a8216b237371acd87e7b92c45e79c0c52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Milliseconds since the last local timer reset, used for deriving elapsed periods.  <br /></td></tr>
 <tr class="memitem:a623e567a5a5a462d4223898f834f29d0" id="r_a623e567a5a5a462d4223898f834f29d0"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a623e567a5a5a462d4223898f834f29d0">lastNTPTime</a> = 0</td></tr>
+<tr class="memdesc:a623e567a5a5a462d4223898f834f29d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last valid epoch time received from the NTP server.  <br /></td></tr>
 <tr class="memitem:a2c408fdcaa5f56ae1fa219ee70537e38" id="r_a2c408fdcaa5f56ae1fa219ee70537e38"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a2c408fdcaa5f56ae1fa219ee70537e38">lastUpdateTime</a> = 0</td></tr>
+<tr class="memdesc:a2c408fdcaa5f56ae1fa219ee70537e38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp of the most recent NTP refresh or status update.  <br /></td></tr>
 <tr class="memitem:adf5b50d68e783cb7d0c9ff0703bf7e9e" id="r_adf5b50d68e783cb7d0c9ff0703bf7e9e"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#adf5b50d68e783cb7d0c9ff0703bf7e9e">ntpAvailable</a> = false</td></tr>
+<tr class="memdesc:adf5b50d68e783cb7d0c9ff0703bf7e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">true when the NTP connection is available and the time is considered usable.  <br /></td></tr>
 <tr class="memitem:ac79aaf9f91e99b52d06da10d1e21fa0b" id="r_ac79aaf9f91e99b52d06da10d1e21fa0b"><td class="memItemLeft">static WiFiUDP&#160;</td><td class="memItemRight"><a class="el" href="#ac79aaf9f91e99b52d06da10d1e21fa0b">ntpUDP</a></td></tr>
+<tr class="memdesc:ac79aaf9f91e99b52d06da10d1e21fa0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">UDP socket used for outbound NTP communication.  <br /></td></tr>
 <tr class="memitem:aa89c59203c79e80f63d55a125bbfbf1c" id="r_aa89c59203c79e80f63d55a125bbfbf1c"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#aa89c59203c79e80f63d55a125bbfbf1c">startupTimeInitialized</a> = false</td></tr>
+<tr class="memdesc:aa89c59203c79e80f63d55a125bbfbf1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">true once the startup time initialization path has completed.  <br /></td></tr>
 <tr class="memitem:ada75b680ea71b3ea8cc358419cd939c2" id="r_ada75b680ea71b3ea8cc358419cd939c2"><td class="memItemLeft">static NTPClient&#160;</td><td class="memItemRight"><a class="el" href="#ada75b680ea71b3ea8cc358419cd939c2">timeClient</a></td></tr>
+<tr class="memdesc:ada75b680ea71b3ea8cc358419cd939c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">NTP client instance used to query the remote time server.  <br /></td></tr>
 <tr class="memitem:a594dda5cd89de87a5b63760f0a31d425" id="r_a594dda5cd89de87a5b63760f0a31d425"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a594dda5cd89de87a5b63760f0a31d425">timeSyncFailureCount</a> = 0</td></tr>
+<tr class="memdesc:a594dda5cd89de87a5b63760f0a31d425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Counter tracking time sync failures so the system can back off or retry deliberately.  <br /></td></tr>
 <tr class="memitem:a4305daeb89d344b710ad77b5ade9ce63" id="r_a4305daeb89d344b710ad77b5ade9ce63"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a4305daeb89d344b710ad77b5ade9ce63">updateInterval</a></td></tr>
+<tr class="memdesc:a4305daeb89d344b710ad77b5ade9ce63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interval between NTP refresh attempts.  <br /></td></tr>
 <tr class="memitem:aaba46593d107e2df11ba48ef4a9dec26" id="r_aaba46593d107e2df11ba48ef4a9dec26"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#aaba46593d107e2df11ba48ef4a9dec26">wasNtpEverSynced</a> = false</td></tr>
+<tr class="memdesc:aaba46593d107e2df11ba48ef4a9dec26"><td class="mdescLeft">&#160;</td><td class="mdescRight">true when the system has ever received a valid NTP sync.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Time Master behavior. </p>
+<div class="textblock"><p>Synchronizes the system clock with NTP and exposes time in both epoch and RTC formats. </p>
+<p>The component keeps track of startup state, successful NTP updates, retry counts, and the last known valid time so the OS can stamp events, schedule tasks, and compute RTC values reliably. </p>
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00015">15</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00018">18</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="afc9b64c74c0aa0ab798f68f9ff5ec2b0" name="afc9b64c74c0aa0ab798f68f9ff5ec2b0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc9b64c74c0aa0ab798f68f9ff5ec2b0">&#9670;&#160;</a></span>cyclic()</h2>
@@ -174,9 +193,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Runs the periodic time update cycle, refreshing NTP values when the configured interval expires. </p>
+
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00063">63</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00113">CBK_RECONNECT_WIFI</a>, <a class="el" href="timeMaster_8cpp_source.html#l00129">getRtcTime()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00010">HALF_NTP_RESYNC_TIME</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="timeMaster_8hpp_source.html#l00037">initialRetryCount</a>, <a class="el" href="timeMaster_8hpp_source.html#l00040">lastUpdateTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00009">NTP_RESYNC_TIME</a>, <a class="el" href="timeMaster_8hpp_source.html#l00043">ntpAvailable</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00101">SIG_STARTUP_TIME</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="timeMaster_8hpp_source.html#l00035">startupTimeInitialized</a>, <a class="el" href="timeMaster_8hpp_source.html#l00034">timeClient</a>, <a class="el" href="timeMaster_8hpp_source.html#l00048">timeSyncFailureCount</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00038">wasNtpEverSynced</a>.</p>
+<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00113">CBK_RECONNECT_WIFI</a>, <a class="el" href="timeMaster_8cpp_source.html#l00129">getRtcTime()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00010">HALF_NTP_RESYNC_TIME</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="timeMaster_8hpp_source.html#l00072">initialRetryCount</a>, <a class="el" href="timeMaster_8hpp_source.html#l00082">lastUpdateTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00009">NTP_RESYNC_TIME</a>, <a class="el" href="timeMaster_8hpp_source.html#l00097">ntpAvailable</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00101">SIG_STARTUP_TIME</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="timeMaster_8hpp_source.html#l00062">startupTimeInitialized</a>, <a class="el" href="timeMaster_8hpp_source.html#l00057">timeClient</a>, <a class="el" href="timeMaster_8hpp_source.html#l00112">timeSyncFailureCount</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00077">wasNtpEverSynced</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00220">OperatingSystem::task1s()</a>.</p>
 
@@ -204,6 +225,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Releases the NTP client and clears the runtime state used by the time service. </p>
 
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00058">58</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
@@ -234,9 +257,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the current Unix epoch timestamp. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current time in seconds since 1970-01-01 UTC. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00154">154</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00042">lastMillis</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00041">lastNTPTime</a>.</p>
+<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00092">lastMillis</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00087">lastNTPTime</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00129">getRtcTime()</a>.</p>
 
@@ -264,6 +290,9 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Converts the current epoch time into the application-specific RTC structure. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current time expressed as <a class="el" href="structRtcTime.html" title="Represents the time descriptor used by sensor and device records.">RtcTime</a>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00129">129</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
@@ -296,9 +325,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the NTP client and prepares the time-sync subsystem. </p>
+
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00024">24</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00087">CBK_GET_CURRENT_TIME</a>, <a class="el" href="timeMaster_8cpp_source.html#l00129">getRtcTime()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8hpp_source.html#l00043">ntpAvailable</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00149">setTimeZone()</a>, <a class="el" href="signals_8hpp_source.html#l00101">SIG_STARTUP_TIME</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="timeMaster_8hpp_source.html#l00035">startupTimeInitialized</a>, <a class="el" href="timeMaster_8hpp_source.html#l00034">timeClient</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
+<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00087">CBK_GET_CURRENT_TIME</a>, <a class="el" href="timeMaster_8cpp_source.html#l00129">getRtcTime()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8hpp_source.html#l00097">ntpAvailable</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00149">setTimeZone()</a>, <a class="el" href="signals_8hpp_source.html#l00101">SIG_STARTUP_TIME</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="timeMaster_8hpp_source.html#l00062">startupTimeInitialized</a>, <a class="el" href="timeMaster_8hpp_source.html#l00057">timeClient</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -327,9 +358,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Configures the system timezone offset used by the time conversion logic. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeZoneOffset</td><td>Time offset in hours relative to UTC. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00149">149</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00034">timeClient</a>.</p>
+<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00057">timeClient</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00024">init()</a>.</p>
 
@@ -358,9 +397,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Refreshes internal state variables based on the current NTP status and elapsed time. </p>
+
 <p class="definition">Definition at line <a class="el" href="timeMaster_8cpp_source.html#l00160">160</a> of file <a class="el" href="timeMaster_8cpp_source.html">timeMaster.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00042">lastMillis</a>, <a class="el" href="timeMaster_8hpp_source.html#l00041">lastNTPTime</a>, <a class="el" href="timeMaster_8hpp_source.html#l00040">lastUpdateTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8hpp_source.html#l00043">ntpAvailable</a>, <a class="el" href="timeMaster_8hpp_source.html#l00034">timeClient</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00038">wasNtpEverSynced</a>.</p>
+<p class="reference">References <a class="el" href="timeMaster_8hpp_source.html#l00092">lastMillis</a>, <a class="el" href="timeMaster_8hpp_source.html#l00087">lastNTPTime</a>, <a class="el" href="timeMaster_8hpp_source.html#l00082">lastUpdateTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="timeMaster_8hpp_source.html#l00097">ntpAvailable</a>, <a class="el" href="timeMaster_8hpp_source.html#l00057">timeClient</a>, and <a class="el" href="timeMaster_8hpp_source.html#l00077">wasNtpEverSynced</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00024">init()</a>.</p>
 
@@ -387,7 +428,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00037">37</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Number of failed NTP synchronization attempts already recorded. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00072">72</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>.</p>
 
@@ -413,7 +456,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00042">42</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Milliseconds since the last local timer reset, used for deriving elapsed periods. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00092">92</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00154">getEpochTime()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
@@ -439,7 +484,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00041">41</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Last valid epoch time received from the NTP server. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00087">87</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00154">getEpochTime()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
@@ -465,7 +512,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00040">40</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Timestamp of the most recent NTP refresh or status update. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00082">82</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
@@ -491,7 +540,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00043">43</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>true when the NTP connection is available and the time is considered usable. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00097">97</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00024">init()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
@@ -517,7 +568,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00036">36</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>UDP socket used for outbound NTP communication. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00067">67</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +594,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00035">35</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>true once the startup time initialization path has completed. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00062">62</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00024">init()</a>.</p>
 
@@ -567,7 +622,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00034">34</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>NTP client instance used to query the remote time server. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00057">57</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00024">init()</a>, <a class="el" href="timeMaster_8cpp_source.html#l00149">setTimeZone()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 
@@ -593,7 +650,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00048">48</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Counter tracking time sync failures so the system can back off or retry deliberately. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00112">112</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>.</p>
 
@@ -619,7 +678,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00044">44</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>Interval between NTP refresh attempts. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00102">102</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +704,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00038">38</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
+<p>true when the system has ever received a valid NTP sync. </p>
+
+<p class="definition">Definition at line <a class="el" href="timeMaster_8hpp_source.html#l00077">77</a> of file <a class="el" href="timeMaster_8hpp_source.html">timeMaster.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="timeMaster_8cpp_source.html#l00063">cyclic()</a>, and <a class="el" href="timeMaster_8cpp_source.html#l00160">updateNtpVariables()</a>.</p>
 

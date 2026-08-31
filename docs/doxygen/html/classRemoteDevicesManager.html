@@ -114,29 +114,40 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRemoteDev
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Remote Devices Manager behavior.  
+<p>Maintains the mapping between local device IDs and devices available on remote nodes.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:ServiceCallFingerprint" id="r_ServiceCallFingerprint"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html">ServiceCallFingerprint</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents the Service Call Fingerprint data structure.  <a href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html#details">More...</a><br /></td></tr>
+<tr class="memitem:ServiceCallFingerprint" id="r_ServiceCallFingerprint"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html">ServiceCallFingerprint</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifies a unique remote service call so a response can be matched to the correct request.  <a href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae361f0d268defbd45ebc3d4d66bd5cdc" id="r_ae361f0d268defbd45ebc3d4d66bd5cdc"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae361f0d268defbd45ebc3d4d66bd5cdc">cyclic</a> ()</td></tr>
+<tr class="memdesc:ae361f0d268defbd45ebc3d4d66bd5cdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs periodic maintenance and state checks for remote requests.  <br /></td></tr>
 <tr class="memitem:a7a20507e2771cf798a69f386b7c87b34" id="r_a7a20507e2771cf798a69f386b7c87b34"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a7a20507e2771cf798a69f386b7c87b34">deinit</a> ()</td></tr>
+<tr class="memdesc:a7a20507e2771cf798a69f386b7c87b34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the manager state when the service is shutting down.  <br /></td></tr>
 <tr class="memitem:a5260a34824e778d9e1e38c0f2052feb2" id="r_a5260a34824e778d9e1e38c0f2052feb2"><td class="memItemLeft">static <a class="el" href="structRCTranslation.html">RCTranslation</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5260a34824e778d9e1e38c0f2052feb2">getTranslationFromUnique</a> (uint8_t uniqueId)</td></tr>
+<tr class="memdesc:a5260a34824e778d9e1e38c0f2052feb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolves the remote-node translation for a given unique internal device ID.  <br /></td></tr>
 <tr class="memitem:a33f96f033a0940dee6e4a1c8773da758" id="r_a33f96f033a0940dee6e4a1c8773da758"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a33f96f033a0940dee6e4a1c8773da758">init</a> ()</td></tr>
+<tr class="memdesc:a33f96f033a0940dee6e4a1c8773da758"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the manager and prepares the current mapping state.  <br /></td></tr>
 <tr class="memitem:a572f3427dda01890a414a16458329f69" id="r_a572f3427dda01890a414a16458329f69"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a572f3427dda01890a414a16458329f69">printTranslationMap</a> ()</td></tr>
+<tr class="memdesc:a572f3427dda01890a414a16458329f69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the current translation map in a readable form for diagnostics.  <br /></td></tr>
 <tr class="memitem:acaa2165782211092d164c43ff0139118" id="r_acaa2165782211092d164c43ff0139118"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#acaa2165782211092d164c43ff0139118">receiveResponse</a> (<a class="el" href="classRcResponse.html">RcResponse</a> &amp;response)</td></tr>
+<tr class="memdesc:acaa2165782211092d164c43ff0139118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles a remote response packet and updates the pending request state.  <br /></td></tr>
 <tr class="memitem:ab013aa871fe1ebb64924e02695901ea5" id="r_ab013aa871fe1ebb64924e02695901ea5"><td class="memItemLeft">static <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab013aa871fe1ebb64924e02695901ea5">service</a> (uint8_t deviceId, <a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType)</td></tr>
+<tr class="memdesc:ab013aa871fe1ebb64924e02695901ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a remote service call with no additional parameters.  <br /></td></tr>
 <tr class="memitem:ac903f441a82f28364cd4e84ff099aadb" id="r_ac903f441a82f28364cd4e84ff099aadb"><td class="memItemLeft">static <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac903f441a82f28364cd4e84ff099aadb">service</a> (uint8_t deviceId, <a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType, <a class="el" href="structServiceParameters__set1.html">ServiceParameters_set1</a> param)</td></tr>
+<tr class="memdesc:ac903f441a82f28364cd4e84ff099aadb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a remote service call with set-1 payload parameters.  <br /></td></tr>
 <tr class="memitem:af6273bb079383a5d0e463e3704e26f44" id="r_af6273bb079383a5d0e463e3704e26f44"><td class="memItemLeft">static <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#af6273bb079383a5d0e463e3704e26f44">service</a> (uint8_t deviceId, <a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType, <a class="el" href="structServiceParameters__set2.html">ServiceParameters_set2</a> param)</td></tr>
+<tr class="memdesc:af6273bb079383a5d0e463e3704e26f44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a remote service call with set-2 payload parameters.  <br /></td></tr>
 <tr class="memitem:a3785ed3fba8f844e828b517f6df7e9bb" id="r_a3785ed3fba8f844e828b517f6df7e9bb"><td class="memItemLeft">static <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3785ed3fba8f844e828b517f6df7e9bb">service</a> (uint8_t deviceId, <a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType, <a class="el" href="structServiceParameters__set3.html">ServiceParameters_set3</a> param)</td></tr>
+<tr class="memdesc:a3785ed3fba8f844e828b517f6df7e9bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a remote service call with set-3 payload parameters.  <br /></td></tr>
 <tr class="memitem:ad2081a36e441589ed95388ffac3be666" id="r_ad2081a36e441589ed95388ffac3be666"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad2081a36e441589ed95388ffac3be666">tunnelDataUpdate</a> (std::any remoteDevices)</td></tr>
+<tr class="memdesc:ad2081a36e441589ed95388ffac3be666"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the remote-device map with the latest collection received through the RC server tunnel.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-types" class="groupheader"><a id="pri-types" name="pri-types"></a>
 Private Types</h2></td></tr>
@@ -145,26 +156,37 @@ Private Types</h2></td></tr>
 , <a class="el" href="#a6a24f48360ac3ac9b95a331eb694cdb1aaa447425553f3ecba4654dd4567a6648">RDM_REQUEST_FAILED</a>
 , <a class="el" href="#a6a24f48360ac3ac9b95a331eb694cdb1af66d3da13d951431bb8fed7c0d663a2c">RDM_REQUEST_COMPLETED</a>
  }</td></tr>
+<tr class="memdesc:a6a24f48360ac3ac9b95a331eb694cdb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">State machine describing the current remote service request lifecycle.  <a href="#a6a24f48360ac3ac9b95a331eb694cdb1">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a5f22156168cc34c6b8de0311f7b97345" id="r_a5f22156168cc34c6b8de0311f7b97345"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a5f22156168cc34c6b8de0311f7b97345">getMappingOffsetForNode</a> (uint64_t &amp;nodeMAC)</td></tr>
+<tr class="memdesc:a5f22156168cc34c6b8de0311f7b97345"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the mapping slot reserved for the supplied node MAC address.  <br /></td></tr>
 <tr class="memitem:aaacc8f7a8cff48787d632db47ade6dfa" id="r_aaacc8f7a8cff48787d632db47ade6dfa"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aaacc8f7a8cff48787d632db47ade6dfa">handleService3Response</a> (<a class="el" href="classRcResponse.html">RcResponse</a> &amp;response, <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &amp;responseDeviceDescription)</td></tr>
+<tr class="memdesc:aaacc8f7a8cff48787d632db47ade6dfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes a remote service response and converts it into the appropriate device-description format.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a208f4609990d12c6c71c932c80ea550d" id="r_a208f4609990d12c6c71c932c80ea550d"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a208f4609990d12c6c71c932c80ea550d">awaitingResponseId</a> = 255</td></tr>
+<tr class="memdesc:a208f4609990d12c6c71c932c80ea550d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request ID of the currently awaited response.  <br /></td></tr>
 <tr class="memitem:a968016ed467b1485999648d1d77efbac" id="r_a968016ed467b1485999648d1d77efbac"><td class="memItemLeft">static std::map&lt; uint8_t, <a class="el" href="structRCTranslation.html">RCTranslation</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a968016ed467b1485999648d1d77efbac">currentIdMapping</a></td></tr>
+<tr class="memdesc:a968016ed467b1485999648d1d77efbac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map of unique local identifiers to their remote-node translation metadata.  <br /></td></tr>
 <tr class="memitem:a2f56c600f21197c8e80830a1c3eac338" id="r_a2f56c600f21197c8e80830a1c3eac338"><td class="memItemLeft">static <a class="el" href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html">ServiceCallFingerprint</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2f56c600f21197c8e80830a1c3eac338">currentRequestFingerprint</a></td></tr>
+<tr class="memdesc:a2f56c600f21197c8e80830a1c3eac338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fingerprint of the request currently awaiting a remote response.  <br /></td></tr>
 <tr class="memitem:abd8ade6756b0406950051918549d2913" id="r_abd8ade6756b0406950051918549d2913"><td class="memItemLeft">static <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#abd8ade6756b0406950051918549d2913">currentRequestRespErrorCode</a></td></tr>
-<tr class="memitem:a39227bc78e6cd8a8ee1ff7c52aafebc2" id="r_a39227bc78e6cd8a8ee1ff7c52aafebc2"><td class="memItemLeft">static std::array&lt; ExternalNodeMapping, 24 &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a39227bc78e6cd8a8ee1ff7c52aafebc2">mappingSlotsForExternalNodes</a></td></tr>
+<tr class="memdesc:abd8ade6756b0406950051918549d2913"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result code returned by the most recent remote service call.  <br /></td></tr>
+<tr class="memitem:a39227bc78e6cd8a8ee1ff7c52aafebc2" id="r_a39227bc78e6cd8a8ee1ff7c52aafebc2"><td class="memItemLeft">static std::array&lt; <a class="el" href="structExternalNodeMapping.html">ExternalNodeMapping</a>, 24 &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a39227bc78e6cd8a8ee1ff7c52aafebc2">mappingSlotsForExternalNodes</a></td></tr>
+<tr class="memdesc:a39227bc78e6cd8a8ee1ff7c52aafebc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Slots reserved for tracking remote-node mappings and checking their occupancy.  <br /></td></tr>
 <tr class="memitem:a002db31ed4e13c024171563ff46d131d" id="r_a002db31ed4e13c024171563ff46d131d"><td class="memItemLeft">static std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a002db31ed4e13c024171563ff46d131d">remoteDevicesCollection</a></td></tr>
+<tr class="memdesc:a002db31ed4e13c024171563ff46d131d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of remote device descriptions tunneled in from the RC server after handshake completion.  <br /></td></tr>
 <tr class="memitem:a1bda8615c4648b10d6832eec5e377e32" id="r_a1bda8615c4648b10d6832eec5e377e32"><td class="memItemLeft">static <a class="el" href="#a6a24f48360ac3ac9b95a331eb694cdb1">RDM_RequestProcessingState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1bda8615c4648b10d6832eec5e377e32">requestProcessingState</a> = <a class="el" href="#a6a24f48360ac3ac9b95a331eb694cdb1a97a26eb26de1f2e047bbf53a6a828c2d">RDM_NO_REQUEST</a></td></tr>
+<tr class="memdesc:a1bda8615c4648b10d6832eec5e377e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current lifecycle state of the pending remote request.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Remote Devices Manager behavior. </p>
+<div class="textblock"><p>Maintains the mapping between local device IDs and devices available on remote nodes. </p>
+<p>The manager tracks remote-node devices, translates identifiers during service calls, and processes the results of requests sent across the network so the local OS can act on remote hardware as if it were local. </p>
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00038">38</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00065">65</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 </div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Member Enumeration Documentation</h2>
 <a id="a6a24f48360ac3ac9b95a331eb694cdb1" name="a6a24f48360ac3ac9b95a331eb694cdb1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6a24f48360ac3ac9b95a331eb694cdb1">&#9670;&#160;</a></span>RDM_RequestProcessingState</h2>
@@ -185,6 +207,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>State machine describing the current remote service request lifecycle. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6a24f48360ac3ac9b95a331eb694cdb1a97a26eb26de1f2e047bbf53a6a828c2d" name="a6a24f48360ac3ac9b95a331eb694cdb1a97a26eb26de1f2e047bbf53a6a828c2d"></a>RDM_NO_REQUEST&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a6a24f48360ac3ac9b95a331eb694cdb1a5e52e325e699ab2747cf80f8bc92e988" name="a6a24f48360ac3ac9b95a331eb694cdb1a5e52e325e699ab2747cf80f8bc92e988"></a>RDM_REQUEST_IN_PROGRESS&#160;</td><td class="fielddoc"></td></tr>
@@ -192,7 +216,7 @@ Static Private Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a6a24f48360ac3ac9b95a331eb694cdb1af66d3da13d951431bb8fed7c0d663a2c" name="a6a24f48360ac3ac9b95a331eb694cdb1af66d3da13d951431bb8fed7c0d663a2c"></a>RDM_REQUEST_COMPLETED&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00040">40</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00070">70</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,6 +243,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Performs periodic maintenance and state checks for remote requests. </p>
 
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00285">285</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
@@ -249,9 +275,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Cleans up the manager state when the service is shutting down. </p>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00250">250</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00036">CBK_SET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00059">e_BLOCK_RDM_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00063">e_BLOCK_RDM_5</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00068">mappingSlotsForExternalNodes</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00021">NVM_VALID_FLAG</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00016">PERSISTENT_DATABLOCK_SIZE</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00036">CBK_SET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00059">e_BLOCK_RDM_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00063">e_BLOCK_RDM_5</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00132">mappingSlotsForExternalNodes</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00021">NVM_VALID_FLAG</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00016">PERSISTENT_DATABLOCK_SIZE</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00270">OperatingSystem::performReset()</a>.</p>
 
@@ -280,9 +308,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Finds the mapping slot reserved for the supplied node MAC address. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nodeMAC</td><td>MAC address of the remote node to look up. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Slot offset assigned to that remote node. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00119">119</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00068">mappingSlotsForExternalNodes</a>.</p>
+<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00132">mappingSlotsForExternalNodes</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">tunnelDataUpdate()</a>.</p>
 
@@ -311,9 +348,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Resolves the remote-node translation for a given unique internal device ID. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uniqueId</td><td>Unique identifier used in the local translation map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Translation metadata for the remote device. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">231</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00067">currentIdMapping</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00127">currentIdMapping</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">service()</a>.</p>
 
@@ -346,6 +392,15 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Processes a remote service response and converts it into the appropriate device-description format. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">response</td><td>Response packet received from the remote node. </td></tr>
+    <tr><td class="paramname">responseDeviceDescription</td><td><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> description associated with the response payload. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00298">298</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="device_8hpp_source.html#l00166">ServiceParameters_set3::buff</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="device_8hpp_source.html#l00155">e_OUT_from_DEVICE</a>, <a class="el" href="device_8hpp_source.html#l00157">e_UNKNOWN_PARAM_DIRECTION</a>, <a class="el" href="rcResponse_8cpp_source.html#l00024">RcResponse::getData()</a>, <a class="el" href="device_8hpp_source.html#l00283">DeviceDescription::getSize()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00018">localCopyOfLastActiveRequestParamSet3</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00019">localCopyOfLastOverloading</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00027">serviceCall_INVALID</a>, and <a class="el" href="device_8hpp_source.html#l00168">ServiceParameters_set3::size</a>.</p>
@@ -377,9 +432,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the manager and prepares the current mapping state. </p>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">23</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="signals_8hpp_source.html#l00050">CBK_REGISTER_RESPONSE_RECEIVER</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00059">e_BLOCK_RDM_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00063">e_BLOCK_RDM_5</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00068">mappingSlotsForExternalNodes</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00021">NVM_VALID_FLAG</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00016">PERSISTENT_DATABLOCK_SIZE</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">receiveResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00058">SIG_RC_DEVICES_INTERNAL_TUNNEL</a>, <a class="el" href="signals_8hpp_source.html#l00064">SIG_REMOTE_DEVICE_SERVICES</a>, <a class="el" href="datacontainer_8cpp_source.html#l00029">DataContainer::subscribe()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">tunnelDataUpdate()</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="signals_8hpp_source.html#l00050">CBK_REGISTER_RESPONSE_RECEIVER</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00059">e_BLOCK_RDM_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00063">e_BLOCK_RDM_5</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00132">mappingSlotsForExternalNodes</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00021">NVM_VALID_FLAG</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00016">PERSISTENT_DATABLOCK_SIZE</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">receiveResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00058">SIG_RC_DEVICES_INTERNAL_TUNNEL</a>, <a class="el" href="signals_8hpp_source.html#l00064">SIG_REMOTE_DEVICE_SERVICES</a>, <a class="el" href="datacontainer_8cpp_source.html#l00029">DataContainer::subscribe()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">tunnelDataUpdate()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -408,9 +465,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Prints the current translation map in a readable form for diagnostics. </p>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00289">289</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00067">currentIdMapping</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00127">currentIdMapping</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
 
 </div>
 </div>
@@ -437,9 +496,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Handles a remote response packet and updates the pending request state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">response</td><td>Response packet received from the remote node. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the response was processed successfully; false when it was invalid. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">331</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">awaitingResponseId</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00078">CBK_UPDATE_RC_SLAVE_INFORMATION</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">currentRequestRespErrorCode</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="device_8hpp_source.html#l00155">e_OUT_from_DEVICE</a>, <a class="el" href="device_8hpp_source.html#l00339">DeviceDescription::fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00024">RcResponse::getData()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00018">RcResponse::getResponseId()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00019">RcResponse::getResponseNodeMAC()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00023">RcResponse::getResponseType()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="device_8hpp_source.html#l00283">DeviceDescription::getSize()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00298">handleService3Response()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00013">INVALID_REQ_RESP</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00018">localCopyOfLastActiveRequestParamSet3</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00019">localCopyOfLastOverloading</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00209">DeviceDescription::macAddress</a>, <a class="el" href="rcResponse_8hpp_source.html#l00011">POSITIVE_RESP</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00044">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00043">RDM_REQUEST_FAILED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00126">UserInterfaceNotification::WARNING</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">awaitingResponseId</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00078">CBK_UPDATE_RC_SLAVE_INFORMATION</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00154">currentRequestRespErrorCode</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="device_8hpp_source.html#l00155">e_OUT_from_DEVICE</a>, <a class="el" href="device_8hpp_source.html#l00339">DeviceDescription::fromByteArray()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00024">RcResponse::getData()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00018">RcResponse::getResponseId()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00019">RcResponse::getResponseNodeMAC()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00023">RcResponse::getResponseType()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="device_8hpp_source.html#l00283">DeviceDescription::getSize()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00298">handleService3Response()</a>, <a class="el" href="rcResponse_8hpp_source.html#l00013">INVALID_REQ_RESP</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00018">localCopyOfLastActiveRequestParamSet3</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00019">localCopyOfLastOverloading</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00209">DeviceDescription::macAddress</a>, <a class="el" href="rcResponse_8hpp_source.html#l00011">POSITIVE_RESP</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">RDM_REQUEST_FAILED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00126">UserInterfaceNotification::WARNING</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">init()</a>.</p>
 
@@ -472,9 +540,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a remote service call with no additional parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td>Remote device identifier. </td></tr>
+    <tr><td class="paramname">serviceType</td><td>Requested service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Result code received from the remote node or the local validation layer. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">416</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">currentRequestFingerprint</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00041">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00044">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00042">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00023">serviceCall_NoParams</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00149">currentRequestFingerprint</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00023">serviceCall_NoParams</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">init()</a>.</p>
 
@@ -512,9 +590,20 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a remote service call with set-1 payload parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td>Remote device identifier. </td></tr>
+    <tr><td class="paramname">serviceType</td><td>Requested service. </td></tr>
+    <tr><td class="paramname">param</td><td>Packed parameter payload for the service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Result code received from the remote node or the local validation layer. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">493</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">currentRequestRespErrorCode</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00041">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00044">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00042">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00024">serviceCall_1</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00149">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00154">currentRequestRespErrorCode</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00024">serviceCall_1</a>.</p>
 
 </div>
 </div>
@@ -550,9 +639,20 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a remote service call with set-2 payload parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td>Remote device identifier. </td></tr>
+    <tr><td class="paramname">serviceType</td><td>Requested service. </td></tr>
+    <tr><td class="paramname">param</td><td>Packed parameter payload for the service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Result code received from the remote node or the local validation layer. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">571</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">currentRequestRespErrorCode</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00041">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00044">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00042">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00025">serviceCall_2</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00149">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00154">currentRequestRespErrorCode</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00025">serviceCall_2</a>.</p>
 
 </div>
 </div>
@@ -588,9 +688,20 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a remote service call with set-3 payload parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceId</td><td>Remote device identifier. </td></tr>
+    <tr><td class="paramname">serviceType</td><td>Requested service. </td></tr>
+    <tr><td class="paramname">param</td><td>Packed parameter payload for the service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Result code received from the remote node or the local validation layer. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">649</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">currentRequestRespErrorCode</a>, <a class="el" href="device_8hpp_source.html#l00156">e_IN_to_DEVICE</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00024">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00018">localCopyOfLastActiveRequestParamSet3</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00019">localCopyOfLastOverloading</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00015">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00041">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00044">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00042">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>.</p>
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">awaitingResponseId</a>, <a class="el" href="signals_8hpp_source.html#l00060">CBK_CREATE_RC_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00149">currentRequestFingerprint</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00154">currentRequestRespErrorCode</a>, <a class="el" href="device_8hpp_source.html#l00156">e_IN_to_DEVICE</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00036">RCTranslation::isValid()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00018">localCopyOfLastActiveRequestParamSet3</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00019">localCopyOfLastOverloading</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::mac</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="rcRequest_8cpp_source.html#l00057">RcRequest::pushData()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">RDM_NO_REQUEST</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">RDM_REQUEST_COMPLETED</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">RDM_REQUEST_IN_PROGRESS</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">requestProcessingState</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_BUSY</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="rcRequest_8hpp_source.html#l00011">SERVICE_CALL_REQ</a>, and <a class="el" href="device_8hpp_source.html#l00026">serviceCall_3</a>.</p>
 
 </div>
 </div>
@@ -617,9 +728,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Updates the remote-device map with the latest collection received through the RC server tunnel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">remoteDevices</td><td>New collection of remote device descriptions. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">165</a> of file <a class="el" href="RemoteDevicesManager_8cpp_source.html">RemoteDevicesManager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00067">currentIdMapping</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00127">UserInterfaceNotification::ERROR</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00119">getMappingOffsetForNode()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00017">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00066">remoteDevicesCollection</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00022">SIG_REMOTE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>.</p>
+<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00127">currentIdMapping</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00127">UserInterfaceNotification::ERROR</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00119">getMappingOffsetForNode()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00022">RCTranslation::onSourceNodeLocalId</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00122">remoteDevicesCollection</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00022">SIG_REMOTE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">init()</a>.</p>
 
@@ -646,7 +765,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00074">74</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Request ID of the currently awaited response. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00159">159</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">receiveResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">service()</a>.</p>
 
@@ -672,7 +793,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00067">67</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Map of unique local identifiers to their remote-node translation metadata. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00127">127</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00231">getTranslationFromUnique()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00289">printTranslationMap()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">tunnelDataUpdate()</a>.</p>
 
@@ -698,7 +821,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00072">72</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Fingerprint of the request currently awaiting a remote response. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00149">149</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">service()</a>.</p>
 
@@ -724,7 +849,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00073">73</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Result code returned by the most recent remote service call. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00154">154</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">receiveResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">service()</a>.</p>
 
@@ -740,7 +867,7 @@ Static Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::array&lt; ExternalNodeMapping, 24 &gt; RemoteDevicesManager::mappingSlotsForExternalNodes</td>
+          <td class="memname">std::array&lt; <a class="el" href="structExternalNodeMapping.html">ExternalNodeMapping</a>, 24 &gt; RemoteDevicesManager::mappingSlotsForExternalNodes</td>
         </tr>
       </table>
   </td>
@@ -750,7 +877,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00068">68</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Slots reserved for tracking remote-node mappings and checking their occupancy. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00132">132</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00250">deinit()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00119">getMappingOffsetForNode()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">init()</a>.</p>
 
@@ -776,7 +905,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00066">66</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Vector of remote device descriptions tunneled in from the RC server after handshake completion. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00122">122</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00165">tunnelDataUpdate()</a>.</p>
 
@@ -802,7 +933,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00071">71</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Current lifecycle state of the pending remote request. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00144">144</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00331">receiveResponse()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00416">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00493">service()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00571">service()</a>, and <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00649">service()</a>.</p>
 

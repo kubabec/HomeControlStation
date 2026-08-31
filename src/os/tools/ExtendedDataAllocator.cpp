@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/tools/ExtendedDataAllocator.cpp
- * @brief Utility implementations used by the Home Control Station OS.
+ * @brief Heap-backed ExtendedData allocator used by devices and services.
  */
 
 

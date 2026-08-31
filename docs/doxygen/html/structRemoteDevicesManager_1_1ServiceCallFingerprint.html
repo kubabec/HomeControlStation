@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>HomeControlStation: RemoteDevicesManager::ServiceCallFingerprint Class Reference</title>
+<title>HomeControlStation: RemoteDevicesManager::ServiceCallFingerprint Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="codefolding.js"></script>
@@ -110,28 +110,33 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structRemoteDe
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">RemoteDevicesManager::ServiceCallFingerprint Class Reference</div></div>
+  <div class="headertitle"><div class="title">RemoteDevicesManager::ServiceCallFingerprint Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Represents the Service Call Fingerprint data structure.  
+<p>Identifies a unique remote service call so a response can be matched to the correct request.  
  <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a24cacf91f0ee8381a0ab0046b5f63ef9" id="r_a24cacf91f0ee8381a0ab0046b5f63ef9"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a24cacf91f0ee8381a0ab0046b5f63ef9">operator==</a> (<a class="el" href="structRemoteDevicesManager_1_1ServiceCallFingerprint.html">ServiceCallFingerprint</a> &amp;other)</td></tr>
+<tr class="memdesc:a24cacf91f0ee8381a0ab0046b5f63ef9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares two request fingerprints for equality.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:acbf5b2d949d516c2e86abb2e49a39050" id="r_acbf5b2d949d516c2e86abb2e49a39050"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#acbf5b2d949d516c2e86abb2e49a39050">deviceId</a> = 255</td></tr>
+<tr class="memdesc:acbf5b2d949d516c2e86abb2e49a39050"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier targeted by the call.  <br /></td></tr>
 <tr class="memitem:afc86587f7e661212992b8f84121fd655" id="r_afc86587f7e661212992b8f84121fd655"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#afc86587f7e661212992b8f84121fd655">memoryRequestDirection</a> = <a class="el" href="device_8hpp.html#a64d03546e9e332a5232ec04c1261fdcdaf2804d0b6e82a2b42628cba70dc8a97a">e_UNKNOWN_PARAM_DIRECTION</a></td></tr>
+<tr class="memdesc:afc86587f7e661212992b8f84121fd655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameter direction metadata for extended memory requests.  <br /></td></tr>
 <tr class="memitem:abdd1beb500cb79cba5113e64cc3f44d2" id="r_abdd1beb500cb79cba5113e64cc3f44d2"><td class="memItemLeft"><a class="el" href="device_8hpp.html#a89ed5b2e43e0258470ec042402d4bfe9">ServiceOverloadingFunction</a>&#160;</td><td class="memItemRight"><a class="el" href="#abdd1beb500cb79cba5113e64cc3f44d2">overloading</a> = <a class="el" href="device_8hpp.html#a89ed5b2e43e0258470ec042402d4bfe9a0b9ee89002adf37eacf6b1db4938c735">serviceCall_INVALID</a></td></tr>
+<tr class="memdesc:abdd1beb500cb79cba5113e64cc3f44d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload variant used by the call.  <br /></td></tr>
 <tr class="memitem:adf312e013059150a4c47286d4533b79b" id="r_adf312e013059150a4c47286d4533b79b"><td class="memItemLeft"><a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf312e013059150a4c47286d4533b79b">serviceName</a> = <a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a5d6207d4ed5567d0d0ebc83b11c0424a">DEVSERVICE_INVALID</a></td></tr>
+<tr class="memdesc:adf312e013059150a4c47286d4533b79b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service type requested from the remote node.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents the Service Call Fingerprint data structure. </p>
+<div class="textblock"><p>Identifies a unique remote service call so a response can be matched to the correct request. </p>
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00051">51</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00081">81</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a24cacf91f0ee8381a0ab0046b5f63ef9" name="a24cacf91f0ee8381a0ab0046b5f63ef9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a24cacf91f0ee8381a0ab0046b5f63ef9">&#9670;&#160;</a></span>operator==()</h2>
@@ -156,9 +161,18 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00058">58</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Compares two request fingerprints for equality. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>Candidate fingerprint. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when both requests describe the same service call. </dd></dl>
 
-<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00052">deviceId</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00054">overloading</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00053">serviceName</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00107">107</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00085">deviceId</a>, <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00095">overloading</a>, and <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00090">serviceName</a>.</p>
 
 </div>
 </div>
@@ -175,9 +189,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00052">52</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> identifier targeted by the call. </p>
 
-<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00058">operator==()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00085">85</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00107">operator==()</a>.</p>
 
 </div>
 </div>
@@ -193,7 +209,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00055">55</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Parameter direction metadata for extended memory requests. </p>
+
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00100">100</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -209,9 +227,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00054">54</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Overload variant used by the call. </p>
 
-<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00058">operator==()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00095">95</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00107">operator==()</a>.</p>
 
 </div>
 </div>
@@ -227,13 +247,15 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00053">53</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+<p>Service type requested from the remote node. </p>
 
-<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00058">operator==()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00090">90</a> of file <a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="RemoteDevicesManager_8hpp_source.html#l00107">operator==()</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/os/app/<a class="el" href="RemoteDevicesManager_8hpp_source.html">RemoteDevicesManager.hpp</a></li>
 </ul>
 </div><!-- contents -->

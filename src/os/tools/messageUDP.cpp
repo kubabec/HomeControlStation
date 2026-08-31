@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/tools/messageUDP.cpp
- * @brief Utility implementations used by the Home Control Station OS.
+ * @brief MessageUDP helpers: construction, validation and serialization for UDP transport.
  */
 
 

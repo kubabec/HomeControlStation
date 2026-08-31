@@ -113,21 +113,30 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structHTTPAsyn
   <div class="headertitle"><div class="title">HTTPAsyncRequestHandler::AsyncHttpRequest Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Container describing the active async HTTP request and its timing metadata.  
+ <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a02dcf8daf148eecc8ef6e5234533907a" id="r_a02dcf8daf148eecc8ef6e5234533907a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a02dcf8daf148eecc8ef6e5234533907a">print</a> ()</td></tr>
+<tr class="memdesc:a02dcf8daf148eecc8ef6e5234533907a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs the basic fields of the request for debugging.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a8eb4e78ff521c61c0967625e961fb3b1" id="r_a8eb4e78ff521c61c0967625e961fb3b1"><td class="memItemLeft">long&#160;</td><td class="memItemRight"><a class="el" href="#a8eb4e78ff521c61c0967625e961fb3b1">receivedTime</a> = 0</td></tr>
+<tr class="memdesc:a8eb4e78ff521c61c0967625e961fb3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp when the request was first received.  <br /></td></tr>
 <tr class="memitem:a17af5fcd268cb43b0492ac3619382c77" id="r_a17af5fcd268cb43b0492ac3619382c77"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a17af5fcd268cb43b0492ac3619382c77">requestData</a> [400]</td></tr>
+<tr class="memdesc:a17af5fcd268cb43b0492ac3619382c77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw parameter data associated with the request.  <br /></td></tr>
 <tr class="memitem:a946cb172385007db3bb8a1f43481bcfe" id="r_a946cb172385007db3bb8a1f43481bcfe"><td class="memItemLeft"><a class="el" href="HttpAsyncRequestHandler_8hpp.html#acd59cb757fb13f9dfaa6b753c2c65f64">AsyncRequestState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a946cb172385007db3bb8a1f43481bcfe">state</a> = <a class="el" href="HttpAsyncRequestHandler_8hpp.html#acd59cb757fb13f9dfaa6b753c2c65f64a56c79af0c3eaa7f97be0ffc8db5f758f">ASYNC_NO_REQUEST</a></td></tr>
+<tr class="memdesc:a946cb172385007db3bb8a1f43481bcfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current finite-state used by the request processing pipeline.  <br /></td></tr>
 <tr class="memitem:abaeeb1c5f558d25d01592dc3b9567677" id="r_abaeeb1c5f558d25d01592dc3b9567677"><td class="memItemLeft"><a class="el" href="HttpAsyncRequestHandler_8hpp.html#ad895f32645faa6ed34deee86bcd3b892">AsyncRequestType</a>&#160;</td><td class="memItemRight"><a class="el" href="#abaeeb1c5f558d25d01592dc3b9567677">type</a> = <a class="el" href="HttpAsyncRequestHandler_8hpp.html#ad895f32645faa6ed34deee86bcd3b892a035f82f61e0aa64389715eec900e13c4">ASYNC_TYPE_INVALID</a></td></tr>
+<tr class="memdesc:abaeeb1c5f558d25d01592dc3b9567677"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the asynchronous request being processed.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00059">59</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<div class="textblock"><p>Container describing the active async HTTP request and its timing metadata. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00064">64</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a02dcf8daf148eecc8ef6e5234533907a" name="a02dcf8daf148eecc8ef6e5234533907a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a02dcf8daf148eecc8ef6e5234533907a">&#9670;&#160;</a></span>print()</h2>
@@ -152,9 +161,11 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00065">65</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Logs the basic fields of the request for debugging. </p>
 
-<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">requestData</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">type</a>.</p>
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00088">88</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">requestData</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">type</a>.</p>
 
 </div>
 </div>
@@ -171,7 +182,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00061">61</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Timestamp when the request was first received. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00073">73</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>.</p>
 
@@ -189,9 +202,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00063">63</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Raw parameter data associated with the request. </p>
 
-<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">HTTPAsyncRequestHandler::createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00065">print()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00083">83</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">HTTPAsyncRequestHandler::createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>, and <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00088">print()</a>.</p>
 
 </div>
 </div>
@@ -207,7 +222,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00060">60</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Current finite-state used by the request processing pipeline. </p>
+
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00068">68</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">HTTPAsyncRequestHandler::createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00181">HTTPAsyncRequestHandler::getProcessingState()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00511">HTTPAsyncRequestHandler::mainFunction()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">HTTPAsyncRequestHandler::processRequest()</a>.</p>
 
@@ -225,9 +242,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00062">62</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+<p>Type of the asynchronous request being processed. </p>
 
-<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">HTTPAsyncRequestHandler::createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">HTTPAsyncRequestHandler::createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00065">print()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">HTTPAsyncRequestHandler::processRequest()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00078">78</a> of file <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html">HttpAsyncRequestHandler.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00463">HTTPAsyncRequestHandler::createJsonResponse()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00028">HTTPAsyncRequestHandler::createRequest()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00069">HTTPAsyncRequestHandler::createServiceCall()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00060">HTTPAsyncRequestHandler::currentRequestClear()</a>, <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>, <a class="el" href="HttpAsyncRequestHandler_8hpp_source.html#l00088">print()</a>, and <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00186">HTTPAsyncRequestHandler::processRequest()</a>.</p>
 
 </div>
 </div>

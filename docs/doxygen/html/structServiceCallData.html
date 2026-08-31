@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.18.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>HomeControlStation: ServiceCallData Class Reference</title>
+<title>HomeControlStation: ServiceCallData Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="codefolding.js"></script>
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structServiceC
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">ServiceCallData Class Reference</div></div>
+  <div class="headertitle"><div class="title">ServiceCallData Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Represents the Service Call Data data structure.  
+<p>Captures a device or room action that should be triggered when a digital event is received.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>&gt;</code></p>
@@ -122,11 +122,14 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('structServiceC
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ae952fb48741c88bf031145a4ce919e33" id="r_ae952fb48741c88bf031145a4ce919e33"><td class="memItemLeft">uint32_t&#160;</td><td class="memItemRight"><a class="el" href="#ae952fb48741c88bf031145a4ce919e33">deviceOrRoomId</a> = 0</td></tr>
+<tr class="memdesc:ae952fb48741c88bf031145a4ce919e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target device or room identifier that should receive the service call.  <br /></td></tr>
 <tr class="memitem:a331deee25f460ad30c05b7e935c8f87a" id="r_a331deee25f460ad30c05b7e935c8f87a"><td class="memItemLeft"><a class="el" href="structServiceParameters__set1.html">ServiceParameters_set1</a>&#160;</td><td class="memItemRight"><a class="el" href="#a331deee25f460ad30c05b7e935c8f87a">parameters</a></td></tr>
+<tr class="memdesc:a331deee25f460ad30c05b7e935c8f87a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameter payload passed to the service call.  <br /></td></tr>
 <tr class="memitem:a16c9917f66937126b44865d9a9af008c" id="r_a16c9917f66937126b44865d9a9af008c"><td class="memItemLeft"><a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a>&#160;</td><td class="memItemRight"><a class="el" href="#a16c9917f66937126b44865d9a9af008c">serviceType</a></td></tr>
+<tr class="memdesc:a16c9917f66937126b44865d9a9af008c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service to invoke on the target entity.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents the Service Call Data data structure. </p>
+<div class="textblock"><p>Captures a device or room action that should be triggered when a digital event is received. </p>
 
 <p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00013">13</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
@@ -142,7 +145,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00015">15</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
+<p>Target device or room identifier that should receive the service call. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00018">18</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00182">DigitalEventReceiver::cyclic()</a>.</p>
 
@@ -160,7 +165,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00017">17</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
+<p>Parameter payload passed to the service call. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00028">28</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00182">DigitalEventReceiver::cyclic()</a>.</p>
 
@@ -178,13 +185,15 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00016">16</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
+<p>Service to invoke on the target entity. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8hpp_source.html#l00023">23</a> of file <a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00182">DigitalEventReceiver::cyclic()</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/os/app/DigitalEvent/<a class="el" href="DigitalEventReceiver_8hpp_source.html">DigitalEventReceiver.hpp</a></li>
 </ul>
 </div><!-- contents -->

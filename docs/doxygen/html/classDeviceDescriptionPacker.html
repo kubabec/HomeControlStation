@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classDeviceDes
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the <a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> Description Packer behavior.  
+<p>Splits and merges device-description vectors across UDP chunk boundaries.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DeviceDescriptionPacker_8hpp_source.html">DeviceDescriptionPacker.hpp</a>&gt;</code></p>
@@ -122,19 +122,26 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classDeviceDes
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a783e651311bbe012e161c5193de4f845" id="r_a783e651311bbe012e161c5193de4f845"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a783e651311bbe012e161c5193de4f845">addChunkToCollection</a> (std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &amp;collection, const std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &amp;chunk)</td></tr>
+<tr class="memdesc:a783e651311bbe012e161c5193de4f845"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a single received chunk to an already-growing output collection.  <br /></td></tr>
 <tr class="memitem:abb299d0c8697df8c42aafc058be438ff" id="r_abb299d0c8697df8c42aafc058be438ff"><td class="memItemLeft">static std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#abb299d0c8697df8c42aafc058be438ff">getChunk</a> (const std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &amp;devices, uint8_t chunkIndex)</td></tr>
+<tr class="memdesc:abb299d0c8697df8c42aafc058be438ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the content of a specific chunk from a device vector.  <br /></td></tr>
 <tr class="memitem:a96ccd54d5c421e2ca01f52ff6bffb9a2" id="r_a96ccd54d5c421e2ca01f52ff6bffb9a2"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a96ccd54d5c421e2ca01f52ff6bffb9a2">getRequiredChunkCount</a> (uint16_t deviceCount)</td></tr>
+<tr class="memdesc:a96ccd54d5c421e2ca01f52ff6bffb9a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates how many chunks are needed to represent a given device count.  <br /></td></tr>
 <tr class="memitem:acef4ca0f7beb8a1864c2a0bd5506830b" id="r_acef4ca0f7beb8a1864c2a0bd5506830b"><td class="memItemLeft">static std::vector&lt; std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#acef4ca0f7beb8a1864c2a0bd5506830b">packDeviceDescriptions</a> (const std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &amp;devices)</td></tr>
+<tr class="memdesc:acef4ca0f7beb8a1864c2a0bd5506830b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Splits a full device-description list into fixed-size chunks for network transfer.  <br /></td></tr>
 <tr class="memitem:a11a24c455dc5280d90c2a60c8dd5fb91" id="r_a11a24c455dc5280d90c2a60c8dd5fb91"><td class="memItemLeft">static std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a11a24c455dc5280d90c2a60c8dd5fb91">unpackDeviceDescriptions</a> (const std::vector&lt; std::vector&lt; <a class="el" href="structDeviceDescription.html">DeviceDescription</a> &gt; &gt; &amp;chunks)</td></tr>
+<tr class="memdesc:a11a24c455dc5280d90c2a60c8dd5fb91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reassembles a full device-description list from a collection of network chunks.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:aea02b328c716a3956e67e25caa37a41e" id="r_aea02b328c716a3956e67e25caa37a41e"><td class="memItemLeft">static constexpr uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#aea02b328c716a3956e67e25caa37a41e">MAX_DEVICES_PER_CHUNK</a> = 5</td></tr>
+<tr class="memdesc:aea02b328c716a3956e67e25caa37a41e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of device descriptions stored in a single UDP chunk.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the <a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> Description Packer behavior. </p>
+<div class="textblock"><p>Splits and merges device-description vectors across UDP chunk boundaries. </p>
+<p>The packet size used by the display and remote-control protocols is limited, so the packer splits a large device-description collection into fixed-size chunks and reassembles it on the receiving side. </p>
 
-<p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00023">23</a> of file <a class="el" href="DeviceDescriptionPacker_8hpp_source.html">DeviceDescriptionPacker.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00026">26</a> of file <a class="el" href="DeviceDescriptionPacker_8hpp_source.html">DeviceDescriptionPacker.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a783e651311bbe012e161c5193de4f845" name="a783e651311bbe012e161c5193de4f845"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a783e651311bbe012e161c5193de4f845">&#9670;&#160;</a></span>addChunkToCollection()</h2>
@@ -162,6 +169,15 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Adds a single received chunk to an already-growing output collection. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">collection</td><td>Collection being assembled on the receiving side. </td></tr>
+    <tr><td class="paramname">chunk</td><td>New chunk to append to the collection. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00047">47</a> of file <a class="el" href="DeviceDescriptionPacker_8cpp_source.html">DeviceDescriptionPacker.cpp</a>.</p>
 
@@ -196,9 +212,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the content of a specific chunk from a device vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">devices</td><td>Full device list. </td></tr>
+    <tr><td class="paramname">chunkIndex</td><td>Index of the chunk to return. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Selected chunk of device descriptions. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00069">69</a> of file <a class="el" href="DeviceDescriptionPacker_8cpp_source.html">DeviceDescriptionPacker.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00026">MAX_DEVICES_PER_CHUNK</a>.</p>
+<p class="reference">References <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00032">MAX_DEVICES_PER_CHUNK</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00009">packDeviceDescriptions()</a>.</p>
 
@@ -227,9 +253,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Calculates how many chunks are needed to represent a given device count. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">deviceCount</td><td>Number of device descriptions to be transferred. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Required number of chunks. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00058">58</a> of file <a class="el" href="DeviceDescriptionPacker_8cpp_source.html">DeviceDescriptionPacker.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00026">MAX_DEVICES_PER_CHUNK</a>.</p>
+<p class="reference">References <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00032">MAX_DEVICES_PER_CHUNK</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00009">packDeviceDescriptions()</a>.</p>
 
@@ -257,6 +292,15 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Splits a full device-description list into fixed-size chunks for network transfer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">devices</td><td>Full collection of device descriptions to serialize. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector of chunks, each containing at most MAX_DEVICES_PER_CHUNK items. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00009">9</a> of file <a class="el" href="DeviceDescriptionPacker_8cpp_source.html">DeviceDescriptionPacker.cpp</a>.</p>
 
@@ -287,6 +331,15 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reassembles a full device-description list from a collection of network chunks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">chunks</td><td>Chunks received over the network. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Combined device-description vector in original order. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00033">33</a> of file <a class="el" href="DeviceDescriptionPacker_8cpp_source.html">DeviceDescriptionPacker.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00047">addChunkToCollection()</a>.</p>
@@ -314,7 +367,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00026">26</a> of file <a class="el" href="DeviceDescriptionPacker_8hpp_source.html">DeviceDescriptionPacker.hpp</a>.</p>
+<p>Maximum number of device descriptions stored in a single UDP chunk. </p>
+
+<p class="definition">Definition at line <a class="el" href="DeviceDescriptionPacker_8hpp_source.html#l00032">32</a> of file <a class="el" href="DeviceDescriptionPacker_8hpp_source.html">DeviceDescriptionPacker.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00069">getChunk()</a>, and <a class="el" href="DeviceDescriptionPacker_8cpp_source.html#l00058">getRequiredChunkCount()</a>.</p>
 

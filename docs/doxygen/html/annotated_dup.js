@@ -30,6 +30,7 @@ var annotated_dup =
     [ "ExtendedDataAllocator", "classExtendedDataAllocator.html", "classExtendedDataAllocator" ],
     [ "ExtendedMemoryCtrlAPI", "structExtendedMemoryCtrlAPI.html", "structExtendedMemoryCtrlAPI" ],
     [ "ExtendedMemoryManager", "classExtendedMemoryManager.html", "classExtendedMemoryManager" ],
+    [ "ExternalNodeMapping", "structExternalNodeMapping.html", null ],
     [ "ExtMemoryData", "structExtMemoryData.html", "structExtMemoryData" ],
     [ "ExtMemoryMetadataType", "structExtMemoryMetadataType.html", "structExtMemoryMetadataType" ],
     [ "FadeInAnimation", "classFadeInAnimation.html", "classFadeInAnimation" ],

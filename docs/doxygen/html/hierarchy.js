@@ -37,6 +37,7 @@ var hierarchy =
     [ "ExtendedDataAllocator", "classExtendedDataAllocator.html", null ],
     [ "ExtendedMemoryCtrlAPI", "structExtendedMemoryCtrlAPI.html", null ],
     [ "ExtendedMemoryManager", "classExtendedMemoryManager.html", null ],
+    [ "ExternalNodeMapping", "structExternalNodeMapping.html", null ],
     [ "ExtMemoryData", "structExtMemoryData.html", null ],
     [ "ExtMemoryMetadataType", "structExtMemoryMetadataType.html", null ],
     [ "HomeLightHttpServer", "classHomeLightHttpServer.html", null ],

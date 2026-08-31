@@ -6,7 +6,7 @@
 
 /**
  * @file src/os/app/deviceProvider.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief Device provider: registers service APIs and maps runtime device IDs to persistent slots.
  */
 
 // #include "deviceProvider.hpp"

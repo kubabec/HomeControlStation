@@ -2,7 +2,7 @@
 
 /**
  * @file src/os/CyclicProfiler.cpp
- * @brief Core operating-system implementation for the Home Control Station.
+ * @brief Profiling utilities for cyclic task timing, stats, and reporting.
  */
 
 

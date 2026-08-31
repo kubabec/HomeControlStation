@@ -540,7 +540,7 @@
     <path>include/os/app/</path>
     <filename>deviceProvider_8hpp.html</filename>
     <class kind="class">DeviceProvider</class>
-    <class kind="class">DeviceTranslationDetails</class>
+    <class kind="struct">DeviceTranslationDetails</class>
   </compound>
   <compound kind="file">
     <name>DigitalEventDefinitions.hpp</name>
@@ -567,7 +567,7 @@
     <filename>DigitalEventReceiver_8hpp.html</filename>
     <includes id="DigitalEventDefinitions_8hpp" name="DigitalEventDefinitions.hpp" local="no" import="no" module="no" objc="no">os/app/DigitalEvent/DigitalEventDefinitions.hpp</includes>
     <class kind="class">DigitalEventReceiver</class>
-    <class kind="class">ServiceCallData</class>
+    <class kind="struct">ServiceCallData</class>
   </compound>
   <compound kind="file">
     <name>DigitalEventTransmitter.hpp</name>
@@ -596,7 +596,7 @@
     <path>include/os/app/display/</path>
     <filename>DisplayDatatypes_8hpp.html</filename>
     <includes id="networkdriver_8hpp" name="networkdriver.hpp" local="yes" import="no" module="no" objc="no">os/drivers/networkdriver.hpp</includes>
-    <class kind="class">DisplayInfo</class>
+    <class kind="struct">DisplayInfo</class>
     <member kind="enumeration">
       <type></type>
       <name>DisplayMessageIds</name>
@@ -1219,9 +1219,9 @@
     <path>include/os/app/</path>
     <filename>RemoteDevicesManager_8hpp.html</filename>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-    <class kind="class">RCTranslation</class>
+    <class kind="struct">RCTranslation</class>
     <class kind="class">RemoteDevicesManager</class>
-    <class kind="class">RemoteDevicesManager::ServiceCallFingerprint</class>
+    <class kind="struct">RemoteDevicesManager::ServiceCallFingerprint</class>
     <member kind="define">
       <type>#define</type>
       <name>MAX_EXTERNAL_NODES</name>
@@ -1995,9 +1995,9 @@
     <filename>RFManager_8hpp.html</filename>
     <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
     <includes id="datacontainertypes_8hpp" name="datacontainertypes.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/datacontainertypes.hpp</includes>
-    <class kind="class">RFButtonInfo</class>
+    <class kind="struct">RFButtonInfo</class>
     <class kind="class">RFManager</class>
-    <class kind="class">RFReceptionEvent</class>
+    <class kind="struct">RFReceptionEvent</class>
     <member kind="define">
       <type>#define</type>
       <name>MAX_RF_BUTTONS_STORED</name>
@@ -2083,7 +2083,7 @@
     <name>messageUDP.hpp</name>
     <path>include/os/tools/</path>
     <filename>messageUDP_8hpp.html</filename>
-    <class kind="class">MessageUDP::IPAddr</class>
+    <class kind="struct">MessageUDP::IPAddr</class>
     <class kind="class">MessageUDP</class>
   </compound>
   <compound kind="file">
@@ -4513,7 +4513,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>DeviceTranslationDetails</name>
     <filename>structDeviceTranslationDetails.html</filename>
     <member kind="variable">
@@ -4760,7 +4760,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>DisplayInfo</name>
     <filename>structDisplayInfo.html</filename>
     <member kind="variable">
@@ -5194,6 +5194,10 @@
       <anchor>abad9d8990a0658bece7abba03fe0abb1</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>ExternalNodeMapping</name>
+    <filename>structExternalNodeMapping.html</filename>
   </compound>
   <compound kind="struct">
     <name>ExtMemoryData</name>
@@ -6537,7 +6541,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>MessageUDP::IPAddr</name>
     <filename>structMessageUDP_1_1IPAddr.html</filename>
     <member kind="function">
@@ -7171,7 +7175,7 @@
   <compound kind="class">
     <name>MessageUDP</name>
     <filename>classMessageUDP.html</filename>
-    <class kind="class">MessageUDP::IPAddr</class>
+    <class kind="struct">MessageUDP::IPAddr</class>
     <member kind="function">
       <type></type>
       <name>MessageUDP</name>
@@ -8788,7 +8792,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>RCTranslation</name>
     <filename>structRCTranslation.html</filename>
     <member kind="function">
@@ -9279,7 +9283,7 @@
   <compound kind="class">
     <name>RemoteDevicesManager</name>
     <filename>classRemoteDevicesManager.html</filename>
-    <class kind="class">RemoteDevicesManager::ServiceCallFingerprint</class>
+    <class kind="struct">RemoteDevicesManager::ServiceCallFingerprint</class>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>cyclic</name>
@@ -9575,7 +9579,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>RFButtonInfo</name>
     <filename>structRFButtonInfo.html</filename>
     <member kind="function">
@@ -9769,7 +9773,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>RFReceptionEvent</name>
     <filename>structRFReceptionEvent.html</filename>
     <member kind="variable">
@@ -10517,7 +10521,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>ServiceCallData</name>
     <filename>structServiceCallData.html</filename>
     <member kind="variable">
@@ -10542,7 +10546,7 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
+  <compound kind="struct">
     <name>RemoteDevicesManager::ServiceCallFingerprint</name>
     <filename>structRemoteDevicesManager_1_1ServiceCallFingerprint.html</filename>
     <member kind="function">

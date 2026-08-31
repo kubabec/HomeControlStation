@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRemoteCon
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Remote Control Client behavior.  
+<p>Implements the node-side RC client that handles discovery, requests, and responses from the master.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>&gt;</code></p>
@@ -122,40 +122,66 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classRemoteCon
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ab3eae89c140bd69e2e78de3a6fbccce9" id="r_ab3eae89c140bd69e2e78de3a6fbccce9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ab3eae89c140bd69e2e78de3a6fbccce9">cyclic</a> ()</td></tr>
+<tr class="memdesc:ab3eae89c140bd69e2e78de3a6fbccce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the periodic processing loop for queued messages and keep-alive tracking.  <br /></td></tr>
 <tr class="memitem:a48ae630a25c37eca293f93523abc9a70" id="r_a48ae630a25c37eca293f93523abc9a70"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a48ae630a25c37eca293f93523abc9a70">deinit</a> ()</td></tr>
+<tr class="memdesc:a48ae630a25c37eca293f93523abc9a70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the client state and releases resources used by the protocol flow.  <br /></td></tr>
 <tr class="memitem:a17f787f265af0df31b6bf705817a5b74" id="r_a17f787f265af0df31b6bf705817a5b74"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a17f787f265af0df31b6bf705817a5b74">init</a> ()</td></tr>
+<tr class="memdesc:a17f787f265af0df31b6bf705817a5b74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the RC client and registers the default handlers.  <br /></td></tr>
 <tr class="memitem:aa696a8cf63bd09a107f9668879302f5e" id="r_aa696a8cf63bd09a107f9668879302f5e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa696a8cf63bd09a107f9668879302f5e">receiveUDP</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;msg)</td></tr>
+<tr class="memdesc:aa696a8cf63bd09a107f9668879302f5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queues a received UDP payload for protocol processing.  <br /></td></tr>
 <tr class="memitem:af19f7e9b0bf82f6435921404fa5496e1" id="r_af19f7e9b0bf82f6435921404fa5496e1"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#af19f7e9b0bf82f6435921404fa5496e1">registerRequestReceiver</a> (<a class="el" href="rcRequest_8hpp.html#ae10b07f2d0feb103db7fe4cfd192e5af">RequestType</a> request, std::function&lt; bool(<a class="el" href="classRcRequest.html">RcRequest</a> &amp;)&gt; receiverCallback)</td></tr>
+<tr class="memdesc:af19f7e9b0bf82f6435921404fa5496e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a callback that handles a specific request type.  <br /></td></tr>
 <tr class="memitem:ad3e2f848abb4d846a4b159bd27d72268" id="r_ad3e2f848abb4d846a4b159bd27d72268"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#ad3e2f848abb4d846a4b159bd27d72268">sendResponse</a> (<a class="el" href="classRcResponse.html">RcResponse</a> &amp;response)</td></tr>
+<tr class="memdesc:ad3e2f848abb4d846a4b159bd27d72268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a prepared response back to the master node.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a06645c129a3c3b1e7ce3ad2fc2959cad" id="r_a06645c129a3c3b1e7ce3ad2fc2959cad"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a06645c129a3c3b1e7ce3ad2fc2959cad">handleKeepAliveState</a> ()</td></tr>
+<tr class="memdesc:a06645c129a3c3b1e7ce3ad2fc2959cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles the keep-alive exchange with the master node.  <br /></td></tr>
 <tr class="memitem:a0d4b2ae02674bd1398bd46d4062c84c5" id="r_a0d4b2ae02674bd1398bd46d4062c84c5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0d4b2ae02674bd1398bd46d4062c84c5">handleNodeDetailedDataState</a> ()</td></tr>
+<tr class="memdesc:a0d4b2ae02674bd1398bd46d4062c84c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles the state where the node sends detailed device data to the master.  <br /></td></tr>
 <tr class="memitem:a4d0a991bfdfcd86bb9ac97d8150f9ba5" id="r_a4d0a991bfdfcd86bb9ac97d8150f9ba5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4d0a991bfdfcd86bb9ac97d8150f9ba5">handleNodeInitialDataState</a> ()</td></tr>
+<tr class="memdesc:a4d0a991bfdfcd86bb9ac97d8150f9ba5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles the state where the node is sending its initial device snapshot.  <br /></td></tr>
 <tr class="memitem:a8a0bd3201247a89da7356c8b8430ed94" id="r_a8a0bd3201247a89da7356c8b8430ed94"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8a0bd3201247a89da7356c8b8430ed94">processGenericRequest</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;msg)</td></tr>
+<tr class="memdesc:a8a0bd3201247a89da7356c8b8430ed94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes a generic request that does not match one of the specialized states.  <br /></td></tr>
 <tr class="memitem:a6a02cec5aa74db8decd6c3881ce7f8a8" id="r_a6a02cec5aa74db8decd6c3881ce7f8a8"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a6a02cec5aa74db8decd6c3881ce7f8a8">processPendingTxData</a> ()</td></tr>
+<tr class="memdesc:a6a02cec5aa74db8decd6c3881ce7f8a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends all queued outgoing UDP packets waiting in the transmit queue.  <br /></td></tr>
 <tr class="memitem:afc758bc6ba9f4551d465d314e1808ff0" id="r_afc758bc6ba9f4551d465d314e1808ff0"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#afc758bc6ba9f4551d465d314e1808ff0">processResponse</a> ()</td></tr>
+<tr class="memdesc:afc758bc6ba9f4551d465d314e1808ff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validates and consumes a pending RC response.  <br /></td></tr>
 <tr class="memitem:a4911f782e6bc1b6a3738ac9a193d3f80" id="r_a4911f782e6bc1b6a3738ac9a193d3f80"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4911f782e6bc1b6a3738ac9a193d3f80">processUDPRequest</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;msg)</td></tr>
+<tr class="memdesc:a4911f782e6bc1b6a3738ac9a193d3f80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses and routes a UDP request received by the client.  <br /></td></tr>
 <tr class="memitem:add33197fccb43fa97c43f5293ae20990" id="r_add33197fccb43fa97c43f5293ae20990"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#add33197fccb43fa97c43f5293ae20990">sendDetailedDataResponse</a> (<a class="el" href="rc__dataTypes_8hpp.html#a39cbc60c3e000bd265826192a95cca69">UdpFrames_RCS</a> udpHeaderValue)</td></tr>
+<tr class="memdesc:add33197fccb43fa97c43f5293ae20990"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends the detailed node description response for the selected UDP frame type.  <br /></td></tr>
 <tr class="memitem:a41bd9023416e47b9d8236f32d4424978" id="r_a41bd9023416e47b9d8236f32d4424978"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a41bd9023416e47b9d8236f32d4424978">sendInitialDataResponse</a> ()</td></tr>
+<tr class="memdesc:a41bd9023416e47b9d8236f32d4424978"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends the initial device description payload in response to discovery.  <br /></td></tr>
 <tr class="memitem:a5f6a5729d293fd18b0211c06835b3c45" id="r_a5f6a5729d293fd18b0211c06835b3c45"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a5f6a5729d293fd18b0211c06835b3c45">sendKeepAlive</a> ()</td></tr>
+<tr class="memdesc:a5f6a5729d293fd18b0211c06835b3c45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a keep-alive packet to the master node.  <br /></td></tr>
 <tr class="memitem:af920c8215fadbb26e2086d0a46915577" id="r_af920c8215fadbb26e2086d0a46915577"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#af920c8215fadbb26e2086d0a46915577">updateLastKnownMasterIp</a> (<a class="el" href="structMessageUDP_1_1IPAddr.html">MessageUDP::IPAddr</a> address)</td></tr>
+<tr class="memdesc:af920c8215fadbb26e2086d0a46915577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the IP address of the most recently seen master node.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a406000aed313025ebf30f845a5aa8695" id="r_a406000aed313025ebf30f845a5aa8695"><td class="memItemLeft">static <a class="el" href="structTransaction.html">Transaction</a>&#160;</td><td class="memItemRight"><a class="el" href="#a406000aed313025ebf30f845a5aa8695">currentTransaction</a> {}</td></tr>
+<tr class="memdesc:a406000aed313025ebf30f845a5aa8695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current request/response transaction being processed by the client.  <br /></td></tr>
 <tr class="memitem:a429aad06664b3f34ae935a7339209890" id="r_a429aad06664b3f34ae935a7339209890"><td class="memItemLeft">static <a class="el" href="structMessageUDP_1_1IPAddr.html">MessageUDP::IPAddr</a>&#160;</td><td class="memItemRight"><a class="el" href="#a429aad06664b3f34ae935a7339209890">lastKnownMasterIp</a> {NETWORK_BROADCAST}</td></tr>
+<tr class="memdesc:a429aad06664b3f34ae935a7339209890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last IP address from which a valid master packet was received.  <br /></td></tr>
 <tr class="memitem:a1898cb30de0ea87e2f5437a4e81bc165" id="r_a1898cb30de0ea87e2f5437a4e81bc165"><td class="memItemLeft">static unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#a1898cb30de0ea87e2f5437a4e81bc165">lastMasterActivityTime</a> = 0</td></tr>
+<tr class="memdesc:a1898cb30de0ea87e2f5437a4e81bc165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp of the last observed master activity.  <br /></td></tr>
 <tr class="memitem:a5f18db9be916dda9f3173f54b3529eb0" id="r_a5f18db9be916dda9f3173f54b3529eb0"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a5f18db9be916dda9f3173f54b3529eb0">lastReceivedRequestId</a> = 0xFF</td></tr>
+<tr class="memdesc:a5f18db9be916dda9f3173f54b3529eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the last request received from the master.  <br /></td></tr>
 <tr class="memitem:a069323d2661ae1a739db483103872c87" id="r_a069323d2661ae1a739db483103872c87"><td class="memItemLeft">static uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#a069323d2661ae1a739db483103872c87">localNodeMACAddress</a></td></tr>
+<tr class="memdesc:a069323d2661ae1a739db483103872c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">MAC address of the local node used in discovery and response packets.  <br /></td></tr>
 <tr class="memitem:a5b421b6c9a069c8087935f5054f45d27" id="r_a5b421b6c9a069c8087935f5054f45d27"><td class="memItemLeft">static std::queue&lt; <a class="el" href="classMessageUDP.html">MessageUDP</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a5b421b6c9a069c8087935f5054f45d27">pendingTxQueue</a></td></tr>
+<tr class="memdesc:a5b421b6c9a069c8087935f5054f45d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outbound UDP messages queued for transmission.  <br /></td></tr>
 <tr class="memitem:ad42823bb4b88e92429ebd5e8fa5910bb" id="r_ad42823bb4b88e92429ebd5e8fa5910bb"><td class="memItemLeft">static std::queue&lt; <a class="el" href="classMessageUDP.html">MessageUDP</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ad42823bb4b88e92429ebd5e8fa5910bb">receivedBuffer</a></td></tr>
+<tr class="memdesc:ad42823bb4b88e92429ebd5e8fa5910bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">UDP packets received from the network and queued for protocol processing.  <br /></td></tr>
 <tr class="memitem:a6d367c36666b19e269f97e74773a52e2" id="r_a6d367c36666b19e269f97e74773a52e2"><td class="memItemLeft">static std::array&lt; std::function&lt; bool(<a class="el" href="classRcRequest.html">RcRequest</a> &amp;)&gt;, <a class="el" href="rcRequest_8hpp.html#ae10b07f2d0feb103db7fe4cfd192e5afa6a01c85da250fba862d6c29d2d0168c4">REQ_COUNT</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a6d367c36666b19e269f97e74773a52e2">requestReceivers</a></td></tr>
+<tr class="memdesc:a6d367c36666b19e269f97e74773a52e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mapping of request types to callbacks that should consume the corresponding incoming RC requests.  <br /></td></tr>
 <tr class="memitem:ab726018ec641df3866cdb3f847362f3a" id="r_ab726018ec641df3866cdb3f847362f3a"><td class="memItemLeft">static std::queue&lt; <a class="el" href="classRcResponse.html">RcResponse</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ab726018ec641df3866cdb3f847362f3a">vecResponseMessage</a></td></tr>
+<tr class="memdesc:ab726018ec641df3866cdb3f847362f3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue of pending RC responses waiting to be transmitted back to the master.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Remote Control Client behavior. </p>
+<div class="textblock"><p>Implements the node-side RC client that handles discovery, requests, and responses from the master. </p>
 
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00028">28</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
@@ -182,9 +208,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Runs the periodic processing loop for queued messages and keep-alive tracking. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00043">43</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rc__dataTypes_8hpp_source.html#l00024">DISCOVER_ME_MESSAGE</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00040">lastMasterActivityTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00065">processPendingTxData()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00318">processResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00031">receivedBuffer</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00012">TIME_TO_ASK_FOR_DISCOVERY</a>.</p>
+<p class="reference">References <a class="el" href="rc__dataTypes_8hpp_source.html#l00024">DISCOVER_ME_MESSAGE</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00063">lastMasterActivityTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00065">processPendingTxData()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00318">processResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00033">receivedBuffer</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00012">TIME_TO_ASK_FOR_DISCOVERY</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00136">OperatingSystem::task10ms()</a>.</p>
 
@@ -212,6 +240,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Clears the client state and releases resources used by the protocol flow. </p>
 
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00025">25</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
@@ -242,6 +272,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Handles the keep-alive exchange with the master node. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00191">191</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
 </div>
@@ -268,6 +300,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Handles the state where the node sends detailed device data to the master. </p>
 
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00186">186</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
@@ -298,6 +332,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Handles the state where the node is sending its initial device snapshot. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00181">181</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="remoteControlClient_8cpp_source.html#l00013">currentState</a>, and <a class="el" href="sigmessages_8hpp_source.html#l00014">STATE_NODE_DETAILED_DATA</a>.</p>
@@ -327,9 +363,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the RC client and registers the default handlers. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00029">29</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00048">CBK_REGISTER_REQUEST_RECEIVER</a>, <a class="el" href="signals_8hpp_source.html#l00054">CBK_RESPONSE</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00013">currentState</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00036">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00287">registerRequestReceiver()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00305">sendResponse()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00072">SIG_MAC_ADDRESS</a>, <a class="el" href="sigmessages_8hpp_source.html#l00013">STATE_NODE_INITIAL_DATA</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00083">updateLastKnownMasterIp()</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00048">CBK_REGISTER_REQUEST_RECEIVER</a>, <a class="el" href="signals_8hpp_source.html#l00054">CBK_RESPONSE</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00013">currentState</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00043">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00287">registerRequestReceiver()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00305">sendResponse()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00072">SIG_MAC_ADDRESS</a>, <a class="el" href="sigmessages_8hpp_source.html#l00013">STATE_NODE_INITIAL_DATA</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00083">updateLastKnownMasterIp()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -358,9 +396,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Processes a generic request that does not match one of the specialized states. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>UDP request message to process. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00128">128</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00021">currentTransaction</a>, <a class="el" href="rcRequest_8cpp_source.html#l00069">RcRequest::fromByteArray()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00033">RcRequest::getRequestNodeMAC()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00035">RcRequest::getRequestType()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00039">lastReceivedRequestId</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00036">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rcRequest_8hpp_source.html#l00010">REQ_FIRST</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00021">Transaction::request</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00035">requestReceivers</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00022">Transaction::response</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00305">sendResponse()</a>, and <a class="el" href="rcRequest_8hpp_source.html#l00013">UNKNOWN_REQ</a>.</p>
+<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00021">currentTransaction</a>, <a class="el" href="rcRequest_8cpp_source.html#l00069">RcRequest::fromByteArray()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00033">RcRequest::getRequestNodeMAC()</a>, <a class="el" href="rcRequest_8cpp_source.html#l00035">RcRequest::getRequestType()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00058">lastReceivedRequestId</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00043">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rcRequest_8hpp_source.html#l00010">REQ_FIRST</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00021">Transaction::request</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">requestReceivers</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00022">Transaction::response</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00305">sendResponse()</a>, and <a class="el" href="rcRequest_8hpp_source.html#l00013">UNKNOWN_REQ</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>.</p>
 
@@ -389,9 +435,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends all queued outgoing UDP packets waiting in the transmit queue. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00065">65</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00038">pendingTxQueue</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>.</p>
+<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00053">pendingTxQueue</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00043">cyclic()</a>.</p>
 
@@ -420,9 +468,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Validates and consumes a pending RC response. </p>
+<dl class="section return"><dt>Returns</dt><dd>true when a response was successfully handled. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00318">318</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00027">RcResponse::getSize()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00021">RC_RESPONSE</a>, <a class="el" href="rcResponse_8cpp_source.html#l00112">RcResponse::toByteArray()</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00037">vecResponseMessage</a>.</p>
+<p class="reference">References <a class="el" href="rcResponse_8cpp_source.html#l00027">RcResponse::getSize()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00053">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00021">RC_RESPONSE</a>, <a class="el" href="rcResponse_8cpp_source.html#l00112">RcResponse::toByteArray()</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00048">vecResponseMessage</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00043">cyclic()</a>.</p>
 
@@ -450,6 +501,14 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Parses and routes a UDP request received by the client. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>Packet arrived over the network. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00089">89</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
@@ -482,9 +541,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Queues a received UDP payload for protocol processing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>Incoming network packet. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00171">171</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00020">RC_REQUEST</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00031">receivedBuffer</a>.</p>
+<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00020">RC_REQUEST</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00033">receivedBuffer</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">NetworkDriver::init()</a>.</p>
 
@@ -517,9 +584,19 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Registers a callback that handles a specific request type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">request</td><td>Request type to bind. </td></tr>
+    <tr><td class="paramname">receiverCallback</td><td>Callback invoked when a request of that type is received. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when registration succeeded. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00287">287</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="rcRequest_8hpp_source.html#l00010">REQ_FIRST</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00035">requestReceivers</a>, and <a class="el" href="rcRequest_8hpp_source.html#l00013">UNKNOWN_REQ</a>.</p>
+<p class="reference">References <a class="el" href="rcRequest_8hpp_source.html#l00010">REQ_FIRST</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">requestReceivers</a>, and <a class="el" href="rcRequest_8hpp_source.html#l00013">UNKNOWN_REQ</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00029">init()</a>.</p>
 
@@ -548,9 +625,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends the detailed node description response for the selected UDP frame type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">udpHeaderValue</td><td>Type of the detailed data packet being generated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00226">226</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00036">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, and <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00043">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00053">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, and <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>.</p>
 
@@ -579,9 +664,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends the initial device description payload in response to discovery. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00195">195</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00036">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00030">NodeInitialData::numberOfDevices</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00017">RESPONSE_NODE_INITIAL_DATA</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00043">localNodeMACAddress</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00030">NodeInitialData::numberOfDevices</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00053">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00017">RESPONSE_NODE_INITIAL_DATA</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>.</p>
 
@@ -610,9 +697,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a keep-alive packet to the master node. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00270">270</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00036">localNodeMACAddress</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00039">KeepAliveData::mac</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00040">KeepAliveData::nodeHash</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00038">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00019">RESPONSE_KEEP_ALIVE</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00043">localNodeMACAddress</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00039">KeepAliveData::mac</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00040">KeepAliveData::nodeHash</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00053">pendingTxQueue</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="rc__dataTypes_8hpp_source.html#l00019">RESPONSE_KEEP_ALIVE</a>, and <a class="el" href="signals_8hpp_source.html#l00056">SIG_RUNTIME_NODE_HASH</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>.</p>
 
@@ -641,9 +730,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a prepared response back to the master node. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">response</td><td>RC response to transmit. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the response is queued or sent successfully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00305">305</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00021">currentTransaction</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00018">RcResponse::getResponseId()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00021">Transaction::request</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00022">Transaction::response</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00037">vecResponseMessage</a>.</p>
+<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00021">currentTransaction</a>, <a class="el" href="rcRequest_8cpp_source.html#l00030">RcRequest::getRequestId()</a>, <a class="el" href="rcResponse_8cpp_source.html#l00018">RcResponse::getResponseId()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00021">Transaction::request</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00022">Transaction::response</a>, and <a class="el" href="remoteControlClient_8hpp_source.html#l00048">vecResponseMessage</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00029">init()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00128">processGenericRequest()</a>.</p>
 
@@ -672,9 +770,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Stores the IP address of the most recently seen master node. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>Network address of the master. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8cpp_source.html#l00083">83</a> of file <a class="el" href="remoteControlClient_8cpp_source.html">remoteControlClient.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00040">lastMasterActivityTime</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, and <a class="el" href="signals_8hpp_source.html#l00111">SIG_LAST_KNOWN_MASTER_IP_ADDR</a>.</p>
+<p class="reference">References <a class="el" href="remoteControlClient_8hpp_source.html#l00020">lastKnownMasterIp</a>, <a class="el" href="remoteControlClient_8hpp_source.html#l00063">lastMasterActivityTime</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, and <a class="el" href="signals_8hpp_source.html#l00111">SIG_LAST_KNOWN_MASTER_IP_ADDR</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00029">init()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00089">processUDPRequest()</a>.</p>
 
@@ -700,6 +806,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Current request/response transaction being processed by the client. </p>
 
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00021">21</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
@@ -727,6 +835,8 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Last IP address from which a valid master packet was received. </p>
+
 <p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00020">20</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00318">processResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00226">sendDetailedDataResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00195">sendInitialDataResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00270">sendKeepAlive()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00083">updateLastKnownMasterIp()</a>.</p>
@@ -753,7 +863,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00040">40</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>Timestamp of the last observed master activity. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00063">63</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00043">cyclic()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00083">updateLastKnownMasterIp()</a>.</p>
 
@@ -779,7 +891,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00039">39</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>ID of the last request received from the master. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00058">58</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00128">processGenericRequest()</a>.</p>
 
@@ -805,7 +919,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00036">36</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>MAC address of the local node used in discovery and response packets. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00043">43</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00029">init()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00128">processGenericRequest()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00226">sendDetailedDataResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00195">sendInitialDataResponse()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00270">sendKeepAlive()</a>.</p>
 
@@ -831,7 +947,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00038">38</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>Outbound UDP messages queued for transmission. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00053">53</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00065">processPendingTxData()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00318">processResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00226">sendDetailedDataResponse()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00195">sendInitialDataResponse()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00270">sendKeepAlive()</a>.</p>
 
@@ -857,7 +975,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00031">31</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>UDP packets received from the network and queued for protocol processing. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00033">33</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00043">cyclic()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00171">receiveUDP()</a>.</p>
 
@@ -883,7 +1003,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00035">35</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>Mapping of request types to callbacks that should consume the corresponding incoming RC requests. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00038">38</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00128">processGenericRequest()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00287">registerRequestReceiver()</a>.</p>
 
@@ -909,7 +1031,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00037">37</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
+<p>Queue of pending RC responses waiting to be transmitted back to the master. </p>
+
+<p class="definition">Definition at line <a class="el" href="remoteControlClient_8hpp_source.html#l00048">48</a> of file <a class="el" href="remoteControlClient_8hpp_source.html">remoteControlClient.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00318">processResponse()</a>, and <a class="el" href="remoteControlClient_8cpp_source.html#l00305">sendResponse()</a>.</p>
 

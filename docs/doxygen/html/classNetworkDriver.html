@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classNetworkDr
 </div><!--header-->
 <div class="contents">
 
-<p>Implements the Network Driver behavior.  
+<p>Mediates UDP traffic, packet routing, and wireless reconnection for the OS.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>&gt;</code></p>
@@ -122,30 +122,45 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classNetworkDr
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad94a9254eb44e94ad7db81d54b104cf5" id="r_ad94a9254eb44e94ad7db81d54b104cf5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad94a9254eb44e94ad7db81d54b104cf5">cyclic</a> ()</td></tr>
+<tr class="memdesc:ad94a9254eb44e94ad7db81d54b104cf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the periodic network maintenance cycle, including queue handling and reconnect logic.  <br /></td></tr>
 <tr class="memitem:a4126eac581f05d84f511aa21d7b1884a" id="r_a4126eac581f05d84f511aa21d7b1884a"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4126eac581f05d84f511aa21d7b1884a">deinit</a> ()</td></tr>
+<tr class="memdesc:a4126eac581f05d84f511aa21d7b1884a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stops the networking services and clears driver state.  <br /></td></tr>
 <tr class="memitem:ad7c174d9e2424575e925347adf1595e6" id="r_ad7c174d9e2424575e925347adf1595e6"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad7c174d9e2424575e925347adf1595e6">init</a> ()</td></tr>
+<tr class="memdesc:ad7c174d9e2424575e925347adf1595e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the network stack and registers the transport callbacks.  <br /></td></tr>
 <tr class="memitem:a26853e557e191f81039d38eb77285547" id="r_a26853e557e191f81039d38eb77285547"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a26853e557e191f81039d38eb77285547">networkReconnect</a> ()</td></tr>
+<tr class="memdesc:a26853e557e191f81039d38eb77285547"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to re-establish connectivity after a temporary connection loss.  <br /></td></tr>
 <tr class="memitem:a0f5d1d53c2892c41967889d4309692b4" id="r_a0f5d1d53c2892c41967889d4309692b4"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0f5d1d53c2892c41967889d4309692b4">runIpDetectionTrick</a> (String ssid, String pwd)</td></tr>
+<tr class="memdesc:a0f5d1d53c2892c41967889d4309692b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the legacy IP-detection workaround used to recover configuration after Wi-Fi startup.  <br /></td></tr>
 <tr class="memitem:a11d1f15ed5e89abbc7b737cea20e98ea" id="r_a11d1f15ed5e89abbc7b737cea20e98ea"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a11d1f15ed5e89abbc7b737cea20e98ea">send</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;data)</td></tr>
+<tr class="memdesc:a11d1f15ed5e89abbc7b737cea20e98ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a UDP message using the configured interface.  <br /></td></tr>
 <tr class="memitem:a2509905b78d726a9be24f96319775f20" id="r_a2509905b78d726a9be24f96319775f20"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a2509905b78d726a9be24f96319775f20">sendBroadcast</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;data)</td></tr>
+<tr class="memdesc:a2509905b78d726a9be24f96319775f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Broadcasts a UDP message to the LAN.  <br /></td></tr>
 <tr class="memitem:a8db312d13c899ca8135bec8cc006b884" id="r_a8db312d13c899ca8135bec8cc006b884"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8db312d13c899ca8135bec8cc006b884">udpReceive</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> data)</td></tr>
+<tr class="memdesc:a8db312d13c899ca8135bec8cc006b884"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receives a UDP packet from the transport layer and forwards it for routing.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-methods" class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a9e6d57dc9a8c82a47cb5964bbfd59b04" id="r_a9e6d57dc9a8c82a47cb5964bbfd59b04"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a9e6d57dc9a8c82a47cb5964bbfd59b04">mapReceivedPacketToInternalReceiver</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;packet)</td></tr>
+<tr class="memdesc:a9e6d57dc9a8c82a47cb5964bbfd59b04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Routes a received packet to its target subsystem callback according to the packet range.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-static-attribs" class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a0766dff847d3614ddb983849ebd6c213" id="r_a0766dff847d3614ddb983849ebd6c213"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a0766dff847d3614ddb983849ebd6c213">networkCredentialsAvailable</a> = false</td></tr>
+<tr class="memdesc:a0766dff847d3614ddb983849ebd6c213"><td class="mdescLeft">&#160;</td><td class="mdescRight">true when a valid set of Wi-Fi credentials has been loaded in memory.  <br /></td></tr>
 <tr class="memitem:adb5cd4089e79e6be82863ad7ca94acee" id="r_adb5cd4089e79e6be82863ad7ca94acee"><td class="memItemLeft">static std::vector&lt; int &gt;&#160;</td><td class="memItemRight"><a class="el" href="#adb5cd4089e79e6be82863ad7ca94acee">packetRanges</a></td></tr>
+<tr class="memdesc:adb5cd4089e79e6be82863ad7ca94acee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Packet ID ranges that determine which callback should own an incoming message.  <br /></td></tr>
 <tr class="memitem:a4216d7af8387b33b469e0fc33991a57b" id="r_a4216d7af8387b33b469e0fc33991a57b"><td class="memItemLeft">static std::vector&lt; std::function&lt; void(<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;)&gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a4216d7af8387b33b469e0fc33991a57b">packetReceivers</a></td></tr>
+<tr class="memdesc:a4216d7af8387b33b469e0fc33991a57b"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of functions that consume packets belonging to the tracked packet ranges.  <br /></td></tr>
 <tr class="memitem:a4c9b26a218e3aa4b98a4ae4e66168cf8" id="r_a4c9b26a218e3aa4b98a4ae4e66168cf8"><td class="memItemLeft">static std::function&lt; void(void)&gt;&#160;</td><td class="memItemRight"><a class="el" href="#a4c9b26a218e3aa4b98a4ae4e66168cf8">pendingPacketsBehavior</a></td></tr>
+<tr class="memdesc:a4c9b26a218e3aa4b98a4ae4e66168cf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback executed when the driver has pending data to flush after a network event.  <br /></td></tr>
 <tr class="memitem:a86b29b8b21c32e2c0b51a05615a49011" id="r_a86b29b8b21c32e2c0b51a05615a49011"><td class="memItemLeft">static std::queue&lt; <a class="el" href="classMessageUDP.html">MessageUDP</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a86b29b8b21c32e2c0b51a05615a49011">pendingToSendPackets</a></td></tr>
+<tr class="memdesc:a86b29b8b21c32e2c0b51a05615a49011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue of outbound messages waiting to be sent by the networking layer.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements the Network Driver behavior. </p>
+<div class="textblock"><p>Mediates UDP traffic, packet routing, and wireless reconnection for the OS. </p>
+<p>The driver maintains the per-packet dispatch table, queues outgoing messages, and ensures that the node can reconnect and recover from transient network failures. </p>
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00030">30</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00056">56</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="ad94a9254eb44e94ad7db81d54b104cf5" name="ad94a9254eb44e94ad7db81d54b104cf5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad94a9254eb44e94ad7db81d54b104cf5">&#9670;&#160;</a></span>cyclic()</h2>
@@ -170,9 +185,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Performs the periodic network maintenance cycle, including queue handling and reconnect logic. </p>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00149">149</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="ota_8cpp_source.html#l00067">OTA::cyclic()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00033">pendingToSendPackets</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00021">UDPAdapter::sendingAllowed()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00035">UDPAdapter::task()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00213">WiFiAdapter::task()</a>.</p>
+<p class="reference">References <a class="el" href="ota_8cpp_source.html#l00067">OTA::cyclic()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00066">pendingToSendPackets</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00071">UDPAdapter::send()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00021">UDPAdapter::sendingAllowed()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00035">UDPAdapter::task()</a>, and <a class="el" href="wifiAdapter_8cpp_source.html#l00213">WiFiAdapter::task()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00131">OperatingSystem::task2ms()</a>.</p>
 
@@ -200,6 +217,8 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Stops the networking services and clears driver state. </p>
 
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00030">30</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
@@ -230,9 +249,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the network stack and registers the transport callbacks. </p>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00034">34</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00113">CBK_RECONNECT_WIFI</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00115">WiFiAdapter::connectToNetwork()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00236">WiFiAdapter::createAccessPoint()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00018">DIGITAL_BUTTON_RANGE</a>, <a class="el" href="networkdriver_8hpp_source.html#l00019">DISPLAY_CONTROLS_RANGE</a>, <a class="el" href="networkdriver_8cpp_source.html#l00026">dummyTobeRemoved()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="ota_8cpp_source.html#l00016">OTA::init()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00016">UDPAdapter::init()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00102">WiFiAdapter::init()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00032">networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00031">NodeConfiguration::networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00034">NodeConfiguration::networkPassword</a>, <a class="el" href="networkdriver_8cpp_source.html#l00133">networkReconnect()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="networkdriver_8hpp_source.html#l00041">packetRanges</a>, <a class="el" href="networkdriver_8hpp_source.html#l00042">packetReceivers</a>, <a class="el" href="networkdriver_8hpp_source.html#l00017">RCS_RANGE_BEGIN</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00261">DigitalEventReceiver::receiveUDP()</a>, <a class="el" href="DisplayServer_8cpp_source.html#l00060">DisplayServer::receiveUDP()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00171">RemoteControlClient::receiveUDP()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00390">RemoteControlServer::receiveUDP()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00122">UDPAdapter::registerOnUdpReceiveCallback()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00016">SERVICE_RANGE_BEGIN</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00026">SIG_IS_RC_SERVER</a>, <a class="el" href="signals_8hpp_source.html#l00072">SIG_MAC_ADDRESS</a>, <a class="el" href="networkdriver_8cpp_source.html#l00190">udpReceive()</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00020">USR_DATA_RANGE_BEGIN</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00113">CBK_RECONNECT_WIFI</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00115">WiFiAdapter::connectToNetwork()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00236">WiFiAdapter::createAccessPoint()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00032">DIGITAL_BUTTON_RANGE</a>, <a class="el" href="networkdriver_8hpp_source.html#l00036">DISPLAY_CONTROLS_RANGE</a>, <a class="el" href="networkdriver_8cpp_source.html#l00026">dummyTobeRemoved()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="ota_8cpp_source.html#l00016">OTA::init()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00016">UDPAdapter::init()</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00102">WiFiAdapter::init()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00061">networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00031">NodeConfiguration::networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00034">NodeConfiguration::networkPassword</a>, <a class="el" href="networkdriver_8cpp_source.html#l00133">networkReconnect()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="networkdriver_8hpp_source.html#l00082">packetRanges</a>, <a class="el" href="networkdriver_8hpp_source.html#l00087">packetReceivers</a>, <a class="el" href="networkdriver_8hpp_source.html#l00028">RCS_RANGE_BEGIN</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00261">DigitalEventReceiver::receiveUDP()</a>, <a class="el" href="DisplayServer_8cpp_source.html#l00060">DisplayServer::receiveUDP()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00171">RemoteControlClient::receiveUDP()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00390">RemoteControlServer::receiveUDP()</a>, <a class="el" href="udpAdapter_8cpp_source.html#l00122">UDPAdapter::registerOnUdpReceiveCallback()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00024">SERVICE_RANGE_BEGIN</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00026">SIG_IS_RC_SERVER</a>, <a class="el" href="signals_8hpp_source.html#l00072">SIG_MAC_ADDRESS</a>, <a class="el" href="networkdriver_8cpp_source.html#l00190">udpReceive()</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00040">USR_DATA_RANGE_BEGIN</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -261,9 +282,17 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Routes a received packet to its target subsystem callback according to the packet range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">packet</td><td>Message to classify and dispatch. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00252">252</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00041">packetRanges</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00042">packetReceivers</a>.</p>
+<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00082">packetRanges</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00087">packetReceivers</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00190">udpReceive()</a>.</p>
 
@@ -292,9 +321,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Attempts to re-establish connectivity after a temporary connection loss. </p>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00133">133</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00032">networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00031">NodeConfiguration::networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00034">NodeConfiguration::networkPassword</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00185">WiFiAdapter::reconnect()</a>, and <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>.</p>
+<p class="reference">References <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="networkdriver_8hpp_source.html#l00061">networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00031">NodeConfiguration::networkCredentialsAvailable</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00034">NodeConfiguration::networkPassword</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="wifiAdapter_8cpp_source.html#l00185">WiFiAdapter::reconnect()</a>, and <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">init()</a>.</p>
 
@@ -327,6 +358,15 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Performs the legacy IP-detection workaround used to recover configuration after Wi-Fi startup. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ssid</td><td>SSID used for the connection attempt. </td></tr>
+    <tr><td class="paramname">pwd</td><td>Password used for the connection attempt. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a11d1f15ed5e89abbc7b737cea20e98ea" name="a11d1f15ed5e89abbc7b737cea20e98ea"></a>
@@ -352,9 +392,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a UDP message using the configured interface. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>Message to transmit. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the send operation succeeded; false otherwise. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00196">196</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="wifiAdapter_8cpp_source.html#l00153">WiFiAdapter::isConnected()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00033">pendingToSendPackets</a>.</p>
+<p class="reference">References <a class="el" href="wifiAdapter_8cpp_source.html#l00153">WiFiAdapter::isConnected()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="networkdriver_8hpp_source.html#l00066">pendingToSendPackets</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="remoteControlClient_8cpp_source.html#l00065">RemoteControlClient::processPendingTxData()</a>, <a class="el" href="RequestProcessor_8cpp_source.html#l00018">RequestProcessor::processReqest()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00396">RemoteControlServer::processUDPMessage()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00261">DigitalEventReceiver::receiveUDP()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00686">RemoteControlServer::refreshRemoteNodeInfo()</a>, <a class="el" href="remotecontrolserver_8cpp_source.html#l00168">RemoteControlServer::requestKeepAliveData()</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00212">sendBroadcast()</a>.</p>
 
@@ -383,9 +432,18 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Broadcasts a UDP message to the LAN. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>Message payload to broadcast. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the broadcast was accepted and queued or transmitted successfully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00212">212</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00349">MessageUDP::getIPAddress()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00021">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00022">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00023">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00024">MessageUDP::IPAddr::octet4</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">send()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00044">MessageUDP::setIpAddress()</a>, and <a class="el" href="signals_8hpp_source.html#l00034">SIG_IP_ADDRESS</a>.</p>
+<p class="reference">References <a class="el" href="messageUDP_8cpp_source.html#l00349">MessageUDP::getIPAddress()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00027">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00042">MessageUDP::IPAddr::octet4</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">send()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00044">MessageUDP::setIpAddress()</a>, and <a class="el" href="signals_8hpp_source.html#l00034">SIG_IP_ADDRESS</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="remoteControlClient_8cpp_source.html#l00043">RemoteControlClient::cyclic()</a>, <a class="el" href="DisplayServer_8cpp_source.html#l00036">DisplayServer::discoverDisplays()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, and <a class="el" href="remotecontrolserver_8cpp_source.html#l00158">RemoteControlServer::requestNodeInitialData()</a>.</p>
 
@@ -413,6 +471,14 @@ Static Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Receives a UDP packet from the transport layer and forwards it for routing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>Packet received from the socket. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="networkdriver_8cpp_source.html#l00190">190</a> of file <a class="el" href="networkdriver_8cpp_source.html">networkdriver.cpp</a>.</p>
 
@@ -443,7 +509,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00032">32</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p>true when a valid set of Wi-Fi credentials has been loaded in memory. </p>
+
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00061">61</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">init()</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00133">networkReconnect()</a>.</p>
 
@@ -469,7 +537,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00041">41</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p>Packet ID ranges that determine which callback should own an incoming message. </p>
+
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00082">82</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">init()</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00252">mapReceivedPacketToInternalReceiver()</a>.</p>
 
@@ -495,7 +565,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00042">42</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p>List of functions that consume packets belonging to the tracked packet ranges. </p>
+
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00087">87</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00034">init()</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00252">mapReceivedPacketToInternalReceiver()</a>.</p>
 
@@ -521,7 +593,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00037">37</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p>Callback executed when the driver has pending data to flush after a network event. </p>
+
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00077">77</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 
 </div>
 </div>
@@ -545,7 +619,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00033">33</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
+<p>Queue of outbound messages waiting to be sent by the networking layer. </p>
+
+<p class="definition">Definition at line <a class="el" href="networkdriver_8hpp_source.html#l00066">66</a> of file <a class="el" href="networkdriver_8hpp_source.html">networkdriver.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="networkdriver_8cpp_source.html#l00149">cyclic()</a>, and <a class="el" href="networkdriver_8cpp_source.html#l00196">send()</a>.</p>
 

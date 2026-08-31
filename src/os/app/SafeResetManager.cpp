@@ -3,7 +3,7 @@
 
 /**
  * @file src/os/app/SafeResetManager.cpp
- * @brief Application-layer runtime implementation for the Home Control Station.
+ * @brief Schedules safe device resets and enforces time-of-day and activity conditions.
  */
 
 
