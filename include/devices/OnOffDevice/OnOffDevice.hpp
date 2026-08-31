@@ -2,7 +2,7 @@
 #define ONOFF_DEVICE_H
 
 #include "Arduino.h"
-#include "Device.hpp"
+#include "devices/device.hpp"
 
 
 class OnOffDevice : public Device

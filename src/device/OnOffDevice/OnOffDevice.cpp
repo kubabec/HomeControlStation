@@ -1,4 +1,4 @@
-#include <devices/OnOffDevice.hpp>
+#include <devices/OnOffDevice/OnOffDevice.hpp>
 #include "os/Logger.hpp"
 
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId)

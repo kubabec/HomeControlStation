@@ -1,4 +1,4 @@
-#include "devices/tempSensorDHT11.hpp"
+#include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
 #include "os/Logger.hpp"
 
 #ifdef TEMP_SENSOR_SUPPORTED

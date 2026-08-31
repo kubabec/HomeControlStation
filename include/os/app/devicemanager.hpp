@@ -1,13 +1,13 @@
 #ifndef DEVICE_MANAGER_H
 #define DEVICE_MANAGER_H
 #include <Arduino.h>
-#include <devices/OnOffDevice.hpp>
-#include <devices/TestDeviceType.hpp>
-#include <devices/LedStrip/LedWS1228b.hpp>
-#include <devices/LedStrip/Segmented_LedWS1228b.hpp>
-#include <devices/tempSensorDHT11.hpp>
-#include <devices/distanceSensor.hpp>
-#include <devices/CustomHardware/HwButton.hpp>
+#include <devices/OnOffDevice/OnOffDevice.hpp>
+#include <devices/TestDeviceType/TestDeviceType.hpp>
+#include <devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp>
+#include <devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp>
+#include <devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp>
+#include <devices/DistanceSensor/DistanceSensor.hpp>
+#include <devices/HwButton/HwButton.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 

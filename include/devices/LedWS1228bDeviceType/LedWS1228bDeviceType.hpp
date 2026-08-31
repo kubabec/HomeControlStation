@@ -1,47 +1,41 @@
-#ifndef LED_SEDWS1282B_TYPE_H
-#define LED_SEDWS1282B_TYPE_H
+#ifndef LED_WS1282B_TYPE_H
+#define LED_WS1282B_TYPE_H
 #include <SystemDefinition.hpp>
 #ifdef LED_STRIP_SUPPORTED
 
 #include "devices/Device.hpp"
 #include "Adafruit_NeoPixel.h"
-#include "Animations/FadeIn.hpp"
-#include "Animations/FadeOut.hpp"
+#include "devices/LedStrip/Animations/FadeIn.hpp"
+#include "devices/LedStrip/Animations/FadeOut.hpp"
+#include "devices/LedStrip/Animations/RollInAnimation.hpp"
+#include "devices/LedStrip/Animations/RollOutAnimation.hpp"
+#include "devices/LedStrip/Animations/SparkleInAnimation.hpp"
+#include "devices/LedStrip/Animations/WaveInAnimation.hpp"
+#include "devices/LedStrip/Animations/TwinkleInAnimation.hpp"
+#include "devices/LedStrip/Animations/BounceInAnimation.hpp"
+
+#include "devices/LedStrip/Animations/live/SingleWaveAnimation.hpp"
 
 #include "Arduino.h"
 
-struct SegmentData {
-    LedColor* current = nullptr;
-    LedColor* savedSlot1 = nullptr;
-    LedColor* savedSlot2 = nullptr;   
-};
+#define DEFAULT_TICKS_TO_ANIMATE 3 // 3 * 10ms = 30ms for animation processing
 
-class SegLedWS1228bDeviceType : public Device {
+
+class LedWS1228bDeviceType : public Device {
     enum LedStripContentIndex{
         eACTIVE_CURRENT_CONTENT = 0,
         eSAVED_CONTENT_SLOT1,
         eSAVED_CONTENT_SLOT2,
+        eSAVED_CONTENT_SLOT3,
         eDIFFERENT_CONTENTS_COUNT
     };
-    /*SEG properties*/
-    std::vector<uint8_t> segmentLedCount; //number of segments in each segment led strip 
-    std::vector<uint8_t> segmentFlips; //flip segments in each segment led strip
-    /*SEG properties*/
-
 
     uint8_t* extendedMemoryPointer = nullptr;
-    std::vector<SegmentData> stripContents; //colors for each segment led strip
-
-
-
-
-    LedColor averagedColors[eDIFFERENT_CONTENTS_COUNT] = {0};
-    std::vector<uint8_t> segmentStatus;
-    std::vector<LedColor> segmentColors; //colors for each segment
-
-    int totalLedsCount = 0; //total number of physical leds in strip
-
-
+    LedColor* stripContent[4];
+    LedColor* runtimeBuffer = nullptr; // buffer for runtime operations
+    LedColor averagedColors[4] = {0};
+    LedStripAnimationProperties animationProperties;
+    uint8_t animationWaitTicks = 4;
     bool isContentInitialized = false;
     bool isInversedOrder = false;
     bool isOn = false; //stan urzadzenia
@@ -54,16 +48,28 @@ class SegLedWS1228bDeviceType : public Device {
     String deviceName;
     uint8_t roomId;
     std::function<void(void)> m_reportNvmDataChangedCbk;
+    std::function<void(void)> m_queuedAction = nullptr;
+    int ticksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for animation processing
+    int liveAnimationTicksToAnimate = DEFAULT_TICKS_TO_ANIMATE; // time in ms for live animation processing
+    int waitTicksLive = 20;
     Adafruit_NeoPixel* adafruit_ws2812b = nullptr;
     ILedAnimation* ongoingAnimation = nullptr;
     ILedAnimation* switchOffAnimation = nullptr;
 
+    ILiveAnimation* liveAnimation = nullptr;
+
     void applyVirtualToRealDiodes();
     void setHwLedStripColor(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b);
 
-    void setSegmentState(uint8_t segmentIndex, uint8_t state);
+    void createEnablingAnimation();
+    void createDisablingAnimation();
+    void createLiveAnimation();
+    void stopLiveAnimation();
+
+    void updateAnimationSpeed();
+
     public:
-    SegLedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
+    LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);
 
     virtual void init();
     virtual void cyclic();
@@ -81,7 +87,12 @@ class SegLedWS1228bDeviceType : public Device {
 
     void setColors(LedColor* ledsArray, uint16_t count);
     void getDetailedColors(LedColor* memoryBuffer, uint16_t count);
+
+    void applyColors();
     
+
+    void updateAveragedColor(LedStripContentIndex content);
+
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set1 param);
     virtual ServiceRequestErrorCode service(DeviceServicesType serviceType, ServiceParameters_set2 param);

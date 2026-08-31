@@ -1,0 +1,114 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "OnOff",
+    "className": "OnOffDevice",
+    "enumSymbol": "type_ONOFFDEVICE",
+    "enumValue": 43
+  },
+  "implementation": {
+    "header": "include/devices/OnOffDevice/OnOffDevice.hpp",
+    "source": "src/device/OnOffDevice/OnOffDevice.cpp",
+    "buildGuard": null,
+    "dependencies": ["Arduino GPIO", "Arduino PWM"],
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::vecOnOffDevices",
+      "includedInDeviceCollection": true
+    }
+  },
+  "lifecycle": {
+    "init": {
+      "actions": ["configure output pin", "write inactive level", "initialize PWM when enabled"]
+    },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "every_manager_cycle",
+        "internalTasks": [
+          {
+            "name": "brightness ramp",
+            "minimumIntervalMs": 10,
+            "step": 1,
+            "unit": "percent"
+          },
+          {
+            "name": "light duration timer",
+            "enabled": false
+          }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" },
+      { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "brightnessSupported", "type": "boolean", "offset": 0, "size": 1, "default": true, "widget": "checkbox" },
+      { "name": "activationState", "type": "enum", "offset": 1, "size": 1, "default": 0, "values": { "0": "activeLow", "1": "activeHigh" }, "widget": "select" },
+      { "name": "minimumPwm", "type": "uint8", "offset": 2, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" },
+      { "name": "maximumPwm", "type": "uint8", "offset": 3, "size": 1, "minimum": 0, "maximum": 255, "widget": "range" }
+    ]
+  },
+  "services": [
+    {
+      "name": "DEVSERVICE_STATE_SWITCH",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "state", "type": "boolean", "source": "ServiceParameters_set1.a" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_BRIGHTNESS_CHANGE",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "availability": "brightnessSupported == true",
+      "parameters": [
+        { "name": "brightness", "type": "uint8", "source": "ServiceParameters_set1.a", "minimum": 0, "maximum": 100, "unit": "percent" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "controls", "type": "AdvancedControlsOnOff", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "sizeof(AdvancedControlsOnOff)" }
+      ]
+    }
+  ],
+  "state": {
+    "enabledSemantics": "isOn",
+    "descriptionCustomBytes": [
+      { "name": "brightnessSupported", "type": "boolean", "offset": 0, "size": 1 },
+      { "name": "activationState", "type": "enum", "offset": 1, "size": 1 },
+      { "name": "brightness", "type": "uint8", "offset": 2, "size": 1, "unit": "percent" }
+    ],
+    "httpFields": [
+      { "name": "hasBrightness", "type": "boolean", "source": "customBytes[0]" },
+      { "name": "brightness", "type": "uint8", "source": "customBytes[2]", "unit": "percent" }
+    ]
+  },
+  "ui": {
+    "roomWidget": "generateOnOffWidget",
+    "controls": [
+      { "name": "power", "widget": "toggle-button", "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1", "parameter": "state" },
+      { "name": "brightness", "widget": "range", "minimum": 0, "maximum": 100, "unit": "percent", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "overload": "serviceCall_1", "parameter": "brightness", "visibleWhen": "hasBrightness == true" }
+    ],
+    "readouts": []
+  },
+  "extendedMemory": {
+    "required": false,
+    "size": 0
+  },
+  "limitations": [
+    "The light-duration timer handler is currently disabled.",
+    "Advanced-control values are readable but no device service currently writes them."
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "SegLedStrip",
+    "className": "SegLedWS1228bDeviceType",
+    "enumSymbol": "type_LED_STRIP_SEGMENTED",
+    "enumValue": 46
+  },
+  "implementation": {
+    "header": "include/devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp",
+    "source": "src/device/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.cpp",
+    "buildGuard": "LED_STRIP_SUPPORTED",
+    "dependencies": ["Adafruit_NeoPixel", "LedStrip animation framework"],
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::segmentedWs2812bDevices",
+      "includedInDeviceCollection": true
+    }
+  },
+  "lifecycle": {
+    "init": { "actions": [] },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "every_manager_cycle",
+        "internalTasks": [
+          { "name": "transition animation", "minimumIntervalMs": 60 }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" },
+      { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "currentLimit", "type": "uint8", "offset": 0, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
+      { "name": "segmentLedCounts", "type": "uint8[5]", "offset": 5, "size": 5, "minimum": 1, "maximum": 100, "widget": "number-array", "terminator": 0 },
+      { "name": "segmentReverseOrder", "type": "boolean[5]", "offset": 10, "size": 5, "widget": "checkbox-array" }
+    ]
+  },
+  "services": [
+    {
+      "name": "DEVSERVICE_SEGMENT_STATE_SWITCH",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "segmentIndex", "type": "uint8", "source": "ServiceParameters_set1.a", "minimum": 0, "maximum": 4 },
+        { "name": "state", "type": "boolean", "source": "ServiceParameters_set1.b" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_STATE_SWITCH",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "state", "type": "boolean", "source": "ServiceParameters_set1.a" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_LED_STRIP_SAVE_CONTENT",
+      "overload": "serviceCall_1",
+      "status": "disabled",
+      "parameters": [
+        { "name": "slot", "type": "uint8", "source": "ServiceParameters_set1.a" }
+      ],
+      "result": "SERV_GENERAL_FAILURE"
+    },
+    {
+      "name": "DEVSERVICE_LED_STRIP_SWITCH_CONTENT",
+      "overload": "serviceCall_1",
+      "status": "disabled",
+      "parameters": [
+        { "name": "slot", "type": "uint8", "source": "ServiceParameters_set1.a" }
+      ],
+      "result": "SERV_GENERAL_FAILURE"
+    },
+    {
+      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "disabled",
+      "parameters": [
+        { "name": "data", "type": "byte[]", "source": "ServiceParameters_set3.buff", "direction": "out" }
+      ],
+      "result": "SERV_GENERAL_FAILURE"
+    },
+    {
+      "name": "DEVSERVICE_GET_DETAILED_COLORS",
+      "overload": "serviceCall_3",
+      "status": "disabled",
+      "parameters": [
+        { "name": "data", "type": "LedColor[]", "source": "ServiceParameters_set3.buff", "direction": "out" }
+      ],
+      "result": "SERV_GENERAL_FAILURE"
+    },
+    {
+      "name": "DEVSERVICE_SET_DETAILED_COLORS",
+      "overload": "serviceCall_3",
+      "status": "disabled",
+      "parameters": [
+        { "name": "data", "type": "LedColor[]", "source": "ServiceParameters_set3.buff", "direction": "in" }
+      ],
+      "result": "SERV_GENERAL_FAILURE"
+    },
+    {
+      "name": "DEVSERVICE_SET_EXT_MEMORY_PTR",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "memory", "type": "byte[]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "getExtendedMemoryLength()" }
+      ]
+    }
+  ],
+  "state": {
+    "enabledSemantics": "at least one segment is on",
+    "descriptionCustomBytes": [
+      { "name": "segmentCount", "type": "uint8", "offset": 0, "size": 1 },
+      { "name": "segmentStates", "type": "boolean[5]", "offset": 1, "size": 5 },
+      { "name": "segmentColors", "type": "rgb888[5]", "offset": 7, "size": 15 }
+    ],
+    "httpFields": [
+      { "name": "segCount", "type": "uint8", "source": "customBytes[0]" },
+      { "name": "segments", "type": "boolean[5]", "source": "customBytes[1..5]" },
+      { "name": "colors", "type": "hex-color[5]", "source": "customBytes[7..21]" }
+    ]
+  },
+  "ui": {
+    "roomWidget": null,
+    "controls": [
+      { "name": "power", "widget": "toggle-button", "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1" },
+      { "name": "segmentPower", "widget": "toggle-array", "countSource": "segCount", "service": "DEVSERVICE_SEGMENT_STATE_SWITCH", "overload": "serviceCall_1" }
+    ],
+    "readouts": [
+      { "name": "segmentColors", "widget": "color-swatch-array", "source": "colors" }
+    ]
+  },
+  "extendedMemory": {
+    "required": true,
+    "size": "3 * totalPhysicalLedCount * sizeof(LedColor)",
+    "layout": ["current content per segment", "saved slot 1 per segment", "saved slot 2 per segment"]
+  },
+  "limitations": [
+    "The room renderer has no segmented-strip widget branch and currently renders this type as unknown.",
+    "Content persistence and detailed-color services are present but explicitly return SERV_GENERAL_FAILURE.",
+    "The description reserves bytes 7 through 21 for five colors."
+  ]
+}
