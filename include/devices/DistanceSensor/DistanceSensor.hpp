@@ -1,5 +1,5 @@
 /**
- * @file distanceSensor.hpp
+ * @file DistanceSensor.hpp
  * @brief Distance sensor device abstraction for proximity-based measurements.
  */
 #ifndef DISTANCE_SENSOR_H

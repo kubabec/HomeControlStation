@@ -1,10 +1,19 @@
 var searchData=
 [
   ['g_0',['g',['../structLedColor.html#a7865e7ea907b705cc4eff661595e4829',1,'LedColor']]],
-  ['getactivenotificationscount_1',['getActiveNotificationsCount',['../structUINotificationsControlAPI.html#a192510d622ccba1b02a4c90be4365613',1,'UINotificationsControlAPI']]],
-  ['getcurrentmemoryusage_2',['getCurrentMemoryUsage',['../structExtendedMemoryCtrlAPI.html#ab91c6dcd06e76c1a4de6bacc4c95363e',1,'ExtendedMemoryCtrlAPI']]],
-  ['getdevicecfgjson_3',['getDeviceCfgJson',['../structDeviceConfigManipulationAPI.html#a15c762ab07d8d27608877e6db356ead6',1,'DeviceConfigManipulationAPI']]],
-  ['getextmemoryptrbydeviceid_4',['getExtMemoryPtrByDeviceId',['../structExtendedMemoryCtrlAPI.html#aeb7076e5362342257e15782f5d95761e',1,'ExtendedMemoryCtrlAPI']]],
-  ['getoldestnotification_5',['getOldestNotification',['../structUINotificationsControlAPI.html#ae46dedd4791e9d22be0261499feb20d5',1,'UINotificationsControlAPI']]],
-  ['gettime_6',['getTime',['../classTempSensorDHT11DeviceType.html#a2c33d2f07aec49ef94043f594d7223bb',1,'TempSensorDHT11DeviceType']]]
+  ['generated_5fhttp_5fdir_1',['GENERATED_HTTP_DIR',['../namespacegenerate__device__registry.html#a01ed0766760044fe7241e471830deb8c',1,'generate_device_registry']]],
+  ['generated_5finclude_5fdir_2',['GENERATED_INCLUDE_DIR',['../namespacegenerate__device__registry.html#a0640cc3916cc56560177ae03938efc62',1,'generate_device_registry']]],
+  ['generateddeviceconfigurationjs_3',['generatedDeviceConfigurationJs',['../GeneratedDeviceConfiguration_8hpp.html#a4133e3bd6cde47162e9efc59dbe24468',1,'GeneratedDeviceConfiguration.hpp']]],
+  ['generateddevicewidgetsjs_4',['generatedDeviceWidgetsJs',['../GeneratedDeviceWidgets_8hpp.html#aac1faee60c16e2d1b3fffd454085a1dd',1,'GeneratedDeviceWidgets.hpp']]],
+  ['generateddistancesensorwidgetjs_5',['generatedDistanceSensorWidgetJs',['../GeneratedDistanceSensorWidget_8hpp.html#a056ef8a7fee1a6549c01325250a808de',1,'GeneratedDistanceSensorWidget.hpp']]],
+  ['generatedledstripwidgetjs_6',['generatedLedStripWidgetJs',['../GeneratedLedStripWidget_8hpp.html#a17fc23ed63e154fe6a1424dd8cef55c6',1,'GeneratedLedStripWidget.hpp']]],
+  ['generatedonoffwidgetjs_7',['generatedOnOffWidgetJs',['../GeneratedOnOffWidget_8hpp.html#a822d63c7c475cd08eb77562fa0cf82ce',1,'GeneratedOnOffWidget.hpp']]],
+  ['generatedtempsensorwidgetjs_8',['generatedTempSensorWidgetJs',['../GeneratedTempSensorWidget_8hpp.html#a0422556c053fb0441d14ce2c7c8072f8',1,'GeneratedTempSensorWidget.hpp']]],
+  ['getactivenotificationscount_9',['getActiveNotificationsCount',['../structUINotificationsControlAPI.html#a192510d622ccba1b02a4c90be4365613',1,'UINotificationsControlAPI']]],
+  ['getcurrentmemoryusage_10',['getCurrentMemoryUsage',['../structExtendedMemoryCtrlAPI.html#ab91c6dcd06e76c1a4de6bacc4c95363e',1,'ExtendedMemoryCtrlAPI']]],
+  ['getdevicecfgjson_11',['getDeviceCfgJson',['../structDeviceConfigManipulationAPI.html#a15c762ab07d8d27608877e6db356ead6',1,'DeviceConfigManipulationAPI']]],
+  ['getextmemoryptrbydeviceid_12',['getExtMemoryPtrByDeviceId',['../structExtendedMemoryCtrlAPI.html#aeb7076e5362342257e15782f5d95761e',1,'ExtendedMemoryCtrlAPI']]],
+  ['getoldestnotification_13',['getOldestNotification',['../structUINotificationsControlAPI.html#ae46dedd4791e9d22be0261499feb20d5',1,'UINotificationsControlAPI']]],
+  ['getrtctime_14',['getRtcTime',['../structGeneratedDeviceRegistry_1_1RuntimeContext.html#aecb88e3fc34125d16cd308563608b825',1,'GeneratedDeviceRegistry::RuntimeContext']]],
+  ['gettime_15',['getTime',['../classTempSensorDHT11DeviceType.html#a2c33d2f07aec49ef94043f594d7223bb',1,'TempSensorDHT11DeviceType']]]
 ];

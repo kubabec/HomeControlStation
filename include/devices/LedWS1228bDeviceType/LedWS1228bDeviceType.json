@@ -12,6 +12,7 @@
     "source": "src/device/LedWS1228bDeviceType/LedWS1228bDeviceType.cpp",
     "buildGuard": "LED_STRIP_SUPPORTED",
     "dependencies": ["Adafruit_NeoPixel", "LedStrip animation framework"],
+    "factory": { "arguments": ["config", "persistentDataChanged"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::ledws2812bDevices",
@@ -129,10 +130,18 @@
   },
   "ui": {
     "roomWidget": "generateLedStripWidget",
+    "advancedControls": {
+      "renderer": "createJsForLedStrip",
+      "payloadSize": {
+        "countState": "virtualLedCount",
+        "elementType": "LedColor",
+        "overheadType": "LedStripAnimationProperties"
+      }
+    },
     "controls": [
-      { "name": "power", "widget": "toggle-button", "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1" },
-      { "name": "advanced", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" },
-      { "name": "liveAnimation", "widget": "play-stop-button", "service": "DEVSERVICE_LIVE_ANIMATION", "overload": "serviceCall_1" },
+      { "name": "power", "widget": "toggle-button", "displayOrder": 2, "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1" },
+      { "name": "advanced", "widget": "settings-button", "displayOrder": 0, "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" },
+      { "name": "liveAnimation", "widget": "play-stop-button", "displayOrder": 1, "service": "DEVSERVICE_LIVE_ANIMATION", "overload": "serviceCall_1" },
       { "name": "detailedColors", "widget": "color-array", "serviceRead": "DEVSERVICE_GET_DETAILED_COLORS", "serviceWrite": "DEVSERVICE_SET_DETAILED_COLORS" }
     ],
     "readouts": [

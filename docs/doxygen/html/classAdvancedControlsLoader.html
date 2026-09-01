@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classAdvancedC
 </div><!--header-->
 <div class="contents">
 
-<p>Loads the advanced-control definitions used by the dashboard and device pages.  
+<p>Loads advanced-control payloads and delegates rendering through generated type dispatch.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>&gt;</code></p>
@@ -139,9 +139,10 @@ Static Private Attributes</h2></td></tr>
 <tr class="memitem:a3982098a91072a98e0dbf62ecb588d19" id="r_a3982098a91072a98e0dbf62ecb588d19"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#a3982098a91072a98e0dbf62ecb588d19">currentRequestJS</a> = &quot;&quot;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Loads the advanced-control definitions used by the dashboard and device pages. </p>
+<div class="textblock"><p>Loads advanced-control payloads and delegates rendering through generated type dispatch. </p>
+<p>Payload sizes and renderer selection are generated from device JSON metadata. Specialized renderer implementations remain responsible for interpreting device-owned payload formats. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00013">13</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00016">16</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a192474537716298f68b1effaee4c1dd1" name="a192474537716298f68b1effaee4c1dd1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a192474537716298f68b1effaee4c1dd1">&#9670;&#160;</a></span>allocateMemoryForControlsBasedOnDeviceType()</h2>
@@ -166,11 +167,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00038">38</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00024">24</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00018">getControlsSizeBasedOnDevType()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00077">type_DEVICE_TYPE_LAST</a>, and <a class="el" href="device_8hpp_source.html#l00071">type_ONOFFDEVICE</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00015">getControlsSizeBasedOnDevType()</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>.</p>
 
 </div>
 </div>
@@ -197,11 +198,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00189">189</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00176">176</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControls_8hpp_source.html#l00044">LedStripAnimationProperties::animationSpeed</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, <a class="el" href="device_8hpp_source.html#l00217">DeviceDescription::customBytes</a>, <a class="el" href="device_8hpp_source.html#l00211">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00042">LedStripAnimationProperties::disableAnimation</a>, and <a class="el" href="AdvancedControls_8hpp_source.html#l00040">LedStripAnimationProperties::enableAnimation</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControls_8hpp_source.html#l00044">LedStripAnimationProperties::animationSpeed</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">currentlyRequestedDeviceDescription</a>, <a class="el" href="device_8hpp_source.html#l00203">DeviceDescription::customBytes</a>, <a class="el" href="device_8hpp_source.html#l00197">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00206">DeviceDescription::deviceName</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00042">LedStripAnimationProperties::disableAnimation</a>, and <a class="el" href="AdvancedControls_8hpp_source.html#l00040">LedStripAnimationProperties::enableAnimation</a>.</p>
 
 </div>
 </div>
@@ -228,11 +227,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00057">57</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00044">44</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00023">AdvancedControlsOnOff::ONOFF_BLINK</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00022">AdvancedControlsOnOff::ONOFF_FADE</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00021">AdvancedControlsOnOff::ONOFF_SWITCH</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00031">AdvancedControlsOnOff::switchAnimationTime</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00029">AdvancedControlsOnOff::switchOffAnimation</a>, and <a class="el" href="AdvancedControls_8hpp_source.html#l00027">AdvancedControlsOnOff::switchOnAnimation</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">currentlyRequestedDeviceDescription</a>, <a class="el" href="device_8hpp_source.html#l00206">DeviceDescription::deviceName</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00023">AdvancedControlsOnOff::ONOFF_BLINK</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00022">AdvancedControlsOnOff::ONOFF_FADE</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00021">AdvancedControlsOnOff::ONOFF_SWITCH</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00031">AdvancedControlsOnOff::switchAnimationTime</a>, <a class="el" href="AdvancedControls_8hpp_source.html#l00029">AdvancedControlsOnOff::switchOffAnimation</a>, and <a class="el" href="AdvancedControls_8hpp_source.html#l00027">AdvancedControlsOnOff::switchOnAnimation</a>.</p>
 
 </div>
 </div>
@@ -259,11 +256,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00018">18</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00015">15</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, <a class="el" href="device_8hpp_source.html#l00217">DeviceDescription::customBytes</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00006">TEMPSENSOR_ADV_CONTROLS_SIZE</a>, <a class="el" href="device_8hpp_source.html#l00072">type_LED_STRIP</a>, <a class="el" href="device_8hpp_source.html#l00071">type_ONOFFDEVICE</a>, and <a class="el" href="device_8hpp_source.html#l00073">type_TEMP_SENSOR</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00038">allocateMemoryForControlsBasedOnDeviceType()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00024">allocateMemoryForControlsBasedOnDeviceType()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>.</p>
 
 </div>
 </div>
@@ -290,11 +285,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00639">639</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00617">617</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, and <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00017">currentRequestJS</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">currentlyRequestedDeviceDescription</a>, and <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00020">currentRequestJS</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00453">HTTPAsyncRequestHandler::createExtendedControls()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00396">HTTPAsyncRequestHandler::createExtendedControls()</a>.</p>
 
 </div>
 </div>
@@ -321,11 +316,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">648</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">626</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00170">ServiceParameters_set3::additionalParam</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00038">allocateMemoryForControlsBasedOnDeviceType()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="device_8hpp_source.html#l00166">ServiceParameters_set3::buff</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00017">currentRequestJS</a>, <a class="el" href="device_8hpp_source.html#l00211">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="device_8hpp_source.html#l00207">DeviceDescription::deviceType</a>, <a class="el" href="device_8hpp_source.html#l00057">DEVSERVICE_GET_ADVANCED_CONTROLS</a>, <a class="el" href="device_8hpp_source.html#l00172">ServiceParameters_set3::direction</a>, <a class="el" href="device_8hpp_source.html#l00155">e_OUT_from_DEVICE</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00018">getControlsSizeBasedOnDevType()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>, <a class="el" href="device_8hpp_source.html#l00037">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00039">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00035">SERV_SUCCESS</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="device_8hpp_source.html#l00168">ServiceParameters_set3::size</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00126">UserInterfaceNotification::WARNING</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00156">ServiceParameters_set3::additionalParam</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00024">allocateMemoryForControlsBasedOnDeviceType()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="device_8hpp_source.html#l00152">ServiceParameters_set3::buff</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">currentlyRequestedDeviceDescription</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00020">currentRequestJS</a>, <a class="el" href="device_8hpp_source.html#l00197">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00206">DeviceDescription::deviceName</a>, <a class="el" href="device_8hpp_source.html#l00193">DeviceDescription::deviceType</a>, <a class="el" href="device_8hpp_source.html#l00058">DEVSERVICE_GET_ADVANCED_CONTROLS</a>, <a class="el" href="device_8hpp_source.html#l00158">ServiceParameters_set3::direction</a>, <a class="el" href="device_8hpp_source.html#l00141">e_OUT_from_DEVICE</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00015">getControlsSizeBasedOnDevType()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00603">prepareJsStringWithAdvancedControls()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00040">SERV_PENDING</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="device_8hpp_source.html#l00154">ServiceParameters_set3::size</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00126">UserInterfaceNotification::WARNING</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00147">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="HttpAsyncRequestHandler_8cpp_source.html#l00148">HTTPAsyncRequestHandler::downloadAdvancedControls()</a>.</p>
 
 </div>
 </div>
@@ -352,11 +347,11 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">616</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00603">603</a> of file <a class="el" href="AdvancedControlsLoader_8cpp_source.html">AdvancedControlsLoader.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00189">createJsForLedStrip()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00057">createJsForOnOff()</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">currentlyRequestedDeviceDescription</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00017">currentRequestJS</a>, <a class="el" href="device_8hpp_source.html#l00211">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00207">DeviceDescription::deviceType</a>, <a class="el" href="device_8hpp_source.html#l00072">type_LED_STRIP</a>, <a class="el" href="device_8hpp_source.html#l00071">type_ONOFFDEVICE</a>, and <a class="el" href="device_8hpp_source.html#l00073">type_TEMP_SENSOR</a>.</p>
+<p class="reference">References <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">currentAdvancedControls</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">currentlyRequestedDeviceDescription</a>, <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00020">currentRequestJS</a>, <a class="el" href="device_8hpp_source.html#l00197">DeviceDescription::deviceId</a>, and <a class="el" href="device_8hpp_source.html#l00193">DeviceDescription::deviceType</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>.</p>
 
 </div>
 </div>
@@ -381,9 +376,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">15</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00018">18</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00038">allocateMemoryForControlsBasedOnDeviceType()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00189">createJsForLedStrip()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00057">createJsForOnOff()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00024">allocateMemoryForControlsBasedOnDeviceType()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00176">createJsForLedStrip()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00044">createJsForOnOff()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00603">prepareJsStringWithAdvancedControls()</a>.</p>
 
 </div>
 </div>
@@ -407,9 +402,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00015">15</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00012">12</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00189">createJsForLedStrip()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00057">createJsForOnOff()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00018">getControlsSizeBasedOnDevType()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00639">getOutpuJavaScript()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00176">createJsForLedStrip()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00044">createJsForOnOff()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00617">getOutpuJavaScript()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00603">prepareJsStringWithAdvancedControls()</a>.</p>
 
 </div>
 </div>
@@ -433,9 +428,9 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00017">17</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdvancedControlsLoader_8hpp_source.html#l00020">20</a> of file <a class="el" href="AdvancedControlsLoader_8hpp_source.html">AdvancedControlsLoader.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00639">getOutpuJavaScript()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00648">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00616">prepareJsStringWithAdvancedControls()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00617">getOutpuJavaScript()</a>, <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00626">loadAdvancedControlsToJavaScript()</a>, and <a class="el" href="AdvancedControlsLoader_8cpp_source.html#l00603">prepareJsStringWithAdvancedControls()</a>.</p>
 
 </div>
 </div>

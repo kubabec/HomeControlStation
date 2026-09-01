@@ -126,18 +126,12 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('httpserver_8cp
 <code>#include &quot;<a class="el" href="tempGaugeJS_8h_source.html">os/app/http/tempGauge/tempGaugeJS.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="tempGaugeCSS_8h_source.html">os/app/http/tempGauge/tempGaugeCSS.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="renderRoomsJS_8h_source.html">os/app/http/renderRoomsJS.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">os/app/http/GeneratedDeviceConfigWidgets.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="build__info_8h_source.html">build_info.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Logger_8hpp_source.html">os/Logger.hpp</a>&quot;</code><br />
 </div>
 <p><a href="httpserver_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:af80ffc6adf99bf5d42403333fb691312" id="r_af80ffc6adf99bf5d42403333fb691312"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af80ffc6adf99bf5d42403333fb691312">generateExtraFieldsForDistanceSensor</a> (uint8_t slotNumber, <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:a2ebd564a494c781d7206898287f302bb" id="r_a2ebd564a494c781d7206898287f302bb"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ebd564a494c781d7206898287f302bb">generateExtraFieldsForLedStrip</a> (uint8_t slotNumber, <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:a17f8d040466fef820afdbb8c60e87b73" id="r_a17f8d040466fef820afdbb8c60e87b73"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a17f8d040466fef820afdbb8c60e87b73">generateExtraFieldsForOnOff</a> (uint8_t slotNumber, <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:ac3b584a475ede4889b9ebbc624afe8fa" id="r_ac3b584a475ede4889b9ebbc624afe8fa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac3b584a475ede4889b9ebbc624afe8fa">generateExtraFieldsForSegmentedLedStrip</a> (uint8_t slotNumber, <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, WiFiClient &amp;client)</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a323dfc205549b3c13f0a25c1b670708a" id="r_a323dfc205549b3c13f0a25c1b670708a"><td class="memItemLeft">WiFiClient&#160;</td><td class="memItemRight"><a class="el" href="#a323dfc205549b3c13f0a25c1b670708a">client</a></td></tr>
@@ -154,136 +148,7 @@ Variables</h2></td></tr>
 <div class="textblock"><p>HTTP server implementation and request callbacks for the Home Control Station. </p>
 
 <p class="definition">Definition in file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="af80ffc6adf99bf5d42403333fb691312" name="af80ffc6adf99bf5d42403333fb691312"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af80ffc6adf99bf5d42403333fb691312">&#9670;&#160;</a></span>generateExtraFieldsForDistanceSensor()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void generateExtraFieldsForDistanceSensor </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00804">804</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00022">client</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::customBytes</a>, and <a class="el" href="httpserver_8cpp_source.html#l00804">generateExtraFieldsForDistanceSensor()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00804">generateExtraFieldsForDistanceSensor()</a>.</p>
-
-</div>
-</div>
-<a id="a2ebd564a494c781d7206898287f302bb" name="a2ebd564a494c781d7206898287f302bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ebd564a494c781d7206898287f302bb">&#9670;&#160;</a></span>generateExtraFieldsForLedStrip()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void generateExtraFieldsForLedStrip </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00728">728</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00022">client</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::customBytes</a>, <a class="el" href="httpserver_8cpp_source.html#l00728">generateExtraFieldsForLedStrip()</a>, and <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00728">generateExtraFieldsForLedStrip()</a>.</p>
-
-</div>
-</div>
-<a id="a17f8d040466fef820afdbb8c60e87b73" name="a17f8d040466fef820afdbb8c60e87b73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17f8d040466fef820afdbb8c60e87b73">&#9670;&#160;</a></span>generateExtraFieldsForOnOff()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void generateExtraFieldsForOnOff </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00686">686</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00022">client</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::customBytes</a>, and <a class="el" href="httpserver_8cpp_source.html#l00686">generateExtraFieldsForOnOff()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00686">generateExtraFieldsForOnOff()</a>.</p>
-
-</div>
-</div>
-<a id="ac3b584a475ede4889b9ebbc624afe8fa" name="ac3b584a475ede4889b9ebbc624afe8fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3b584a475ede4889b9ebbc624afe8fa">&#9670;&#160;</a></span>generateExtraFieldsForSegmentedLedStrip()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void generateExtraFieldsForSegmentedLedStrip </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00763">763</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00022">client</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::customBytes</a>, and <a class="el" href="httpserver_8cpp_source.html#l00763">generateExtraFieldsForSegmentedLedStrip()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00763">generateExtraFieldsForSegmentedLedStrip()</a>.</p>
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+</div><a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="a323dfc205549b3c13f0a25c1b670708a" name="a323dfc205549b3c13f0a25c1b670708a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a323dfc205549b3c13f0a25c1b670708a">&#9670;&#160;</a></span>client</h2>
 
@@ -296,9 +161,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00022">22</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00023">23</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="asyncHandlers_8cpp_source.html#l00482">HomeLightHttpServer::constantHandler_asyncGetNotifications()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00477">HomeLightHttpServer::constantHandler_asyncGetPageContent()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00258">HomeLightHttpServer::constantHandler_asyncTest()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00134">HomeLightHttpServer::constantHandler_configPage()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00148">HomeLightHttpServer::constantHandler_devicesSetup()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00351">HomeLightHttpServer::constantHandler_digitalEvents()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00011">HomeLightHttpServer::constantHandler_mainPage()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00232">HomeLightHttpServer::constantHandler_massErase()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00263">HomeLightHttpServer::constantHandler_networkInspecion()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00141">HomeLightHttpServer::constantHandler_resetDevice()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00153">HomeLightHttpServer::constantHandler_roomAssignment()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00295">HomeLightHttpServer::constantHandler_systemDetails()</a>, <a class="el" href="httpserver_8cpp_source.html#l00134">HomeLightHttpServer::cyclic()</a>, <a class="el" href="httpserver_8cpp_source.html#l00628">HomeLightHttpServer::generateAsyncPageContentJson()</a>, <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>, <a class="el" href="httpserver_8cpp_source.html#l00804">generateExtraFieldsForDistanceSensor()</a>, <a class="el" href="httpserver_8cpp_source.html#l00728">generateExtraFieldsForLedStrip()</a>, <a class="el" href="httpserver_8cpp_source.html#l00686">generateExtraFieldsForOnOff()</a>, <a class="el" href="httpserver_8cpp_source.html#l00763">generateExtraFieldsForSegmentedLedStrip()</a>, <a class="el" href="httpserver_8cpp_source.html#l00527">HomeLightHttpServer::handleClientRequest()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00454">HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00016">HomeLightHttpServer::parameterizedHandler_deviceSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00442">HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00417">HomeLightHttpServer::parameterizedHandler_getExtendedControls()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00412">HomeLightHttpServer::parameterizedHandler_getHash()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00150">HomeLightHttpServer::parameterizedHandler_ledColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00382">HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00126">HomeLightHttpServer::parameterizedHandler_ledStripColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00041">HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00010">HomeLightHttpServer::parameterizedHandler_newConfigApply()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00089">HomeLightHttpServer::parameterizedHandler_newDigEvntTab()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00010">HomeLightHttpServer::parameterizedHandler_newSetupJson()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00108">HomeLightHttpServer::parameterizedHandler_passwordApply()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00027">HomeLightHttpServer::parameterizedHandler_roomNameMappingApply()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00232">HomeLightHttpServer::parameterizedHandler_roomStateChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00285">HomeLightHttpServer::parameterizedHandler_roomToggle()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00350">HomeLightHttpServer::parameterizedHandler_segmentStateSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00087">HomeLightHttpServer::parameterizedHandler_setStripColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00169">HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00200">HomeLightHttpServer::parameterizedHandler_stripSaveCurrent()</a>, <a class="el" href="httpserver_8cpp_source.html#l01221">HomeLightHttpServer::pending()</a>, <a class="el" href="httpserver_8cpp_source.html#l00970">HomeLightHttpServer::printConfigPage()</a>, <a class="el" href="httpserver_8cpp_source.html#l01188">HomeLightHttpServer::printSlotsConfigPage()</a>, <a class="el" href="httpserver_8cpp_source.html#l00423">HomeLightHttpServer::processConstantRequests()</a>, <a class="el" href="httpserver_8cpp_source.html#l00346">HomeLightHttpServer::processLinkAsyncRequest()</a>, <a class="el" href="httpserver_8cpp_source.html#l00361">HomeLightHttpServer::processLinkRequestData()</a>, <a class="el" href="httpserver_8cpp_source.html#l00492">HomeLightHttpServer::processParameterizedAsyncRequests()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00453">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="asyncHandlers_8cpp_source.html#l00482">HomeLightHttpServer::constantHandler_asyncGetNotifications()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00477">HomeLightHttpServer::constantHandler_asyncGetPageContent()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00258">HomeLightHttpServer::constantHandler_asyncTest()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00134">HomeLightHttpServer::constantHandler_configPage()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00148">HomeLightHttpServer::constantHandler_devicesSetup()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00351">HomeLightHttpServer::constantHandler_digitalEvents()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00011">HomeLightHttpServer::constantHandler_mainPage()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00232">HomeLightHttpServer::constantHandler_massErase()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00263">HomeLightHttpServer::constantHandler_networkInspecion()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00141">HomeLightHttpServer::constantHandler_resetDevice()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00153">HomeLightHttpServer::constantHandler_roomAssignment()</a>, <a class="el" href="constantHandlers_8cpp_source.html#l00295">HomeLightHttpServer::constantHandler_systemDetails()</a>, <a class="el" href="httpserver_8cpp_source.html#l00135">HomeLightHttpServer::cyclic()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">GeneratedDeviceConfigWidgets::emitField()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">GeneratedDeviceConfigWidgets::emitGeneratedCustomFields()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00063">GeneratedDeviceConfigWidgets::emitGpioSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00052">GeneratedDeviceConfigWidgets::emitSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00152">GeneratedDeviceConfigWidgets::emitTypeSelector()</a>, <a class="el" href="httpserver_8cpp_source.html#l00629">HomeLightHttpServer::generateAsyncPageContentJson()</a>, <a class="el" href="httpserver_8cpp_source.html#l00687">HomeLightHttpServer::generateConfigSlotUi()</a>, <a class="el" href="httpserver_8cpp_source.html#l00528">HomeLightHttpServer::handleClientRequest()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00454">HomeLightHttpServer::parameterizedHandler_deviceBrightnessChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00016">HomeLightHttpServer::parameterizedHandler_deviceSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00442">HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00417">HomeLightHttpServer::parameterizedHandler_getExtendedControls()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00412">HomeLightHttpServer::parameterizedHandler_getHash()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00150">HomeLightHttpServer::parameterizedHandler_ledColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00382">HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00126">HomeLightHttpServer::parameterizedHandler_ledStripColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00041">HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00010">HomeLightHttpServer::parameterizedHandler_newConfigApply()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00089">HomeLightHttpServer::parameterizedHandler_newDigEvntTab()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00010">HomeLightHttpServer::parameterizedHandler_newSetupJson()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00108">HomeLightHttpServer::parameterizedHandler_passwordApply()</a>, <a class="el" href="parameterizedHandlers_8cpp_source.html#l00027">HomeLightHttpServer::parameterizedHandler_roomNameMappingApply()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00232">HomeLightHttpServer::parameterizedHandler_roomStateChange()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00285">HomeLightHttpServer::parameterizedHandler_roomToggle()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00350">HomeLightHttpServer::parameterizedHandler_segmentStateSwitch()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00087">HomeLightHttpServer::parameterizedHandler_setStripColor()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00169">HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory()</a>, <a class="el" href="asyncHandlers_8cpp_source.html#l00200">HomeLightHttpServer::parameterizedHandler_stripSaveCurrent()</a>, <a class="el" href="httpserver_8cpp_source.html#l00991">HomeLightHttpServer::pending()</a>, <a class="el" href="httpserver_8cpp_source.html#l00740">HomeLightHttpServer::printConfigPage()</a>, <a class="el" href="httpserver_8cpp_source.html#l00958">HomeLightHttpServer::printSlotsConfigPage()</a>, <a class="el" href="httpserver_8cpp_source.html#l00424">HomeLightHttpServer::processConstantRequests()</a>, <a class="el" href="httpserver_8cpp_source.html#l00347">HomeLightHttpServer::processLinkAsyncRequest()</a>, <a class="el" href="httpserver_8cpp_source.html#l00362">HomeLightHttpServer::processLinkRequestData()</a>, <a class="el" href="httpserver_8cpp_source.html#l00493">HomeLightHttpServer::processParameterizedAsyncRequests()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00454">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
 
 </div>
 </div>
@@ -338,9 +203,9 @@ Variables</h2></td></tr>
 <div class="ttc" id="adatacontainertypes_8hpp_html_a50a624b41b1ab08096f2ebc8e680327ba8c1e96ed57cd344aafeb89ec8eee0c2b"><div class="ttname"><a href="datacontainertypes_8hpp.html#a50a624b41b1ab08096f2ebc8e680327ba8c1e96ed57cd344aafeb89ec8eee0c2b">e_ACCESS_LEVEL_SERVICE_MODE</a></div><div class="ttdeci">@ e_ACCESS_LEVEL_SERVICE_MODE</div><div class="ttdef"><b>Definition</b> <a href="datacontainertypes_8hpp_source.html#l00119">datacontainertypes.hpp:119</a></div></div>
 <div class="ttc" id="adatacontainertypes_8hpp_html_a50a624b41b1ab08096f2ebc8e680327bac330a5b50b92f8db02a425bc3afcf8b2"><div class="ttname"><a href="datacontainertypes_8hpp.html#a50a624b41b1ab08096f2ebc8e680327bac330a5b50b92f8db02a425bc3afcf8b2">e_ACCESS_LEVEL_NONE</a></div><div class="ttdeci">@ e_ACCESS_LEVEL_NONE</div><div class="ttdef"><b>Definition</b> <a href="datacontainertypes_8hpp_source.html#l00118">datacontainertypes.hpp:118</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00085">85</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00086">86</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00423">HomeLightHttpServer::processConstantRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00424">HomeLightHttpServer::processConstantRequests()</a>.</p>
 
 </div>
 </div>
@@ -368,9 +233,9 @@ Variables</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;digBtn&quot;</span></div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00043">43</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00044">44</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00423">HomeLightHttpServer::processConstantRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00424">HomeLightHttpServer::processConstantRequests()</a>.</p>
 
 </div>
 </div>
@@ -386,9 +251,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00041">41</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00042">42</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00687">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
 
 </div>
 </div>
@@ -404,9 +269,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00040">40</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00041">41</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00837">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00687">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
 
 </div>
 </div>
@@ -458,9 +323,9 @@ Variables</h2></td></tr>
 <div class="ttc" id="aclassHomeLightHttpServer_html_af7367ce1952dd6cba9ed782163984d5f"><div class="ttname"><a href="classHomeLightHttpServer.html#af7367ce1952dd6cba9ed782163984d5f">HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration</a></div><div class="ttdeci">static void parameterizedHandler_loadDeviceConfiguration(String &amp;request, WiFiClient &amp;client)</div><div class="ttdoc">Loads a device configuration payload sent by the browser.</div><div class="ttdef"><b>Definition</b> <a href="asyncHandlers_8cpp_source.html#l00041">asyncHandlers.cpp:41</a></div></div>
 <div class="ttc" id="aclassHomeLightHttpServer_html_afb11471e00117042c2bacfe74d49f0c8"><div class="ttname"><a href="classHomeLightHttpServer.html#afb11471e00117042c2bacfe74d49f0c8">HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory</a></div><div class="ttdeci">static void parameterizedHandler_stripLoadFromMemory(String &amp;request, WiFiClient &amp;client)</div><div class="ttdoc">Loads a strip configuration from the persistent memory block.</div><div class="ttdef"><b>Definition</b> <a href="asyncHandlers_8cpp_source.html#l00169">asyncHandlers.cpp:169</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00106">106</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00107">107</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00492">HomeLightHttpServer::processParameterizedAsyncRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00493">HomeLightHttpServer::processParameterizedAsyncRequests()</a>.</p>
 
 </div>
 </div>
@@ -495,9 +360,9 @@ Variables</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;newDigEvntTab&quot;</span></div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00064">64</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00065">65</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00492">HomeLightHttpServer::processParameterizedAsyncRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00493">HomeLightHttpServer::processParameterizedAsyncRequests()</a>.</p>
 
 </div>
 </div>
@@ -525,9 +390,9 @@ Variables</h2></td></tr>
 <div class="ttc" id="aclassHomeLightHttpServer_html_a804b503292c41ba8f0e327ffd1307093"><div class="ttname"><a href="classHomeLightHttpServer.html#a804b503292c41ba8f0e327ffd1307093">HomeLightHttpServer::parameterizedHandler_ledColor</a></div><div class="ttdeci">static void parameterizedHandler_ledColor(String &amp;request, WiFiClient &amp;client)</div><div class="ttdoc">Sets a single LED color from the web interface.</div><div class="ttdef"><b>Definition</b> <a href="parameterizedHandlers_8cpp_source.html#l00150">parameterizedHandlers.cpp:150</a></div></div>
 <div class="ttc" id="aclassHomeLightHttpServer_html_acbdecd8d0f110685d64329a1311b2957"><div class="ttname"><a href="classHomeLightHttpServer.html#acbdecd8d0f110685d64329a1311b2957">HomeLightHttpServer::parameterizedHandler_roomNameMappingApply</a></div><div class="ttdeci">static void parameterizedHandler_roomNameMappingApply(String &amp;request, WiFiClient &amp;client)</div><div class="ttdoc">Applies room-name mappings submitted by the browser.</div><div class="ttdef"><b>Definition</b> <a href="parameterizedHandlers_8cpp_source.html#l00027">parameterizedHandlers.cpp:27</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00098">98</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00099">99</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00453">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00454">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
 
 </div>
 </div>
@@ -550,9 +415,9 @@ Variables</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;ledColor&quot;</span></div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00056">56</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="httpserver_8cpp_source.html#l00057">57</a> of file <a class="el" href="httpserver_8cpp_source.html">httpserver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00453">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="httpserver_8cpp_source.html#l00454">HomeLightHttpServer::processParameterizedRequests()</a>.</p>
 
 </div>
 </div>

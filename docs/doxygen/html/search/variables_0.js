@@ -10,8 +10,9 @@ var searchData=
   ['animationproperties_7',['animationProperties',['../classLedWS1228bDeviceType.html#a5bdcf92b74ad471974253ab05dffb589',1,'LedWS1228bDeviceType']]],
   ['animationspeed_8',['animationSpeed',['../structLedStripAnimationProperties.html#a05dabe35b78dd2b72db5b1e74da8c6b9',1,'LedStripAnimationProperties']]],
   ['animationwaitticks_9',['animationWaitTicks',['../classLedWS1228bDeviceType.html#a54bdeb10bffda12c7b1fd287678016d1',1,'LedWS1228bDeviceType']]],
-  ['averagecolor_10',['averageColor',['../classSingleWaveAnimation.html#a5765140c82c07ef241d16cf9455b44e6',1,'SingleWaveAnimation::averageColor'],['../classSmoothWaveAnimation.html#a7fbbfddd42536f0c51ef7f86635b3c89',1,'SmoothWaveAnimation::averageColor']]],
-  ['averagedcolors_11',['averagedColors',['../classLedWS1228bDeviceType.html#ad27f9c22f27c3123e1b222bac2cd3261',1,'LedWS1228bDeviceType::averagedColors'],['../classSegLedWS1228bDeviceType.html#aae55f8343f2004718977a92e25d2f39d',1,'SegLedWS1228bDeviceType::averagedColors']]],
-  ['avgcolor_12',['avgColor',['../classComplexSequenceAnimation.html#a9977c14a71036bf384c2fee989b9dd8a',1,'ComplexSequenceAnimation']]],
-  ['awaitingresponseid_13',['awaitingResponseId',['../classRemoteDevicesManager.html#a208f4609990d12c6c71c932c80ea550d',1,'RemoteDevicesManager']]]
+  ['arraylength_10',['arrayLength',['../structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a114f24b043a0c0b085419593209b1f33',1,'GeneratedDeviceConfigWidgets::FieldSpec']]],
+  ['averagecolor_11',['averageColor',['../classSingleWaveAnimation.html#a5765140c82c07ef241d16cf9455b44e6',1,'SingleWaveAnimation::averageColor'],['../classSmoothWaveAnimation.html#a7fbbfddd42536f0c51ef7f86635b3c89',1,'SmoothWaveAnimation::averageColor']]],
+  ['averagedcolors_12',['averagedColors',['../classLedWS1228bDeviceType.html#ad27f9c22f27c3123e1b222bac2cd3261',1,'LedWS1228bDeviceType::averagedColors'],['../classSegLedWS1228bDeviceType.html#aae55f8343f2004718977a92e25d2f39d',1,'SegLedWS1228bDeviceType::averagedColors']]],
+  ['avgcolor_13',['avgColor',['../classComplexSequenceAnimation.html#a9977c14a71036bf384c2fee989b9dd8a',1,'ComplexSequenceAnimation']]],
+  ['awaitingresponseid_14',['awaitingResponseId',['../classRemoteDevicesManager.html#a208f4609990d12c6c71c932c80ea550d',1,'RemoteDevicesManager']]]
 ];

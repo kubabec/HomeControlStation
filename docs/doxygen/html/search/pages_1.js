@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['english_20documentation_20standard_0',['English documentation standard',['../index.html#autotoc_md2',1,'']]]
+  ['build_20time_20generation_0',['Build-time generation',['../index.html#autotoc_md4',1,'']]]
 ];

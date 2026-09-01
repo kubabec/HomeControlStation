@@ -11,10 +11,12 @@ var searchData=
   ['deviceprovider_8',['DeviceProvider',['../classDeviceProvider.html',1,'']]],
   ['deviceservicesapi_9',['DeviceServicesAPI',['../structDeviceServicesAPI.html',1,'']]],
   ['devicetranslationdetails_10',['DeviceTranslationDetails',['../structDeviceTranslationDetails.html',1,'']]],
-  ['digitaleventreceiver_11',['DigitalEventReceiver',['../classDigitalEventReceiver.html',1,'']]],
-  ['digitaleventtransmitter_12',['DigitalEventTransmitter',['../classDigitalEventTransmitter.html',1,'']]],
-  ['display_13',['Display',['../classDisplay.html',1,'']]],
-  ['displayinfo_14',['DisplayInfo',['../structDisplayInfo.html',1,'']]],
-  ['displayserver_15',['DisplayServer',['../classDisplayServer.html',1,'']]],
-  ['distancesensor_16',['DistanceSensor',['../classDistanceSensor.html',1,'']]]
+  ['devicetypeinfo_11',['DeviceTypeInfo',['../structGeneratedDeviceTypes_1_1DeviceTypeInfo.html',1,'GeneratedDeviceTypes']]],
+  ['devicetypespec_12',['DeviceTypeSpec',['../structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html',1,'GeneratedDeviceConfigWidgets']]],
+  ['digitaleventreceiver_13',['DigitalEventReceiver',['../classDigitalEventReceiver.html',1,'']]],
+  ['digitaleventtransmitter_14',['DigitalEventTransmitter',['../classDigitalEventTransmitter.html',1,'']]],
+  ['display_15',['Display',['../classDisplay.html',1,'']]],
+  ['displayinfo_16',['DisplayInfo',['../structDisplayInfo.html',1,'']]],
+  ['displayserver_17',['DisplayServer',['../classDisplayServer.html',1,'']]],
+  ['distancesensor_18',['DistanceSensor',['../classDistanceSensor.html',1,'']]]
 ];

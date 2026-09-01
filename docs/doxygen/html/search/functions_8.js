@@ -19,5 +19,6 @@ var searchData=
   ['handleservice3response_16',['handleService3Response',['../classRemoteDevicesManager.html#aaacc8f7a8cff48787d632db47ade6dfa',1,'RemoteDevicesManager']]],
   ['handleslavealivemonitoring_17',['handleSlaveAliveMonitoring',['../classRemoteControlServer.html#a97f6c20f1240b5a15a93574dc48ce2c0',1,'RemoteControlServer']]],
   ['handleuiblocktimeexpiration_18',['handleUiBlockTimeExpiration',['../classOperatingSystem.html#a4ed4bb4dae26544ba008c30988739837',1,'OperatingSystem']]],
-  ['hwbutton_19',['HwButton',['../classHwButton.html#a61fbed7dab683aceab082b67c59e484e',1,'HwButton::HwButton(DeviceConfigSlotType nvmData, std::function&lt; void(uint16_t)&gt; localToggleCbk, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)'],['../classHwButton.html#a4754855f6c44cd7258d12f0554265479',1,'HwButton::HwButton(DeviceConfigSlotType nvmData, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)']]]
+  ['hexdigit_19',['hexDigit',['../namespaceGeneratedDeviceStateSerializer.html#a1ee73ac750752004417ea9baf8bb05df',1,'GeneratedDeviceStateSerializer']]],
+  ['hwbutton_20',['HwButton',['../classHwButton.html#a61fbed7dab683aceab082b67c59e484e',1,'HwButton::HwButton(DeviceConfigSlotType nvmData, std::function&lt; void(uint16_t)&gt; localToggleCbk, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)'],['../classHwButton.html#a4754855f6c44cd7258d12f0554265479',1,'HwButton::HwButton(DeviceConfigSlotType nvmData, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)']]]
 ];

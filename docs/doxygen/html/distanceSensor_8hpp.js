@@ -1,4 +1,4 @@
-var distanceSensor_8hpp =
+var DistanceSensor_8hpp =
 [
     [ "DistanceSensor", "classDistanceSensor.html", "classDistanceSensor" ]
 ];

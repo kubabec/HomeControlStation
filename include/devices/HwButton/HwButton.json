@@ -5,13 +5,17 @@
     "name": "HardwareButton",
     "className": "HwButton",
     "enumSymbol": "type_HARDWARE_BUTTON",
-    "enumValue": 48
+    "enumValue": 48,
+    "httpConfig": {
+      "configurable": false
+    }
   },
   "implementation": {
     "header": "include/devices/HwButton/HwButton.hpp",
     "source": "src/device/HwButton/HwButton.cpp",
     "buildGuard": null,
     "dependencies": ["Arduino GPIO interrupts", "digital-event callback"],
+    "factory": { "arguments": ["config", "toggleLocalDevice", "fireDigitalEvent"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::hardwareButtons",

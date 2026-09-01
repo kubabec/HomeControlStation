@@ -12,6 +12,7 @@
     "source": "src/device/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.cpp",
     "buildGuard": "LED_STRIP_SUPPORTED",
     "dependencies": ["Adafruit_NeoPixel", "LedStrip animation framework"],
+    "factory": { "arguments": ["config", "persistentDataChanged"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::segmentedWs2812bDevices",

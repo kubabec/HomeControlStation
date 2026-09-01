@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('index.html',''
   <div class="headertitle"><div class="title">HomeControlStation </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_docs_2DoxygenMainPage"></a></p>
+<div class="textblock"><p><a class="anchor" id="mainpage"></a></p>
 <p>This project implements an embedded home automation controller for ESP-based systems. The firmware coordinates device management, periodic maintenance tasks, configuration persistence, display rendering, and remote-control interfaces.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md0"></a>
 Project scope</h1>
 <p>The documentation covers the project sources under the <span class="tt">include</span> and <span class="tt">src</span> directories, with emphasis on:</p>
 <ul>
@@ -125,11 +125,13 @@ Project scope</h1>
 <li>Remote control and network communication</li>
 <li>UI display and status handling</li>
 <li>Hardware dependencies and LED device logic</li>
+<li>Build-time device discovery and generated registries</li>
+<li>Schema-driven HTTP configuration and dashboard widgets</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
 English documentation standard</h1>
 <p>All documentation generated for this project is written in English. Descriptions focus on runtime behavior, lifecycle responsibilities, configuration fields, and service payload semantics for each class and method.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
 Main modules</h1>
 <ul>
 <li><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> layer: data models, service interfaces, device implementations</li>
@@ -137,8 +139,74 @@ Main modules</h1>
 <li>Network and protocol layer: HTTP, UDP, remote control, and RF dependencies</li>
 <li><a class="el" href="classDisplay.html" title="Represents a display endpoint discovered by the station and tracked for periodic refresh.">Display</a> and reporting: status pages, device previews, and user-facing content</li>
 <li>Hardware drivers: board-specific synchronization and peripheral control</li>
+<li><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> code generation: type IDs, factories, configuration codecs, state serializers, and browser widgets</li>
 </ul>
-<p>The generated Doxygen pages provide cross-links between classes, methods, and data structures to make the firmware easier to understand and extend. </p>
+<p>The generated Doxygen pages provide cross-links between classes, methods, and data structures to make the firmware easier to understand and extend.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+Schema-driven device architecture</h1>
+<p>The operating-system layer does not maintain a handwritten list of concrete device classes. Each device implementation is accompanied by a JSON description under <span class="tt">include/devices/&lt;device&gt;/</span>. The description conforms to <span class="tt">include/devices/device.schema.json</span> and is the source of truth for:</p>
+<ul>
+<li>the persistent numeric device type and C++ enum symbol,</li>
+<li>implementation header, class name, build guard, and factory arguments,</li>
+<li>participation in the public device collection,</li>
+<li>configuration fields and their custom-byte layout,</li>
+<li>runtime state fields exposed over HTTP,</li>
+<li>dashboard controls and readouts,</li>
+<li>optional advanced-control payload and renderer registration.</li>
+</ul>
+<p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> type identifiers are part of persisted and network-visible data. Existing identifiers must remain stable, <span class="tt">255</span> is reserved for an unknown or unconfigured device, and duplicate identifiers cause generation to fail.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
+Build-time generation</h1>
+<p>PlatformIO invokes <span class="tt"><a class="el" href="generate__device__registry_8py.html">extra/generate_device_registry.py</a></span> and <span class="tt"><a class="el" href="generate__device__config__widgets_8py.html">extra/generate_device_config_widgets.py</a></span> before every compilation. The generators validate the discovered JSON descriptions and produce the integration layer under <span class="tt">include/generated/</span> and <span class="tt">src/os/app/http/</span>.</p>
+<p>The generated artifacts include:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Artifact  </th><th class="markdownTableHeadNone">Responsibility  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceTypes_8hpp.html" title="Schema-derived stable device identifiers and human-readable type metadata.">GeneratedDeviceTypes.hpp</a></span>  </td><td class="markdownTableBodyNone">Stable <span class="tt"><a class="el" href="GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255c">DevType</a></span> constants and type-name lookup  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceRegistry_8hpp.html" title="Build-profile-specific device factories and runtime participation metadata.">GeneratedDeviceRegistry.hpp</a></span>  </td><td class="markdownTableBodyNone">Enabled implementations, factory construction, and collection participation  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceStateSerializer_8hpp.html" title="Converts schema-described device state bytes into dashboard JSON fields.">GeneratedDeviceStateSerializer.hpp</a></span>  </td><td class="markdownTableBodyNone">Conversion of <span class="tt"><a class="el" href="structDeviceDescription.html#aceb2d4e5b37d5a45119955df825d979f" title="Free-form bytes reserved for custom metadata.">DeviceDescription::customBytes</a></span> to HTTP JSON fields  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceConfiguration_8hpp.html" title="Browser-side device configuration encoder generated from schema fields.">GeneratedDeviceConfiguration.hpp</a></span>  </td><td class="markdownTableBodyNone">Browser-side packing of configuration fields into the common slot representation  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceWidgets_8hpp.html" title="Aggregates dashboard widgets enabled in the current firmware build.">GeneratedDeviceWidgets.hpp</a></span>  </td><td class="markdownTableBodyNone">Aggregate dashboard widget bundle for the active build profile  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">generated/widgets/Generated*Widget.hpp</span>  </td><td class="markdownTableBodyNone">One independently generated dashboard widget per device type  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceConfigWidgets_8hpp.html" title="Schema-derived configuration-page controls for enabled device types.">GeneratedDeviceConfigWidgets.hpp</a></span>  </td><td class="markdownTableBodyNone">Configuration-page selectors and type-specific field controls  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">GeneratedAdvancedControls*.inc</span>  </td><td class="markdownTableBodyNone">Advanced-control payload-size and renderer dispatch  </td></tr>
+</table>
+<p>Generated files must not be edited directly. Changes belong in a device JSON description or in a generator.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
+Runtime device lifecycle</h1>
+<p><span class="tt"><a class="el" href="classDeviceManager.html" title="Owns the runtime device catalog and orchestrates initialization, configuration, and service calls.">DeviceManager</a></span> owns all generated device instances through <span class="tt">std::unique_ptr&lt;<a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a>&gt;</span>. During initialization it reads each NVM slot, validates the type through the generated metadata, builds a <span class="tt"><a class="el" href="structGeneratedDeviceRegistry_1_1RuntimeContext.html" title="Platform callbacks made available to generated device factory calls.">GeneratedDeviceRegistry::RuntimeContext</a></span>, and asks the generated factory to construct the concrete class.</p>
+<p>All registered instances participate in initialization and cyclic processing. The <span class="tt">includedInDeviceCollection</span> metadata flag determines whether an instance is published to the room dashboard and exposed through the regular device service API. This allows infrastructure devices, such as hardware buttons, to run without appearing as controllable room devices.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
+HTTP generation pipeline</h1>
+<p>The HTTP interface has three generated device-dependent layers:</p>
+<ol type="1">
+<li><b>Configuration page</b> — configuration field metadata creates selectors and controls for the enabled device set.</li>
+<li><b>Configuration submission</b> — generated JavaScript packs common values and custom fields into a uniform JSON payload. The server decodes this payload without a per-device switch.</li>
+<li><b>Dashboard</b> — runtime state metadata serializes device custom bytes into named JSON fields. Separate generated widget files render the controls and readouts described by each device's <span class="tt">ui</span> section. Button controls are ordered by their optional <span class="tt">displayOrder</span> value, falling back to JSON declaration order. Only widgets whose build guards are enabled by <span class="tt"><a class="el" href="SystemDefinition_8hpp.html" title="Compile-time feature selection for the HomeControlStation firmware.">SystemDefinition.hpp</a></span> are included in the firmware.</li>
+</ol>
+<p>Advanced controls retain their specialized renderer implementations, while payload sizing and type-to-renderer dispatch are generated from device metadata.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+Adding a device type</h1>
+<p>To add a device without modifying the operating-system implementation:</p>
+<ol type="1">
+<li>Implement a class derived from <span class="tt"><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a></span>.</li>
+<li>Add a JSON description beside the implementation header.</li>
+<li>Assign a new, explicit, previously unused type identifier and enum symbol.</li>
+<li>Describe constructor dependencies with the supported factory argument names.</li>
+<li>Define configuration-byte and description-state layouts with non-overlapping offsets.</li>
+<li>Describe dashboard controls and readouts in the <span class="tt">ui</span> section.</li>
+<li>Add advanced-control metadata only when the device supports that service.</li>
+<li>Run a PlatformIO build and inspect generator validation errors.</li>
+</ol>
+<p>No concrete device include, factory branch, HTTP state branch, configuration parser, or dashboard type dispatch should be added manually under <span class="tt">include/os</span> or <span class="tt">src/os</span>. </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

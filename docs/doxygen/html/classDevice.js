@@ -1,5 +1,6 @@
 var classDevice =
 [
+    [ "~Device", "classDevice.html#a6fef4f7180512c7517c9696cd95e503a", null ],
     [ "cyclic", "classDevice.html#a8d0638fea9ff80bf80627ed684f4e051", null ],
     [ "getDeviceDescription", "classDevice.html#a245aa604bbe9a24171eeb8a4dd34e4cd", null ],
     [ "getDeviceIdentifier", "classDevice.html#a76583be58ff9ac8d40fdf32e75ddfed6", null ],

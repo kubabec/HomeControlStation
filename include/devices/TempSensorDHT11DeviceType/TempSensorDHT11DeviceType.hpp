@@ -1,5 +1,5 @@
 /**
- * @file tempSensorDHT11.hpp
+ * @file TempSensorDHT11DeviceType.hpp
  * @brief Temperature and humidity sensor implementation using a DHT22 device.
  */
 #ifndef TEMP_SENSOR_DHT11_TYPE_H

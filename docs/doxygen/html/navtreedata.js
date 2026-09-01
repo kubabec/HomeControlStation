@@ -25,14 +25,20 @@
 var NAVTREE =
 [
   [ "HomeControlStation", "index.html", [
-    [ "Project scope", "index.html#autotoc_md1", null ],
-    [ "English documentation standard", "index.html#autotoc_md2", null ],
-    [ "Main modules", "index.html#autotoc_md3", null ],
+    [ "Project scope", "index.html#autotoc_md0", null ],
+    [ "English documentation standard", "index.html#autotoc_md1", null ],
+    [ "Main modules", "index.html#autotoc_md2", null ],
+    [ "Schema-driven device architecture", "index.html#autotoc_md3", null ],
+    [ "Build-time generation", "index.html#autotoc_md4", null ],
+    [ "Runtime device lifecycle", "index.html#autotoc_md5", null ],
+    [ "HTTP generation pipeline", "index.html#autotoc_md6", null ],
+    [ "Adding a device type", "index.html#autotoc_md7", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ],
+        [ "Variables", "namespacemembers_vars.html", null ],
         [ "Enumerations", "namespacemembers_enum.html", null ],
         [ "Enumerator", "namespacemembers_eval.html", null ]
       ] ]
@@ -68,14 +74,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AdvancedControlsLoader_8cpp.html",
-"classBounceInAnimation.html#a18436464652d39a832de2315cf7e45b1",
-"classFadeOutAnimation.html#a782abdb77158fd37703924e776909188",
-"classMessageUDP.html#ad632e88283d2afd6f853ffe2cae0589b",
-"classRemoteControlServer.html#ab3946b62b2ea3853b0f603f8f4d30f4d",
-"classTwinkleInAnimation.html#ae55a3cbe1cb3db16dd2ea27f275511c7",
-"functions_j.html",
-"signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea75742edaa6eb8c92d22ddf764847331c",
-"structServiceParameters__set2.html#a13c12ef08b5b5e4a6c8503e73c6f7622"
+"SparkleInAnimation_8hpp.html",
+"classExtendedDataAllocator.html#a5eae9c758f231f9df65cb4c1b9350ee9",
+"classLedWS1228bDeviceType.html#aebd6bc5c04d856ec2896ac812a664a56",
+"classRemoteControlClient.html#a5f6a5729d293fd18b0211c06835b3c45",
+"classTempSensorDHT11DeviceType.html#afa987d58b8a82063a6a87f2c23f8b486",
+"dir_f29d85dd4a02f94d9087189ebca38efc.html",
+"persistentMemoryAccess_8cpp_source.html",
+"structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a649d9ec350f44d18dd3ffc3ffccabb95"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

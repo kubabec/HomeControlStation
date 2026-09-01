@@ -8,6 +8,7 @@
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "AdvancedControls.hpp"
 #include "os/Logger.hpp"
+#include "generated/GeneratedDeviceTypes.hpp"
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 #define DEVICE_NAME_MAX_LENGHT 25
@@ -62,21 +63,6 @@ typedef enum
     DEVSERVICE_LIVE_ANIMATION,
     DEVSERVICE_INVALID
 } DeviceServicesType;
-
-/**
- * @brief Runtime device type identifiers used throughout the control plane.
- */
-typedef enum
-{
-    type_ONOFFDEVICE = 43,
-    type_LED_STRIP,
-    type_TEMP_SENSOR,
-    type_LED_STRIP_SEGMENTED,
-    type_DISTANCE_SENSOR,
-    type_HARDWARE_BUTTON,
-    type_DEVICE_TYPE_LAST = type_HARDWARE_BUTTON
-
-} DevType;
 
 /**
  * @brief Represents the time descriptor used by sensor and device records.
@@ -238,31 +224,7 @@ struct DeviceDescription
                  (uint8_t)(macAddress >> 40), (uint8_t)(macAddress >> 32),
                  (uint8_t)(macAddress >> 24), (uint8_t)(macAddress >> 16),
                  (uint8_t)(macAddress >> 8), (uint8_t)(macAddress));
-        String devTypeStr;
-        switch (deviceType)
-        {
-        case type_ONOFFDEVICE:
-            devTypeStr = "ONOFFDEVICE";
-            break;
-        case type_LED_STRIP:
-            devTypeStr = "LED_STRIP";
-            break;
-        case type_TEMP_SENSOR:
-            devTypeStr = "TEMP_SENSOR";
-            break;
-        case type_LED_STRIP_SEGMENTED:
-            devTypeStr = "LED_STRIP_SEGMENTED";
-            break;
-        case type_DISTANCE_SENSOR:
-            devTypeStr = "DISTANCE_SENSOR";
-            break;
-        case type_HARDWARE_BUTTON:
-            devTypeStr = "HARDWARE_BUTTON";
-            break;
-        default:
-            devTypeStr = "UNKNOWN";
-            break;
-        }
+        String devTypeStr = GeneratedDeviceTypes::nameOf(deviceType);
         String out = "deviceType: {" + devTypeStr + "} | ";
         out += "macAddress: " + String(macStr) + " | ";
         out += "deviceId: " + String(deviceId) + " | ";
@@ -391,6 +353,9 @@ private:
     uint8_t DeviceIdentifier = 0xFF;
 
 public:
+    /** Allows device instances to be owned and destroyed through the base interface. */
+    virtual ~Device() = default;
+
     /**
      * @brief Initializes the device and prepares its hardware resources.
      */

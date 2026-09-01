@@ -1,5 +1,5 @@
 /**
- * @file onoffdevice.hpp
+ * @file OnOffDevice.hpp
  * @brief Driver for basic on/off devices and their brightness controls.
  */
 #ifndef ONOFF_DEVICE_H

@@ -2,9 +2,6 @@
 #include <SystemDefinition.hpp>
 #include "os/Logger.hpp"
 
-#define ONOFF_ADV_CONTROLS_SIZE 100
-#define TEMPSENSOR_ADV_CONTROLS_SIZE 50
-
 /**
  * @file src/os/app/http/AdvancedControlsLoader.cpp
  * @brief HTTP server implementation and request callbacks for the Home Control Station.
@@ -17,18 +14,7 @@ String AdvancedControlsLoader::currentRequestJS = "";
 
 uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceType){
     switch(deviceType){
-        case type_ONOFFDEVICE:
-            return sizeof(AdvancedControlsOnOff);
-        break;
-
-        case type_LED_STRIP:
-            return (currentlyRequestedDeviceDescription.customBytes[0] * sizeof(LedColor)) + sizeof(LedStripAnimationProperties);
-        break;
-
-        case type_TEMP_SENSOR:
-            return TEMPSENSOR_ADV_CONTROLS_SIZE;
-        break;
-
+#include "GeneratedAdvancedControlsSize.inc"
         default:
             return 0;
     }
@@ -44,9 +30,10 @@ uint8_t* AdvancedControlsLoader::allocateMemoryForControlsBasedOnDeviceType(uint
 
     currentAdvancedControls = nullptr;
     Logger::log("AdvancedControlsLoader://Allocating memory for device type : " + String((int)deviceType));
-    if(deviceType >= type_ONOFFDEVICE && deviceType <= type_DEVICE_TYPE_LAST){
-        Logger::log("AdvancedControlsLoader://Allocating memory for type {"+String((int)deviceType)+"} with size : " + String((int)getControlsSizeBasedOnDevType(deviceType)));
-        currentAdvancedControls = (uint8_t*)malloc(getControlsSizeBasedOnDevType(deviceType));
+    const uint16_t controlsSize = getControlsSizeBasedOnDevType(deviceType);
+    if(controlsSize > 0){
+        Logger::log("AdvancedControlsLoader://Allocating memory for type {"+String((int)deviceType)+"} with size : " + String((int)controlsSize));
+        currentAdvancedControls = (uint8_t*)malloc(controlsSize);
     }else {
         Logger::log("AdvancedControlsLoader://Type {"+String((int)deviceType)+"} is out of range");
     }
@@ -620,16 +607,7 @@ void AdvancedControlsLoader::prepareJsStringWithAdvancedControls()
             currentRequestJS = "";
         
             switch(currentlyRequestedDeviceDescription.deviceType){
-                case type_ONOFFDEVICE:
-                    currentRequestJS = createJsForOnOff();
-                    break;
-                case type_LED_STRIP:
-                    currentRequestJS = createJsForLedStrip();
-                    break;
-                case type_TEMP_SENSOR:
-
-                    break;
-
+#include "GeneratedAdvancedControlsRender.inc"
                 default:
                     break;
             }

@@ -1,5 +1,16 @@
 var annotated_dup =
 [
+    [ "GeneratedDeviceConfigWidgets", "namespaceGeneratedDeviceConfigWidgets.html", [
+      [ "DeviceTypeSpec", "structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html", "structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec" ],
+      [ "FieldSpec", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html", "structGeneratedDeviceConfigWidgets_1_1FieldSpec" ]
+    ] ],
+    [ "GeneratedDeviceRegistry", "namespaceGeneratedDeviceRegistry.html", [
+      [ "Registration", "structGeneratedDeviceRegistry_1_1Registration.html", "structGeneratedDeviceRegistry_1_1Registration" ],
+      [ "RuntimeContext", "structGeneratedDeviceRegistry_1_1RuntimeContext.html", "structGeneratedDeviceRegistry_1_1RuntimeContext" ]
+    ] ],
+    [ "GeneratedDeviceTypes", "namespaceGeneratedDeviceTypes.html", [
+      [ "DeviceTypeInfo", "structGeneratedDeviceTypes_1_1DeviceTypeInfo.html", "structGeneratedDeviceTypes_1_1DeviceTypeInfo" ]
+    ] ],
     [ "AdvancedControlsLoader", "classAdvancedControlsLoader.html", "classAdvancedControlsLoader" ],
     [ "AdvancedControlsOnOff", "structAdvancedControlsOnOff.html", "structAdvancedControlsOnOff" ],
     [ "BounceInAnimation", "classBounceInAnimation.html", "classBounceInAnimation" ],

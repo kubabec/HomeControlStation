@@ -6,7 +6,10 @@
 #include <os/datacontainer/DataContainer.hpp>
 /**
  * @class AdvancedControlsLoader
- * @brief Loads the advanced-control definitions used by the dashboard and device pages.
+ * @brief Loads advanced-control payloads and delegates rendering through generated type dispatch.
+ *
+ * Payload sizes and renderer selection are generated from device JSON metadata. Specialized renderer
+ * implementations remain responsible for interpreting device-owned payload formats.
  */
 
 

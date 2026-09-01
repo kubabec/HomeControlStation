@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['default_5fticks_5fto_5fanimate_0',['DEFAULT_TICKS_TO_ANIMATE',['../LedWS1228b_8hpp.html#a9d6f448b7661c7824335bf69d70c7920',1,'LedWS1228b.hpp']]],
+  ['default_5fticks_5fto_5fanimate_0',['DEFAULT_TICKS_TO_ANIMATE',['../LedWS1228bDeviceType_8hpp.html#a9d6f448b7661c7824335bf69d70c7920',1,'LedWS1228bDeviceType.hpp']]],
   ['developer_1',['DEVELOPER',['../build__info_8h.html#a48e4b155916c5a6b0f861fb825d08f7c',1,'build_info.h']]],
   ['device_5fid_5fin_5fasync_5frequest_5fservice_5fcall_2',['DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL',['../HttpAsyncRequestHandler_8hpp.html#ac04f6f61708711837a1b6031d4a90a35',1,'HttpAsyncRequestHandler.hpp']]],
   ['device_5fname_5fmax_5flenght_3',['DEVICE_NAME_MAX_LENGHT',['../device_8hpp.html#a81bd54af79993b2990e5bd293c79468f',1,'device.hpp']]],

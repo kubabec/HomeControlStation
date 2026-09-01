@@ -12,6 +12,7 @@
     "source": "src/device/DistanceSensor/DistanceSensor.cpp",
     "buildGuard": "DISTANCE_SENSOR_SUPPORTED",
     "dependencies": ["Arduino GPIO"],
+    "factory": { "arguments": ["config"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::distanceSensorsDevices",

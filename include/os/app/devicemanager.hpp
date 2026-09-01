@@ -1,13 +1,9 @@
 #ifndef DEVICE_MANAGER_H
 #define DEVICE_MANAGER_H
 #include <Arduino.h>
-#include <devices/OnOffDevice/OnOffDevice.hpp>
-#include <devices/TestDeviceType/TestDeviceType.hpp>
-#include <devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp>
-#include <devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp>
-#include <devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp>
-#include <devices/DistanceSensor/DistanceSensor.hpp>
-#include <devices/HwButton/HwButton.hpp>
+#include <memory>
+#include <vector>
+#include <devices/device.hpp>
 #include <os/datacontainer/DataContainerTypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
@@ -20,51 +16,19 @@
  * @class DeviceManager
  * @brief Owns the runtime device catalog and orchestrates initialization, configuration, and service calls.
  *
- * This manager keeps the concrete device instances, refreshes their descriptions for the UI, persists
- * the NVM configuration, and routes service calls to the appropriate hardware class.
+ * The concrete type set and factory wiring are supplied by the generated device registry. The manager
+ * owns every instance through the Device interface, refreshes public descriptions for the UI, persists
+ * the common NVM configuration, and routes service calls without depending on concrete device classes.
  */
 
 class DeviceManager 
 {
-    /*TESTCODE*/
     /**
-     * List of generic device pointers currently managed by the OS.
+    * @brief Owns all device instances enabled by the generated registry.
+    *
+    * Registry metadata decides which instances are published to the common device collection.
      */
-    static std::vector<Device*> devices;
-    // static TestDeviceType testDev;
-    /*TESTCODE*/
-    /**
-     * Local instances of simple on/off devices managed by the Home Control Station.
-     */
-    static std::vector<OnOffDevice> vecOnOffDevices;
-#ifdef LED_STRIP_SUPPORTED
-    /**
-     * WS2812B LED strip devices attached to the station.
-     */
-    static std::vector<LedWS1228bDeviceType> ledws2812bDevices;
-
-    /**
-     * Segmented LED strip devices requiring chunked control logic.
-     */
-    static std::vector<SegLedWS1228bDeviceType> segmentedWs2812bDevices;
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-    /**
-     * Temperature sensor devices registered for periodic reporting.
-     */
-    static std::vector<TempSensorDHT11DeviceType> tempSensorsDevices;
-#endif
-#ifdef DISTANCE_SENSOR_SUPPORTED
-    /**
-     * Distance sensor devices used for presence or range detection.
-     */
-    static std::vector<DistanceSensor> distanceSensorsDevices;
-#endif
-
-    /**
-     * Hardware buttons discovered and owned by the station.
-     */
-    static std::vector<HwButton> hardwareButtons;
+    static std::vector<std::unique_ptr<Device>> devices;
 
     /**
      * RAM shadow of the pin configuration slots stored in NVM.
@@ -82,7 +46,7 @@ class DeviceManager
     static void updateDeviceDescriptionSignal();
 
     /**
-     * Reconstructs a concrete device instance from the NVM configuration slot content.
+    * Reconstructs a device through the generated factory registry from NVM slot content.
      * @param nvmData Stored data describing the device configuration.
      * @param configSlotID Slot index associated with the entity.
      * @return true when the instance could be created from the requested slot; false otherwise.

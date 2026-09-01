@@ -28,15 +28,6 @@ var device_8hpp =
       [ "DEVSERVICE_LIVE_ANIMATION", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a2b046e5f4ac31337ebf86a46119a92b8", null ],
       [ "DEVSERVICE_INVALID", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a5d6207d4ed5567d0d0ebc83b11c0424a", null ]
     ] ],
-    [ "DevType", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46b", [
-      [ "type_ONOFFDEVICE", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46ba4681d42feaecce95f3969e3adbd148e9", null ],
-      [ "type_LED_STRIP", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46badc0f1f44d57864572222ed5f4ecf2054", null ],
-      [ "type_TEMP_SENSOR", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46bae877adb07bf73f323b1ab3d522281262", null ],
-      [ "type_LED_STRIP_SEGMENTED", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46ba592bb49e84bfcedce4210f6575f033af", null ],
-      [ "type_DISTANCE_SENSOR", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46ba96174c5862b93157edd19f36be5790f8", null ],
-      [ "type_HARDWARE_BUTTON", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46baeed38a5239ba6c989571d8f1e19c779a", null ],
-      [ "type_DEVICE_TYPE_LAST", "device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46bad5b98bac129b434ef127e0a5f2840017", null ]
-    ] ],
     [ "ServiceDirectionType", "device_8hpp.html#a64d03546e9e332a5232ec04c1261fdcd", [
       [ "e_OUT_from_DEVICE", "device_8hpp.html#a64d03546e9e332a5232ec04c1261fdcdadca70b624958554d99940d60b77e2dc6", null ],
       [ "e_IN_to_DEVICE", "device_8hpp.html#a64d03546e9e332a5232ec04c1261fdcda6d6301edcc5a3a419b7df479088fa980", null ],

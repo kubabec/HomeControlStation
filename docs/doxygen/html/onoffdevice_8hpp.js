@@ -1,4 +1,4 @@
-var onoffdevice_8hpp =
+var OnOffDevice_8hpp =
 [
     [ "OnOffDevice", "classOnOffDevice.html", "classOnOffDevice" ]
 ];

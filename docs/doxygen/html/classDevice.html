@@ -136,6 +136,8 @@ Inheritance diagram for Device:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a6fef4f7180512c7517c9696cd95e503a" id="r_a6fef4f7180512c7517c9696cd95e503a"><td class="memItemLeft">virtual&#160;</td><td class="memItemRight"><a class="el" href="#a6fef4f7180512c7517c9696cd95e503a">~Device</a> ()=default</td></tr>
+<tr class="memdesc:a6fef4f7180512c7517c9696cd95e503a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows device instances to be owned and destroyed through the base interface.  <br /></td></tr>
 <tr class="memitem:a8d0638fea9ff80bf80627ed684f4e051" id="r_a8d0638fea9ff80bf80627ed684f4e051"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a8d0638fea9ff80bf80627ed684f4e051">cyclic</a> ()=0</td></tr>
 <tr class="memdesc:a8d0638fea9ff80bf80627ed684f4e051"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the recurring processing loop of the device.  <br /></td></tr>
 <tr class="memitem:a245aa604bbe9a24171eeb8a4dd34e4cd" id="r_a245aa604bbe9a24171eeb8a4dd34e4cd"><td class="memItemLeft">virtual <a class="el" href="structDeviceDescription.html">DeviceDescription</a>&#160;</td><td class="memItemRight"><a class="el" href="#a245aa604bbe9a24171eeb8a4dd34e4cd">getDeviceDescription</a> ()=0</td></tr>
@@ -166,8 +168,36 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Abstract base interface implemented by all runtime devices. </p>
 <p>Each device provides lifecycle hooks, a description payload, and service methods that allow the operating system to control, inspect, and persist its state. </p>
 
-<p class="definition">Definition at line <a class="el" href="device_8hpp_source.html#l00387">387</a> of file <a class="el" href="device_8hpp_source.html">device.hpp</a>.</p>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="device_8hpp_source.html#l00349">349</a> of file <a class="el" href="device_8hpp_source.html">device.hpp</a>.</p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a6fef4f7180512c7517c9696cd95e503a" name="a6fef4f7180512c7517c9696cd95e503a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fef4f7180512c7517c9696cd95e503a">&#9670;&#160;</a></span>~Device()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual Device::~Device </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allows device instances to be owned and destroyed through the base interface. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a8d0638fea9ff80bf80627ed684f4e051" name="a8d0638fea9ff80bf80627ed684f4e051"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8d0638fea9ff80bf80627ed684f4e051">&#9670;&#160;</a></span>cyclic()</h2>
 
@@ -281,7 +311,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the device category type. </p>
-<dl class="section return"><dt>Returns</dt><dd>Type enumeration value defined by <a class="el" href="device_8hpp.html#acc6818b8521baa7c7802b20cd44ff46b" title="Runtime device type identifiers used throughout the control plane.">DevType</a>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Type enumeration value defined by <a class="el" href="GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255c">DevType</a>. </dd></dl>
 
 <p>Implemented in <a class="el" href="classDistanceSensor.html#a04e2ed765bc075ea1a500bdbf0ef2b8f">DistanceSensor</a>, <a class="el" href="classHwButton.html#a0152bd7760a46560d190f42f0f21e423">HwButton</a>, <a class="el" href="classLedWS1228bDeviceType.html#a76fb974b1f944341f71e7fa492b44bf1">LedWS1228bDeviceType</a>, <a class="el" href="classOnOffDevice.html#a9eea95147e6c2812cba03d081593611f">OnOffDevice</a>, <a class="el" href="classSegLedWS1228bDeviceType.html#a88718c2775dffaad9a0890bf97535ee2">SegLedWS1228bDeviceType</a>, <a class="el" href="classTempSensorDHT11DeviceType.html#a9c3dc56b9001fa5ee05579737eb10274">TempSensorDHT11DeviceType</a>, and <a class="el" href="classTestDeviceType.html#aae0f46e18084f502ce40476491f01929">TestDeviceType</a>.</p>
 
@@ -528,7 +558,7 @@ Private Attributes</h2></td></tr>
 
 <p>Internal device identifier for the default runtime mapping. </p>
 
-<p class="definition">Definition at line <a class="el" href="device_8hpp_source.html#l00391">391</a> of file <a class="el" href="device_8hpp_source.html">device.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="device_8hpp_source.html#l00353">353</a> of file <a class="el" href="device_8hpp_source.html">device.hpp</a>.</p>
 
 </div>
 </div>

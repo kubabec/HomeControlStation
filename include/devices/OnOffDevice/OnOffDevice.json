@@ -12,6 +12,7 @@
     "source": "src/device/OnOffDevice/OnOffDevice.cpp",
     "buildGuard": null,
     "dependencies": ["Arduino GPIO", "Arduino PWM"],
+    "factory": { "arguments": ["config"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::vecOnOffDevices",
@@ -97,6 +98,10 @@
   },
   "ui": {
     "roomWidget": "generateOnOffWidget",
+    "advancedControls": {
+      "renderer": "createJsForOnOff",
+      "payloadSize": { "fixedType": "AdvancedControlsOnOff" }
+    },
     "controls": [
       { "name": "power", "widget": "toggle-button", "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1", "parameter": "state" },
       { "name": "brightness", "widget": "range", "minimum": 0, "maximum": 100, "unit": "percent", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "overload": "serviceCall_1", "parameter": "brightness", "visibleWhen": "hasBrightness == true" }

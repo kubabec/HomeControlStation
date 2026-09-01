@@ -60,6 +60,25 @@
             "includedInDeviceCollection": { "type": "boolean" }
           },
           "additionalProperties": true
+        },
+        "factory": {
+          "type": ["object", "null"],
+          "required": ["arguments"],
+          "properties": {
+            "arguments": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "config",
+                  "persistentDataChanged",
+                  "getRtcTime",
+                  "toggleLocalDevice",
+                  "fireDigitalEvent"
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": true
@@ -158,6 +177,34 @@
         "readouts": {
           "type": "array",
           "items": { "$ref": "#/$defs/control" }
+        },
+        "advancedControls": {
+          "type": ["object", "null"],
+          "required": ["renderer", "payloadSize"],
+          "properties": {
+            "renderer": { "type": "string" },
+            "payloadSize": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["fixedType"],
+                  "properties": { "fixedType": { "type": "string" } },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "required": ["countState", "elementType", "overheadType"],
+                  "properties": {
+                    "countState": { "type": "string" },
+                    "elementType": { "type": "string" },
+                    "overheadType": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": true
@@ -218,7 +265,8 @@
       "required": ["name", "widget"],
       "properties": {
         "name": { "type": "string" },
-        "widget": { "type": "string" }
+        "widget": { "type": "string" },
+        "displayOrder": { "type": "integer", "minimum": 0 }
       },
       "additionalProperties": true
     }

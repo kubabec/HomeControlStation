@@ -12,6 +12,7 @@
     "source": "src/device/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.cpp",
     "buildGuard": "TEMP_SENSOR_SUPPORTED",
     "dependencies": ["DHT sensor library", "RTC callback"],
+    "factory": { "arguments": ["config", "getRtcTime"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::tempSensorsDevices",

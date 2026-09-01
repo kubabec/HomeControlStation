@@ -1,24 +1,7 @@
 var searchData=
 [
-  ['rc_5fdatatypes_2ehpp_0',['rc_dataTypes.hpp',['../rc__dataTypes_8hpp.html',1,'']]],
-  ['rc_5fpublicdatatypes_2ehpp_1',['RC_publicDataTypes.hpp',['../RC__publicDataTypes_8hpp.html',1,'']]],
-  ['rcrequest_2ecpp_2',['rcRequest.cpp',['../rcRequest_8cpp.html',1,'']]],
-  ['rcrequest_2ehpp_3',['rcRequest.hpp',['../rcRequest_8hpp.html',1,'']]],
-  ['rcresponse_2ecpp_4',['rcResponse.cpp',['../rcResponse_8cpp.html',1,'']]],
-  ['rcresponse_2ehpp_5',['rcResponse.hpp',['../rcResponse_8hpp.html',1,'']]],
-  ['remotecontrolclient_2ecpp_6',['remoteControlClient.cpp',['../remoteControlClient_8cpp.html',1,'']]],
-  ['remotecontrolclient_2ehpp_7',['remoteControlClient.hpp',['../remoteControlClient_8hpp.html',1,'']]],
-  ['remotecontrolserver_2ecpp_8',['remotecontrolserver.cpp',['../remotecontrolserver_8cpp.html',1,'']]],
-  ['remotecontrolserver_2ehpp_9',['remotecontrolserver.hpp',['../remotecontrolserver_8hpp.html',1,'']]],
-  ['remotedevicesmanager_2ecpp_10',['RemoteDevicesManager.cpp',['../RemoteDevicesManager_8cpp.html',1,'']]],
-  ['remotedevicesmanager_2ehpp_11',['RemoteDevicesManager.hpp',['../RemoteDevicesManager_8hpp.html',1,'']]],
-  ['renderroomsjs_2eh_12',['renderRoomsJS.h',['../renderRoomsJS_8h.html',1,'']]],
-  ['reqestprocessor_2ehpp_13',['ReqestProcessor.hpp',['../ReqestProcessor_8hpp.html',1,'']]],
-  ['requestprocessor_2ecpp_14',['RequestProcessor.cpp',['../RequestProcessor_8cpp.html',1,'']]],
-  ['rfmanager_2ecpp_15',['RFManager.cpp',['../RFManager_8cpp.html',1,'']]],
-  ['rfmanager_2ehpp_16',['RFManager.hpp',['../RFManager_8hpp.html',1,'']]],
-  ['rollinanimation_2ecpp_17',['RollInAnimation.cpp',['../RollInAnimation_8cpp.html',1,'']]],
-  ['rollinanimation_2ehpp_18',['RollInAnimation.hpp',['../RollInAnimation_8hpp.html',1,'']]],
-  ['rolloutanimation_2ecpp_19',['RollOutAnimation.cpp',['../RollOutAnimation_8cpp.html',1,'']]],
-  ['rolloutanimation_2ehpp_20',['RollOutAnimation.hpp',['../RollOutAnimation_8hpp.html',1,'']]]
+  ['pagehead_2eh_0',['pageHead.h',['../pageHead_8h.html',1,'']]],
+  ['parameterizedhandlers_2ecpp_1',['parameterizedHandlers.cpp',['../parameterizedHandlers_8cpp.html',1,'']]],
+  ['persistentmemoryaccess_2ecpp_2',['persistentMemoryAccess.cpp',['../persistentMemoryAccess_8cpp.html',1,'']]],
+  ['persistentmemoryaccess_2ehpp_3',['persistentMemoryAccess.hpp',['../persistentMemoryAccess_8hpp.html',1,'']]]
 ];

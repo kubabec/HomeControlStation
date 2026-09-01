@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main_20modules_0',['Main modules',['../index.html#autotoc_md3',1,'']]],
-  ['modules_1',['Main modules',['../index.html#autotoc_md3',1,'']]]
+  ['english_20documentation_20standard_0',['English documentation standard',['../index.html#autotoc_md1',1,'']]]
 ];

@@ -1,13 +1,16 @@
 var searchData=
 [
-  ['tempgaugecss_2eh_0',['tempGaugeCSS.h',['../tempGaugeCSS_8h.html',1,'']]],
-  ['tempgaugejs_2eh_1',['tempGaugeJS.h',['../tempGaugeJS_8h.html',1,'']]],
-  ['tempsensordht11_2ecpp_2',['tempSensorDHT11.cpp',['../tempSensorDHT11_8cpp.html',1,'']]],
-  ['tempsensordht11_2ehpp_3',['tempSensorDHT11.hpp',['../tempSensorDHT11_8hpp.html',1,'']]],
-  ['testdevicetype_2ecpp_4',['TestDeviceType.cpp',['../TestDeviceType_8cpp.html',1,'']]],
-  ['testdevicetype_2ehpp_5',['TestDeviceType.hpp',['../TestDeviceType_8hpp.html',1,'']]],
-  ['timemaster_2ecpp_6',['timeMaster.cpp',['../timeMaster_8cpp.html',1,'']]],
-  ['timemaster_2ehpp_7',['timeMaster.hpp',['../timeMaster_8hpp.html',1,'']]],
-  ['twinkleinanimation_2ecpp_8',['TwinkleInAnimation.cpp',['../TwinkleInAnimation_8cpp.html',1,'']]],
-  ['twinkleinanimation_2ehpp_9',['TwinkleInAnimation.hpp',['../TwinkleInAnimation_8hpp.html',1,'']]]
+  ['saferesetmanager_2ecpp_0',['SafeResetManager.cpp',['../SafeResetManager_8cpp.html',1,'']]],
+  ['saferesetmanager_2ehpp_1',['SafeResetManager.hpp',['../SafeResetManager_8hpp.html',1,'']]],
+  ['segledws1228bdevicetype_2ecpp_2',['SegLedWS1228bDeviceType.cpp',['../SegLedWS1228bDeviceType_8cpp.html',1,'']]],
+  ['segledws1228bdevicetype_2ehpp_3',['SegLedWS1228bDeviceType.hpp',['../SegLedWS1228bDeviceType_8hpp.html',1,'']]],
+  ['sigmessages_2ehpp_4',['sigmessages.hpp',['../sigmessages_8hpp.html',1,'']]],
+  ['signals_2ehpp_5',['signals.hpp',['../signals_8hpp.html',1,'']]],
+  ['singlewaveanimation_20copy_2ehpp_6',['SingleWaveAnimation copy.hpp',['../SingleWaveAnimation_01copy_8hpp.html',1,'']]],
+  ['singlewaveanimation_2ecpp_7',['SingleWaveAnimation.cpp',['../SingleWaveAnimation_8cpp.html',1,'']]],
+  ['singlewaveanimation_2ehpp_8',['SingleWaveAnimation.hpp',['../SingleWaveAnimation_8hpp.html',1,'']]],
+  ['sparkleinanimation_2ecpp_9',['SparkleInAnimation.cpp',['../SparkleInAnimation_8cpp.html',1,'']]],
+  ['sparkleinanimation_2ehpp_10',['SparkleInAnimation.hpp',['../SparkleInAnimation_8hpp.html',1,'']]],
+  ['style_2eh_11',['style.h',['../style_8h.html',1,'']]],
+  ['systemdefinition_2ehpp_12',['SystemDefinition.hpp',['../SystemDefinition_8hpp.html',1,'']]]
 ];

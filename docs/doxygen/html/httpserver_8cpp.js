@@ -1,9 +1,5 @@
 var httpserver_8cpp =
 [
-    [ "generateExtraFieldsForDistanceSensor", "httpserver_8cpp.html#af80ffc6adf99bf5d42403333fb691312", null ],
-    [ "generateExtraFieldsForLedStrip", "httpserver_8cpp.html#a2ebd564a494c781d7206898287f302bb", null ],
-    [ "generateExtraFieldsForOnOff", "httpserver_8cpp.html#a17f8d040466fef820afdbb8c60e87b73", null ],
-    [ "generateExtraFieldsForSegmentedLedStrip", "httpserver_8cpp.html#ac3b584a475ede4889b9ebbc624afe8fa", null ],
     [ "client", "httpserver_8cpp.html#a323dfc205549b3c13f0a25c1b670708a", null ],
     [ "constantRequestHandlers", "httpserver_8cpp.html#a95beeebfd33da0e0d4484205e59d222c", null ],
     [ "constantRequests", "httpserver_8cpp.html#a5c23bd2a6b5850bc93d25bb7a6544081", null ],

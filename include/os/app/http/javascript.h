@@ -1,14 +1,19 @@
 #ifndef JAVASCRIPT_H
 #define JAVASCRIPT_H
+#include <Arduino.h>
+#include "generated/GeneratedDeviceConfiguration.hpp"
 
 /**
  * @file include/os/app/http/javascript.h
- * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ * @brief Device-independent browser helpers used by the Home Control Station HTTP interface.
+ *
+ * Device configuration serialization is appended from GeneratedDeviceConfiguration.hpp and is not
+ * maintained as handwritten per-device JavaScript in this file.
  */
 
 
 
-const char* javascript = "\
+const String legacyJavascript = "\
 <script>\
 let interfaceVisible = true;\
 document.addEventListener('visibilitychange', () => {\
@@ -106,169 +111,6 @@ let isNotificationPollingActive = 1;\
             fieldsToShow.classList.add('visible');\
         }\
     };\
-    function getOnOffConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var brightnessSupport =  document.getElementById('brightnessSupported-' + id).value;\
-        var activeSt = document.getElementById('activationState-' + id).value;\
-        var pwmMin = document.getElementById('pwmMin-' + id).value;\
-        var pwmMax = document.getElementById('pwmMax-' + id).value;\
-        return {\
-        type:\"OnOff\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        briSup:brightnessSupport,\
-        activeState:activeSt,\
-        PwmMin:pwmMin,\
-        PwmMax:pwmMax\
-      };\
-    }\
-    function getLedStripConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
-        var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
-        var curLim =  document.getElementById('curLim-' + id).value;\ 
-        return {\
-        type:\"LedStrip\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        ledCount:ledsCnt,\
-        sideFlp:sideFlip,\
-        currLim:curLim\
-        };\
-    }\
-    function getSegStripConfigJson(id){\
-        const segments = [];\
-        const flips = [];\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var curLim =  document.getElementById('SegcurLimVal-' + id).value;\ 
-        \
-        for (let i = 1; i <= 5; i++) {\
-          var segCnt =  document.getElementById('seg'+i+'Count-' + id).value;\ 
-          var segFlip =  document.getElementById('Seg'+i+'Flip-' + id).value;\
-          if (segCnt) {\
-            segments.push(segCnt);\
-          }\
-          if(segFlip) {\
-            flips.push(segFlip);\
-          }\
-        }\
-        return {\
-        type:\"SegLedStrip\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        ledCount:segments,\
-        sideFlp:flips,\
-        currLim:curLim\
-        };\
-    }\
-    function getTempSensorConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        return {\
-        type:\"TempSensor\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-      };\
-    }\
-    function getDistSensorConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var tx = document.getElementById('pinTx-' + id).value;\
-        var rx = document.getElementById('pinRx-' + id).value;\
-        return {\
-        type:\"DistanceSensor\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        pinTx:tx,\
-        pinRx:rx\
-      };\
-    }\
-    function getEmptyConfigurationJson(id){\
-        return {\
-        type:\"Empty\",\
-        id:id,\
-        enabled:false,\
-      };\
-    }\
-    function createConfigurationStringJson()\
-    {\
-        let devices = [];\
-\
-        for (let i = 1; i <= 6; i++) {\
-            var deviceTypeValue = document.getElementById('type' + i).value;\
-\
-            if(deviceTypeValue == 43){\
-                devices.push(getOnOffConfigurationJson(i));\
-            } else if(deviceTypeValue == 44) {\
-                devices.push(getLedStripConfigurationJson(i));\
-            } else if(deviceTypeValue == 45) {\
-                devices.push(getTempSensorConfigurationJson(i));\
-            } else if(deviceTypeValue == 46) {\
-                devices.push(getSegStripConfigJson(i));\
-            } else if(deviceTypeValue == 47) {\
-                devices.push(getDistSensorConfigurationJson(i));\
-            } else {\
-                devices.push(getEmptyConfigurationJson(i));\
-            }\
-        }\
-\
-        let finalJson = {\
-            devices: devices\
-        };\
-    \
-        let jsonString = JSON.stringify(finalJson);\
-        console.log(\"Wygenerowany JSON:\", jsonString);\
-        var url = '/lclSetupJson&' + jsonString;\
-\
-        const xhr = new XMLHttpRequest();\
-        xhr.timeout = 10000;\
-        xhr.open(\"POST\", url, true);\
-        xhr.onreadystatechange = function() {\
-            if (xhr.readyState === 4) { \
-                if (xhr.status === 200) { \
-                    console.log('Config changed');\
-                } else { \
-                    console.log('Error with AJAX request');\
-                }\
-            }\
-            url = '/';\
-            window.location.href = url;\
-        };\
-        xhr.send();\
-    }\
     function roomMappingCreateString(count)\
     {\
         let roomMappings = [];\
@@ -732,6 +574,8 @@ function updateLocalDateTime(initialDateTime, elementId = 'currentDateTime') {\
     return setInterval(updateDateTime, 1000);\
 }\
 </script>";
+
+const String javascript = legacyJavascript + generatedDeviceConfigurationJs;
 
 #endif
 

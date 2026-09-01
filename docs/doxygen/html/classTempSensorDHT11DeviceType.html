@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classTempSenso
 <p>Reads and stores temperature and humidity values for the control station.  
  <a href="#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for TempSensorDHT11DeviceType:</div>
 <div class="dyncontent">
@@ -136,7 +136,7 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad685edc53faa5c345c8e92de66b64e7c" id="r_ad685edc53faa5c345c8e92de66b64e7c"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad685edc53faa5c345c8e92de66b64e7c">TempSensorDHT11DeviceType</a> (<a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> nvmData, std::function&lt; <a class="el" href="structRtcTime.html">RtcTime</a>(void)&gt; getTimeCallback)</td></tr>
-<tr class="memdesc:ad685edc53faa5c345c8e92de66b64e7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the DHT11-based sensor from persisted configuration.  <br /></td></tr>
+<tr class="memdesc:ad685edc53faa5c345c8e92de66b64e7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the DHT22-based sensor from persisted configuration.  <br /></td></tr>
 <tr class="memitem:a98f99fbdafa6a41a2644195dc5da98c6" id="r_a98f99fbdafa6a41a2644195dc5da98c6"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a98f99fbdafa6a41a2644195dc5da98c6">cyclic</a> ()</td></tr>
 <tr class="memdesc:a98f99fbdafa6a41a2644195dc5da98c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the periodic sensor acquisition loop.  <br /></td></tr>
 <tr class="memitem:aa7db8356d84458a66b1c5ef13a6b8e06" id="r_aa7db8356d84458a66b1c5ef13a6b8e06"><td class="memItemLeft">virtual <a class="el" href="structDeviceDescription.html">DeviceDescription</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa7db8356d84458a66b1c5ef13a6b8e06">getDeviceDescription</a> ()</td></tr>
@@ -148,7 +148,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab32b340d0aadbdaf26307ba30c5e7833" id="r_ab32b340d0aadbdaf26307ba30c5e7833"><td class="memItemLeft">virtual uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#ab32b340d0aadbdaf26307ba30c5e7833">getExtendedMemoryLength</a> ()</td></tr>
 <tr class="memdesc:ab32b340d0aadbdaf26307ba30c5e7833"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports the size of persistent extended memory used by the device.  <br /></td></tr>
 <tr class="memitem:ad83c7552975edd13499562c615057f51" id="r_ad83c7552975edd13499562c615057f51"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#ad83c7552975edd13499562c615057f51">init</a> ()</td></tr>
-<tr class="memdesc:ad83c7552975edd13499562c615057f51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the DHT sensor and its internal storage buffers.  <br /></td></tr>
+<tr class="memdesc:ad83c7552975edd13499562c615057f51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs device initialization.  <br /></td></tr>
 <tr class="memitem:aca794a049493aca2d15d8a3e25967693" id="r_aca794a049493aca2d15d8a3e25967693"><td class="memItemLeft">virtual <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#aca794a049493aca2d15d8a3e25967693">service</a> (<a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType)</td></tr>
 <tr class="memdesc:aca794a049493aca2d15d8a3e25967693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a general service request for the sensor.  <br /></td></tr>
 <tr class="memitem:a4e81bfe2181462a972f149012f08606e" id="r_a4e81bfe2181462a972f149012f08606e"><td class="memItemLeft">virtual <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4e81bfe2181462a972f149012f08606e">service</a> (<a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType, <a class="el" href="structServiceParameters__set1.html">ServiceParameters_set1</a> param)</td></tr>
@@ -157,6 +157,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ad9d3e7e0c36b05bdf1510109c0926bfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a floating-point request for the sensor.  <br /></td></tr>
 <tr class="memitem:a62c65fa482f44032b8737a7cd6959dc1" id="r_a62c65fa482f44032b8737a7cd6959dc1"><td class="memItemLeft">virtual <a class="el" href="device_8hpp.html#ad905eb84f911940c72b89af14f6931eb">ServiceRequestErrorCode</a>&#160;</td><td class="memItemRight"><a class="el" href="#a62c65fa482f44032b8737a7cd6959dc1">service</a> (<a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3">DeviceServicesType</a> serviceType, <a class="el" href="structServiceParameters__set3.html">ServiceParameters_set3</a> param)</td></tr>
 <tr class="memdesc:a62c65fa482f44032b8737a7cd6959dc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a raw-buffer service request for the sensor.  <br /></td></tr>
+<tr class="inherit_header pub_methods_classDevice"><td colspan="2">Public Member Functions inherited from <a class="el" href="classDevice.html">Device</a></td></tr>
+<tr class="memitem:a6fef4f7180512c7517c9696cd95e503a pub_methods_classDevice" id="r_a6fef4f7180512c7517c9696cd95e503a"><td class="memItemLeft">virtual&#160;</td><td class="memItemRight"><a class="el" href="classDevice.html#a6fef4f7180512c7517c9696cd95e503a">~Device</a> ()=default</td></tr>
+<tr class="memdesc:a6fef4f7180512c7517c9696cd95e503a pub_methods_classDevice"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows device instances to be owned and destroyed through the base interface.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -194,22 +197,22 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a9f8cc6d051b6010cc03c1a110dd8ce2d" id="r_a9f8cc6d051b6010cc03c1a110dd8ce2d"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a9f8cc6d051b6010cc03c1a110dd8ce2d">lastTemp</a> = 0</td></tr>
 <tr class="memdesc:a9f8cc6d051b6010cc03c1a110dd8ce2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Previous temperature value retained for comparisons.  <br /></td></tr>
 <tr class="memitem:a9bda517e2c15a270d84e05d2d7f597ce" id="r_a9bda517e2c15a270d84e05d2d7f597ce"><td class="memItemLeft">const size_t&#160;</td><td class="memItemRight"><a class="el" href="#a9bda517e2c15a270d84e05d2d7f597ce">MAX_ENTRIES</a> = 288</td></tr>
-<tr class="memdesc:a9bda517e2c15a270d84e05d2d7f597ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of historical entries retained in memory.  <br /></td></tr>
+<tr class="memdesc:a9bda517e2c15a270d84e05d2d7f597ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of entries retained when history recording is enabled.  <br /></td></tr>
 <tr class="memitem:afa987d58b8a82063a6a87f2c23f8b486" id="r_afa987d58b8a82063a6a87f2c23f8b486"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#afa987d58b8a82063a6a87f2c23f8b486">pinNumber</a></td></tr>
 <tr class="memdesc:afa987d58b8a82063a6a87f2c23f8b486"><td class="mdescLeft">&#160;</td><td class="mdescRight">GPIO pin connected to the DHT sensor.  <br /></td></tr>
 <tr class="memitem:a61e58c796ee2a59f55019f66a177785e" id="r_a61e58c796ee2a59f55019f66a177785e"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a61e58c796ee2a59f55019f66a177785e">roomId</a></td></tr>
 <tr class="memdesc:a61e58c796ee2a59f55019f66a177785e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Room index of the sensor.  <br /></td></tr>
 <tr class="memitem:a700a135fabe149da709b2e14070bede3" id="r_a700a135fabe149da709b2e14070bede3"><td class="memItemLeft">std::vector&lt; <a class="el" href="structTempSensorDHT11DeviceType_1_1SensorReading.html">SensorReading</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a700a135fabe149da709b2e14070bede3">sensorData</a></td></tr>
-<tr class="memdesc:a700a135fabe149da709b2e14070bede3"><td class="mdescLeft">&#160;</td><td class="mdescRight">History list storing the recorded sensor samples.  <br /></td></tr>
+<tr class="memdesc:a700a135fabe149da709b2e14070bede3"><td class="mdescLeft">&#160;</td><td class="mdescRight">History list used when sensor-recording support is enabled.  <br /></td></tr>
 <tr class="memitem:aac609aeeb4977042d283db907fed4bea" id="r_aac609aeeb4977042d283db907fed4bea"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#aac609aeeb4977042d283db907fed4bea">temHumSensError</a> = 0</td></tr>
 <tr class="memdesc:aac609aeeb4977042d283db907fed4bea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error status for the temperature/humidity sensor.  <br /></td></tr>
 <tr class="memitem:aeb49908c5299ba7ea9315516b6781a4b" id="r_aeb49908c5299ba7ea9315516b6781a4b"><td class="memItemLeft">const unsigned long&#160;</td><td class="memItemRight"><a class="el" href="#aeb49908c5299ba7ea9315516b6781a4b">TIME_STORE_PERIOD</a> = 30 * 1000</td></tr>
-<tr class="memdesc:aeb49908c5299ba7ea9315516b6781a4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sampling interval for the sensor history log.  <br /></td></tr>
+<tr class="memdesc:aeb49908c5299ba7ea9315516b6781a4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum interval between history-recording checks.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Reads and stores temperature and humidity values for the control station. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00020">20</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00020">20</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad685edc53faa5c345c8e92de66b64e7c" name="ad685edc53faa5c345c8e92de66b64e7c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad685edc53faa5c345c8e92de66b64e7c">&#9670;&#160;</a></span>TempSensorDHT11DeviceType()</h2>
@@ -230,7 +233,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Constructs the DHT11-based sensor from persisted configuration. </p>
+<p>Constructs the DHT22-based sensor from persisted configuration. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">nvmData</td><td>Persisted device configuration. </td></tr>
@@ -239,11 +242,11 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">6</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">6</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::deviceId</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00037">deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::deviceName</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00065">dht</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00067">getTime</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00033">isOn</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00035">pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::roomId</a>, and <a class="el" href="tempSensorDHT11_8hpp_source.html#l00041">roomId</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::deviceId</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00037">deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00020">DeviceConfigSlotType::deviceName</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00065">dht</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00067">getTime</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00033">isOn</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00035">pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::roomId</a>, and <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00041">roomId</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00336">DeviceManager::extractDeviceInstanceBasedOnNvmData()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00076">GeneratedDeviceRegistry::create()</a>.</p>
 
 </div>
 </div>
@@ -275,9 +278,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a8d0638fea9ff80bf80627ed684f4e051">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00161">161</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00161">161</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -306,9 +309,9 @@ Private Attributes</h2></td></tr>
 
 <p>Stores a new sample into the historical sensor buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">116</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">116</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8hpp_source.html#l00065">dht</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00067">getTime</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00027">TempSensorDHT11DeviceType::SensorReading::humidity</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00060">lastCheckedTime</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00062">lastLoggedMinute</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00052">MAX_ENTRIES</a>, <a class="el" href="device_8hpp_source.html#l00089">RtcTime::min</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00036">printSensorData()</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00076">sensorData</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00025">TempSensorDHT11DeviceType::SensorReading::temperature</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00054">TIME_STORE_PERIOD</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00029">TempSensorDHT11DeviceType::SensorReading::timestamp</a>, and <a class="el" href="device_8hpp_source.html#l00097">RtcTime::year</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00065">dht</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00067">getTime</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00027">TempSensorDHT11DeviceType::SensorReading::humidity</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00060">lastCheckedTime</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00062">lastLoggedMinute</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00052">MAX_ENTRIES</a>, <a class="el" href="device_8hpp_source.html#l00075">RtcTime::min</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00036">printSensorData()</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00076">sensorData</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00025">TempSensorDHT11DeviceType::SensorReading::temperature</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00054">TIME_STORE_PERIOD</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00029">TempSensorDHT11DeviceType::SensorReading::timestamp</a>, and <a class="el" href="device_8hpp_source.html#l00083">RtcTime::year</a>.</p>
 
 </div>
 </div>
@@ -340,9 +343,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a245aa604bbe9a24171eeb8a4dd34e4cd">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">214</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">214</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="device_8hpp_source.html#l00217">DeviceDescription::customBytes</a>, <a class="el" href="device_8hpp_source.html#l00211">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00220">DeviceDescription::deviceName</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="device_8hpp_source.html#l00207">DeviceDescription::deviceType</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00172">getDeviceIdentifier()</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00176">getDeviceType()</a>, <a class="el" href="device_8hpp_source.html#l00215">DeviceDescription::isEnabled</a>, <a class="el" href="device_8hpp_source.html#l00012">NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION</a>, <a class="el" href="device_8hpp_source.html#l00213">DeviceDescription::roomId</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00041">roomId</a>, and <a class="el" href="tempSensorDHT11_8hpp_source.html#l00047">temHumSensError</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="device_8hpp_source.html#l00203">DeviceDescription::customBytes</a>, <a class="el" href="device_8hpp_source.html#l00197">DeviceDescription::deviceId</a>, <a class="el" href="device_8hpp_source.html#l00206">DeviceDescription::deviceName</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="device_8hpp_source.html#l00193">DeviceDescription::deviceType</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00172">getDeviceIdentifier()</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00176">getDeviceType()</a>, <a class="el" href="device_8hpp_source.html#l00201">DeviceDescription::isEnabled</a>, <a class="el" href="device_8hpp_source.html#l00013">NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION</a>, <a class="el" href="device_8hpp_source.html#l00199">DeviceDescription::roomId</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00041">roomId</a>, and <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00047">temHumSensError</a>.</p>
 
 </div>
 </div>
@@ -374,11 +377,11 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a76583be58ff9ac8d40fdf32e75ddfed6">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00172">172</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00172">172</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8hpp_source.html#l00037">deviceId</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00037">deviceId</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
 
 </div>
 </div>
@@ -406,15 +409,15 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the environment sensor type. </p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> type code for the DHT11 sensor. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> type code for the temperature sensor. </dd></dl>
 
 <p>Implements <a class="el" href="classDevice.html#a220eb86524a9dec1ec6624aa48cb1754">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00176">176</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00176">176</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00073">type_TEMP_SENSOR</a>.</p>
+<p class="reference">References <a class="el" href="GeneratedDeviceTypes_8hpp_source.html#l00016">type_TEMP_SENSOR</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
 
 </div>
 </div>
@@ -446,7 +449,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a8956c8cecb40e2d2342e75c6803590e3">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00167">167</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00167">167</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
 </div>
 </div>
@@ -473,11 +476,12 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Initializes the DHT sensor and its internal storage buffers. </p>
+<p>Performs device initialization. </p>
+<p>The current implementation performs no additional initialization because the DHT sensor is initialized by the constructor. </p>
 
 <p>Implements <a class="el" href="classDevice.html#a20d10b3501aa4df9c94a4b0b3c7f9caf">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00157">157</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00157">157</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,11 +519,11 @@ Private Attributes</h2></td></tr>
 
 <p>Converts the last reading into a serializable log entry. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00036">36</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00036">36</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00091">RtcTime::hour</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00089">RtcTime::min</a>, <a class="el" href="device_8hpp_source.html#l00087">RtcTime::sec</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00076">sensorData</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00029">TempSensorDHT11DeviceType::SensorReading::timestamp</a>, and <a class="el" href="device_8hpp_source.html#l00097">RtcTime::year</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00077">RtcTime::hour</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="device_8hpp_source.html#l00075">RtcTime::min</a>, <a class="el" href="device_8hpp_source.html#l00073">RtcTime::sec</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00076">sensorData</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00029">TempSensorDHT11DeviceType::SensorReading::timestamp</a>, and <a class="el" href="device_8hpp_source.html#l00083">RtcTime::year</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
@@ -557,9 +561,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a57750faec69dece984d782a4ce0b47e9">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00181">181</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00181">181</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00041">SERV_NOT_SUPPORTED</a>.</p>
 
 </div>
 </div>
@@ -602,9 +606,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a5399e322b0c8d7cbb4cd3d033f99253d">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00189">189</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00189">189</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00041">SERV_NOT_SUPPORTED</a>.</p>
 
 </div>
 </div>
@@ -647,9 +651,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a04028f2868c08bfbbdc35f46d66f99a7">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00197">197</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00197">197</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00041">SERV_NOT_SUPPORTED</a>.</p>
 
 </div>
 </div>
@@ -692,9 +696,9 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classDevice.html#a1161967d79f1d9b09da0e92793ade5d2">Device</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00205">205</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00205">205</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="device_8hpp_source.html#l00040">SERV_NOT_SUPPORTED</a>.</p>
+<p class="reference">References <a class="el" href="device_8hpp_source.html#l00041">SERV_NOT_SUPPORTED</a>.</p>
 
 </div>
 </div>
@@ -723,11 +727,11 @@ Private Attributes</h2></td></tr>
 
 <p>Reads raw temperature and humidity from the DHT sensor. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">78</a> of file <a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">78</a> of file <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tempSensorDHT11_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00065">dht</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00056">lastDataUpdateTime</a>, <a class="el" href="tempSensorDHT11_8hpp_source.html#l00049">lastTemp</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="tempSensorDHT11_8hpp_source.html#l00047">temHumSensError</a>.</p>
+<p class="reference">References <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00045">currentHumid</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00043">currentTemp</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00039">deviceName</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00065">dht</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00056">lastDataUpdateTime</a>, <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00049">lastTemp</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00047">temHumSensError</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00161">cyclic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00161">cyclic()</a>.</p>
 
 </div>
 </div>
@@ -754,9 +758,9 @@ Private Attributes</h2></td></tr>
 
 <p>Latest measured humidity percentage. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00045">45</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00045">45</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -782,9 +786,9 @@ Private Attributes</h2></td></tr>
 
 <p>Latest measured temperature. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00043">43</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00043">43</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -810,9 +814,9 @@ Private Attributes</h2></td></tr>
 
 <p>System ID of the device. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00037">37</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00037">37</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00172">getDeviceIdentifier()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00172">getDeviceIdentifier()</a>.</p>
 
 </div>
 </div>
@@ -838,9 +842,9 @@ Private Attributes</h2></td></tr>
 
 <p>Human-readable name used in the UI. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00039">39</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00039">39</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -866,9 +870,9 @@ Private Attributes</h2></td></tr>
 
 <p>Concrete DHT sensor object used for reading the environment. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00065">65</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00065">65</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -894,9 +898,9 @@ Private Attributes</h2></td></tr>
 
 <p>Callback used to obtain the current system time. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00067">67</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00067">67</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
@@ -922,9 +926,9 @@ Private Attributes</h2></td></tr>
 
 <p>Indicates whether the sensor is currently enabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00033">33</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00033">33</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>.</p>
 
 </div>
 </div>
@@ -950,9 +954,9 @@ Private Attributes</h2></td></tr>
 
 <p>Last timestamp when the sensor check was evaluated. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00060">60</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00060">60</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
@@ -978,9 +982,9 @@ Private Attributes</h2></td></tr>
 
 <p>Last time a sensor update was performed. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00056">56</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00056">56</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -1006,9 +1010,9 @@ Private Attributes</h2></td></tr>
 
 <p>Minute value of the last logged record. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00062">62</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00062">62</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1038,7 @@ Private Attributes</h2></td></tr>
 
 <p>Last timestamp when data was stored into the history buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00058">58</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00058">58</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
 </div>
 </div>
@@ -1060,9 +1064,9 @@ Private Attributes</h2></td></tr>
 
 <p>Previous temperature value retained for comparisons. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00049">49</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00049">49</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -1086,11 +1090,11 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Maximum number of historical entries retained in memory. </p>
+<p>Maximum number of entries retained when history recording is enabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00052">52</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00052">52</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
@@ -1116,9 +1120,9 @@ Private Attributes</h2></td></tr>
 
 <p>GPIO pin connected to the DHT sensor. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00035">35</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00035">35</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>.</p>
 
 </div>
 </div>
@@ -1144,9 +1148,9 @@ Private Attributes</h2></td></tr>
 
 <p>Room index of the sensor. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00041">41</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00041">41</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00006">TempSensorDHT11DeviceType()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>.</p>
 
 </div>
 </div>
@@ -1170,11 +1174,11 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>History list storing the recorded sensor samples. </p>
+<p>History list used when sensor-recording support is enabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00076">76</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00076">76</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00036">printSensorData()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00036">printSensorData()</a>.</p>
 
 </div>
 </div>
@@ -1200,9 +1204,9 @@ Private Attributes</h2></td></tr>
 
 <p>Error status for the temperature/humidity sensor. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00047">47</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00047">47</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="tempSensorDHT11_8cpp_source.html#l00078">temHumReading()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00214">getDeviceDescription()</a>, and <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00078">temHumReading()</a>.</p>
 
 </div>
 </div>
@@ -1226,17 +1230,17 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sampling interval for the sensor history log. </p>
+<p>Minimum interval between history-recording checks. </p>
 
-<p class="definition">Definition at line <a class="el" href="tempSensorDHT11_8hpp_source.html#l00054">54</a> of file <a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html#l00054">54</a> of file <a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tempSensorDHT11_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html#l00116">dhtSensorRecords()</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>include/devices/<a class="el" href="tempSensorDHT11_8hpp_source.html">tempSensorDHT11.hpp</a></li>
-<li>src/device/<a class="el" href="tempSensorDHT11_8cpp_source.html">tempSensorDHT11.cpp</a></li>
+<li>include/devices/TempSensorDHT11DeviceType/<a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">TempSensorDHT11DeviceType.hpp</a></li>
+<li>src/device/TempSensorDHT11DeviceType/<a class="el" href="TempSensorDHT11DeviceType_8cpp_source.html">TempSensorDHT11DeviceType.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

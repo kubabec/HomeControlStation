@@ -15,5 +15,7 @@ var searchData=
   ['wifiadapter_2ecpp_12',['wifiAdapter.cpp',['../wifiAdapter_8cpp.html',1,'']]],
   ['wifiadapter_2ehpp_13',['wifiAdapter.hpp',['../wifiAdapter_8hpp.html',1,'']]],
   ['wifievent_14',['WiFiEvent',['../classWiFiAdapter.html#ada433ffbbbd42383a6d14e1866a506ca',1,'WiFiAdapter']]],
-  ['writeextendedmemory_15',['writeExtendedMemory',['../classPersistentMemoryAccess.html#a5dbe555f0ba1abc926b38557196bc7ad',1,'PersistentMemoryAccess']]]
+  ['write_5fbuild_5finfo_15',['write_build_info',['../namespacegenerate__build__info.html#a0f9adbf296664b67415e83f060b46582',1,'generate_build_info']]],
+  ['write_5fif_5fchanged_16',['write_if_changed',['../namespacegenerate__device__registry.html#ae33a8d278b6981238d1c9cc835c82048',1,'generate_device_registry']]],
+  ['writeextendedmemory_17',['writeExtendedMemory',['../classPersistentMemoryAccess.html#a5dbe555f0ba1abc926b38557196bc7ad',1,'PersistentMemoryAccess']]]
 ];
