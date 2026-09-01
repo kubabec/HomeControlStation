@@ -7,6 +7,8 @@
 **
 ### Description
 
+> **New to the project?** Start with the [architecture and end-to-end flow guide](ARCHITECTURE.md) for the Platform/Devices boundary, build-time generation, runtime lifecycle, and ESP32 UDP network diagrams.
+
 **HomeControlStation** is an open source project developed in order to simplify usage of cheap ESP32 board to control popular home automation usecases, e.g.:
 - Light switching
 - Color LED strip with customization
