@@ -22,7 +22,6 @@ document.addEventListener('visibilitychange', () => {\
   } else {\
     interfaceVisible = true;\
     currentData = {};\
-    hash = 0;\
     fetchData();\
 }});\
 function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
@@ -37,10 +36,9 @@ function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
                 console.log(xhr.responseText);\
-                const [newData, hashObj] = JSON.parse(xhr.responseText);\
+                const [newData] = JSON.parse(xhr.responseText);\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
-                    hash = hashObj.hash;\
                     renderRooms(currentData);\
                 }\
             } else { \
@@ -207,13 +205,19 @@ let isNotificationPollingActive = 1;\
                 document.getElementById(\"password-input\").focus();\
             }, 0);\
         }\
+        let advancedControlsCleanup = [];\
+        function closeAdvancedControls() {\
+            advancedControlsCleanup.forEach(cleanup => { try { cleanup(); } catch (error) { console.error(error); } });\
+            advancedControlsCleanup = [];\
+            hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+        }\
         function showAdvancedControls() {\
             const popupOverlay = document.getElementById('advanced-ctrl-overlay');\
             const popupContent = document.getElementById('advanced-ctrl-popup');\
             const popupMessage = document.getElementById('advanced-ctrl-popup-msg');\
 \
             document.getElementById('advanced-ctrl-popup-close').onclick = function () {\
-                hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+                closeAdvancedControls();\
             };\
 \
             popupOverlay.classList.remove('hidden-popup');\
@@ -265,37 +269,6 @@ let isNotificationPollingActive = 1;\
         function closePopup() {\
             const backdrop = document.querySelector(\".popup-backdrop\");\
             colorPickerPopup.style.display = \"none\";\
-            backdrop.style.display = \"none\";\
-        }\
-        function openLedStripMemorySlots() {\
-            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
-            const composClose = document.getElementById(\"composClose\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            composClose.addEventListener(\"click\", closeCompositions);\
-            FavouritesPopup.style.display = \"flex\";\
-            backdrop.style.display = \"block\";\
-        }\
-\
-        function closeCompositions() {\
-            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            FavouritesPopup.style.display = \"none\";\
-            backdrop.style.display = \"none\";\
-        }\
-        function openSaveCompositions() {\
-            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
-            const composClose = document.getElementById(\"composSaveClose\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            composClose.addEventListener(\"click\", closeSaveCompositions);\
-            colorInput.value = 0xFF00FA;\
-            FavouritesPopup.style.display = \"flex\";\
-            backdrop.style.display = \"block\";\
-        }\
-\
-        function closeSaveCompositions() {\
-            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            FavouritesPopup.style.display = \"none\";\
             backdrop.style.display = \"none\";\
         }\
         function rgbToHex(rgb) {\
@@ -494,8 +467,11 @@ function getExtendedControlsRequest(id, devContainer){\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
                 console.log('Advanced controls respose:' + xhr.responseText);\
-                showAdvancedControls();\
-                window.eval(xhr.responseText);\
+                try {\
+                    mountAdvancedControls(JSON.parse(xhr.responseText));\
+                } catch (error) {\
+                    console.error('Invalid advanced-controls response:', error);\
+                }\
             } else { \
                 console.log('Error with AJAX request');\
             }\
@@ -504,21 +480,40 @@ function getExtendedControlsRequest(id, devContainer){\
     };\
     xhr.send();\
 }\
-function overWriteMemSlot(memSlotId, ledStripDevId){\
-    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
-    let jsonString = JSON.stringify(json);\
-    var url = '/stripOverwriteSlot&' + jsonString;\
-    createAsyncRequestWithRenderRoomsResponse(url);\
-    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
-    closeCompositions();\
+async function sendAdvancedControls(deviceId, payload, additionalParam = 255){\
+    const bytes = Array.from(payload, value => Math.max(0, Math.min(255, Number(value) || 0)));\
+    const request = JSON.stringify({devId:deviceId, additionalParam:additionalParam, payload:bytes});\
+    try {\
+        const response = await fetch('/setAdvancedControls&' + request, {method:'POST'});\
+        if (!response.ok) return false;\
+        await fetchData();\
+        return true;\
+    } catch (error) {\
+        console.error('Advanced-controls update failed:', error);\
+        return false;\
+    }\
 }\
-function loadMemSlot(memSlotId, ledStripDevId){\
-    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
-    let jsonString = JSON.stringify(json);\
-    var url = '/stripLoadFromMemory&' + jsonString;\
-    createAsyncRequestWithRenderRoomsResponse(url);\
-    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
-    closeCompositions();\
+function mountAdvancedControls(response){\
+    showAdvancedControls();\
+    const root = document.getElementById('advanced-ctrl-popup-msg');\
+    const header = document.getElementById('adv-ctrl-head');\
+    if (response.error) { header.textContent = 'Advanced controls'; root.textContent = response.error; return; }\
+    header.textContent = response.deviceName;\
+    root.innerHTML = response.template;\
+    const script = root.querySelector('script[type=\"application/x-hcs-advanced-controls\"]');\
+    if (!script) { root.textContent = 'Advanced-controls template has no controller script.'; return; }\
+    const context = {\
+        root: root, deviceId: response.deviceId, deviceType: response.deviceType, deviceName: response.deviceName,\
+        payload: Uint8Array.from(response.payload || []),\
+        descriptionBytes: Uint8Array.from(response.descriptionBytes || []),\
+        save: payload => sendAdvancedControls(response.deviceId, payload, 255),\
+        action: additionalParam => sendAdvancedControls(response.deviceId, [], additionalParam),\
+        close: closeAdvancedControls,\
+        onCleanup: cleanup => advancedControlsCleanup.push(cleanup),\
+        showError: message => { root.textContent = message; }\
+    };\
+    try { new Function('context', script.textContent)(context); }\
+    catch (error) { console.error(error); root.textContent = 'Advanced-controls template failed to initialize.'; }\
 }\
 function updateCurLimVal(id, val) {\
     var value = Math.round((val/255)*100);\

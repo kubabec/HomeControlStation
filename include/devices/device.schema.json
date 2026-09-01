@@ -98,7 +98,12 @@
               "required": ["mode"],
               "properties": {
                 "mode": {
-                  "enum": ["every_manager_cycle", "not_registered"]
+                  "enum": ["every_manager_cycle", "fixed_interval", "not_registered"]
+                },
+                "intervalMs": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483647
                 }
               },
               "additionalProperties": true
@@ -180,24 +185,25 @@
         },
         "advancedControls": {
           "type": ["object", "null"],
-          "required": ["renderer", "payloadSize"],
+          "required": ["template", "payloadSize"],
           "properties": {
-            "renderer": { "type": "string" },
+            "template": { "type": "string", "pattern": "\\.html$" },
             "payloadSize": {
               "oneOf": [
                 {
                   "type": "object",
-                  "required": ["fixedType"],
-                  "properties": { "fixedType": { "type": "string" } },
+                  "required": ["fixedBytes"],
+                  "properties": { "fixedBytes": { "type": "integer", "minimum": 1, "maximum": 391 } },
                   "additionalProperties": false
                 },
                 {
                   "type": "object",
-                  "required": ["countState", "elementType", "overheadType"],
+                  "required": ["countState", "maximumCount", "elementBytes", "overheadBytes"],
                   "properties": {
                     "countState": { "type": "string" },
-                    "elementType": { "type": "string" },
-                    "overheadType": { "type": "string" }
+                    "maximumCount": { "type": "integer", "minimum": 1 },
+                    "elementBytes": { "type": "integer", "minimum": 1 },
+                    "overheadBytes": { "type": "integer", "minimum": 0 }
                   },
                   "additionalProperties": false
                 }

@@ -52,8 +52,6 @@ class TempSensorDHT11DeviceType : public Device
     const size_t MAX_ENTRIES = 288;
     /** Minimum interval between history-recording checks. */
     const unsigned long TIME_STORE_PERIOD = 30 * 1000;
-    /** Last time a sensor update was performed. */
-    unsigned long lastDataUpdateTime = 0;
     /** Last timestamp when data was stored into the history buffer. */
     unsigned long lastStoredTime = 0;
     /** Last timestamp when the sensor check was evaluated. */

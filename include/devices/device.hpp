@@ -61,6 +61,8 @@ typedef enum
     DEVSERVICE_ROOM_STATE_CHANGE,
     DEVSERVICE_SEGMENT_STATE_SWITCH,
     DEVSERVICE_LIVE_ANIMATION,
+    /** Common opaque payload write used by every generated advanced-controls widget. */
+    DEVSERVICE_SET_ADVANCED_CONTROLS,
     DEVSERVICE_INVALID
 } DeviceServicesType;
 

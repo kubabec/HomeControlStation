@@ -77,39 +77,32 @@ void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorR
 
 void TempSensorDHT11DeviceType::temHumReading()
 {
-    if (millis() - lastDataUpdateTime > (1000 * 60)) // every 60 seconds
-    {
-        float h = dht->readHumidity();
-        float t = dht->readTemperature();
+    float h = dht->readHumidity();
+    float t = dht->readTemperature();
 
-        if (!isnan(t))
+    if (!isnan(t))
+    {
+        if (lastTemp == 0 || abs(t - lastTemp) <= 2.0)
         {
-            if (lastTemp == 0 || abs(t - lastTemp) <= 2.0)
-            {
-                temHumSensError = 0;
-                currentTemp = t;
-                lastTemp = t;
-                Logger::log("[Sensor '"+ deviceName+ "']Temperature: " + String(currentTemp));
-            }
-            else
-            {
-                Logger::log("Rejected due to unpredicted temperature jump: " + String(t));
-            }
-            if (!isnan(h))
-            {
-                currentHumid = (int)h;
-                Logger::log("[Sensor '"+ deviceName+ "']Humidity: " + String(currentHumid));
-            }
+            temHumSensError = 0;
+            currentTemp = t;
+            lastTemp = t;
+            Logger::log("[Sensor '"+ deviceName+ "']Temperature: " + String(currentTemp));
         }
         else
         {
-            temHumSensError = 1;
-            Logger::log("[Sensor '"+ deviceName+ "']Temperature and humidity sensor error");
+            Logger::log("Rejected due to unpredicted temperature jump: " + String(t));
         }
-
-        lastDataUpdateTime = millis();
-
-        // Logger::log("Temp: " + String(currentTemp));
+        if (!isnan(h))
+        {
+            currentHumid = (int)h;
+            Logger::log("[Sensor '"+ deviceName+ "']Humidity: " + String(currentHumid));
+        }
+    }
+    else
+    {
+        temHumSensError = 1;
+        Logger::log("[Sensor '"+ deviceName+ "']Temperature and humidity sensor error");
     }
 }
 

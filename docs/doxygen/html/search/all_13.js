@@ -67,12 +67,12 @@ var searchData=
   ['twinkleinanimation_2ecpp_64',['TwinkleInAnimation.cpp',['../TwinkleInAnimation_8cpp.html',1,'']]],
   ['twinkleinanimation_2ehpp_65',['TwinkleInAnimation.hpp',['../TwinkleInAnimation_8hpp.html',1,'']]],
   ['type_66',['Type',['../structUserInterfaceNotification.html#a064918e3728ce4cb49aabb423500498b',1,'UserInterfaceNotification']]],
-  ['type_67',['type',['../index.html#autotoc_md7',1,'Adding a device type'],['../structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html#abaeeb1c5f558d25d01592dc3b9567677',1,'HTTPAsyncRequestHandler::AsyncHttpRequest::type'],['../structUserInterfaceNotification.html#a170dcc2f79e326ec0e64bd4bc46924ef',1,'UserInterfaceNotification::type']]],
+  ['type_67',['type',['../index.html#autotoc_md8',1,'Adding a device type'],['../structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html#abaeeb1c5f558d25d01592dc3b9567677',1,'HTTPAsyncRequestHandler::AsyncHttpRequest::type'],['../structUserInterfaceNotification.html#a170dcc2f79e326ec0e64bd4bc46924ef',1,'UserInterfaceNotification::type']]],
   ['type_5fdistance_5fsensor_68',['type_DISTANCE_SENSOR',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255ca96174c5862b93157edd19f36be5790f8',1,'GeneratedDeviceTypes.hpp']]],
   ['type_5fhardware_5fbutton_69',['type_HARDWARE_BUTTON',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255caeed38a5239ba6c989571d8f1e19c779a',1,'GeneratedDeviceTypes.hpp']]],
   ['type_5fled_5fstrip_70',['type_LED_STRIP',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255cadc0f1f44d57864572222ed5f4ecf2054',1,'GeneratedDeviceTypes.hpp']]],
   ['type_5fled_5fstrip_5fsegmented_71',['type_LED_STRIP_SEGMENTED',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255ca592bb49e84bfcedce4210f6575f033af',1,'GeneratedDeviceTypes.hpp']]],
   ['type_5fonoffdevice_72',['type_ONOFFDEVICE',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255ca4681d42feaecce95f3969e3adbd148e9',1,'GeneratedDeviceTypes.hpp']]],
   ['type_5ftemp_5fsensor_73',['type_TEMP_SENSOR',['../GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255cae877adb07bf73f323b1ab3d522281262',1,'GeneratedDeviceTypes.hpp']]],
-  ['typeid_74',['typeId',['../structGeneratedDeviceRegistry_1_1Registration.html#ade1f58b3bcc7497de6be00b237efc4b6',1,'GeneratedDeviceRegistry::Registration::typeId'],['../structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html#a0b8fde7dd90d51e1c51aaa3afe60aa86',1,'GeneratedDeviceConfigWidgets::DeviceTypeSpec::typeId']]]
+  ['typeid_74',['typeId',['../structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html#a0b8fde7dd90d51e1c51aaa3afe60aa86',1,'GeneratedDeviceConfigWidgets::DeviceTypeSpec::typeId'],['../structGeneratedDeviceRegistry_1_1Registration.html#ade1f58b3bcc7497de6be00b237efc4b6',1,'GeneratedDeviceRegistry::Registration::typeId']]]
 ];

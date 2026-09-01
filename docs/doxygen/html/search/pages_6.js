@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['lifecycle_0',['Runtime device lifecycle',['../index.html#autotoc_md5',1,'']]]
+  ['homecontrolstation_0',['HomeControlStation',['../index.html',1,'']]],
+  ['http_20generation_20pipeline_1',['HTTP generation pipeline',['../index.html#autotoc_md6',1,'']]]
 ];

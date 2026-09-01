@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['generation_0',['Build-time generation',['../index.html#autotoc_md4',1,'']]],
-  ['generation_20pipeline_1',['HTTP generation pipeline',['../index.html#autotoc_md6',1,'']]]
+  ['english_20documentation_20standard_0',['English documentation standard',['../index.html#autotoc_md1',1,'']]]
 ];

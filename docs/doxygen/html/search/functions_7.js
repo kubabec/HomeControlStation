@@ -51,7 +51,7 @@ var searchData=
   ['getnetworkstatus_48',['getNetworkStatus',['../classWiFiAdapter.html#a1403b76f008cd8f455f3bb6d52e33303',1,'WiFiAdapter']]],
   ['getoldestnotification_49',['getOldestNotification',['../classNotificationHandler.html#ab4228cdd8c379e171aa7bd58c80b8840',1,'NotificationHandler']]],
   ['getoriginalidfromunique_50',['getOriginalIdFromUnique',['../classDeviceProvider.html#a235561234f0bd4a6c444272d1d15db7f',1,'DeviceProvider']]],
-  ['getoutpujavascript_51',['getOutpuJavaScript',['../classAdvancedControlsLoader.html#adb4337ad3909917b7c7cc3e585e488d5',1,'AdvancedControlsLoader']]],
+  ['getoutput_51',['getOutput',['../classAdvancedControlsLoader.html#a8eaed80f4240f67e43294a4aa79aa50c',1,'AdvancedControlsLoader']]],
   ['getpayload_52',['getPayload',['../classMessageUDP.html#af71b7dc94c503448b0ecee93c861da88',1,'MessageUDP']]],
   ['getport_53',['getPort',['../classMessageUDP.html#a53e3aaa9912bcd671dff44f27b6b1bae',1,'MessageUDP']]],
   ['getprocessingstate_54',['getProcessingState',['../classHTTPAsyncRequestHandler.html#a5405b938acbe3d462e13610a4b4f5d72',1,'HTTPAsyncRequestHandler']]],

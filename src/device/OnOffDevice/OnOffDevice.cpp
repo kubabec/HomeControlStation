@@ -1,6 +1,8 @@
 #include <devices/OnOffDevice/OnOffDevice.hpp>
 #include "os/Logger.hpp"
 
+static_assert(sizeof(AdvancedControlsOnOff) == 4, "OnOff advanced-controls JSON payload size is out of sync");
+
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId)
 {
     pinNumber = pin;
@@ -305,7 +307,15 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
 
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS completed");
         return SERV_SUCCESS;
-        break;
+
+    case DEVSERVICE_SET_ADVANCED_CONTROLS:
+        Logger::log("<"+deviceName+"> Service: DEVSERVICE_SET_ADVANCED_CONTROLS");
+        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr)
+        {
+            return SERV_EXECUTION_FAILURE;
+        }
+        memcpy(&controls, param.buff, sizeof(AdvancedControlsOnOff));
+        return SERV_SUCCESS;
 
     default:
         Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param3)");

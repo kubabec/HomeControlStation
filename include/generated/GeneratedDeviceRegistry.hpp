@@ -43,23 +43,25 @@ struct Registration
     uint8_t typeId;
     const char* name;
     bool includedInDeviceCollection;
+    /** Zero runs every manager cycle; positive values are fixed millisecond intervals. */
+    uint32_t cycleIntervalMs;
 };
 
 inline constexpr Registration kEnabledTypes[] = {
-    {43, "OnOff", true},
+    {43, "OnOff", true, 0u},
     #ifdef LED_STRIP_SUPPORTED
-    {44, "LedStrip", true},
+    {44, "LedStrip", true, 0u},
     #endif
     #ifdef TEMP_SENSOR_SUPPORTED
-    {45, "TempSensor", true},
+    {45, "TempSensor", true, 60000u},
     #endif
     #ifdef LED_STRIP_SUPPORTED
-    {46, "SegLedStrip", true},
+    {46, "SegLedStrip", true, 0u},
     #endif
     #ifdef DISTANCE_SENSOR_SUPPORTED
-    {47, "DistanceSensor", true},
+    {47, "DistanceSensor", true, 0u},
     #endif
-    {48, "HardwareButton", false},
+    {48, "HardwareButton", false, 0u},
 };
 
 /** @brief Finds an implementation enabled in the current firmware build. */

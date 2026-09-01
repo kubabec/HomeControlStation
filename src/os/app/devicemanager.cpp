@@ -12,6 +12,7 @@
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
 std::vector<std::unique_ptr<Device>> DeviceManager::devices;
+std::vector<uint32_t> DeviceManager::lastDeviceCycleTimes;
 
 void DeviceManager::deinit()
 {
@@ -46,6 +47,7 @@ void DeviceManager::init()
 {
     Logger::log("DeviceManager init ...");
     devices.clear();
+    lastDeviceCycleTimes.clear();
 
     /* Protection against PersistentDataBlock size modification without DeviceConfigSlotType update */
     if (PersistentDataBlock::getSize() == DeviceConfigSlotType::getSize())
@@ -243,17 +245,25 @@ void DeviceManager::init()
 
 void DeviceManager::cyclic()
 {
-    static long lastInternalDescriptionUpdateTime = 0;
+    static uint32_t lastInternalDescriptionUpdateTime = 0;
+    const uint32_t now = millis();
 
-    for (auto &device : devices)
+    for (size_t index = 0; index < devices.size(); ++index)
     {
-        device->cyclic();
+        auto &device = devices[index];
+        const auto *registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        const uint32_t intervalMs = registration != nullptr ? registration->cycleIntervalMs : 0;
+        if (intervalMs == 0 || static_cast<uint32_t>(now - lastDeviceCycleTimes[index]) >= intervalMs)
+        {
+            lastDeviceCycleTimes[index] = now;
+            device->cyclic();
+        }
     }
 
-    if (millis() - lastInternalDescriptionUpdateTime > 5000)
-    { /* 30sec */
+    if (static_cast<uint32_t>(now - lastInternalDescriptionUpdateTime) >= 1000)
+    {
         updateDeviceDescriptionSignal();
-        lastInternalDescriptionUpdateTime = millis();
+        lastInternalDescriptionUpdateTime = now;
     }
 }
 
@@ -327,6 +337,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
             if (device)
             {
                 devices.push_back(std::move(device));
+                lastDeviceCycleTimes.push_back(millis());
                 isValidDeviceGiven = true;
             }
             /* TODO more NVM Data to be extracted here ! */

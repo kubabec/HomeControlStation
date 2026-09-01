@@ -31,12 +31,13 @@ var searchData=
   ['currentreceptionevent_28',['currentReceptionEvent',['../classRFManager.html#a56862d59939349fc070465479b5000e6',1,'RFManager']]],
   ['currentrequest_29',['currentRequest',['../classHTTPAsyncRequestHandler.html#a622e23e608edbf4efd89e407d03f3ef4',1,'HTTPAsyncRequestHandler::currentRequest'],['../classRequestProcessor.html#aa6fe24b1e637a416d274d88b9f488006',1,'RequestProcessor::currentRequest']]],
   ['currentrequestfingerprint_30',['currentRequestFingerprint',['../classRemoteDevicesManager.html#a2f56c600f21197c8e80830a1c3eac338',1,'RemoteDevicesManager']]],
-  ['currentrequestjs_31',['currentRequestJS',['../classAdvancedControlsLoader.html#a3982098a91072a98e0dbf62ecb588d19',1,'AdvancedControlsLoader']]],
-  ['currentrequestresperrorcode_32',['currentRequestRespErrorCode',['../classRemoteDevicesManager.html#abd8ade6756b0406950051918549d2913',1,'RemoteDevicesManager']]],
+  ['currentrequestresperrorcode_31',['currentRequestRespErrorCode',['../classRemoteDevicesManager.html#abd8ade6756b0406950051918549d2913',1,'RemoteDevicesManager']]],
+  ['currentresponse_32',['currentResponse',['../classAdvancedControlsLoader.html#a4669b0e30083e1e1f7f0d3e5058b947d',1,'AdvancedControlsLoader']]],
   ['currentstate_33',['currentState',['../classRemoteControlServer.html#abc700439dbf2a31d1a35c11b81b74a73',1,'RemoteControlServer::currentState'],['../remoteControlClient_8cpp.html#af51995f443c40dc0025d51a68771f12d',1,'currentState:&#160;remoteControlClient.cpp']]],
   ['currentstatus_34',['currentStatus',['../classWiFiAdapter.html#adf632a1efe3b6bbca94e9eb9f6425f20',1,'WiFiAdapter']]],
   ['currenttemp_35',['currentTemp',['../classTempSensorDHT11DeviceType.html#a1be87a95be7db73c1e69295b597248a9',1,'TempSensorDHT11DeviceType']]],
   ['currenttime_36',['currentTime',['../classHomeLightHttpServer.html#a24b3dac7efeb057fbe8eca7b711cc7b9',1,'HomeLightHttpServer']]],
   ['currenttransaction_37',['currentTransaction',['../classRemoteControlClient.html#a406000aed313025ebf30f845a5aa8695',1,'RemoteControlClient']]],
-  ['custombytes_38',['customBytes',['../structDeviceDescription.html#aceb2d4e5b37d5a45119955df825d979f',1,'DeviceDescription::customBytes'],['../structDeviceConfigSlotType.html#aa7f23be16928362f055b9a111d8f00d8',1,'DeviceConfigSlotType::customBytes']]]
+  ['custombytes_38',['customBytes',['../structDeviceDescription.html#aceb2d4e5b37d5a45119955df825d979f',1,'DeviceDescription::customBytes'],['../structDeviceConfigSlotType.html#aa7f23be16928362f055b9a111d8f00d8',1,'DeviceConfigSlotType::customBytes']]],
+  ['cycleintervalms_39',['cycleIntervalMs',['../structGeneratedDeviceRegistry_1_1Registration.html#a11de294725af503e5e7aa31ba110e90e',1,'GeneratedDeviceRegistry::Registration']]]
 ];

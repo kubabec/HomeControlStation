@@ -15,7 +15,7 @@ try:
 except NameError:
     PROJECT_DIR = Path(__file__).resolve().parent.parent
 DEVICES_DIR = PROJECT_DIR / "include" / "devices"
-OUTPUT_FILE = PROJECT_DIR / "src" / "os" / "app" / "http" / "GeneratedDeviceConfigWidgets.hpp"
+OUTPUT_FILE = PROJECT_DIR / "include" / "generated" / "GeneratedDeviceConfigWidgets.hpp"
 
 
 def cpp_string(value):

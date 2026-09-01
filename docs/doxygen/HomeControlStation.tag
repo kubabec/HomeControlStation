@@ -180,6 +180,12 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
+      <name>DEVSERVICE_SET_ADVANCED_CONTROLS</name>
+      <anchorfile>device_8hpp.html</anchorfile>
+      <anchor>a85b136736229097bd3d73d2e51d9e0f3a2df115a2381add2f4d6f9fd3ac48e228</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>DEVSERVICE_INVALID</name>
       <anchorfile>device_8hpp.html</anchorfile>
       <anchor>a85b136736229097bd3d73d2e51d9e0f3a5d6207d4ed5567d0d0ebc83b11c0424a</anchor>
@@ -443,6 +449,14 @@
     <class kind="class">TestDeviceType</class>
   </compound>
   <compound kind="file">
+    <name>GeneratedAdvancedControlTemplates.hpp</name>
+    <path>include/generated/</path>
+    <filename>GeneratedAdvancedControlTemplates_8hpp.html</filename>
+    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="GeneratedDeviceTypes_8hpp" name="GeneratedDeviceTypes.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceTypes.hpp</includes>
+    <namespace>GeneratedAdvancedControlTemplates</namespace>
+  </compound>
+  <compound kind="file">
     <name>GeneratedDeviceConfiguration.hpp</name>
     <path>include/generated/</path>
     <filename>GeneratedDeviceConfiguration_8hpp.html</filename>
@@ -461,6 +475,16 @@
       <anchor>a4133e3bd6cde47162e9efc59dbe24468</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="file">
+    <name>GeneratedDeviceConfigWidgets.hpp</name>
+    <path>include/generated/</path>
+    <filename>GeneratedDeviceConfigWidgets_8hpp.html</filename>
+    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
+    <class kind="struct">GeneratedDeviceConfigWidgets::DeviceTypeSpec</class>
+    <class kind="struct">GeneratedDeviceConfigWidgets::FieldSpec</class>
+    <namespace>GeneratedDeviceConfigWidgets</namespace>
   </compound>
   <compound kind="file">
     <name>GeneratedDeviceRegistry.hpp</name>
@@ -2634,18 +2658,9 @@
     <path>src/os/app/http/</path>
     <filename>AdvancedControlsLoader_8cpp.html</filename>
     <includes id="AdvancedControlsLoader_8hpp" name="AdvancedControlsLoader.hpp" local="no" import="no" module="no" objc="no">os/app/http/AdvancedControlsLoader.hpp</includes>
-    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="GeneratedAdvancedControlTemplates_8hpp" name="GeneratedAdvancedControlTemplates.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedAdvancedControlTemplates.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-  </compound>
-  <compound kind="file">
-    <name>GeneratedDeviceConfigWidgets.hpp</name>
-    <path>src/os/app/http/</path>
-    <filename>GeneratedDeviceConfigWidgets_8hpp.html</filename>
-    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
-    <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
-    <class kind="struct">GeneratedDeviceConfigWidgets::DeviceTypeSpec</class>
-    <class kind="struct">GeneratedDeviceConfigWidgets::FieldSpec</class>
-    <namespace>GeneratedDeviceConfigWidgets</namespace>
+    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
   </compound>
   <compound kind="file">
     <name>HttpAsyncRequestHandler.cpp</name>
@@ -2670,7 +2685,7 @@
     <includes id="tempGaugeJS_8h" name="tempGaugeJS.h" local="yes" import="no" module="no" objc="no">os/app/http/tempGauge/tempGaugeJS.h</includes>
     <includes id="tempGaugeCSS_8h" name="tempGaugeCSS.h" local="yes" import="no" module="no" objc="no">os/app/http/tempGauge/tempGaugeCSS.h</includes>
     <includes id="renderRoomsJS_8h" name="renderRoomsJS.h" local="yes" import="no" module="no" objc="no">os/app/http/renderRoomsJS.h</includes>
-    <includes id="GeneratedDeviceConfigWidgets_8hpp" name="GeneratedDeviceConfigWidgets.hpp" local="yes" import="no" module="no" objc="no">os/app/http/GeneratedDeviceConfigWidgets.hpp</includes>
+    <includes id="GeneratedDeviceConfigWidgets_8hpp" name="GeneratedDeviceConfigWidgets.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceConfigWidgets.hpp</includes>
     <includes id="build__info_8h" name="build_info.h" local="yes" import="no" module="no" objc="no">build_info.h</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
     <member kind="variable">
@@ -3064,16 +3079,16 @@
     <filename>classAdvancedControlsLoader.html</filename>
     <member kind="function" static="yes">
       <type>static String</type>
-      <name>getOutpuJavaScript</name>
+      <name>getOutput</name>
       <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>adb4337ad3909917b7c7cc3e585e488d5</anchor>
+      <anchor>a8eaed80f4240f67e43294a4aa79aa50c</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static ServiceRequestErrorCode</type>
-      <name>loadAdvancedControlsToJavaScript</name>
+      <name>loadAdvancedControls</name>
       <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>a0b5f3756997af2b3efd5e05affefad59</anchor>
+      <anchor>a8948d7f674230bbf3a11b0dcb7432b5d</anchor>
       <arglist>(uint16_t deviceIdentifier)</arglist>
     </member>
     <member kind="function" protection="private" static="yes">
@@ -3084,18 +3099,11 @@
       <arglist>(uint8_t deviceType)</arglist>
     </member>
     <member kind="function" protection="private" static="yes">
-      <type>static String</type>
-      <name>createJsForLedStrip</name>
+      <type>static void</type>
+      <name>appendJsonString</name>
       <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>a23f5327b0935416da37c5c40bc3254fa</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" protection="private" static="yes">
-      <type>static String</type>
-      <name>createJsForOnOff</name>
-      <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>a6bddaaf7d9fa9d02d5bcae0c73ac2c7c</anchor>
-      <arglist>()</arglist>
+      <anchor>ae877c422903f010b1bf7179ac3b1328a</anchor>
+      <arglist>(String &amp;destination, const char *value)</arglist>
     </member>
     <member kind="function" protection="private" static="yes">
       <type>static uint16_t</type>
@@ -3106,9 +3114,9 @@
     </member>
     <member kind="function" protection="private" static="yes">
       <type>static void</type>
-      <name>prepareJsStringWithAdvancedControls</name>
+      <name>prepareResponse</name>
       <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>a1361a42ee70a4fb0017baff2962acb6e</anchor>
+      <anchor>af1eb4954931fae94333c5b624f97ca2f</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="variable" protection="private" static="yes">
@@ -3127,9 +3135,9 @@
     </member>
     <member kind="variable" protection="private" static="yes">
       <type>static String</type>
-      <name>currentRequestJS</name>
+      <name>currentResponse</name>
       <anchorfile>classAdvancedControlsLoader.html</anchorfile>
-      <anchor>a3982098a91072a98e0dbf62ecb588d19</anchor>
+      <anchor>a4669b0e30083e1e1f7f0d3e5058b947d</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -4373,6 +4381,13 @@
       <name>extDataAllocator</name>
       <anchorfile>classDeviceManager.html</anchorfile>
       <anchor>ad88a4a55f00c2db15e2bd28554288e75</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>static std::vector&lt; uint32_t &gt;</type>
+      <name>lastDeviceCycleTimes</name>
+      <anchorfile>classDeviceManager.html</anchorfile>
+      <anchor>aac3c80d51730a3b8df4e0082bdf47ad9</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" protection="private" static="yes">
@@ -5955,23 +5970,9 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>parameterizedHandler_setStripColor</name>
+      <name>parameterizedHandler_setAdvancedControls</name>
       <anchorfile>classHomeLightHttpServer.html</anchorfile>
-      <anchor>ae8f2616506042553cfb5e32402d52092</anchor>
-      <arglist>(String &amp;request, WiFiClient &amp;client)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>parameterizedHandler_stripLoadFromMemory</name>
-      <anchorfile>classHomeLightHttpServer.html</anchorfile>
-      <anchor>afb11471e00117042c2bacfe74d49f0c8</anchor>
-      <arglist>(String &amp;request, WiFiClient &amp;client)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>parameterizedHandler_stripSaveCurrent</name>
-      <anchorfile>classHomeLightHttpServer.html</anchorfile>
-      <anchor>ae6dfd29b6b2dd3941a4c1607ffce30fa</anchor>
+      <anchor>a5dac9bc484a4e3b041566adf1b0e12d4</anchor>
       <arglist>(String &amp;request, WiFiClient &amp;client)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -9033,6 +9034,13 @@
     <name>GeneratedDeviceRegistry::Registration</name>
     <filename>structGeneratedDeviceRegistry_1_1Registration.html</filename>
     <member kind="variable">
+      <type>uint32_t</type>
+      <name>cycleIntervalMs</name>
+      <anchorfile>structGeneratedDeviceRegistry_1_1Registration.html</anchorfile>
+      <anchor>a11de294725af503e5e7aa31ba110e90e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
       <type>bool</type>
       <name>includedInDeviceCollection</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1Registration.html</anchorfile>
@@ -11540,13 +11548,6 @@
       <arglist></arglist>
     </member>
     <member kind="variable" protection="private">
-      <type>unsigned long</type>
-      <name>lastDataUpdateTime</name>
-      <anchorfile>classTempSensorDHT11DeviceType.html</anchorfile>
-      <anchor>a0a436b3623fe16891d50e4a5f48ca310</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
       <type>uint8_t</type>
       <name>lastLoggedMinute</name>
       <anchorfile>classTempSensorDHT11DeviceType.html</anchorfile>
@@ -12635,16 +12636,16 @@
     </member>
     <member kind="variable">
       <type>str</type>
-      <name>GENERATED_HTTP_DIR</name>
-      <anchorfile>namespacegenerate__device__registry.html</anchorfile>
-      <anchor>a01ed0766760044fe7241e471830deb8c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>str</type>
       <name>GENERATED_INCLUDE_DIR</name>
       <anchorfile>namespacegenerate__device__registry.html</anchorfile>
       <anchor>a0640cc3916cc56560177ae03938efc62</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE</name>
+      <anchorfile>namespacegenerate__device__registry.html</anchorfile>
+      <anchor>a71649a4ce9a8451feca45f8ec8e8be1e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12660,6 +12661,31 @@
       <anchorfile>namespacegenerate__device__registry.html</anchorfile>
       <anchor>a3468b0a3df6bf0da00ed96301272e13c</anchor>
       <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>GeneratedAdvancedControlTemplates</name>
+    <filename>namespaceGeneratedAdvancedControlTemplates.html</filename>
+    <member kind="function">
+      <type>const char *</type>
+      <name>find</name>
+      <anchorfile>namespaceGeneratedAdvancedControlTemplates.html</anchorfile>
+      <anchor>a4e4961dcd0df8f146309da90ac9ef73d</anchor>
+      <arglist>(uint8_t typeId)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const char</type>
+      <name>advancedControlsTemplate_type_LED_STRIP</name>
+      <anchorfile>namespaceGeneratedAdvancedControlTemplates.html</anchorfile>
+      <anchor>aeb188df5176d3c709d0c766ad0d43c71</anchor>
+      <arglist>[]</arglist>
+    </member>
+    <member kind="variable">
+      <type>const char</type>
+      <name>advancedControlsTemplate_type_ONOFFDEVICE</name>
+      <anchorfile>namespaceGeneratedAdvancedControlTemplates.html</anchorfile>
+      <anchor>a1feefed933400a44337df00750deba08</anchor>
+      <arglist>[]</arglist>
     </member>
   </compound>
   <compound kind="namespace">
@@ -13004,7 +13030,9 @@
     <path>include/generated/</path>
     <filename>dir_4d1ed909a21131f86fc8e803e1892b06.html</filename>
     <dir>include/generated/widgets</dir>
+    <file>GeneratedAdvancedControlTemplates.hpp</file>
     <file>GeneratedDeviceConfiguration.hpp</file>
+    <file>GeneratedDeviceConfigWidgets.hpp</file>
     <file>GeneratedDeviceRegistry.hpp</file>
     <file>GeneratedDeviceStateSerializer.hpp</file>
     <file>GeneratedDeviceTypes.hpp</file>
@@ -13030,7 +13058,6 @@
     <filename>dir_556aa9bd837eebf911a6370a247dd75e.html</filename>
     <dir>src/os/app/http/requestCallbacks</dir>
     <file>AdvancedControlsLoader.cpp</file>
-    <file>GeneratedDeviceConfigWidgets.hpp</file>
     <file>HttpAsyncRequestHandler.cpp</file>
     <file>httpserver.cpp</file>
   </compound>

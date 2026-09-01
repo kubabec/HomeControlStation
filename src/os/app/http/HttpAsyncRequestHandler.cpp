@@ -155,7 +155,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls()
     // Logger::log("Requesting controls for id " + String((int)deviceId));
     /* call loading processing function */
     ServiceRequestErrorCode errorCode =
-        AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);
+        AdvancedControlsLoader::loadAdvancedControls(deviceId);
 
     switch (errorCode)
     {
@@ -395,7 +395,7 @@ void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
 
 void HTTPAsyncRequestHandler::createExtendedControls()
 {
-    jsonResponse += AdvancedControlsLoader::getOutpuJavaScript();
+    jsonResponse += AdvancedControlsLoader::getOutput();
 }
 
 void HTTPAsyncRequestHandler::createRedirectToMainJson()

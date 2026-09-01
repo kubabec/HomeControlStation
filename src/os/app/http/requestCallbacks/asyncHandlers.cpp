@@ -84,149 +84,63 @@ void HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration(String &r
   }
 }
 
-void HomeLightHttpServer::parameterizedHandler_setStripColor(String &request, WiFiClient &client)
+void HomeLightHttpServer::parameterizedHandler_setAdvancedControls(String &request, WiFiClient &client)
 {
   escapeSpecialCharsInJson(request);
-  request.replace("/setStripColor&", "");
+  request.replace("/setAdvancedControls&", "");
 
   JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if (success == DeserializationError::Code::Ok)
+  const DeserializationError error = deserializeJson(doc, request.c_str());
+  if (error != DeserializationError::Code::Ok || !doc["devId"].is<uint16_t>() || !doc["payload"].is<JsonArray>())
   {
-    uint16_t numberOfLeds = doc["color"].size();
-
-    uint8_t *memory = (uint8_t *)malloc(numberOfLeds * 3 + 40);
-    memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
-    memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_DETAILED_COLORS;
-
-    *((uint16_t *)(memory + DYNAMIC_REQUEST_MEMORY_LENGTH_IDX)) = (numberOfLeds * sizeof(LedColor)) + sizeof(LedStripAnimationProperties);
-
-    memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
-    /* set the colors data */
-    LedColor *ledValueAddr = (LedColor *)&memory[DYNAMIC_REQUEST_START_OF_DATA_IDX + sizeof(LedStripAnimationProperties)];
-
-    String deviceId = String(doc["devId"]);
-    String enAnim = String(doc["enableAnimation"]);
-    String disAnim = String(doc["disableAnimation"]);
-    String animSpeed = String(doc["speed"]);
-    String liveAnim = String(doc["live"]);
-    String liveSpeedStr = String(doc["liveSpd"]);
-    /* Process JSON to extrac each device slot*/
-    for (uint16_t i = 0; i < numberOfLeds; i++)
-    {
-      /*this exist for every slot*/
-      String r = String(doc["color"][i][0]);
-      String g = String(doc["color"][i][1]);
-      String b = String(doc["color"][i][2]);
-
-      if (r != "null" && g != "null" && b != "null")
-      {
-        ledValueAddr->r = r.toInt() <= 255 ? r.toInt() : 255;
-        ledValueAddr->g = g.toInt() <= 255 ? g.toInt() : 255;
-        ledValueAddr->b = b.toInt() <= 255 ? b.toInt() : 255;
-
-        // Logger::log(String((int)ledValueAddr->r) + " " + String((int)ledValueAddr->g) + " " + String((int)ledValueAddr->b));
-      }
-      else
-      {
-        break;
-      }
-
-      /* go to next diode */
-      ledValueAddr++;
-    }
-
-    if (deviceId != "null")
-    {
-      // Parse animation properties from json values
-      uint8_t enableAnimation = enAnim.toInt() ? enAnim.toInt() : 0;
-      uint8_t disableAnimation = disAnim.toInt() ? disAnim.toInt() : 0;
-      uint8_t speed = animSpeed.toInt() ? animSpeed.toInt() : 0;
-      uint8_t liveAnimation = liveAnim.toInt() ? liveAnim.toInt() : 0;
-      uint8_t liveSpeed = liveSpeedStr.toInt() ? liveSpeedStr.toInt() : 0;
-      LedStripAnimationProperties animationProperties = {
-          .enableAnimation = enableAnimation,
-          .disableAnimation = disableAnimation,
-          .animationSpeed = speed,
-          .liveAnimation = liveAnimation,
-          .liveAnimationSpeed = liveSpeed,
-        };
-      // Set animation properties to the request
-      memcpy(memory + DYNAMIC_REQUEST_START_OF_DATA_IDX, &animationProperties, sizeof(LedStripAnimationProperties));
-
-      memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = deviceId.toInt();
-
-      // Logger::log(request);
-      HTTPAsyncRequestHandler::createRequest(
-          ASYNC_TYPE_DEVICE_SERVICE_CALL,
-          memory,
-          (numberOfLeds * 3 + 40));
-    }
-    free(memory);
+    Logger::log("Invalid generic advanced-controls request");
+    return;
   }
-}
 
-void HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory(String &request, WiFiClient &client)
-{
-
-  escapeSpecialCharsInJson(request);
-  request.replace("stripLoadFromMemory&", "");
-
-  Logger::log(request);
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if (success == DeserializationError::Code::Ok)
+  const uint16_t deviceId = doc["devId"].as<uint16_t>();
+  const uint16_t additionalParam = doc["additionalParam"] | 0xFF;
+  if (deviceId > 255 || additionalParam > 255)
   {
-    String devIdStr = doc["devId"];
-    String memorySlotStr = doc["slot"];
-
-    if (devIdStr != "null" && memorySlotStr != "null")
-    {
-      Logger::log("Load strip from memory ...");
-      uint8_t parameters[4];
-      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
-      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;         /* idx 1 */
-      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SWITCH_CONTENT;   /* idx 2 */
-      parameters[3] = memorySlotStr.toInt();                                  /* idx 3 */
-
-      HTTPAsyncRequestHandler::createRequest(
-          ASYNC_TYPE_DEVICE_SERVICE_CALL,
-          parameters,
-          4);
-    }
+    Logger::log("Advanced-controls device ID or action is out of range");
+    return;
   }
-}
 
-void HomeLightHttpServer::parameterizedHandler_stripSaveCurrent(String &request, WiFiClient &client)
-{
-  escapeSpecialCharsInJson(request);
-  request.replace("stripOverwriteSlot&", "");
-
-  Logger::log(request);
-
-  JsonDocument doc;
-  DeserializationError success = deserializeJson(doc, request.c_str());
-  if (success == DeserializationError::Code::Ok)
+  const JsonArray payload = doc["payload"].as<JsonArray>();
+  const uint16_t payloadSize = payload.size();
+  const uint16_t requestSize = DYNAMIC_REQUEST_START_OF_DATA_IDX + payloadSize;
+  if (requestSize >= MAX_PARAM_LENGTH_FOR_ASYNC_REQUEST)
   {
-    String devId = doc["devId"];
-    String slot = doc["slot"];
-
-    if (devId != "null" && slot != "null")
-    {
-
-      Logger::log("Request: stripOverwriteSlot {devId, slot}");
-      uint8_t parameters[4];
-      parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devId.toInt(); /* idx 0 */
-      parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;      /* idx 1 */
-      parameters[SERVICE_NAME_INDEX] = DEVSERVICE_LED_STRIP_SAVE_CONTENT;  /* idx 2 */
-      parameters[3] = slot.toInt();                                        /* idx 3 */
-
-      HTTPAsyncRequestHandler::createRequest(
-          ASYNC_TYPE_DEVICE_SERVICE_CALL,
-          parameters,
-          4);
-    }
+    Logger::log("Advanced-controls payload exceeds async request capacity");
+    return;
   }
+
+  uint8_t *memory = static_cast<uint8_t *>(calloc(requestSize, sizeof(uint8_t)));
+  if (memory == nullptr)
+  {
+    Logger::log("Unable to allocate generic advanced-controls request");
+    return;
+  }
+
+  memory[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_3;
+  memory[SERVICE_NAME_INDEX] = DEVSERVICE_SET_ADVANCED_CONTROLS;
+  memory[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = static_cast<uint8_t>(deviceId);
+  memcpy(memory + DYNAMIC_REQUEST_MEMORY_LENGTH_IDX, &payloadSize, sizeof(payloadSize));
+  memory[DYNAMIC_REQUEST_DIRECTION_IDX] = e_IN_to_DEVICE;
+  memory[DYNAMIC_REQUEST_ADDITIONAL_PARAM_IDX] = static_cast<uint8_t>(additionalParam);
+  for (uint16_t index = 0; index < payloadSize; ++index)
+  {
+    const int value = payload[index].as<int>();
+    if (!payload[index].is<int>() || value < 0 || value > 255)
+    {
+      Logger::log("Advanced-controls payload contains a non-byte value");
+      free(memory);
+      return;
+    }
+    memory[DYNAMIC_REQUEST_START_OF_DATA_IDX + index] = static_cast<uint8_t>(value);
+  }
+
+  HTTPAsyncRequestHandler::createRequest(ASYNC_TYPE_DEVICE_SERVICE_CALL, memory, requestSize);
+  free(memory);
 }
 
 void HomeLightHttpServer::parameterizedHandler_roomStateChange(String &request, WiFiClient &client)

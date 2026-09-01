@@ -23,7 +23,6 @@ var classTempSensorDHT11DeviceType =
     [ "getTime", "classTempSensorDHT11DeviceType.html#a2c33d2f07aec49ef94043f594d7223bb", null ],
     [ "isOn", "classTempSensorDHT11DeviceType.html#aaa034f01e99475b8db8150cf14b2e09e", null ],
     [ "lastCheckedTime", "classTempSensorDHT11DeviceType.html#a8676a73296133c102aa4f6d587433a8e", null ],
-    [ "lastDataUpdateTime", "classTempSensorDHT11DeviceType.html#a0a436b3623fe16891d50e4a5f48ca310", null ],
     [ "lastLoggedMinute", "classTempSensorDHT11DeviceType.html#a875791e729cef9306da0fbf0703ba479", null ],
     [ "lastStoredTime", "classTempSensorDHT11DeviceType.html#aa9f9e75d6d34bd367298bab274f5f0a5", null ],
     [ "lastTemp", "classTempSensorDHT11DeviceType.html#a9f8cc6d051b6010cc03c1a110dd8ce2d", null ],

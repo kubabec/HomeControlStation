@@ -31,6 +31,11 @@ class DeviceManager
     static std::vector<std::unique_ptr<Device>> devices;
 
     /**
+     * Last execution timestamp for each entry in devices. Both vectors are populated and cleared together.
+     */
+    static std::vector<uint32_t> lastDeviceCycleTimes;
+
+    /**
      * RAM shadow of the pin configuration slots stored in NVM.
      */
     static ConfigSlotsDataType pinConfigSlotsRamMirror;
@@ -66,7 +71,8 @@ public:
     static void deinit();
 
     /**
-     * Runs the periodic device refresh cycle for state updates and config checks.
+    * Runs devices according to their generated lifecycle intervals and publishes state once per second.
+    * Fixed intervals use wrap-safe millisecond arithmetic and have the resolution of the manager task.
      */
     static void cyclic();
 

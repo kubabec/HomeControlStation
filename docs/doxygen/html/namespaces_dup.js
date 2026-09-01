@@ -48,10 +48,15 @@ var namespaces_dup =
       [ "write_if_changed", "namespacegenerate__device__registry.html#ae33a8d278b6981238d1c9cc835c82048", null ],
       [ "DEVICES_DIR", "namespacegenerate__device__registry.html#a6b9f69ea06e1f17d32e3e4158e874f03", null ],
       [ "FACTORY_ARGUMENTS", "namespacegenerate__device__registry.html#ae1c9b9170c3d29411548640a88c5cc84", null ],
-      [ "GENERATED_HTTP_DIR", "namespacegenerate__device__registry.html#a01ed0766760044fe7241e471830deb8c", null ],
       [ "GENERATED_INCLUDE_DIR", "namespacegenerate__device__registry.html#a0640cc3916cc56560177ae03938efc62", null ],
+      [ "MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE", "namespacegenerate__device__registry.html#a71649a4ce9a8451feca45f8ec8e8be1e", null ],
       [ "PROJECT_DIR", "namespacegenerate__device__registry.html#a6fa111dc94a5e8adc44d01c7e465428f", null ],
       [ "RESERVED_TYPE_IDS", "namespacegenerate__device__registry.html#a3468b0a3df6bf0da00ed96301272e13c", null ]
+    ] ],
+    [ "GeneratedAdvancedControlTemplates", "namespaceGeneratedAdvancedControlTemplates.html", [
+      [ "find", "namespaceGeneratedAdvancedControlTemplates.html#a4e4961dcd0df8f146309da90ac9ef73d", null ],
+      [ "advancedControlsTemplate_type_LED_STRIP", "namespaceGeneratedAdvancedControlTemplates.html#aeb188df5176d3c709d0c766ad0d43c71", null ],
+      [ "advancedControlsTemplate_type_ONOFFDEVICE", "namespaceGeneratedAdvancedControlTemplates.html#a1feefed933400a44337df00750deba08", null ]
     ] ],
     [ "GeneratedDeviceConfigWidgets", "namespaceGeneratedDeviceConfigWidgets.html", "namespaceGeneratedDeviceConfigWidgets" ],
     [ "GeneratedDeviceRegistry", "namespaceGeneratedDeviceRegistry.html", "namespaceGeneratedDeviceRegistry" ],

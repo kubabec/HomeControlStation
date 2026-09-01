@@ -149,15 +149,17 @@ Schema-driven device architecture</h1>
 <li>the persistent numeric device type and C++ enum symbol,</li>
 <li>implementation header, class name, build guard, and factory arguments,</li>
 <li>participation in the public device collection,</li>
+<li>lifecycle scheduling for the device's main <span class="tt">cyclic()</span> function,</li>
 <li>configuration fields and their custom-byte layout,</li>
 <li>runtime state fields exposed over HTTP,</li>
 <li>dashboard controls and readouts,</li>
-<li>optional advanced-control payload and renderer registration.</li>
+<li>optional advanced-control payload sizing and device-owned HTML pattern.</li>
 </ul>
 <p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> type identifiers are part of persisted and network-visible data. Existing identifiers must remain stable, <span class="tt">255</span> is reserved for an unknown or unconfigured device, and duplicate identifiers cause generation to fail.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 Build-time generation</h1>
-<p>PlatformIO invokes <span class="tt"><a class="el" href="generate__device__registry_8py.html">extra/generate_device_registry.py</a></span> and <span class="tt"><a class="el" href="generate__device__config__widgets_8py.html">extra/generate_device_config_widgets.py</a></span> before every compilation. The generators validate the discovered JSON descriptions and produce the integration layer under <span class="tt">include/generated/</span> and <span class="tt">src/os/app/http/</span>.</p>
+<p>PlatformIO invokes <span class="tt"><a class="el" href="generate__device__registry_8py.html">extra/generate_device_registry.py</a></span> and <span class="tt"><a class="el" href="generate__device__config__widgets_8py.html">extra/generate_device_config_widgets.py</a></span> before every compilation. Before loading any descriptions, the registry generator removes the complete <span class="tt">include/generated/</span> directory. Both generators then validate the discovered JSON descriptions and recreate every device-dependent integration artifact under <span class="tt">include/generated/</span>. This prevents removed or renamed devices from surviving through stale files during incremental builds.</p>
+<p>An empty device catalog is valid. If <span class="tt">include/devices/</span> contains no concrete device description directories and no concrete device sources are compiled, generation emits empty registries and generic fallback handlers. The firmware still compiles and runs, but persisted or handshaked device identifiers are treated as unknown and no concrete device instance is created.</p>
 <p>The generated artifacts include:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -177,13 +179,16 @@ Build-time generation</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceConfigWidgets_8hpp.html" title="Schema-derived configuration-page controls for enabled device types.">GeneratedDeviceConfigWidgets.hpp</a></span>  </td><td class="markdownTableBodyNone">Configuration-page selectors and type-specific field controls  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">GeneratedAdvancedControls*.inc</span>  </td><td class="markdownTableBodyNone">Advanced-control payload-size and renderer dispatch  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">GeneratedAdvancedControlsSize.inc</span>  </td><td class="markdownTableBodyNone">Advanced-control payload-size dispatch  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedAdvancedControlTemplates_8hpp.html" title="Device-owned HTML templates for the generic advanced-controls host.">GeneratedAdvancedControlTemplates.hpp</a></span>  </td><td class="markdownTableBodyNone">Build-guarded device-owned HTML patterns referenced by JSON  </td></tr>
 </table>
 <p>Generated files must not be edited directly. Changes belong in a device JSON description or in a generator.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
 Runtime device lifecycle</h1>
 <p><span class="tt"><a class="el" href="classDeviceManager.html" title="Owns the runtime device catalog and orchestrates initialization, configuration, and service calls.">DeviceManager</a></span> owns all generated device instances through <span class="tt">std::unique_ptr&lt;<a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a>&gt;</span>. During initialization it reads each NVM slot, validates the type through the generated metadata, builds a <span class="tt"><a class="el" href="structGeneratedDeviceRegistry_1_1RuntimeContext.html" title="Platform callbacks made available to generated device factory calls.">GeneratedDeviceRegistry::RuntimeContext</a></span>, and asks the generated factory to construct the concrete class.</p>
-<p>All registered instances participate in initialization and cyclic processing. The <span class="tt">includedInDeviceCollection</span> metadata flag determines whether an instance is published to the room dashboard and exposed through the regular device service API. This allows infrastructure devices, such as hardware buttons, to run without appearing as controllable room devices.</p>
+<p>All registered instances participate in initialization and cyclic processing. A lifecycle schedule with <span class="tt">mode: every_manager_cycle</span> runs <span class="tt">cyclic()</span> whenever the manager runs. A schedule with <span class="tt">mode: fixed_interval</span> and a positive <span class="tt">intervalMs</span> runs it when that interval has elapsed. Timing uses wrap-safe <span class="tt">millis()</span> subtraction; effective resolution is the 10 ms <span class="tt"><a class="el" href="classDeviceManager.html" title="Owns the runtime device catalog and orchestrates initialization, configuration, and service calls.">DeviceManager</a></span> task period. <a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> implementations using a fixed schedule should perform one processing iteration per <span class="tt">cyclic()</span> call rather than adding another internal interval for the same work.</p>
+<p>The <span class="tt">includedInDeviceCollection</span> metadata flag determines whether an instance is published to the room dashboard and exposed through the regular device service API. This allows infrastructure devices, such as hardware buttons, to run without appearing as controllable room devices.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
 HTTP generation pipeline</h1>
 <p>The HTTP interface has three generated device-dependent layers:</p>
@@ -192,8 +197,20 @@ HTTP generation pipeline</h1>
 <li><b>Configuration submission</b> — generated JavaScript packs common values and custom fields into a uniform JSON payload. The server decodes this payload without a per-device switch.</li>
 <li><b>Dashboard</b> — runtime state metadata serializes device custom bytes into named JSON fields. Separate generated widget files render the controls and readouts described by each device's <span class="tt">ui</span> section. Button controls are ordered by their optional <span class="tt">displayOrder</span> value, falling back to JSON declaration order. Only widgets whose build guards are enabled by <span class="tt"><a class="el" href="SystemDefinition_8hpp.html" title="Compile-time feature selection for the HomeControlStation firmware.">SystemDefinition.hpp</a></span> are included in the firmware.</li>
 </ol>
-<p>Advanced controls retain their specialized renderer implementations, while payload sizing and type-to-renderer dispatch are generated from device metadata.</p>
+<p><span class="tt"><a class="el" href="classDeviceManager.html" title="Owns the runtime device catalog and orchestrates initialization, configuration, and service calls.">DeviceManager</a></span> publishes its latest local descriptions once per second, and the dashboard requests the complete device list once per second. This HTTP cadence is independent of individual device schedules: fast sensors may execute several times between requests, while slow sensors may return the same latest sample across many requests.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+Generic advanced controls</h1>
+<p>Advanced controls are a generic capability rather than a platform-owned list of device renderers. A capable device provides an HTML pattern beside its implementation and references it through <span class="tt">ui.advancedControls.template</span>. The same section declares either a fixed byte count or a state-dependent element and overhead byte count. Build-time generation validates the path and embeds the pattern in <span class="tt"><a class="el" href="GeneratedAdvancedControlTemplates_8hpp.html" title="Device-owned HTML templates for the generic advanced-controls host.">GeneratedAdvancedControlTemplates.hpp</a></span>.</p>
+<p>The platform always reads opaque bytes through <span class="tt"><a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3aa0ba4767de01df07799d7c9c3fe326ec">DEVSERVICE_GET_ADVANCED_CONTROLS</a></span> using <span class="tt"><a class="el" href="device_8hpp.html#a89ed5b2e43e0258470ec042402d4bfe9a03b0e1aadddbb050e7c803668f425183">serviceCall_3</a></span> and writes them through <span class="tt"><a class="el" href="device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a2df115a2381add2f4d6f9fd3ac48e228" title="Common opaque payload write used by every generated advanced-controls widget.">DEVSERVICE_SET_ADVANCED_CONTROLS</a></span> using the same overload. Payloads are limited to 391 bytes by the current asynchronous request transport. Fixed and maximum dynamic sizes are validated during generation. <span class="tt"><a class="el" href="classAdvancedControlsLoader.html" title="Loads a device payload through the common advanced-controls service.">AdvancedControlsLoader</a></span> does not include concrete device classes or interpret device payload fields. Its JSON response contains the pattern, payload bytes, and description bytes. The generic browser host mounts the pattern and executes its controller script with a <span class="tt">context</span> object containing:</p>
+<ul>
+<li><span class="tt">root</span>, <span class="tt">deviceId</span>, <span class="tt">deviceType</span>, and <span class="tt">deviceName</span>,</li>
+<li><span class="tt">payload</span> and <span class="tt">descriptionBytes</span> as <span class="tt">Uint8Array</span> values,</li>
+<li><span class="tt">save(payload)</span> for a normal opaque-byte update,</li>
+<li><span class="tt">action(additionalParam)</span> for a device-defined action using the common write service,</li>
+<li><span class="tt">close()</span>, <span class="tt">showError(message)</span>, and <span class="tt">onCleanup(callback)</span> lifecycle helpers.</li>
+</ul>
+<p>The pattern controller is placed in a <span class="tt">&lt;script type="application/x-hcs-advanced-controls"&gt;</span> element. It owns payload decoding, DOM event handling, validation, and encoding. The device C++ class owns the corresponding binary contract and service behavior. Pattern scripts are trusted build-time resources and are never accepted from runtime HTTP input.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
 Adding a device type</h1>
 <p>To add a device without modifying the operating-system implementation:</p>
 <ol type="1">
@@ -202,8 +219,9 @@ Adding a device type</h1>
 <li>Assign a new, explicit, previously unused type identifier and enum symbol.</li>
 <li>Describe constructor dependencies with the supported factory argument names.</li>
 <li>Define configuration-byte and description-state layouts with non-overlapping offsets.</li>
+<li>Select <span class="tt">every_manager_cycle</span>, or select <span class="tt">fixed_interval</span> and provide <span class="tt">intervalMs</span>, under <span class="tt">lifecycle.update.schedule</span>.</li>
 <li>Describe dashboard controls and readouts in the <span class="tt">ui</span> section.</li>
-<li>Add advanced-control metadata only when the device supports that service.</li>
+<li>For advanced controls, implement the common get/set services, add the HTML pattern, and reference its path and payload size in <span class="tt">ui.advancedControls</span>.</li>
 <li>Run a PlatformIO build and inspect generator validation errors.</li>
 </ol>
 <p>No concrete device include, factory branch, HTTP state branch, configuration parser, or dashboard type dispatch should be added manually under <span class="tt">include/os</span> or <span class="tt">src/os</span>. </p>

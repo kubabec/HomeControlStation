@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classDeviceMan
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:abede853a2004bc9a48d3b2a68d1b8cb1" id="r_abede853a2004bc9a48d3b2a68d1b8cb1"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#abede853a2004bc9a48d3b2a68d1b8cb1">cyclic</a> ()</td></tr>
-<tr class="memdesc:abede853a2004bc9a48d3b2a68d1b8cb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the periodic device refresh cycle for state updates and config checks.  <br /></td></tr>
+<tr class="memdesc:abede853a2004bc9a48d3b2a68d1b8cb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs devices according to their generated lifecycle intervals and publishes state once per second.  <br /></td></tr>
 <tr class="memitem:ada6b112849143ca893cabe765d410718" id="r_ada6b112849143ca893cabe765d410718"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ada6b112849143ca893cabe765d410718">deinit</a> ()</td></tr>
 <tr class="memdesc:ada6b112849143ca893cabe765d410718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the managed device resources and closes optional runtime services.  <br /></td></tr>
 <tr class="memitem:a8fab75625581e3633b23f48a63d2fc5d" id="r_a8fab75625581e3633b23f48a63d2fc5d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8fab75625581e3633b23f48a63d2fc5d">flushNvmData</a> ()</td></tr>
@@ -161,6 +161,8 @@ Static Private Attributes</h2></td></tr>
 <tr class="memdesc:ac638a356a2e6c9818c05e46f76d08f8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Owns all device instances enabled by the generated registry.  <br /></td></tr>
 <tr class="memitem:ad88a4a55f00c2db15e2bd28554288e75" id="r_ad88a4a55f00c2db15e2bd28554288e75"><td class="memItemLeft">static <a class="el" href="classExtendedDataAllocator.html">ExtendedDataAllocator</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad88a4a55f00c2db15e2bd28554288e75">extDataAllocator</a></td></tr>
 <tr class="memdesc:ad88a4a55f00c2db15e2bd28554288e75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator used for extended device memory and persistent payload storage.  <br /></td></tr>
+<tr class="memitem:aac3c80d51730a3b8df4e0082bdf47ad9" id="r_aac3c80d51730a3b8df4e0082bdf47ad9"><td class="memItemLeft">static std::vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight"><a class="el" href="#aac3c80d51730a3b8df4e0082bdf47ad9">lastDeviceCycleTimes</a></td></tr>
+<tr class="memdesc:aac3c80d51730a3b8df4e0082bdf47ad9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last execution timestamp for each entry in devices.  <br /></td></tr>
 <tr class="memitem:ac52a3e3a2644b14c12a20e2992c99be1" id="r_ac52a3e3a2644b14c12a20e2992c99be1"><td class="memItemLeft">static <a class="el" href="structConfigSlotsDataType.html">ConfigSlotsDataType</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac52a3e3a2644b14c12a20e2992c99be1">pinConfigSlotsRamMirror</a> = {}</td></tr>
 <tr class="memdesc:ac52a3e3a2644b14c12a20e2992c99be1"><td class="mdescLeft">&#160;</td><td class="mdescRight">RAM shadow of the pin configuration slots stored in NVM.  <br /></td></tr>
 </table>
@@ -193,11 +195,12 @@ Static Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Runs the periodic device refresh cycle for state updates and config checks. </p>
+<p>Runs devices according to their generated lifecycle intervals and publishes state once per second. </p>
+<p>Fixed intervals use wrap-safe millisecond arithmetic and have the resolution of the manager task. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00244">244</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00246">246</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00036">lastDeviceCycleTimes</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00136">OperatingSystem::task10ms()</a>.</p>
 
@@ -228,9 +231,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Releases the managed device resources and closes optional runtime services. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00016">16</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00017">17</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8cpp_source.html#l00027">flushNvmData()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8cpp_source.html#l00028">flushNvmData()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00270">OperatingSystem::performReset()</a>.</p>
 
@@ -273,11 +276,11 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true when the instance could be created from the requested slot; false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00276">276</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00286">286</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00103">CBK_FIRE_DIGITAL_EVENT</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00076">GeneratedDeviceRegistry::create()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="device_8hpp_source.html#l00053">DEVSERVICE_STATE_SWITCH</a>, <a class="el" href="devicemanager_8cpp_source.html#l00667">getRtcTimeWrapper()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00055">DeviceConfigSlotType::isValid()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="devicemanager_8cpp_source.html#l00021">persistentDataChanged()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00103">CBK_FIRE_DIGITAL_EVENT</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00078">GeneratedDeviceRegistry::create()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="device_8hpp_source.html#l00053">DEVSERVICE_STATE_SWITCH</a>, <a class="el" href="devicemanager_8cpp_source.html#l00678">getRtcTimeWrapper()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00055">DeviceConfigSlotType::isValid()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00036">lastDeviceCycleTimes</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00033">NodeConfiguration::networkSSID</a>, <a class="el" href="devicemanager_8cpp_source.html#l00022">persistentDataChanged()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, <a class="el" href="signals_8hpp_source.html#l00020">SIG_DEVICE_COLLECTION</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00066">SIG_DEVICE_SERVICES</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -306,11 +309,11 @@ Static Private Attributes</h2></td></tr>
 
 <p>Flushes the in-memory configuration back to NVM when persistence is required. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00027">27</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00028">28</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="signals_8hpp_source.html#l00036">CBK_SET_NVM_DATABLOCK</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00042">e_BLOCK_DEVICE_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00047">e_BLOCK_DEVICE_6</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00016">deinit()</a>, and <a class="el" href="HomeStation__os_8cpp_source.html#l00256">OperatingSystem::saveNvmData()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00017">deinit()</a>, and <a class="el" href="HomeStation__os_8cpp_source.html#l00256">OperatingSystem::saveNvmData()</a>.</p>
 
 </div>
 </div>
@@ -340,11 +343,11 @@ Static Private Attributes</h2></td></tr>
 <p>Serializes the current local setup into JSON form for persistence or UI export. </p>
 <dl class="section return"><dt>Returns</dt><dd>A JSON string containing the device configuration. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00361">361</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00372">372</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -374,11 +377,11 @@ Static Private Attributes</h2></td></tr>
 <p>Returns the current RTC time formatted in the application’s time structure. </p>
 <dl class="section return"><dt>Returns</dt><dd>Current device time represented by <a class="el" href="structRtcTime.html" title="Represents the time descriptor used by sensor and device records.">RtcTime</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00667">667</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00678">678</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="signals_8hpp_source.html#l00087">CBK_GET_CURRENT_TIME</a>, and <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00276">extractDeviceInstanceBasedOnNvmData()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>.</p>
 
 </div>
 </div>
@@ -407,9 +410,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Initializes all configured device types and registers their runtime callbacks. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00045">45</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00046">46</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="signals_8hpp_source.html#l00042">CBK_RESET_DEVICE</a>, <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="device_8hpp_source.html#l00057">DEVSERVICE_SET_EXT_MEMORY_PTR</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00042">e_BLOCK_DEVICE_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00047">e_BLOCK_DEVICE_6</a>, <a class="el" href="devicemanager_8cpp_source.html#l00276">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00112">ExtendedMemoryCtrlAPI::getExtMemoryPtrByDeviceId</a>, <a class="el" href="devicemanager_8cpp_source.html#l00361">getLocalSetupJson()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00060">DeviceConfigSlotType::getSize()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00086">PersistentDataBlock::getSize()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="devicemanager_8cpp_source.html#l00413">loadConfigFromFile()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00110">ExtendedMemoryCtrlAPI::requestNewExtendedMemorySpace</a>, <a class="el" href="devicemanager_8cpp_source.html#l00557">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00481">setLocalSetupViaJson()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00040">SIG_CONFIG_SLOTS</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00080">SIG_EXT_MEM_CTRL_API</a>, <a class="el" href="signals_8hpp_source.html#l00062">SIG_LOCAL_DEVICE_SERVICES</a>, <a class="el" href="signals_8hpp_source.html#l00082">SIG_SET_DEVICES_CONFIG_VIA_JSON</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="datacontainertypes_8hpp_source.html#l00131">UserInterfaceNotification::body</a>, <a class="el" href="signals_8hpp_source.html#l00038">CBK_GET_NVM_DATABLOCK</a>, <a class="el" href="signals_8hpp_source.html#l00042">CBK_RESET_DEVICE</a>, <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="device_8hpp_source.html#l00057">DEVSERVICE_SET_EXT_MEMORY_PTR</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00042">e_BLOCK_DEVICE_1</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00047">e_BLOCK_DEVICE_6</a>, <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00112">ExtendedMemoryCtrlAPI::getExtMemoryPtrByDeviceId</a>, <a class="el" href="devicemanager_8cpp_source.html#l00372">getLocalSetupJson()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00060">DeviceConfigSlotType::getSize()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00086">PersistentDataBlock::getSize()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00125">UserInterfaceNotification::INFO</a>, <a class="el" href="devicemanager_8hpp_source.html#l00036">lastDeviceCycleTimes</a>, <a class="el" href="devicemanager_8cpp_source.html#l00424">loadConfigFromFile()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00110">ExtendedMemoryCtrlAPI::requestNewExtendedMemorySpace</a>, <a class="el" href="devicemanager_8cpp_source.html#l00568">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00492">setLocalSetupViaJson()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, <a class="el" href="signals_8hpp_source.html#l00040">SIG_CONFIG_SLOTS</a>, <a class="el" href="signals_8hpp_source.html#l00028">SIG_DEVICE_CONFIGURATION</a>, <a class="el" href="signals_8hpp_source.html#l00080">SIG_EXT_MEM_CTRL_API</a>, <a class="el" href="signals_8hpp_source.html#l00062">SIG_LOCAL_DEVICE_SERVICES</a>, <a class="el" href="signals_8hpp_source.html#l00082">SIG_SET_DEVICES_CONFIG_VIA_JSON</a>, <a class="el" href="signals_8hpp_source.html#l00074">SIG_UI_NOTIFICATIONS_CONTROL</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00130">UserInterfaceNotification::title</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00133">UserInterfaceNotification::type</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -447,11 +450,11 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true when the configuration was accepted; false on invalid data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00413">413</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00424">424</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00020">DeviceConfigSlotType::deviceName</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="devicemanager_8cpp_source.html#l00408">isNull()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::roomId</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
+<p class="reference">References <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00020">DeviceConfigSlotType::deviceName</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="devicemanager_8cpp_source.html#l00419">isNull()</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::roomId</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -480,11 +483,11 @@ Static Private Attributes</h2></td></tr>
 
 <p>Handles the callback triggered after persistent data changes and refreshes related runtime state. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00021">21</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00022">22</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="signals_8hpp_source.html#l00099">CBK_START_NVM_SAVE_TIMER</a>, and <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00276">extractDeviceInstanceBasedOnNvmData()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>.</p>
 
 </div>
 </div>
@@ -525,11 +528,11 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Service result code describing success or failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00557">557</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00568">568</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -576,9 +579,9 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Service result code describing success or failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00584">584</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00595">595</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 </div>
 </div>
@@ -625,9 +628,9 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Service result code describing success or failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00611">611</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00622">622</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 </div>
 </div>
@@ -674,9 +677,9 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Service result code describing success or failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00639">639</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00650">650</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="device_8hpp_source.html#l00038">SERV_GENERAL_FAILURE</a>, <a class="el" href="device_8hpp_source.html#l00036">SERV_SUCCESS</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 </div>
 </div>
@@ -712,11 +715,11 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true when the setup was applied successfully. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00481">481</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00492">492</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00042">CBK_RESET_DEVICE</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00020">DeviceConfigSlotType::deviceName</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::roomId</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00042">CBK_RESET_DEVICE</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00023">DeviceConfigSlotType::deviceId</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00020">DeviceConfigSlotType::deviceName</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00021">DeviceConfigSlotType::deviceType</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00019">DeviceConfigSlotType::isActive</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="devicemanager_8hpp_source.html#l00012">pinConfigSlotsRamMirror</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00022">DeviceConfigSlotType::pinNumber</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00024">DeviceConfigSlotType::roomId</a>, and <a class="el" href="datacontainertypes_8hpp_source.html#l00078">ConfigSlotsDataType::slots</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -745,11 +748,11 @@ Static Private Attributes</h2></td></tr>
 
 <p>Updates the device description signal so the UI and remote-control subsystem see the current catalog. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00260">260</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00270">270</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00066">GeneratedDeviceRegistry::find()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, and <a class="el" href="signals_8hpp_source.html#l00018">SIG_LOCAL_COLLECTION</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8hpp_source.html#l00031">devices</a>, <a class="el" href="GeneratedDeviceRegistry_8hpp_source.html#l00068">GeneratedDeviceRegistry::find()</a>, <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>, and <a class="el" href="signals_8hpp_source.html#l00018">SIG_LOCAL_COLLECTION</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00244">cyclic()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00557">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00584">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00611">service()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00639">service()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00246">cyclic()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00568">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00595">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00622">service()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00650">service()</a>.</p>
 
 </div>
 </div>
@@ -779,7 +782,7 @@ Static Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="devicemanager_8hpp_source.html#l00031">31</a> of file <a class="el" href="devicemanager_8hpp_source.html">devicemanager.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00244">cyclic()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00276">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00557">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00584">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00611">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00639">service()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00260">updateDeviceDescriptionSignal()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00246">cyclic()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00568">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00595">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00622">service()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00650">service()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00270">updateDeviceDescriptionSignal()</a>.</p>
 
 </div>
 </div>
@@ -805,7 +808,36 @@ Static Private Attributes</h2></td></tr>
 
 <p>Allocator used for extended device memory and persistent payload storage. </p>
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8hpp_source.html#l00041">41</a> of file <a class="el" href="devicemanager_8hpp_source.html">devicemanager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8hpp_source.html#l00046">46</a> of file <a class="el" href="devicemanager_8hpp_source.html">devicemanager.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aac3c80d51730a3b8df4e0082bdf47ad9" name="aac3c80d51730a3b8df4e0082bdf47ad9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac3c80d51730a3b8df4e0082bdf47ad9">&#9670;&#160;</a></span>lastDeviceCycleTimes</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; uint32_t &gt; DeviceManager::lastDeviceCycleTimes</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Last execution timestamp for each entry in devices. </p>
+<p>Both vectors are populated and cleared together. </p>
+
+<p class="definition">Definition at line <a class="el" href="devicemanager_8hpp_source.html#l00036">36</a> of file <a class="el" href="devicemanager_8hpp_source.html">devicemanager.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00246">cyclic()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>.</p>
 
 </div>
 </div>
@@ -833,7 +865,7 @@ Static Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="devicemanager_8hpp_source.html#l00012">12</a> of file <a class="el" href="devicemanager_8hpp_source.html">devicemanager.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00276">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00027">flushNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00361">getLocalSetupJson()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00045">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00413">loadConfigFromFile()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00481">setLocalSetupViaJson()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00286">extractDeviceInstanceBasedOnNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00028">flushNvmData()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00372">getLocalSetupJson()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00046">init()</a>, <a class="el" href="devicemanager_8cpp_source.html#l00424">loadConfigFromFile()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00492">setLocalSetupViaJson()</a>.</p>
 
 </div>
 </div>

@@ -89,6 +89,15 @@
       ]
     },
     {
+      "name": "DEVSERVICE_SET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "data", "type": "LedColor[] + LedStripAnimationProperties", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)" },
+        { "name": "action", "type": "uint8", "source": "ServiceParameters_set3.additionalParam", "description": "255 applies payload; 1..3 save slots; 4..6 load slots" }
+      ]
+    },
+    {
       "name": "DEVSERVICE_GET_DETAILED_COLORS",
       "overload": "serviceCall_3",
       "status": "implemented",
@@ -131,11 +140,12 @@
   "ui": {
     "roomWidget": "generateLedStripWidget",
     "advancedControls": {
-      "renderer": "createJsForLedStrip",
+      "template": "include/devices/LedWS1228bDeviceType/AdvancedControls.html",
       "payloadSize": {
         "countState": "virtualLedCount",
-        "elementType": "LedColor",
-        "overheadType": "LedStripAnimationProperties"
+        "maximumCount": 100,
+        "elementBytes": 3,
+        "overheadBytes": 5
       }
     },
     "controls": [

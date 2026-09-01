@@ -17,5 +17,6 @@ var classDeviceManager =
     [ "updateDeviceDescriptionSignal", "classDeviceManager.html#aadb1e0ca4205944ae186c02d4844fb89", null ],
     [ "devices", "classDeviceManager.html#ac638a356a2e6c9818c05e46f76d08f8f", null ],
     [ "extDataAllocator", "classDeviceManager.html#ad88a4a55f00c2db15e2bd28554288e75", null ],
+    [ "lastDeviceCycleTimes", "classDeviceManager.html#aac3c80d51730a3b8df4e0082bdf47ad9", null ],
     [ "pinConfigSlotsRamMirror", "classDeviceManager.html#ac52a3e3a2644b14c12a20e2992c99be1", null ]
 ];

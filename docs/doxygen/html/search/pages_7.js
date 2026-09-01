@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main_20modules_0',['Main modules',['../index.html#autotoc_md2',1,'']]],
-  ['modules_1',['Main modules',['../index.html#autotoc_md2',1,'']]]
+  ['lifecycle_0',['Runtime device lifecycle',['../index.html#autotoc_md5',1,'']]]
 ];

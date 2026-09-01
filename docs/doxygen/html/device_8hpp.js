@@ -26,6 +26,7 @@ var device_8hpp =
       [ "DEVSERVICE_ROOM_STATE_CHANGE", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3ae8d86b71a38b72dcc973c0f2406e7f7c", null ],
       [ "DEVSERVICE_SEGMENT_STATE_SWITCH", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a8c18d5e91eb8a193017069ced5684097", null ],
       [ "DEVSERVICE_LIVE_ANIMATION", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a2b046e5f4ac31337ebf86a46119a92b8", null ],
+      [ "DEVSERVICE_SET_ADVANCED_CONTROLS", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a2df115a2381add2f4d6f9fd3ac48e228", null ],
       [ "DEVSERVICE_INVALID", "device_8hpp.html#a85b136736229097bd3d73d2e51d9e0f3a5d6207d4ed5567d0d0ebc83b11c0424a", null ]
     ] ],
     [ "ServiceDirectionType", "device_8hpp.html#a64d03546e9e332a5232ec04c1261fdcd", [

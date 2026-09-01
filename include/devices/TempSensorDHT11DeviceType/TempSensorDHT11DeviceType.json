@@ -24,7 +24,8 @@
     "update": {
       "entryPoint": "cyclic",
       "schedule": {
-        "mode": "every_manager_cycle",
+        "mode": "fixed_interval",
+        "intervalMs": 60000,
         "internalTasks": [
           { "name": "temperature and humidity sample", "minimumIntervalMs": 60000 },
           { "name": "historical sample", "minimumIntervalMs": 30000, "enabled": false }

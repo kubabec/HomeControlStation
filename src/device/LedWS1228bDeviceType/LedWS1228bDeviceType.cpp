@@ -1,6 +1,9 @@
 #include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
 #include "os/Logger.hpp"
 #ifdef LED_STRIP_SUPPORTED
+static_assert(sizeof(LedStripAnimationProperties) == 5, "LED advanced-controls overhead size is out of sync");
+static_assert(sizeof(LedColor) == 3, "LED advanced-controls element size is out of sync");
+
 const uint8_t maxVirtualLeds = 100;
 
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
@@ -526,8 +529,18 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             Logger::log("<" + deviceName + "> Service: DEVSERVICE_GET_ADVANCED_CONTROLS/DETAILED_COLORS failed");
             return SERV_EXECUTION_FAILURE;
         }
+    case DEVSERVICE_SET_ADVANCED_CONTROLS:
+        if (param.additionalParam >= 1 && param.additionalParam <= 3)
+        {
+            return saveContentAs((LedStripContentIndex)param.additionalParam);
+        }
+        if (param.additionalParam >= 4 && param.additionalParam <= 6)
+        {
+            return applyContent((LedStripContentIndex)(param.additionalParam - 3));
+        }
+        [[fallthrough]];
     case DEVSERVICE_SET_DETAILED_COLORS:
-        Logger::log("<" + deviceName + "> Service: DEVSERVICE_SET_DETAILED_COLORS, size: " + String((int)param.size));
+        Logger::log("<" + deviceName + "> Service: SET_ADVANCED_CONTROLS/SET_DETAILED_COLORS, size: " + String((int)param.size));
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
             // Colors cannot be updated during ongoin LIVE show

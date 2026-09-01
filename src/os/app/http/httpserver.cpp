@@ -8,7 +8,7 @@
 #include "os/app/http/tempGauge/tempGaugeJS.h"
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
-#include "os/app/http/GeneratedDeviceConfigWidgets.hpp"
+#include "generated/GeneratedDeviceConfigWidgets.hpp"
 #include "build_info.h"
 #include "os/Logger.hpp"
 
@@ -71,9 +71,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "dwlddevcfg",
   "loaddeicvcfg",
   "getExtendedControls",
-  "setStripColor",
-  "stripLoadFromMemory",
-  "stripOverwriteSlot",
+  "setAdvancedControls",
   "stRmChng",
   "segSwtch",
   "ledsLiveSwtch",
@@ -113,9 +111,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_setAdvancedControls, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},

@@ -391,25 +391,11 @@ public:
     static void parameterizedHandler_getExtendedControls(String& request, WiFiClient& client);
 
     /**
-     * Sets the strip color state from the requested data payload.
+    * Sends an opaque byte payload or action to a device's common advanced-controls service.
      * @param request Raw request string.
      * @param client HTTP client receiving the response.
      */
-    static void parameterizedHandler_setStripColor(String& request, WiFiClient& client);
-
-    /**
-     * Loads a strip configuration from the persistent memory block.
-     * @param request Raw request string.
-     * @param client HTTP client receiving the response.
-     */
-    static void parameterizedHandler_stripLoadFromMemory(String& request, WiFiClient& client);
-
-    /**
-     * Saves the current strip state to persistent memory.
-     * @param request Raw request string.
-     * @param client HTTP client receiving the response.
-     */
-    static void parameterizedHandler_stripSaveCurrent(String& request, WiFiClient& client);
+    static void parameterizedHandler_setAdvancedControls(String& request, WiFiClient& client);
 
     /**
      * Changes the room state through the UI trigger.

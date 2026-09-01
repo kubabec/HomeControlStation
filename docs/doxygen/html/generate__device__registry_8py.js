@@ -18,8 +18,8 @@ var generate__device__registry_8py =
     [ "generate_device_registry.write_if_changed", "namespacegenerate__device__registry.html#ae33a8d278b6981238d1c9cc835c82048", null ],
     [ "generate_device_registry.DEVICES_DIR", "namespacegenerate__device__registry.html#a6b9f69ea06e1f17d32e3e4158e874f03", null ],
     [ "generate_device_registry.FACTORY_ARGUMENTS", "namespacegenerate__device__registry.html#ae1c9b9170c3d29411548640a88c5cc84", null ],
-    [ "generate_device_registry.GENERATED_HTTP_DIR", "namespacegenerate__device__registry.html#a01ed0766760044fe7241e471830deb8c", null ],
     [ "generate_device_registry.GENERATED_INCLUDE_DIR", "namespacegenerate__device__registry.html#a0640cc3916cc56560177ae03938efc62", null ],
+    [ "generate_device_registry.MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE", "namespacegenerate__device__registry.html#a71649a4ce9a8451feca45f8ec8e8be1e", null ],
     [ "generate_device_registry.PROJECT_DIR", "namespacegenerate__device__registry.html#a6fa111dc94a5e8adc44d01c7e465428f", null ],
     [ "generate_device_registry.RESERVED_TYPE_IDS", "namespacegenerate__device__registry.html#a3468b0a3df6bf0da00ed96301272e13c", null ]
 ];
