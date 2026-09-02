@@ -146,6 +146,7 @@ typedef struct
 
 typedef struct{
     std::function<bool(UserInterfaceNotification&)> createNotification;
+    std::function<bool(UserInterfaceNotification&, uint32_t)> createNotificationWithTimeout;
     std::function<uint8_t(void)> getActiveNotificationsCount;
     std::function<UserInterfaceNotification(void)> getOldestNotification;
 }UINotificationsControlAPI;

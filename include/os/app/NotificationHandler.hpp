@@ -2,7 +2,8 @@
 #define NOTIFICATION_HANDLER_H
 #include <Arduino.h>
 #include <os/datacontainer/DataContainer.hpp>
-#include <queue>
+#include <deque>
+#include <cstdint>
 
 #define MAX_NUMBER_OF_NOTIFICATIONS 10
 /**
@@ -14,19 +15,29 @@
  */
 
 class NotificationHandler {
+    struct PendingNotification {
+        UserInterfaceNotification notification;
+        uint32_t createdAtMs;
+        uint32_t timeoutMs;
+    };
+
     /**
      * FIFO queue of pending UI notifications waiting to be displayed or processed.
      */
-    static std::queue<UserInterfaceNotification> notifications;
+    static std::deque<PendingNotification> notifications;
+
+    static void removeExpiredNotifications();
 
 public:
+    static constexpr uint32_t DEFAULT_NOTIFICATION_TIMEOUT_MS = 60UL * 60UL * 1000UL;
+
     /**
      * Registers the notification callbacks in the system data container and initializes the queue.
      */
     static void init();
 
     /**
-     * Keeps the handler ready for future calls. The implementation currently has no periodic work.
+    * Removes notifications whose display timeout has elapsed.
      */
     static void cyclic();
 
@@ -41,6 +52,14 @@ public:
      * @return true when the notification was accepted; false when the queue is full.
      */
     static bool createNotification(UserInterfaceNotification& newNotification);
+
+    /**
+     * Adds a new notification with a caller-defined display timeout.
+     * @param newNotification Notification object that should be stored and later displayed.
+     * @param timeoutMs Time in milliseconds for which the notification remains available.
+     * @return true when the notification was accepted; false when the queue is full.
+     */
+    static bool createNotification(UserInterfaceNotification& newNotification, uint32_t timeoutMs);
 
     /**
      * Returns the number of pending notifications currently stored in the queue.

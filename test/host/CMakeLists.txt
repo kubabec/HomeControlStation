@@ -63,6 +63,7 @@ add_executable(host_tests
     TestMain.cpp
     Arduino.cpp
     OsTests.cpp
+    NotificationTests.cpp
     ActiveDeviceTests.cpp
     PredefinedDeviceTests.cpp
     LedDeviceTests.cpp
@@ -73,6 +74,7 @@ add_executable(host_tests
     "${PROJECT_ROOT}/src/os/app/remoteControl/rcRequest.cpp"
     "${PROJECT_ROOT}/src/os/app/remoteControl/rcResponse.cpp"
     "${PROJECT_ROOT}/src/os/app/display/DeviceDescriptionPacker.cpp"
+    "${PROJECT_ROOT}/src/os/app/NotificationHandler.cpp"
     "${PROJECT_ROOT}/src/device/OnOffDevice/OnOffDevice.cpp"
     "${PROJECT_ROOT}/src/device/WindowDoorSensor/WindowDoorSensor.cpp"
     "${PROJECT_ROOT}/src/device/WindowBlinder/WindowBlinder.cpp"
@@ -84,7 +86,7 @@ add_executable(host_tests
     ${LED_SOURCES}
 )
 
-target_compile_definitions(host_tests PRIVATE LED_STRIP_SUPPORTED)
+target_compile_definitions(host_tests PRIVATE LED_STRIP_SUPPORTED SUPPORT_NOTIFICATION)
 target_include_directories(host_tests PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/stubs"
     "${GENERATED_DIR}/include"
