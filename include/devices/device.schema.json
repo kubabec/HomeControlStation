@@ -245,6 +245,7 @@
         "unit": { "type": "string" },
         "minimum": { "type": "number" },
         "maximum": { "type": "number" },
+        "displayScale": { "type": "number", "exclusiveMinimum": 0 },
         "default": {},
         "widget": { "type": ["string", "null"] },
         "options": {
@@ -272,7 +273,20 @@
       "properties": {
         "name": { "type": "string" },
         "widget": { "type": "string" },
-        "displayOrder": { "type": "integer", "minimum": 0 }
+        "displayOrder": { "type": "integer", "minimum": 0 },
+        "source": { "type": "string" },
+        "label": { "type": "string" },
+        "unit": { "type": "string" },
+        "trueLabel": { "type": "string" },
+        "falseLabel": { "type": "string" },
+        "trueTone": { "enum": ["neutral", "accent", "success", "warning", "danger"] },
+        "falseTone": { "enum": ["neutral", "accent", "success", "warning", "danger"] },
+        "unknownValue": { "type": "number" },
+        "unknownLabel": { "type": "string" },
+        "valueLabels": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
       },
       "additionalProperties": true
     }

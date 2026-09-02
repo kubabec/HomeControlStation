@@ -145,7 +145,7 @@ public:
 #endif
 ```
 
-If the JSON uses a build guard, include `SystemDefinition.hpp` and wrap the class declaration and implementation with the same `#ifdef`. A predefined guarded example is [DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp](DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp).
+If the JSON uses a build guard, include `SystemDefinition.hpp` and wrap the class declaration and implementation with the same `#ifdef`. A predefined guarded example is [DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp.example](DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp.example).
 
 ### 3.3 Constructor and NVM configuration
 
@@ -583,9 +583,9 @@ The current custom configuration renderers are:
 |---|---|---|
 | `checkbox` | normal size is 1 | Saves `0` or `1`. |
 | `select` | `options` | Dropdown. Current storage supports at most two options. |
-| `gpio-select` | normal size is 1 | Dropdown containing GPIO values `0..31`. |
+| `gpio-select` | normal size is 1; optional `minimum`/`maximum`, `default`, `optional`, `claimWhen` | Dropdown containing the inclusive GPIO range. The generated server validator claims the selected GPIO and rejects invalid or duplicate active assignments. |
 | `range` | `minimum`, `maximum` | HTML range input. Defaults are `0` and `255`. |
-| `number` | `minimum`, `maximum` | HTML number input. Defaults are `0` and `255`. |
+| `number` | `minimum`, `maximum`, optional `displayScale` | HTML number input. Defaults are `0` and `255`. A scale such as `10` displays stored fixed-point value `253` as `25.3` and multiplies it again when saving. |
 | `segment-array` | `arrayLength`, bounds, companion field | Specialized segmented-strip editor described below. |
 
 Important details:
@@ -595,11 +595,38 @@ Important details:
 - `select` supports at most two `{ "value", "label" }` options.
 - Visible custom fields are read into a `uint16_t` by the renderer. Prefer one- or two-byte numeric fields.
 - Saved numeric values are encoded little-endian into `size` bytes.
-- `minimum` and `maximum` constrain the browser input but are not a substitute for C++ validation.
-- `default` and `zeroMeans` are accepted metadata, but the current generator does not initialize new NVM slots from `default` or alter rendering for `zeroMeans`. Fresh custom bytes are normally zero.
+- `minimum`, `maximum`, and `select.options` drive the browser controls and generated server-side validation. C++ must still defend itself because constructors and service calls are separate trust boundaries.
+- `default` supplies the generated control value when the slot currently stores a different/unknown device type. It prevents zero-filled fresh slots from submitting invalid values. The value is not persistent until the user saves the form, and an existing slot of the same type continues to display its stored bytes.
+- `zeroMeans` remains descriptive metadata; it does not alter rendering or validation.
 - `mustEqual` copies bytes from the named source field during browser save. This is useful for a hidden safety copy.
 - Gaps are allowed and saved as zero.
-- Keep every `offset + size <= 20`. The current custom generator detects ordinary overlaps but does **not** reliably enforce the 20-byte boundary, so this must be reviewed manually.
+- The registry generator rejects configuration fields extending beyond byte 19 and ordinary overlaps. Still keep a byte-layout table because C++ offsets cannot be inferred or verified automatically.
+
+#### Generated hardware validation
+
+For every enabled slot, `DeviceManager` calls the generated configuration validator before replacing the RAM mirror. It runs again while restoring NVM slots, before the factory constructs a device. The validator currently:
+
+- claims the common `pinNumber` GPIO;
+- recognizes custom GPIO fields through `hardwareRole: "gpio"`, `htmlType: "gpio-select"`, or a GPIO label;
+- permits `255` only for fields marked `optional: true` or having `maximum: 255`;
+- rejects duplicate claims within one device and across all six active slots;
+- rejects pins outside `0..48` and the unavailable/reserved ESP32-S3 range `22..32`;
+- checks one- and two-byte `minimum`/`maximum` values and `select.options`;
+- restricts a common pin marked `hardwareRole: "adc"` to Wi-Fi-safe ADC1 GPIO `1..10`.
+
+Use explicit metadata for new descriptions even where inference would currently work:
+
+```json
+{ "name": "probePin", "source": "pinNumber", "widget": "gpio-select", "hardwareRole": "adc" }
+```
+
+Conditional outputs can be claimed only in one mode. For example, a second motor pin may contain:
+
+```json
+"claimWhen": { "offset": 5, "equals": 2 }
+```
+
+This means the GPIO is claimed only when custom byte 5 equals 2. Semantic relationships not expressible as individual bounds—such as a cutoff being greater than a setpoint—remain C++ responsibilities.
 
 Hidden safety-copy example:
 
@@ -662,7 +689,7 @@ This array documents the 50 bytes returned in `DeviceDescription::customBytes[0.
 
 Examples of useful descriptive types are `boolean`, `uint8`, `uint16`, `float32`, `enum`, `rgb888`, and fixed arrays. The generator does not encode these fields for the class; C++ remains responsible for writing the bytes.
 
-Keep every `offset + size <= 50`, with no unintended overlap. As with configuration, the generator detects normal overlaps but does not reliably enforce the final 50-byte boundary.
+Keep every `offset + size <= 50`, with no unintended overlap. The generator rejects fields extending beyond byte 49 and ordinary overlaps; C++ is still responsible for writing exactly the declared representation.
 
 ### 5.10 `state.httpFields`
 
@@ -701,7 +728,8 @@ Supported readouts:
 
 | `widget` | Relevant fields | Current behavior |
 |---|---|---|
-| `numeric-label` | `source`, optional `label`, `unit` | Displays a textual value. |
+| `numeric-label` | `source`, optional `label`, `unit`, `valueLabels`, `unknownValue`, `unknownLabel` | Displays a metric tile. `valueLabels` maps numeric codes to readable text; `unknownValue` replaces one sentinel value with `unknownLabel`. |
+| `status-label` | `source`, optional `label`, `trueLabel`, `falseLabel`, `trueTone`, `falseTone` | Maps a boolean/numeric state to two labels. Optional tones are `neutral`, `accent`, `success`, `warning`, or `danger`. |
 | `color-swatch` | `source` | Displays one generated hex-color HTTP field. |
 | `temperature-gauge` + `humidity-gauge` | each has `source` | The current generator renders these as a pair. |
 | `error-message` | `source` | Used by the temperature/humidity pair to show sensor error. |
@@ -860,7 +888,7 @@ ServiceRequestErrorCode MyDevice::service(
 }
 ```
 
-If a POD struct is copied directly, add a `static_assert(sizeof(StructName) == fixedBytes)` and make its byte order/padding part of the contract. See [include/devices/AdvancedControls.hpp](include/devices/AdvancedControls.hpp) and [DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp](DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp).
+If a POD struct is copied directly, add a `static_assert(sizeof(StructName) == fixedBytes)` and make its byte order/padding part of the contract. See [include/devices/AdvancedControls.hpp](include/devices/AdvancedControls.hpp) and [DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example](DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example).
 
 Advanced-control changes are runtime-only unless the class explicitly copies them into persistent storage and invokes the `persistentDataChanged` callback.
 
@@ -941,6 +969,7 @@ The generated integration includes:
 - room-widget JavaScript;
 - advanced-control templates and payload sizing;
 - device configuration fields and browser byte encoding.
+- schema-derived defaults and per-slot semantic/GPIO validation.
 
 The generators currently check important items such as:
 
@@ -950,13 +979,15 @@ The generators currently check important items such as:
 - registered header and source files exist;
 - schedule mode and fixed interval are valid;
 - ordinary byte ranges do not overlap;
+- configuration/state fields remain inside their 20-/50-byte areas;
 - at most eight visible custom configuration fields;
 - at most two select options;
 - advanced-controls template, services, settings button, and maximum payload.
 
-However, do not treat the generator as complete semantic proof. In particular, manually review:
+At runtime, configuration submission also checks JSON value types, exact slot/custom-byte counts, known enabled types, numeric/select bounds, board GPIO availability, ADC restrictions, and cross-slot GPIO conflicts. Only a fully valid six-slot set replaces the current RAM mirror and schedules a safe restart. Imported configuration files pass through the same generated slot validation.
 
-- the 20-byte configuration boundary and 50-byte state boundary;
+However, do not treat the generator as complete semantic proof. Configuration fields are checked against 20 bytes and state fields against 50 bytes, but still manually review:
+
 - service name/overload agreement with C++;
 - constructor signature agreement with factory argument order;
 - `descriptionCustomBytes` agreement with `httpFields` sources;
@@ -982,6 +1013,8 @@ Then test on hardware:
 - [ ] The generated type enum contains the selected symbol and value.
 - [ ] The type appears in the device configuration dropdown when configurable.
 - [ ] Every custom field renders and saves the expected NVM bytes.
+- [ ] A newly selected type renders valid, safe `default` values.
+- [ ] Duplicate, unavailable, out-of-range, and malformed GPIO configurations are rejected.
 - [ ] The device is reconstructed correctly after reboot.
 - [ ] `init()` leaves hardware in a safe state.
 - [ ] `cyclic()` follows the expected cadence and remains non-blocking.
@@ -1010,7 +1043,7 @@ The safest multi-node deployment is to build the same device catalog into every 
 | Configuration extends beyond byte 19 | NVM corruption or out-of-bounds access. | Draw and review a 20-byte layout. |
 | State extends beyond byte 49 | Description corruption. | Draw and review a 50-byte layout. |
 | JSON offset differs from C++ | Wrong dashboard/configuration values. | Keep one byte-layout table and test raw bytes. |
-| Assuming `default` initializes NVM | Fresh value remains zero. | Handle zero as the default or add explicit initialization/migration. |
+| Omitting a valid `default` for a nonzero-constrained field | A fresh type-selection form may submit zero and be rejected. | Declare a safe schema default and also handle corrupted/legacy bytes in C++. |
 | Unsupported custom `htmlType` | Field is not rendered. | Use the supported table or extend the generator. |
 | Unsupported room widget string | Control/readout is omitted. | Use current widgets or implement generator and HTTP support. |
 | Advertising a service only in JSON | UI request returns unsupported. | Implement the matching C++ overload. |

@@ -61,6 +61,96 @@ context.root.querySelector('[data-action="save"]').addEventListener('click', asy
 });
 </script>
 )HCSADV";
+inline const char advancedControlsTemplate_type_WINDOW_BLINDER[] = R"HCSADV(<div class="advanced-controls-form" data-role="window-blinder-controls">
+  <div class="advanced-status-card">
+    <div class="advanced-status-item"><span class="advanced-status-label">Motion</span><span class="advanced-status-value" data-field="motion">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Position</span><span class="advanced-status-value" data-field="position">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Upper limit</span><span class="advanced-status-value" data-field="upper">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Lower limit</span><span class="advanced-status-value" data-field="lower">—</span></div>
+    <div class="advanced-status-item wide"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault">—</span></div>
+  </div>
+  <div class="advanced-actions"><button class="advanced-action primary" data-action="open">Open blind</button><button class="advanced-action danger" data-action="stop">Stop</button><button class="advanced-action" data-action="close">Close blind</button></div>
+</div>
+<script type="application/x-hcs-advanced-controls">
+if (context.payload.length !== 6) { context.showError('Invalid WindowBlinder payload.'); return; }
+const labels = ['Stopped', 'Opening', 'Closing'];
+const position = context.payload[2] === 255 ? 'unknown' : `${context.payload[2]}%`;
+const faultLabels = ['Ready', 'Travel timeout', 'Limit conflict'];
+const motionValue = context.root.querySelector('[data-field="motion"]');
+const faultValue = context.root.querySelector('[data-field="fault"]');
+motionValue.textContent = labels[context.payload[1]] || 'Invalid'; motionValue.classList.add(context.payload[1] ? 'warn' : 'good');
+context.root.querySelector('[data-field="position"]').textContent = position;
+context.root.querySelector('[data-field="upper"]').textContent = context.payload[3] ? 'Reached' : 'Clear';
+context.root.querySelector('[data-field="lower"]').textContent = context.payload[4] ? 'Reached' : 'Clear';
+faultValue.textContent = faultLabels[context.payload[5]] || `Code ${context.payload[5]}`; faultValue.classList.add(context.payload[5] ? 'danger' : 'good');
+async function command(value) {
+  const next = new Uint8Array(context.payload); next[0] = value;
+  if (await context.save(next)) context.close();
+}
+context.root.querySelector('[data-action="stop"]').onclick = () => command(0);
+context.root.querySelector('[data-action="open"]').onclick = () => command(1);
+context.root.querySelector('[data-action="close"]').onclick = () => command(2);
+</script>)HCSADV";
+inline const char advancedControlsTemplate_type_GATE[] = R"HCSADV(<div class="advanced-controls-form" data-role="gate-controls">
+  <div class="advanced-status-card">
+    <div class="advanced-status-item"><span class="advanced-status-label">Motion</span><span class="advanced-status-value" data-field="motion">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Open limit</span><span class="advanced-status-value" data-field="opened">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Closed limit</span><span class="advanced-status-value" data-field="closed">—</span></div>
+  </div>
+  <div class="advanced-actions"><button class="advanced-action primary" data-action="open">Open gate</button><button class="advanced-action danger" data-action="stop">Stop</button><button class="advanced-action" data-action="close">Close gate</button></div>
+</div>
+<script type="application/x-hcs-advanced-controls">
+if (context.payload.length !== 5) { context.showError('Invalid Gate payload.'); return; }
+const motion = ['Stopped', 'Opening', 'Closing'][context.payload[1]] || 'Invalid';
+const faultLabels = ['Ready', 'Travel timeout', 'Limit conflict'];
+const motionValue = context.root.querySelector('[data-field="motion"]');
+const faultValue = context.root.querySelector('[data-field="fault"]');
+motionValue.textContent = motion; motionValue.classList.add(context.payload[1] ? 'warn' : 'good');
+faultValue.textContent = faultLabels[context.payload[4]] || `Code ${context.payload[4]}`; faultValue.classList.add(context.payload[4] ? 'danger' : 'good');
+context.root.querySelector('[data-field="opened"]').textContent = context.payload[2] ? 'Reached' : 'Clear';
+context.root.querySelector('[data-field="closed"]').textContent = context.payload[3] ? 'Reached' : 'Clear';
+async function command(value) { const next = new Uint8Array(context.payload); next[0] = value; if (await context.save(next)) context.close(); }
+context.root.querySelector('[data-action="stop"]').onclick = () => command(0);
+context.root.querySelector('[data-action="open"]').onclick = () => command(1);
+context.root.querySelector('[data-action="close"]').onclick = () => command(2);
+</script>)HCSADV";
+inline const char advancedControlsTemplate_type_AQUARIUM_CONTROLLER[] = R"HCSADV(<div class="advanced-controls-form" data-role="aquarium-controls">
+  <div class="advanced-status-card">
+    <div class="advanced-status-item"><span class="advanced-status-label">Water</span><span class="advanced-status-value" data-field="temperature">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Heater</span><span class="advanced-status-value" data-field="heater-state">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Water level</span><span class="advanced-status-value" data-field="water-state">—</span></div>
+    <div class="advanced-status-item"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault-state">—</span></div>
+  </div>
+  <label class="advanced-field"><span>Heater mode</span><select data-field="heater"><option value="0">Off</option><option value="1">Automatic thermostat</option><option value="2">Forced on (cutoffs active)</option></select></label>
+  <label class="advanced-switch"><span>Lighting</span><input data-field="light" type="checkbox"></label>
+  <label class="advanced-switch"><span>Filter pump</span><input data-field="filter" type="checkbox"></label>
+  <button class="advanced-primary" data-action="save">Apply changes</button>
+</div>
+<script type="application/x-hcs-advanced-controls">
+if (context.payload.length !== 10) { context.showError('Invalid AquariumController payload.'); return; }
+const rawTemperature = context.payload[6] | (context.payload[7] << 8);
+const signedTemperature = rawTemperature & 0x8000 ? rawTemperature - 0x10000 : rawTemperature;
+const temperatureState = context.root.querySelector('[data-field="temperature"]');
+const heaterState = context.root.querySelector('[data-field="heater-state"]');
+const waterState = context.root.querySelector('[data-field="water-state"]');
+const faultState = context.root.querySelector('[data-field="fault-state"]');
+temperatureState.textContent = context.payload[4] ? `${signedTemperature / 10} °C` : 'Sensor error';
+temperatureState.classList.add(context.payload[4] ? 'good' : 'danger');
+heaterState.textContent = context.payload[3] ? 'Heating' : 'Idle';
+heaterState.classList.add(context.payload[3] ? 'warn' : 'good');
+waterState.textContent = context.payload[5] ? 'Low' : 'Normal';
+waterState.classList.add(context.payload[5] ? 'danger' : 'good');
+const faultLabels = ['Ready', 'Probe error', 'Low water', 'Probe + water', 'Over temperature', 'Probe + over temp', 'Water + over temp', 'Multiple faults'];
+faultState.textContent = faultLabels[context.payload[8]] || `Code ${context.payload[8]}`;
+faultState.classList.add(context.payload[8] ? 'danger' : 'good');
+const heater = context.root.querySelector('[data-field="heater"]'); const light = context.root.querySelector('[data-field="light"]'); const filter = context.root.querySelector('[data-field="filter"]');
+heater.value = String(context.payload[0]); light.checked = context.payload[1] !== 0; filter.checked = context.payload[2] !== 0;
+context.root.querySelector('[data-action="save"]').onclick = async () => {
+  const next = new Uint8Array(context.payload); next[0] = Number(heater.value); next[1] = light.checked ? 1 : 0; next[2] = filter.checked ? 1 : 0;
+  if (await context.save(next)) context.close();
+};
+</script>)HCSADV";
 
 /** @brief Returns the device-provided advanced-controls template, or nullptr. */
 inline const char* find(uint8_t typeId)
@@ -68,6 +158,9 @@ inline const char* find(uint8_t typeId)
     switch (typeId)
     {
     case type_ONOFFDEVICE: return advancedControlsTemplate_type_ONOFFDEVICE;
+    case type_WINDOW_BLINDER: return advancedControlsTemplate_type_WINDOW_BLINDER;
+    case type_GATE: return advancedControlsTemplate_type_GATE;
+    case type_AQUARIUM_CONTROLLER: return advancedControlsTemplate_type_AQUARIUM_CONTROLLER;
     default:
         return nullptr;
     }

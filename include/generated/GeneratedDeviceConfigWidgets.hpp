@@ -29,6 +29,8 @@ struct FieldSpec
     const char* optionLabels[2];
     uint8_t optionCount;
     uint8_t arrayLength;
+    float displayScale;
+    uint16_t defaultValue;
 };
 
 /** @brief Configuration widget metadata for one enabled device type. */
@@ -63,16 +65,15 @@ inline void emitSelect(uint8_t slotNumber, const FieldSpec& field, uint16_t valu
 inline void emitGpioSelect(uint8_t slotNumber, const FieldSpec& field, uint16_t value, WiFiClient& client)
 {
     client.println("<label>" + String(field.label) + ":<select id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\">");
-    for (uint8_t pin = 0; pin < 32; ++pin)
+    for (int pin = field.minimum; pin <= field.maximum; ++pin)
     {
-        client.println(String("<option value=\"") + String((int)pin) + "\"" + (value == pin ? " selected" : "") + ">" + String((int)pin) + "</option>");
+        client.println(String("<option value=\"") + String(pin) + "\"" + (value == pin ? " selected" : "") + ">" + String(pin) + "</option>");
     }
     client.println("</select></label>");
 }
 
-inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, const FieldSpec& field, WiFiClient& client)
+inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, const FieldSpec& field, uint16_t value, WiFiClient& client)
 {
-    const uint16_t value = readValue(slot, field);
     const String htmlType = String(field.htmlType);
     if (htmlType == "select") { emitSelect(slotNumber, field, value, client); return; }
     if (htmlType == "gpio-select") { emitGpioSelect(slotNumber, field, value, client); return; }
@@ -81,9 +82,21 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
         client.println(String("<label><input id=\"") + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"checkbox\"" + (value ? " checked" : "") + "> " + String(field.label) + "</label>");
         return;
     }
-    if (htmlType == "range" || htmlType == "number")
+    if (htmlType == "range")
     {
         client.println("<label>" + String(field.label) + ":<input id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"" + htmlType + "\" min=\"" + String(field.minimum) + "\" max=\"" + String(field.maximum) + "\" value=\"" + String((int)value) + "\"></label>");
+        return;
+    }
+    if (htmlType == "number")
+    {
+        const float scale = field.displayScale > 0.0f ? field.displayScale : 1.0f;
+        const unsigned int decimals = scale > 1.0f ? 1u : 0u;
+        String minimum(field.minimum / scale, decimals);
+        String maximum(field.maximum / scale, decimals);
+        String step(1.0f / scale, decimals);
+        String displayedValue(value / scale, decimals);
+        minimum.trim(); maximum.trim(); step.trim(); displayedValue.trim();
+        client.println("<label>" + String(field.label) + ":<input id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"number\" min=\"" + minimum + "\" max=\"" + maximum + "\" step=\"" + step + "\" value=\"" + displayedValue + "\"></label>");
         return;
     }
     if (htmlType == "segment-array")
@@ -98,14 +111,46 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
 }
 
 inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
-    {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1"}, {"No", "Yes"}, 2, 0},
-        {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1"}, {"LOW (0)", "HIGH (1)"}, 2, 0},
-        {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0},
-        {"pwmMax", "Max PWM", "range", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 4},
+    {52, "AquariumController", "type_AQUARIUM_CONTROLLER", {{"aquariumHeaterPin", "Heater GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"aquariumLightPin", "Light GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"aquariumFilterPin", "Filter GPIO", "gpio-select", 2, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"aquariumWaterPin", "Low-water GPIO (255 = none)", "number", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
+        {"aquariumOutputLevel", "Output active level", "select", 4, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
+        {"aquariumSetpoint", "Temperature setpoint [\u00b0C]", "number", 5, 2, 50, 400, {"", ""}, {"", ""}, 0, 0, 10.0, 250},
+        {"aquariumHysteresis", "Thermostat hysteresis [\u00b0C]", "number", 7, 2, 1, 50, {"", ""}, {"", ""}, 0, 0, 10.0, 5},
+        {"aquariumMaximum", "Heater cutoff [\u00b0C]", "number", 9, 2, 50, 600, {"", ""}, {"", ""}, 0, 0, 10.0, 320}}, 8},
+    {51, "Gate", "type_GATE", {{"gateM1Close", "Motor 1 CLOSE GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"gateM2Open", "Motor 2 OPEN GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"gateM2Close", "Motor 2 CLOSE GPIO", "gpio-select", 2, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"gateOpenedLimit", "Opened limit GPIO (255 = none)", "number", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
+        {"gateClosedLimit", "Closed limit GPIO (255 = none)", "number", 4, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
+        {"gateMotorCount", "Motor count", "select", 5, 1, 0, 255, {"1", "2"}, {"Single motor", "Double motor"}, 2, 0, 1.0, 1},
+        {"gateOutputLevel", "Motor output level", "select", 6, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
+        {"gateTimeout", "Travel safety timeout [s]", "number", 7, 2, 1, 900, {"", ""}, {"", ""}, 0, 0, 1.0, 60}}, 8},
+    {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1"}, {"No", "Yes"}, 2, 0, 1.0, 1},
+        {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1"}, {"LOW (0)", "HIGH (1)"}, 2, 0, 1.0, 0},
+        {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"pwmMax", "Max PWM", "range", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 4},
+    {49, "WindowBlinder", "type_WINDOW_BLINDER", {{"blindDownPin", "Motor DOWN GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"blindUpperLimit", "Upper limit GPIO (255 = none)", "number", 1, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
+        {"blindLowerLimit", "Lower limit GPIO (255 = none)", "number", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
+        {"blindOutputLevel", "Motor output level", "select", 3, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
+        {"blindLimitLevel", "Limit active level", "select", 4, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
+        {"blindOpenTimeout", "Open safety timeout [s]", "number", 5, 2, 1, 600, {"", ""}, {"", ""}, 0, 0, 1.0, 30},
+        {"blindCloseTimeout", "Close safety timeout [s]", "number", 7, 2, 1, 600, {"", ""}, {"", ""}, 0, 0, 1.0, 30},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 7},
+    {50, "WindowDoorSensor", "type_WINDOW_DOOR_SENSOR", {{"contactClosedLevel", "Closed contact level", "select", 0, 1, 0, 255, {"0", "1"}, {"LOW = closed", "HIGH = closed"}, 2, 0, 1.0, 0},
+        {"contactPullup", "Input mode", "select", 1, 1, 0, 255, {"0", "1"}, {"External bias", "Internal pull-up"}, 2, 0, 1.0, 1},
+        {"contactDebounce", "Debounce [ms]", "number", 2, 2, 10, 5000, {"", ""}, {"", ""}, 0, 0, 1.0, 50},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
 };
 
 /** @brief Emits the device type selector for one NVM configuration slot. */
@@ -129,7 +174,11 @@ inline void emitGeneratedCustomFields(uint8_t slotNumber, uint8_t deviceType, co
     for (const auto& spec : kKnownDeviceTypeWidgetSpecs)
     {
         client.println("<div class=\"extra-fields extra-" + String((int)spec.typeId) + "\">");
-        for (uint8_t field = 0; field < spec.fieldCount; ++field) { emitField(slotNumber, slot, spec.fields[field], client); }
+        for (uint8_t field = 0; field < spec.fieldCount; ++field)
+        {
+            const uint16_t value = deviceType == spec.typeId ? readValue(slot, spec.fields[field]) : spec.fields[field].defaultValue;
+            emitField(slotNumber, slot, spec.fields[field], value, client);
+        }
         client.println("</div>");
     }
 }

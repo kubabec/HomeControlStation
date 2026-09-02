@@ -1,0 +1,44 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": { "name": "WindowBlinder", "className": "WindowBlinder", "enumSymbol": "type_WINDOW_BLINDER", "enumValue": 49 },
+  "implementation": {
+    "header": "include/devices/WindowBlinder/WindowBlinder.hpp", "source": "src/device/WindowBlinder/WindowBlinder.cpp", "buildGuard": null,
+    "dependencies": ["Arduino GPIO", "two interlocked relay/driver inputs"], "factory": { "arguments": ["config"] },
+    "manager": { "registered": true, "collection": "DeviceManager::devices", "includedInDeviceCollection": true }
+  },
+  "lifecycle": { "init": { "actions": ["deactivate both motor outputs", "configure optional limits"] }, "update": { "entryPoint": "cyclic", "schedule": { "mode": "every_manager_cycle" } } },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" }, { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "upPin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" }, { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" }, { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "downPin", "type": "uint8", "label": "Motor DOWN GPIO", "fieldId": "blindDownPin", "htmlType": "gpio-select", "offset": 0, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select" },
+      { "name": "upperLimitPin", "type": "uint8", "label": "Upper limit GPIO (255 = none)", "fieldId": "blindUpperLimit", "htmlType": "number", "offset": 1, "size": 1, "minimum": 0, "maximum": 255, "default": 255, "widget": "number" },
+      { "name": "lowerLimitPin", "type": "uint8", "label": "Lower limit GPIO (255 = none)", "fieldId": "blindLowerLimit", "htmlType": "number", "offset": 2, "size": 1, "minimum": 0, "maximum": 255, "default": 255, "widget": "number" },
+      { "name": "outputActiveHigh", "type": "boolean", "label": "Motor output level", "fieldId": "blindOutputLevel", "htmlType": "select", "offset": 3, "size": 1, "widget": "select", "options": [{ "value": 0, "label": "Active LOW" }, { "value": 1, "label": "Active HIGH" }] },
+      { "name": "limitActiveHigh", "type": "boolean", "label": "Limit active level", "fieldId": "blindLimitLevel", "htmlType": "select", "offset": 4, "size": 1, "widget": "select", "options": [{ "value": 0, "label": "Active LOW" }, { "value": 1, "label": "Active HIGH" }] },
+      { "name": "openTimeoutSeconds", "type": "uint16", "label": "Open safety timeout [s]", "fieldId": "blindOpenTimeout", "htmlType": "number", "offset": 5, "size": 2, "minimum": 1, "maximum": 600, "default": 30, "widget": "number" },
+      { "name": "closeTimeoutSeconds", "type": "uint16", "label": "Close safety timeout [s]", "fieldId": "blindCloseTimeout", "htmlType": "number", "offset": 7, "size": 2, "minimum": 1, "maximum": 600, "default": 30, "widget": "number" }
+    ]
+  },
+  "services": [
+    { "name": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "controls", "type": "byte[6]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "6" }] },
+    { "name": "DEVSERVICE_SET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "command", "type": "byte[6]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "6" }] }
+  ],
+  "state": {
+    "enabledSemantics": "motor is moving", "descriptionCustomBytes": [
+      { "name": "motion", "type": "enum", "offset": 0, "size": 1 }, { "name": "position", "type": "uint8", "offset": 1, "size": 1 },
+      { "name": "upperLimit", "type": "boolean", "offset": 2, "size": 1 }, { "name": "lowerLimit", "type": "boolean", "offset": 3, "size": 1 }, { "name": "fault", "type": "uint8", "offset": 4, "size": 1 }
+    ],
+    "httpFields": [{ "name": "motion", "type": "uint8", "source": "customBytes[0]" }, { "name": "position", "type": "uint8", "source": "customBytes[1]" }, { "name": "fault", "type": "uint8", "source": "customBytes[4]" }]
+  },
+  "ui": {
+    "roomWidget": "generateWindowBlinderWidget", "advancedControls": { "template": "include/devices/WindowBlinder/AdvancedControls.html", "payloadSize": { "fixedBytes": 6 } },
+    "controls": [{ "name": "advanced", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" }],
+    "readouts": [{ "name": "position", "widget": "numeric-label", "source": "position", "label": "Position", "unit": "%", "unknownValue": 255, "unknownLabel": "Not calibrated" }, { "name": "fault", "widget": "numeric-label", "source": "fault", "label": "Safety status", "valueLabels": { "0": "Ready", "1": "Travel timeout", "2": "Limit conflict" } }]
+  },
+  "extendedMemory": { "required": false, "size": 0 },
+  "limitations": ["Position is estimated only after a limit establishes a known endpoint.", "GPIO 255 disables a limit input; motor interlocking/contactors remain mandatory."]
+}

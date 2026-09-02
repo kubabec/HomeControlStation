@@ -18,6 +18,24 @@ ExtendedDataAllocator DeviceManager::extDataAllocator;
 std::vector<std::unique_ptr<Device>> DeviceManager::devices;
 std::vector<uint32_t> DeviceManager::lastDeviceCycleTimes;
 
+namespace
+{
+constexpr size_t CONFIGURABLE_GPIO_COUNT = 49;
+
+bool validateConfigurationSet(const ConfigSlotsDataType& configuration)
+{
+    bool claimedPins[CONFIGURABLE_GPIO_COUNT] = {};
+    for (const auto& slot : configuration.slots)
+    {
+        if (slot.isActive && !GeneratedDeviceRegistry::validateConfiguration(slot, claimedPins, CONFIGURABLE_GPIO_COUNT))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+}
+
 void DeviceManager::deinit()
 {
     flushNvmData();
@@ -63,6 +81,7 @@ void DeviceManager::init()
         {
 
             uint8_t numberOfSuccessfullyRetrievedDevices = 0;
+            bool claimedPins[CONFIGURABLE_GPIO_COUNT] = {};
 
             /* For each DEVICE relevant datablock */
             for (uint8_t datablock = e_BLOCK_DEVICE_1; datablock <= e_BLOCK_DEVICE_6; datablock++)
@@ -80,7 +99,7 @@ void DeviceManager::init()
                 /* Now NVM data of current datablock shall be inside of 'configBlock' variable */
 
                 /* Try to extract (add to devices vector) device based on NVM data */
-                if (extractDeviceInstanceBasedOnNvmData(*configBlock, datablock))
+                if (extractDeviceInstanceBasedOnNvmData(*configBlock, datablock, claimedPins, CONFIGURABLE_GPIO_COUNT))
                 {
                     numberOfSuccessfullyRetrievedDevices++;
                 }
@@ -287,7 +306,11 @@ void DeviceManager::updateDeviceDescriptionSignal()
     DataContainer::setSignalValue(SIG_LOCAL_COLLECTION, Descriptions);
 }
 
-bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nvmData, uint8_t configSlotID)
+bool DeviceManager::extractDeviceInstanceBasedOnNvmData(
+    DeviceConfigSlotType &nvmData,
+    uint8_t configSlotID,
+    bool* claimedPins,
+    size_t claimedPinCount)
 {
     bool isValidDeviceGiven = false;
 
@@ -295,7 +318,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
     if (nvmData.isActive)
     {
         /* Is known and valid device type inside?*/
-        if (nvmData.isValid())
+        if (nvmData.isValid() && GeneratedDeviceRegistry::validateConfiguration(nvmData, claimedPins, claimedPinCount))
         {
 
             GeneratedDeviceRegistry::RuntimeContext context = {
@@ -365,7 +388,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
             /* Handle errors only when device is properly configured */
             if (currentConfig.networkSSID[0] != '\0')
             {
-                Logger::log("Invalid Device type for config slot : " + String((int)configSlotID));
+                Logger::log("Invalid device type or GPIO configuration for config slot: " + String((int)configSlotID));
             }
         }
     }
@@ -487,6 +510,12 @@ bool DeviceManager::loadConfigFromFile(JsonDocument &doc)
         // configSlot.print();
     }
 
+    if (!validateConfigurationSet(receivedConfigurationSet))
+    {
+        Logger::log("DeviceManager: imported configuration contains invalid or conflicting GPIO assignments");
+        return true;
+    }
+
     pinConfigSlotsRamMirror = receivedConfigurationSet;
 
     /* no failure */
@@ -522,6 +551,14 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
     for (uint16_t i = 0; i < devicesJson.size(); ++i)
     {
         JsonObject deviceJson = devicesJson[i];
+        if (!deviceJson["id"].is<uint8_t>() || !deviceJson["typeId"].is<uint8_t>() ||
+            !deviceJson["enabled"].is<bool>() || !deviceJson["name"].is<const char*>() ||
+            !deviceJson["pin"].is<uint8_t>() || !deviceJson["room"].is<uint8_t>() ||
+            !deviceJson["customBytes"].is<JsonArray>())
+        {
+            Logger::log("DeviceManager: invalid configuration value type");
+            return false;
+        }
         const uint8_t id = deviceJson["id"] | 255;
         const uint8_t typeId = deviceJson["typeId"] | 255;
         if (id != i + 1)
@@ -532,8 +569,14 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
 
         DeviceConfigSlotType &configSlot = receivedConfigurationSet.slots.at(i);
         const auto* registration = GeneratedDeviceRegistry::find(typeId);
+        const bool enabled = deviceJson["enabled"].as<bool>();
+        if (enabled && registration == nullptr)
+        {
+            Logger::log("DeviceManager: active slot uses an unknown device type");
+            return false;
+        }
         configSlot.deviceType = registration ? typeId : 255;
-        configSlot.isActive = registration && (deviceJson["enabled"] | false);
+        configSlot.isActive = registration && enabled;
         configSlot.deviceId = id;
         configSlot.pinNumber = deviceJson["pin"] | 255;
         configSlot.roomId = deviceJson["room"] | 255;
@@ -554,8 +597,19 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
         }
         for (uint8_t byte = 0; byte < customBytes.size() && byte < sizeof(configSlot.customBytes); ++byte)
         {
-            configSlot.customBytes[byte] = customBytes[byte] | 0;
+            if (!customBytes[byte].is<uint8_t>())
+            {
+                Logger::log("DeviceManager: invalid custom byte value");
+                return false;
+            }
+            configSlot.customBytes[byte] = customBytes[byte].as<uint8_t>();
         }
+    }
+
+    if (!validateConfigurationSet(receivedConfigurationSet))
+    {
+        Logger::log("DeviceManager: invalid or conflicting GPIO configuration");
+        return false;
     }
 
     pinConfigSlotsRamMirror = receivedConfigurationSet;

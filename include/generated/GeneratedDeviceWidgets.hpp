@@ -8,13 +8,21 @@
 #include <Arduino.h>
 #include "SystemDefinition.hpp"
 #include "generated/widgets/GeneratedOnOffWidget.hpp"
+#include "generated/widgets/GeneratedWindowBlinderWidget.hpp"
+#include "generated/widgets/GeneratedWindowDoorSensorWidget.hpp"
+#include "generated/widgets/GeneratedGateWidget.hpp"
+#include "generated/widgets/GeneratedAquariumControllerWidget.hpp"
 
 /** @brief Builds the JavaScript widget bundle and generated type dispatcher. */
 inline String buildGeneratedDeviceWidgetsJs()
 {
     String widgets;
     widgets += generatedOnOffWidgetJs;
-    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){case 43: generateOnOffWidget(deviceContainer,device); return true;default:return false;}}";
+widgets += generatedWindowBlinderWidgetJs;
+widgets += generatedWindowDoorSensorWidgetJs;
+widgets += generatedGateWidgetJs;
+widgets += generatedAquariumControllerWidgetJs;
+    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){case 43: generateOnOffWidget(deviceContainer,device); return true;case 49: generateWindowBlinderWidget(deviceContainer,device); return true;case 50: generateWindowDoorSensorWidget(deviceContainer,device); return true;case 51: generateGateWidget(deviceContainer,device); return true;case 52: generateAquariumControllerWidget(deviceContainer,device); return true;default:return false;}}";
     return widgets;
 }
 

@@ -20,12 +20,12 @@ flowchart TB
     subgraph BuildTime["BUILD TIME — PlatformIO pre-build"]
         Clean["Delete include/generated/"]
         Validate["Discover and validate<br/>include/devices/*/*.json"]
-        Generate["Generate type registry, factory,<br/>serializers, widgets and templates"]
+        Generate["Generate type registry, factory,<br/>serializers, widgets, defaults,<br/>templates and slot validators"]
     end
 
     subgraph Platform["PLATFORM — device-independent firmware"]
         OS["OperatingSystem<br/>fixed-rate scheduler"]
-        NVM["ConfigProvider + NVM<br/>six local configuration slots"]
+        NVM["ConfigProvider + persistent memory<br/>six local configuration slots"]
         DM["DeviceManager<br/>owns vector of Device pointers"]
         DC["DataContainer<br/>signals and callback APIs"]
         DP["DeviceProvider<br/>one public catalog and service API"]
@@ -114,7 +114,7 @@ When active descriptions exist, all device-dependent outputs are recreated under
 
 ### Active catalog versus predefined catalog
 
-A clean checkout keeps only the shared interface files in `include/devices` and no concrete sources under `src/device`; packages under `DevicesPredefined` are inert. Before building a firmware preset, overlay both the `include/` and `src/` trees of each wanted package onto the project. The registry generator scans only the active descriptions, while PlatformIO compiles only active sources under `src`. This keeps unrelated device implementations out of compilation.
+Packages under `DevicesPredefined` are always inert. The device set for a firmware image is the concrete package directories currently copied into `include/devices` and `src/device`. Before building a preset, use the catalog helper to overlay both trees of every wanted package. Activation is additive and copies files rather than linking them, so it neither removes other active packages nor propagates later catalog edits automatically. The registry generator scans only active descriptions, while PlatformIO compiles only active sources under `src`.
 
 For example, an OnOff-only preset contains active `include/devices/OnOffDevice` and `src/device/OnOffDevice` trees copied from the matching predefined overlay. LED device packages also require both trees from the `DevicesPredefined/LedStrip` support package. See `DevicesPredefined/README.md` for exact selection and dependency instructions.
 
@@ -125,7 +125,7 @@ For example, an OnOff-only preset contains active `include/devices/OnOffDevice` 
 | `deviceType` | Stable `DevType`, names, known-type lookup | NVM validation, HTTP state |
 | `implementation` | Guarded include and factory case | `DeviceManager` |
 | `lifecycle.update.schedule` | `cycleIntervalMs` registration metadata | `DeviceManager::cyclic()` |
-| `configuration.customBytes` | Browser encoder and configuration controls | HTTP configuration page |
+| `configuration.customBytes` | Browser encoder, defaults, value checks and GPIO claims | HTTP configuration page and `DeviceManager` |
 | `state.httpFields` | `DeviceDescription::customBytes` serializer | Dashboard JSON |
 | `ui.controls` and `ui.readouts` | Per-device room widget JavaScript | Dashboard renderer |
 | `ui.advancedControls` | Embedded HTML pattern and payload sizing | Generic advanced-controls loader |
@@ -151,11 +151,11 @@ sequenceDiagram
     OS->>DC: publish node role and callbacks
     OS->>DM: init()
     loop six NVM device slots
-        DM->>Registry: is this type known and enabled?
-        alt known registered type
+        DM->>Registry: validate known type, values and GPIO claims
+        alt enabled and valid registered type
             DM->>Registry: create(typeId, config, RuntimeContext)
             Registry-->>DM: unique_ptr<Device>
-        else unknown, disabled, or empty catalog
+        else unknown, disabled, conflicting, malformed, or empty catalog
             Registry-->>DM: nullptr
         end
     end
@@ -184,6 +184,48 @@ flowchart LR
 ```
 
 The one-second state publication is independent of the device's own acquisition interval. A sensor may acquire once per minute while the dashboard and UDP node hash continue using the latest state.
+
+### Local configuration, persistence, and restart
+
+The `/localDevices` page renders common slot fields plus generated controls for every active type. When a slot changes to another type, controls use schema `default` values rather than unrelated zero-filled bytes. Defaults are presentation values until Save; stored values are preserved when rendering an existing slot of the same type.
+
+Configuration replacement is transactional across all six slots:
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant HTTP as HTTP handler
+    participant DM as DeviceManager
+    participant Registry as Generated validator
+    participant OS as OperatingSystem
+    participant Config as ConfigProvider
+    participant PM as PersistentMemoryAccess
+
+    Browser->>HTTP: submit six slots and 20 custom bytes each
+    HTTP->>DM: setLocalSetupViaJson(payload)
+    DM->>DM: validate JSON types, IDs, names and exact lengths
+    loop every enabled slot
+        DM->>Registry: validateConfiguration(slot, claimed GPIO map)
+        Registry->>Registry: check known type, bounds/options,<br/>GPIO range, ADC role and conflicts
+    end
+    alt any slot invalid
+        DM-->>HTTP: false; retain current RAM mirror
+        Note over DM,OS: no restart is scheduled
+    else complete set valid
+        DM->>DM: replace configuration RAM mirror
+        DM->>OS: schedule reset after response delay
+        OS->>DM: deinit()
+        DM->>Config: write six device blocks to merged RAM mirror
+        OS->>Config: deinit() last
+        Config->>PM: save merged image and safe-shutdown flag
+        PM->>PM: commit full-width checksum
+        OS->>OS: ESP.restart()
+    end
+```
+
+Generated GPIO ownership is global to all enabled local slots. Required pins must fit the current ESP32-S3 target (`0..48`, excluding `22..32`), optional fields may use `255`, and no two claimed fields may share a GPIO. A common field marked `hardwareRole: "adc"` is restricted to Wi-Fi-safe ADC1 GPIO `1..10`. Device-specific numeric bounds and select options are generated from JSON. More complex relationships and all service payloads remain the responsibility of C++.
+
+The same generated validation runs while restoring NVM, before device construction. A malformed or conflicting persisted slot is skipped, so it cannot initialize GPIO hardware; valid later slots can still load because GPIO claims are transactional per slot. Type IDs and byte layouts are permanent deployed contracts: changing their meaning requires an explicit migration rather than silently reusing existing NVM bytes.
 
 ## 4. One public device catalog
 
@@ -322,8 +364,9 @@ flowchart TD
     B --> C["3. Implement init, cyclic, description,<br/>identity, memory and service behavior"]
     C --> D["4. Describe constructor arguments and<br/>optional build guard in MyDevice.json"]
     D --> E["5. Describe schedule, configuration bytes,<br/>state fields, services and room UI"]
-    E --> F{"Advanced popup required?"}
-    F -- no --> G["6. Run platformio run"]
+    E --> E2["6. Declare safe field defaults,<br/>bounds and GPIO/ADC roles"]
+    E2 --> F{"Advanced popup required?"}
+    F -- no --> G["7. Run platformio run"]
     F -- yes --> H["Add device-owned HTML controller<br/>and fixed or bounded payload size"]
     H --> G
     G --> I{"Generator validation passes?"}
@@ -360,6 +403,8 @@ Use `include/devices/device.schema.json` and a predefined description such as `D
 8. UI controls reference services actually implemented by the class.
 9. Advanced-control fixed or maximum dynamic payload size does not exceed 391 bytes.
 10. C++ `static_assert` checks any packed binary layout shared with HTML.
+11. Every nonzero-constrained generated control has a safe `default`.
+12. GPIO fields declare valid bounds and optionality; ADC common pins use `hardwareRole: "adc"`, and conditional GPIOs use `claimWhen` when needed.
 
 ### Network deployment rule
 
@@ -387,7 +432,7 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Slave discovery responses and RC handling | `src/os/app/remoteControl/remoteControlClient.cpp` |
 | Master remote ID mapping | `src/os/app/RemoteDevicesManager.cpp` |
 | HTTP server and dashboard | `src/os/app/http/` and `include/os/app/http/` |
-| Predefined device examples | `DevicesPredefined/OnOffDevice/` and `DevicesPredefined/LedWS1228bDeviceType/` |
+| Predefined device examples | `DevicesPredefined/` (OnOff, button, DHT, LED, blind, contact, gate, and aquarium packages) |
 | Preset selection instructions | `DevicesPredefined/README.md` |
 
 ## 8. Timing and limits quick reference
@@ -402,10 +447,13 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Master discovery retry during normal operation | Every 30 seconds |
 | Master keep-alive scheduling | Requests are considered every 2.3 seconds; each node is rate-limited by its own request timestamp |
 | Local NVM device slots | 6 |
+| Configuration custom bytes per slot | 20 |
+| Required GPIO range | `0..48`, excluding ESP32-S3 `22..32`; claimed assignments must be unique |
+| Wi-Fi-safe ADC role | ADC1 GPIO `1..10` |
 | Reserved unknown device type | 255 |
 | Device description custom bytes | 50 |
 | Generic advanced-control payload | Maximum 391 bytes |
 
 ---
 
-**Mental model:** JSON describes integration, generated code connects it, `DeviceManager` owns local instances, `DataContainer` distributes state and APIs, `DeviceProvider` hides local-versus-remote routing, and the RC server/client pair carries the same service and description model across UDP.
+**Mental model:** JSON describes integration, defaults, and hardware claims; generated code connects and validates it; `DeviceManager` transactionally persists and owns local instances; `DataContainer` distributes state and APIs; `DeviceProvider` hides local-versus-remote routing; and the RC server/client pair carries the same service and description model across UDP.

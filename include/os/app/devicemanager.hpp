@@ -56,7 +56,11 @@ class DeviceManager
      * @param configSlotID Slot index associated with the entity.
      * @return true when the instance could be created from the requested slot; false otherwise.
      */
-    static bool extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType& nvmData, uint8_t configSlotID);
+    static bool extractDeviceInstanceBasedOnNvmData(
+        DeviceConfigSlotType& nvmData,
+        uint8_t configSlotID,
+        bool* claimedPins,
+        size_t claimedPinCount);
 
 
 public:

@@ -11,12 +11,16 @@
 
 > **Adding hardware support?** Follow [Adding a new device type](ADDING_A_NEW_DEVICE_TYPE.md) for the C++ interface, JSON metadata, services, generated UI, byte layouts, and optional advanced controls.
 
-> **Building a device preset?** A clean checkout contains no active concrete devices. Overlay both the `include/` and `src/` trees of only the required packages from [DevicesPredefined](DevicesPredefined) before running `platformio run`.
+> **Building a device preset?** The concrete devices compiled into a firmware image are the package directories currently present under `include/devices/` and `src/device/`. Use the additive activation helper documented in [DevicesPredefined](DevicesPredefined) to copy complete opt-in packages, then run `platformio run`.
 
 **HomeControlStation** is an open source project developed in order to simplify usage of cheap ESP32 board to control popular home automation usecases, e.g.:
 - Light switching
 - Color LED strip with customization
 - Temperature check
+- Window and door contact monitoring
+- Roller blind and shutter control
+- Gate controller integration
+- Aquarium temperature, heater, light, and filter control
 - RC via customizable IrDA controler
 
 ![System overview](https://github.com/kubabec/HomeControlStation/blob/main/ArchitectureOverview.png "System overview")
@@ -41,6 +45,15 @@ Future plans:
 
 
 ## Usage
+
+Activate the required predefined device packages before building. For example:
+
+```sh
+sh DevicesPredefined/activate-examples.sh OnOffDevice WindowDoorSensor WindowBlinder
+platformio run
+```
+
+Activation copies package files; it does not remove other active types or link them to the predefined catalog. See [DevicesPredefined/README.md](DevicesPredefined/README.md) for the complete package table, dependencies, removal process, GPIO validation rules, and configuration workflow.
 
 GPIO pin must be connected either to PWM controlled external switch module (e.g. to control cheap LED chain) or directly to relay switch pin to control On/Off device with possible brigthness adjustment via PWM.  
 

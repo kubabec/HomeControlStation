@@ -26,7 +26,7 @@ document.addEventListener('visibilitychange', () => {\
   } else {\
     interfaceVisible = true;\
     currentData = {};\
-    fetchData();\
+    if (typeof fetchData === 'function') fetchData();\
 }});\
 function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
     const xhr = new XMLHttpRequest();\
@@ -89,8 +89,11 @@ let isNotificationPollingActive = 1;\
         createAsyncRequestWithRenderRoomsResponse(url, container);\
     }\
     function toggleDeviceConfig(checkbox) {\
+        if (!checkbox) return;\
         var container = checkbox.closest('.device-container');\
+        if (!container) return;\
         var statusText = container.querySelector('.status-text');\
+        if (!statusText) return;\
         if (checkbox.checked) {\
             container.classList.remove('disabled');\
             statusText.textContent = 'Enabled';\
@@ -103,6 +106,7 @@ let isNotificationPollingActive = 1;\
     }\
     function showExtraFields(select, deviceId) {\
         const deviceContainer = document.getElementById(deviceId);\
+        if (!select || !deviceContainer) return;\
         const extraFields = deviceContainer.querySelectorAll('.extra-fields');\
         extraFields.forEach(field => {\
             field.classList.remove('visible');\
@@ -139,18 +143,16 @@ let isNotificationPollingActive = 1;\
     window.onload = function() {\
         document.querySelectorAll('.device-container').forEach(container => {\
             var checkbox = container.querySelector('input[type=\"checkbox\"]');\
+            if (!checkbox || !container.querySelector('.status-text')) return;\
             toggleDeviceConfig(checkbox);\
             checkbox.addEventListener('change', function() {\
                 toggleDeviceConfig(this);\
             });\
         });\
 \
-        showExtraFields(document.getElementById('type1'), 'device-1');\
-        showExtraFields(document.getElementById('type2'), 'device-2');\
-        showExtraFields(document.getElementById('type3'), 'device-3');\
-        showExtraFields(document.getElementById('type4'), 'device-4');\
-        showExtraFields(document.getElementById('type5'), 'device-5');\
-        showExtraFields(document.getElementById('type6'), 'device-6');\
+        for (let slot = 1; slot <= 6; slot++) {\
+            showExtraFields(document.getElementById('type' + slot), 'device-' + slot);\
+        }\
     };\
 \
 \
@@ -490,7 +492,7 @@ async function sendAdvancedControls(deviceId, payload, additionalParam = 255){\
     try {\
         const response = await fetch('/setAdvancedControls&' + request, {method:'POST'});\
         if (!response.ok) return false;\
-        await fetchData();\
+        if (typeof fetchData === 'function') await fetchData();\
         return true;\
     } catch (error) {\
         console.error('Advanced-controls update failed:', error);\

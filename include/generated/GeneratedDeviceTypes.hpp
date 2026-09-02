@@ -11,7 +11,11 @@
 
 enum DevType : uint8_t
 {
-    type_ONOFFDEVICE = 43
+    type_ONOFFDEVICE = 43,
+    type_WINDOW_BLINDER = 49,
+    type_WINDOW_DOOR_SENSOR = 50,
+    type_GATE = 51,
+    type_AQUARIUM_CONTROLLER = 52
 };
 
 namespace GeneratedDeviceTypes
@@ -24,7 +28,11 @@ struct DeviceTypeInfo
 };
 
 inline constexpr DeviceTypeInfo kKnownTypes[] = {
-    {43, "OnOff"}
+    {43, "OnOff"},
+    {49, "WindowBlinder"},
+    {50, "WindowDoorSensor"},
+    {51, "Gate"},
+    {52, "AquariumController"}
 };
 
 /** @brief Finds known type metadata by persistent numeric identifier. */

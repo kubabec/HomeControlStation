@@ -1,0 +1,41 @@
+{
+  "$schema": "../device.schema.json", "schemaVersion": 1,
+  "deviceType": { "name": "Gate", "className": "Gate", "enumSymbol": "type_GATE", "enumValue": 51 },
+  "implementation": {
+    "header": "include/devices/Gate/Gate.hpp", "source": "src/device/Gate/Gate.cpp", "buildGuard": null,
+    "dependencies": ["Arduino GPIO", "certified gate motor controllers/contactors"], "factory": { "arguments": ["config"] },
+    "manager": { "registered": true, "collection": "DeviceManager::devices", "includedInDeviceCollection": true }
+  },
+  "lifecycle": { "init": { "actions": ["force all motor outputs inactive", "configure active-LOW endpoint inputs"] }, "update": { "entryPoint": "cyclic", "schedule": { "mode": "every_manager_cycle" } } },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" }, { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "motor1OpenPin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" }, { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" }, { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "motor1ClosePin", "type": "uint8", "label": "Motor 1 CLOSE GPIO", "fieldId": "gateM1Close", "htmlType": "gpio-select", "offset": 0, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select" },
+      { "name": "motor2OpenPin", "type": "uint8", "label": "Motor 2 OPEN GPIO", "fieldId": "gateM2Open", "htmlType": "gpio-select", "offset": 1, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select", "claimWhen": { "offset": 5, "equals": 2 } },
+      { "name": "motor2ClosePin", "type": "uint8", "label": "Motor 2 CLOSE GPIO", "fieldId": "gateM2Close", "htmlType": "gpio-select", "offset": 2, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select", "claimWhen": { "offset": 5, "equals": 2 } },
+      { "name": "openedLimitPin", "type": "uint8", "label": "Opened limit GPIO (255 = none)", "fieldId": "gateOpenedLimit", "htmlType": "number", "offset": 3, "size": 1, "minimum": 0, "maximum": 255, "default": 255, "widget": "number" },
+      { "name": "closedLimitPin", "type": "uint8", "label": "Closed limit GPIO (255 = none)", "fieldId": "gateClosedLimit", "htmlType": "number", "offset": 4, "size": 1, "minimum": 0, "maximum": 255, "default": 255, "widget": "number" },
+      { "name": "motorCount", "type": "uint8", "label": "Motor count", "fieldId": "gateMotorCount", "htmlType": "select", "offset": 5, "size": 1, "default": 1, "widget": "select", "options": [{ "value": 1, "label": "Single motor" }, { "value": 2, "label": "Double motor" }] },
+      { "name": "outputActiveHigh", "type": "boolean", "label": "Motor output level", "fieldId": "gateOutputLevel", "htmlType": "select", "offset": 6, "size": 1, "widget": "select", "options": [{ "value": 0, "label": "Active LOW" }, { "value": 1, "label": "Active HIGH" }] },
+      { "name": "travelTimeoutSeconds", "type": "uint16", "label": "Travel safety timeout [s]", "fieldId": "gateTimeout", "htmlType": "number", "offset": 7, "size": 2, "minimum": 1, "maximum": 900, "default": 60, "widget": "number" }
+    ]
+  },
+  "services": [
+    { "name": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "controls", "type": "byte[5]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "5" }] },
+    { "name": "DEVSERVICE_SET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "command", "type": "byte[5]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "5" }] }
+  ],
+  "state": {
+    "enabledSemantics": "gate motors are commanded", "descriptionCustomBytes": [{ "name": "motion", "type": "enum", "offset": 0, "size": 1 }, { "name": "opened", "type": "boolean", "offset": 1, "size": 1 }, { "name": "closed", "type": "boolean", "offset": 2, "size": 1 }, { "name": "fault", "type": "uint8", "offset": 3, "size": 1 }, { "name": "motorCount", "type": "uint8", "offset": 4, "size": 1 }],
+    "httpFields": [{ "name": "motion", "type": "uint8", "source": "customBytes[0]" }, { "name": "opened", "type": "boolean", "source": "customBytes[1]" }, { "name": "closed", "type": "boolean", "source": "customBytes[2]" }, { "name": "fault", "type": "uint8", "source": "customBytes[3]" }]
+  },
+  "ui": {
+    "roomWidget": "generateGateWidget", "advancedControls": { "template": "include/devices/Gate/AdvancedControls.html", "payloadSize": { "fixedBytes": 5 } },
+    "controls": [{ "name": "advanced", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" }],
+    "readouts": [{ "name": "opened", "widget": "status-label", "source": "opened", "label": "Open limit", "trueLabel": "Reached", "falseLabel": "Clear", "trueTone": "accent" }, { "name": "closed", "widget": "status-label", "source": "closed", "label": "Closed limit", "trueLabel": "Reached", "falseLabel": "Clear", "trueTone": "accent" }, { "name": "fault", "widget": "numeric-label", "source": "fault", "label": "Safety status", "valueLabels": { "0": "Ready", "1": "Travel timeout", "2": "Limit conflict" } }]
+  },
+  "extendedMemory": { "required": false, "size": 0 },
+  "limitations": ["Endpoint inputs are active LOW and use internal pull-ups.", "This example is not a certified safety controller and has no obstacle-edge input.", "Both leaves start simultaneously; leaf sequencing must be provided by the motor controller."]
+}

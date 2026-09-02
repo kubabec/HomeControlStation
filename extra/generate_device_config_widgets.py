@@ -63,7 +63,7 @@ def field_initializer(field):
     option_labels = [option["label"] for option in options]
     option_values.extend([""] * (2 - len(option_values)))
     option_labels.extend([""] * (2 - len(option_labels)))
-    return "{{{key}, {label}, {html_type}, {offset}, {size}, {minimum}, {maximum}, {{{option_values}}}, {{{option_labels}}}, {option_count}, {array_length}}}".format(
+    return "{{{key}, {label}, {html_type}, {offset}, {size}, {minimum}, {maximum}, {{{option_values}}}, {{{option_labels}}}, {option_count}, {array_length}, {display_scale}, {default_value}}}".format(
         key=cpp_string(field["fieldId"]),
         label=cpp_string(field["label"]),
         html_type=cpp_string(field["htmlType"]),
@@ -75,6 +75,8 @@ def field_initializer(field):
         option_labels=", ".join(cpp_string(value) for value in option_labels),
         option_count=len(options),
         array_length=int(field.get("arrayLength", 0)),
+        display_scale=float(field.get("displayScale", 1)),
+        default_value=int(field.get("default", 0)),
     )
 
 
@@ -85,7 +87,7 @@ def device_initializer(description):
         raise ValueError(f"{device_type['name']}: a generated device type supports at most eight configuration fields")
 
     fields.extend([None] * (8 - len(fields)))
-    field_rows = [field_initializer(field) if field else '{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}' for field in fields]
+    field_rows = [field_initializer(field) if field else '{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}' for field in fields]
     http_config = device_type.get("httpConfig", {})
     display_name = http_config.get("displayName", device_type["name"])
     initializer = "{{{type_id}, {name}, {enum_symbol}, {{{fields}}}, {field_count}}}".format(
@@ -132,6 +134,8 @@ struct FieldSpec
     const char* optionLabels[2];
     uint8_t optionCount;
     uint8_t arrayLength;
+    float displayScale;
+    uint16_t defaultValue;
 };
 
 /** @brief Configuration widget metadata for one enabled device type. */
@@ -166,16 +170,15 @@ inline void emitSelect(uint8_t slotNumber, const FieldSpec& field, uint16_t valu
 inline void emitGpioSelect(uint8_t slotNumber, const FieldSpec& field, uint16_t value, WiFiClient& client)
 {
     client.println("<label>" + String(field.label) + ":<select id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\">");
-    for (uint8_t pin = 0; pin < 32; ++pin)
+    for (int pin = field.minimum; pin <= field.maximum; ++pin)
     {
-        client.println(String("<option value=\"") + String((int)pin) + "\"" + (value == pin ? " selected" : "") + ">" + String((int)pin) + "</option>");
+        client.println(String("<option value=\"") + String(pin) + "\"" + (value == pin ? " selected" : "") + ">" + String(pin) + "</option>");
     }
     client.println("</select></label>");
 }
 
-inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, const FieldSpec& field, WiFiClient& client)
+inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, const FieldSpec& field, uint16_t value, WiFiClient& client)
 {
-    const uint16_t value = readValue(slot, field);
     const String htmlType = String(field.htmlType);
     if (htmlType == "select") { emitSelect(slotNumber, field, value, client); return; }
     if (htmlType == "gpio-select") { emitGpioSelect(slotNumber, field, value, client); return; }
@@ -184,9 +187,21 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
         client.println(String("<label><input id=\"") + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"checkbox\"" + (value ? " checked" : "") + "> " + String(field.label) + "</label>");
         return;
     }
-    if (htmlType == "range" || htmlType == "number")
+    if (htmlType == "range")
     {
         client.println("<label>" + String(field.label) + ":<input id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"" + htmlType + "\" min=\"" + String(field.minimum) + "\" max=\"" + String(field.maximum) + "\" value=\"" + String((int)value) + "\"></label>");
+        return;
+    }
+    if (htmlType == "number")
+    {
+        const float scale = field.displayScale > 0.0f ? field.displayScale : 1.0f;
+        const unsigned int decimals = scale > 1.0f ? 1u : 0u;
+        String minimum(field.minimum / scale, decimals);
+        String maximum(field.maximum / scale, decimals);
+        String step(1.0f / scale, decimals);
+        String displayedValue(value / scale, decimals);
+        minimum.trim(); maximum.trim(); step.trim(); displayedValue.trim();
+        client.println("<label>" + String(field.label) + ":<input id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"number\" min=\"" + minimum + "\" max=\"" + maximum + "\" step=\"" + step + "\" value=\"" + displayedValue + "\"></label>");
         return;
     }
     if (htmlType == "segment-array")
@@ -225,7 +240,11 @@ inline void emitGeneratedCustomFields(uint8_t slotNumber, uint8_t deviceType, co
     for (const auto& spec : kKnownDeviceTypeWidgetSpecs)
     {
         client.println("<div class=\"extra-fields extra-" + String((int)spec.typeId) + "\">");
-        for (uint8_t field = 0; field < spec.fieldCount; ++field) { emitField(slotNumber, slot, spec.fields[field], client); }
+        for (uint8_t field = 0; field < spec.fieldCount; ++field)
+        {
+            const uint16_t value = deviceType == spec.typeId ? readValue(slot, spec.fields[field]) : spec.fields[field].defaultValue;
+            emitField(slotNumber, slot, spec.fields[field], value, client);
+        }
         client.println("</div>");
     }
 }
