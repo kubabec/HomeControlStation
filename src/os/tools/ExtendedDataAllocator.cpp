@@ -71,7 +71,7 @@ void ExtendedDataAllocator::printExtendedDataContainer()
     for(int i = 0 ; i < extendedDataContainer.size(); i++){
         Logger::log("Identifier: " + String((int)extendedDataContainer.at(i).identifier));
         Logger::log("Length: " + String((int)extendedDataContainer.at(i).length));
-        Logger::log(String("Address: %x", (int)extendedDataContainer.at(i).memoryPtr));    
+        Logger::log("Address: " + String(reinterpret_cast<uintptr_t>(extendedDataContainer.at(i).memoryPtr)));
     }
     Logger::log("-- --");
 }

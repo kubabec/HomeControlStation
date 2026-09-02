@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include <devices/device.hpp>
-#include <os/datacontainer/DataContainerTypes.hpp>
+#include <os/datacontainer/datacontainertypes.hpp>
 #include <os/tools/ExtendedDataAllocator.hpp>
 
 /**

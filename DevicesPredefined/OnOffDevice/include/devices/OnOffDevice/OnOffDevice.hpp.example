@@ -49,13 +49,13 @@ private:
     uint8_t maxPwmValue = 255;
 
     /** Current brightness step-sized delta. */
-    unsigned long brightnessStep ;
+    unsigned long brightnessStep = 0;
     /** Duration of each brightness step. */
-    unsigned long brightnessStepDurationMS ;
+    unsigned long brightnessStepDurationMS = 0;
     /** Timestamp of the previous brightness update. */
-    unsigned long timePrevious1 ;
+    unsigned long timePrevious1 = 0;
     /** Timestamp of the previous timer evaluation. */
-    unsigned long timePrevious2 ; 
+    unsigned long timePrevious2 = 0;
     
 public:
     /**

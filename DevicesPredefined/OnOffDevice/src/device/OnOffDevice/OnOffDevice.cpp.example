@@ -149,7 +149,9 @@ void OnOffDevice::changeBrightness(int requestedBrightness)
     brightnessLevelTarget = requestedBrightness;
     brightnessLevelBackupWhenOff = requestedBrightness; // Save current brightness level
     float brightnessDelta = abs(brightnessLevelTarget - brightnessLevel);
-    brightnessStepDurationMS = brightnessChangeTime / brightnessDelta;
+    brightnessStepDurationMS = brightnessDelta > 0.0f
+        ? static_cast<unsigned long>(brightnessChangeTime / brightnessDelta)
+        : 0;
 
     isOn = true; // Ensure device is ON when changing brightness
     timePrevious1 = millis();
@@ -252,6 +254,10 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     {
     case DEVSERVICE_STATE_SWITCH:
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_STATE_SWITCH, param.a: " + String((int)param.a));
+        if (param.a > 1)
+        {
+            return SERV_EXECUTION_FAILURE;
+        }
         if (param.a == 1)
         {
             if (!isOn)
@@ -273,6 +279,10 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
 
     case DEVSERVICE_BRIGHTNESS_CHANGE:
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_BRIGHTNESS_CHANGE, param.a: " + String((int)param.a));
+        if (!brightnessLevelSupport || param.a > 100)
+        {
+            return SERV_EXECUTION_FAILURE;
+        }
         changeBrightness(param.a);
         Logger::log("Changing brightness to " + String((int)param.a));
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_BRIGHTNESS_CHANGE completed");
@@ -300,17 +310,20 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS");
-        if (param.size == sizeof(AdvancedControlsOnOff))
+        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr ||
+            param.direction != e_OUT_from_DEVICE)
         {
-            memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
+            return SERV_EXECUTION_FAILURE;
         }
+        memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
 
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS completed");
         return SERV_SUCCESS;
 
     case DEVSERVICE_SET_ADVANCED_CONTROLS:
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_SET_ADVANCED_CONTROLS");
-        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr)
+        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr ||
+            param.direction != e_IN_to_DEVICE)
         {
             return SERV_EXECUTION_FAILURE;
         }

@@ -8,7 +8,7 @@
 #ifdef TEMP_SENSOR_SUPPORTED
 
 
-#include "devices/Device.hpp"
+#include "devices/device.hpp"
 #include "Arduino.h"
 #include <DHT.h>
 #include <vector>

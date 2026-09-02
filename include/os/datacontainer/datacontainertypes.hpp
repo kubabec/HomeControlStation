@@ -8,7 +8,7 @@
 
 #include "DeviceControlApi.hpp"
 #include "os/app/remoteControl/RC_publicDataTypes.hpp"
-#include "devices/Device.hpp"
+#include "devices/device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "os/tools/messageUDP.hpp"
 #include <ArduinoJson.h>

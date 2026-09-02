@@ -9,8 +9,8 @@
 #include <chrono>
 #include <iostream>
 #include <Arduino.h>
-#include "DataContainerTypes.hpp"
-#include "Signals.hpp"
+#include "datacontainertypes.hpp"
+#include "signals.hpp"
 /**
  * @class DataContainer
  * @brief Stores the shared runtime data and exposes accessors used by the service layer.

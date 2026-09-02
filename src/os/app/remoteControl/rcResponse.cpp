@@ -110,7 +110,7 @@ bool RcResponse::fromByteArray(uint8_t* buffer, uint16_t size) {
 }
 
 bool RcResponse::toByteArray(uint8_t* buffer, uint16_t size) {
-    if (buffer == nullptr ) {
+    if (buffer == nullptr || size != getSize()) {
         return false; 
     }  
     crc = calculateCrc();

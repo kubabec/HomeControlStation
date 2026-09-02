@@ -3,7 +3,7 @@
 #include <SystemDefinition.hpp>
 #ifdef LED_STRIP_SUPPORTED
 
-#include "devices/Device.hpp"
+#include "devices/device.hpp"
 #include "Adafruit_NeoPixel.h"
 #include "devices/LedStrip/Animations/FadeIn.hpp"
 #include "devices/LedStrip/Animations/FadeOut.hpp"

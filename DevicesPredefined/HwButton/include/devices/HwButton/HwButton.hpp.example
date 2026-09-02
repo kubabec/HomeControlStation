@@ -1,6 +1,6 @@
 #ifndef HW_BUTTON_TYPE_H
 #define HW_BUTTON_TYPE_H
-#include "devices/Device.hpp"
+#include "devices/device.hpp"
 #include "Arduino.h"
 #include <functional>
 #include <queue>

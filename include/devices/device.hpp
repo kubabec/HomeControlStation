@@ -169,7 +169,7 @@ typedef struct
     void print()
     {
         Logger::log("ServiceParameters_set3");
-        Logger::log("buff: " + String((int)buff));
+        Logger::log("buff: " + String(reinterpret_cast<uintptr_t>(buff)));
         Logger::log("size: " + String((int)size));
         Logger::log("additionalParam: " + String((int)additionalParam));
         switch (direction)
