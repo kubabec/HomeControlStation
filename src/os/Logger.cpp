@@ -2,6 +2,12 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
+/**
+ * @file src/os/Logger.cpp
+ * @brief UDP logging helper implementation with a disabled public log sink.
+ */
+
+
 WiFiUDP udp;
 
 std::queue<String> Logger::offlineLogQueue;

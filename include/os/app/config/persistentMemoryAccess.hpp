@@ -1,6 +1,10 @@
 #ifndef PERSISTENT_MEMORY_ACCESS_H
 #define PERSISTENT_MEMORY_ACCESS_H
 #include <Arduino.h>
+/**
+ * @class PersistentMemoryAccess
+ * @brief Provides the low-level read/write interface used to persist runtime state in NVM.
+ */
 
 
 class PersistentMemoryAccess 

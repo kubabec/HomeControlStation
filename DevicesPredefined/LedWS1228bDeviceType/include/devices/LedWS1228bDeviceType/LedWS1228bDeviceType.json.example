@@ -1,0 +1,170 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "LedStrip",
+    "className": "LedWS1228bDeviceType",
+    "enumSymbol": "type_LED_STRIP",
+    "enumValue": 44
+  },
+  "implementation": {
+    "header": "include/devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp",
+    "source": "src/device/LedWS1228bDeviceType/LedWS1228bDeviceType.cpp",
+    "buildGuard": "LED_STRIP_SUPPORTED",
+    "dependencies": ["Adafruit_NeoPixel", "LedStrip animation framework"],
+    "factory": { "arguments": ["config", "persistentDataChanged"] },
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::ledws2812bDevices",
+      "includedInDeviceCollection": true
+    }
+  },
+  "lifecycle": {
+    "init": { "actions": [] },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "every_manager_cycle",
+        "internalTasks": [
+          { "name": "transition animation", "cadence": "animationWaitTicks manager cycles", "defaultTicks": 4 },
+          { "name": "live animation", "cadence": "waitTicksLive manager cycles", "defaultTicks": 20 }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" },
+      { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "physicalLedCount", "type": "uint16", "label": "LEDs num.", "fieldId": "ledsCount", "htmlType": "number", "offset": 0, "size": 2, "minimum": 1, "byteOrder": "native", "widget": "number" },
+      { "name": "reverseOrder", "type": "boolean", "label": "Sides flip", "fieldId": "ledsSideFlip", "htmlType": "select", "offset": 2, "size": 1, "widget": "checkbox", "options": [{"value": 0, "label": "Not inversed"}, {"value": 1, "label": "Inversed"}] },
+      { "name": "currentLimit", "type": "uint8", "label": "Current limiter", "fieldId": "curLim", "htmlType": "range", "offset": 3, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
+      { "name": "currentLimitSafetyCopy", "type": "uint8", "label": "Current limiter copy", "fieldId": "currentLimitSafetyCopy", "htmlType": "hidden", "offset": 19, "size": 1, "widget": null, "mustEqual": "currentLimit" }
+    ]
+  },
+  "services": [
+    {
+      "name": "DEVSERVICE_STATE_SWITCH",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "state", "type": "boolean", "source": "ServiceParameters_set1.a" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_LED_STRIP_SAVE_CONTENT",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "slot", "type": "uint8", "source": "ServiceParameters_set1.a", "minimum": 1, "maximum": 3 }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_LED_STRIP_SWITCH_CONTENT",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "slot", "type": "uint8", "source": "ServiceParameters_set1.a", "minimum": 0, "maximum": 3 }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_LIVE_ANIMATION",
+      "overload": "serviceCall_1",
+      "status": "implemented",
+      "parameters": [
+        { "name": "state", "type": "boolean", "source": "ServiceParameters_set1.a" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "data", "type": "LedColor[] + LedStripAnimationProperties", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_SET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "data", "type": "LedColor[] + LedStripAnimationProperties", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)" },
+        { "name": "action", "type": "uint8", "source": "ServiceParameters_set3.additionalParam", "description": "255 applies payload; 1..3 save slots; 4..6 load slots" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_GET_DETAILED_COLORS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "data", "type": "LedColor[] + LedStripAnimationProperties", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_SET_DETAILED_COLORS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "data", "type": "LedColor[] + LedStripAnimationProperties", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)" }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_SET_EXT_MEMORY_PTR",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "memory", "type": "byte[]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "getExtendedMemoryLength()" }
+      ]
+    }
+  ],
+  "state": {
+    "enabledSemantics": "isOn",
+    "descriptionCustomBytes": [
+      { "name": "virtualLedCount", "type": "uint8", "offset": 0, "size": 1 },
+      { "name": "activeAverageColor", "type": "rgb888", "offset": 2, "size": 3 },
+      { "name": "savedSlot1AverageColor", "type": "rgb888", "offset": 5, "size": 3 },
+      { "name": "savedSlot2AverageColor", "type": "rgb888", "offset": 8, "size": 3 },
+      { "name": "savedSlot3AverageColor", "type": "rgb888", "offset": 11, "size": 3 },
+      { "name": "liveAnimationRunning", "type": "boolean", "offset": 15, "size": 1 }
+    ],
+    "httpFields": [
+      { "name": "avgColor", "type": "hex-color", "source": "customBytes[2..4]" },
+      { "name": "liveStatus", "type": "boolean", "source": "customBytes[15]" }
+    ]
+  },
+  "ui": {
+    "roomWidget": "generateLedStripWidget",
+    "advancedControls": {
+      "template": "include/devices/LedWS1228bDeviceType/AdvancedControls.html",
+      "payloadSize": {
+        "countState": "virtualLedCount",
+        "maximumCount": 100,
+        "elementBytes": 3,
+        "overheadBytes": 5
+      }
+    },
+    "controls": [
+      { "name": "power", "widget": "toggle-button", "displayOrder": 2, "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1" },
+      { "name": "advanced", "widget": "settings-button", "displayOrder": 0, "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" },
+      { "name": "liveAnimation", "widget": "play-stop-button", "displayOrder": 1, "service": "DEVSERVICE_LIVE_ANIMATION", "overload": "serviceCall_1" },
+      { "name": "detailedColors", "widget": "color-array", "serviceRead": "DEVSERVICE_GET_DETAILED_COLORS", "serviceWrite": "DEVSERVICE_SET_DETAILED_COLORS" }
+    ],
+    "readouts": [
+      { "name": "averageColor", "widget": "color-swatch", "source": "avgColor" }
+    ]
+  },
+  "extendedMemory": {
+    "required": true,
+    "size": "4 * virtualLedCount * sizeof(LedColor)",
+    "layout": ["active content", "saved slot 1", "saved slot 2", "saved slot 3"]
+  },
+  "limitations": [
+    "The runtime animation buffer is separately heap-allocated after extended memory is assigned.",
+    "Animation cadence is cycle-count based and therefore depends on DeviceManager call frequency."
+  ]
+}

@@ -1,6 +1,12 @@
 #include <os/tools/ExtendedDataAllocator.hpp>
 #include "os/Logger.hpp"    
 
+/**
+ * @file src/os/tools/ExtendedDataAllocator.cpp
+ * @brief Heap-backed ExtendedData allocator used by devices and services.
+ */
+
+
 
 ExtendedData ExtendedDataAllocator::createNewExtendedData(uint16_t length){
     /* Try to allocate memory for new data */

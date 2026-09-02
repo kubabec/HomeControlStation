@@ -1,6 +1,12 @@
 #include "os/app/remoteControl/rcRequest.hpp"
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/remoteControl/rcRequest.cpp
+ * @brief Remote-control protocol implementation for the Home Control Station.
+ */
+
+
 
 
 RcRequest::RcRequest(){}

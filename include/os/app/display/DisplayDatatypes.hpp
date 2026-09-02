@@ -9,11 +9,29 @@ enum class DisplayMessageIds : uint8_t {
     DISPLAY_PRESENT,
 
 };
-
+/**
+ * @struct DisplayInfo
+ * @brief Description of a display endpoint discovered on the LAN.
+ */
 
 struct DisplayInfo{
+    /**
+     * MAC address identifying the display endpoint uniquely.
+     */
     uint64_t macAddress = 0;
+
+    /**
+     * Width of the display in pixels.
+     */
     uint16_t resWidth = 480;
+
+    /**
+     * Height of the display in pixels.
+     */
     uint16_t resHeight = 480;
+
+    /**
+     * IPv4 address used to contact the display over the local network.
+     */
     MessageUDP::IPAddr ip{0, 0, 0, 0};
 };

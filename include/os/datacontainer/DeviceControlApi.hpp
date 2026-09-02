@@ -3,6 +3,12 @@
 
 #include <functional>
 
+/**
+ * @file include/os/datacontainer/DeviceControlApi.hpp
+ * @brief Data container and persistence definitions for the Home Control Station operating system.
+ */
+
+
 typedef struct{ 
     /*
         uint8_t device identifier - ID of the device

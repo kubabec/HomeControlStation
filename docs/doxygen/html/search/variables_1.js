@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['b_0',['b',['../structLedColor.html#a3e9a3d5146e0fd245198bbe15736b9c2',1,'LedColor::b'],['../structServiceParameters__set1.html#a4642bc0c6ba2be8ba86f870046de8076',1,'ServiceParameters_set1::b'],['../structServiceParameters__set2.html#aec82ac14cdfb9fa897c4e022e94e76ce',1,'ServiceParameters_set2::b']]],
+  ['backlog_1',['backlog',['../structCyclicProfiler_1_1Stat.html#a47b4565d8c34686a129acc3af645043e',1,'CyclicProfiler::Stat']]],
+  ['bits_2',['bits',['../structRFButtonInfo.html#a82a7e2d47e2a75b79362621a158d6638',1,'RFButtonInfo']]],
+  ['body_3',['body',['../structUserInterfaceNotification.html#abeb2560896a15a48c798e20275d05bdd',1,'UserInterfaceNotification']]],
+  ['brightness_4',['brightness',['../classLedWS1228bDeviceType.html#ac27fd51ebe109ff49cb0a13aa280533c',1,'LedWS1228bDeviceType::brightness'],['../classSegLedWS1228bDeviceType.html#ab4c8ad71d60a672faad5488d38596788',1,'SegLedWS1228bDeviceType::brightness']]],
+  ['brightnesschangetime_5',['brightnessChangeTime',['../classOnOffDevice.html#ae0b30b02db16d1a611b94410835ada09',1,'OnOffDevice']]],
+  ['brightnesslevel_6',['brightnessLevel',['../classOnOffDevice.html#aa78d8043d759aa639ddea3b14ce198a2',1,'OnOffDevice']]],
+  ['brightnesslevelbackupwhenoff_7',['brightnessLevelBackupWhenOff',['../classOnOffDevice.html#aeadeba3130917a08076564bfcf324092',1,'OnOffDevice']]],
+  ['brightnesslevelsupport_8',['brightnessLevelSupport',['../classOnOffDevice.html#a5697543e1ea3bc8a6f5c5a4c16d18aab',1,'OnOffDevice']]],
+  ['brightnessleveltarget_9',['brightnessLevelTarget',['../classOnOffDevice.html#ac8a623b52c48f3dd09254164e7e14455',1,'OnOffDevice']]],
+  ['brightnessstep_10',['brightnessStep',['../classOnOffDevice.html#a25776d509fe07577872d457cca199632',1,'OnOffDevice']]],
+  ['brightnessstepdurationms_11',['brightnessStepDurationMS',['../classOnOffDevice.html#a809edc7237a8f5a7df3f54a900faa4aa',1,'OnOffDevice']]],
+  ['broadcastip_12',['broadcastIP',['../classUDPAdapter.html#a6c901725cd612c9ec1b21a11374ff2a4',1,'UDPAdapter']]],
+  ['buff_13',['buff',['../structServiceParameters__set3.html#a0bf3a355035a2b5a4e68b63c08965923',1,'ServiceParameters_set3']]],
+  ['bursts_14',['bursts',['../classComplexSequenceAnimation.html#a3b5506e6e1bb2c5d2696a82a07128c4b',1,'ComplexSequenceAnimation']]],
+  ['burstsissued_15',['burstsIssued',['../classComplexSequenceAnimation.html#a3075a5281f1f28259bb7206440a2d3a7',1,'ComplexSequenceAnimation']]],
+  ['buttonactionsqueue_16',['buttonActionsQueue',['../classHwButton.html#aad047176582386e3fd1d2654b4a50f1b',1,'HwButton']]],
+  ['buttonuniquenumber_17',['buttonUniqueNumber',['../structRFButtonInfo.html#a9889981f38b4a419629d93bbd9370f0e',1,'RFButtonInfo::buttonUniqueNumber'],['../structRFReceptionEvent.html#a8509f19b4645e03baa880ce9400581d2',1,'RFReceptionEvent::buttonUniqueNumber']]],
+  ['byteiterationindex_18',['byteIterationIndex',['../classMessageUDP.html#ab9a07e8316655ccfe3e21d49d5a3c4d7',1,'MessageUDP']]]
+];

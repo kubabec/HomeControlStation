@@ -1,0 +1,48 @@
+{
+  "$schema": "../device.schema.json", "schemaVersion": 1,
+  "deviceType": { "name": "AquariumController", "className": "AquariumController", "enumSymbol": "type_AQUARIUM_CONTROLLER", "enumValue": 52 },
+  "implementation": {
+    "header": "include/devices/AquariumController/AquariumController.hpp", "source": "src/device/AquariumController/AquariumController.cpp", "buildGuard": null,
+    "dependencies": ["Arduino GPIO/ADC", "10k NTC B3950 thermistor", "isolated relay/SSR drivers"], "factory": { "arguments": ["config"] },
+    "manager": { "registered": true, "collection": "DeviceManager::devices", "includedInDeviceCollection": true }
+  },
+  "lifecycle": { "init": { "actions": ["force heater and light off", "start filter", "sample thermistor"] }, "update": { "entryPoint": "cyclic", "schedule": { "mode": "every_manager_cycle", "internalTasks": [{ "name": "temperature and thermostat update", "minimumIntervalMs": 1000 }] } } },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" }, { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "temperatureAdcPin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select", "hardwareRole": "adc" }, { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" }, { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "heaterPin", "type": "uint8", "label": "Heater GPIO", "fieldId": "aquariumHeaterPin", "htmlType": "gpio-select", "offset": 0, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select" },
+      { "name": "lightPin", "type": "uint8", "label": "Light GPIO", "fieldId": "aquariumLightPin", "htmlType": "gpio-select", "offset": 1, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select" },
+      { "name": "filterPin", "type": "uint8", "label": "Filter GPIO", "fieldId": "aquariumFilterPin", "htmlType": "gpio-select", "offset": 2, "size": 1, "minimum": 0, "maximum": 48, "widget": "gpio-select" },
+      { "name": "lowWaterPin", "type": "uint8", "label": "Low-water GPIO (255 = none)", "fieldId": "aquariumWaterPin", "htmlType": "number", "offset": 3, "size": 1, "minimum": 0, "maximum": 255, "default": 255, "widget": "number" },
+      { "name": "outputActiveHigh", "type": "boolean", "label": "Output active level", "fieldId": "aquariumOutputLevel", "htmlType": "select", "offset": 4, "size": 1, "widget": "select", "options": [{ "value": 0, "label": "Active LOW" }, { "value": 1, "label": "Active HIGH" }] },
+      { "name": "setpointTenthsC", "type": "uint16", "label": "Temperature setpoint [°C]", "fieldId": "aquariumSetpoint", "htmlType": "number", "offset": 5, "size": 2, "minimum": 50, "maximum": 400, "default": 250, "displayScale": 10, "widget": "number" },
+      { "name": "hysteresisTenthsC", "type": "uint16", "label": "Thermostat hysteresis [°C]", "fieldId": "aquariumHysteresis", "htmlType": "number", "offset": 7, "size": 2, "minimum": 1, "maximum": 50, "default": 5, "displayScale": 10, "widget": "number" },
+      { "name": "maximumTenthsC", "type": "uint16", "label": "Heater cutoff [°C]", "fieldId": "aquariumMaximum", "htmlType": "number", "offset": 9, "size": 2, "minimum": 50, "maximum": 600, "default": 320, "displayScale": 10, "widget": "number" }
+    ]
+  },
+  "services": [
+    { "name": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "controls", "type": "byte[10]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "10" }] },
+    { "name": "DEVSERVICE_SET_ADVANCED_CONTROLS", "overload": "serviceCall_3", "status": "implemented", "parameters": [{ "name": "controls", "type": "byte[10]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "10" }] }
+  ],
+  "state": {
+    "enabledSemantics": "one or more managed outputs are on", "descriptionCustomBytes": [
+      { "name": "temperature", "type": "float32", "offset": 0, "size": 4 }, { "name": "temperatureValid", "type": "boolean", "offset": 4, "size": 1 }, { "name": "waterLow", "type": "boolean", "offset": 5, "size": 1 },
+      { "name": "heaterOn", "type": "boolean", "offset": 6, "size": 1 }, { "name": "lightOn", "type": "boolean", "offset": 7, "size": 1 }, { "name": "filterOn", "type": "boolean", "offset": 8, "size": 1 },
+      { "name": "heaterMode", "type": "enum", "offset": 9, "size": 1 }, { "name": "fault", "type": "uint8", "offset": 10, "size": 1 }
+    ],
+    "httpFields": [
+      { "name": "temperature", "type": "float32", "source": "customBytes[0..3]" }, { "name": "temperatureValid", "type": "boolean", "source": "customBytes[4]" }, { "name": "waterLow", "type": "boolean", "source": "customBytes[5]" },
+      { "name": "heaterOn", "type": "boolean", "source": "customBytes[6]" }, { "name": "lightOn", "type": "boolean", "source": "customBytes[7]" }, { "name": "filterOn", "type": "boolean", "source": "customBytes[8]" }, { "name": "fault", "type": "uint8", "source": "customBytes[10]" }
+    ]
+  },
+  "ui": {
+    "roomWidget": "generateAquariumControllerWidget", "advancedControls": { "template": "include/devices/AquariumController/AdvancedControls.html", "payloadSize": { "fixedBytes": 10 } },
+    "controls": [{ "name": "advanced", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" }],
+    "readouts": [{ "name": "temperature", "widget": "numeric-label", "source": "temperature", "label": "Water temperature", "unit": "°C" }, { "name": "sensor", "widget": "status-label", "source": "temperatureValid", "label": "Temperature probe", "trueLabel": "Online", "falseLabel": "Sensor error", "trueTone": "success", "falseTone": "danger" }, { "name": "heater", "widget": "status-label", "source": "heaterOn", "label": "Heater", "trueLabel": "Heating", "falseLabel": "Idle", "trueTone": "warning" }, { "name": "water", "widget": "status-label", "source": "waterLow", "label": "Water level", "trueLabel": "Low", "falseLabel": "Normal", "trueTone": "danger", "falseTone": "success" }, { "name": "fault", "widget": "numeric-label", "source": "fault", "label": "Safety status", "valueLabels": { "0": "Ready", "1": "Probe error", "2": "Low water", "3": "Probe + water", "4": "Over temperature", "5": "Probe + over temp", "6": "Water + over temp", "7": "Multiple faults" } }]
+  },
+  "extendedMemory": { "required": false, "size": 0 },
+  "limitations": ["Thermistor constants are fixed for a 10k B3950 NTC and 10k series resistor.", "Advanced-control output/mode changes are runtime-only and reset at reboot.", "This is not a life-support controller; independent heater cutoff and alarms are required."]
+}

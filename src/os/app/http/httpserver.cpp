@@ -8,8 +8,19 @@
 #include "os/app/http/tempGauge/tempGaugeJS.h"
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
+#if __has_include("generated/GeneratedDeviceConfigWidgets.hpp")
+#include "generated/GeneratedDeviceConfigWidgets.hpp"
+#else
+#include "devices/fallback/DeviceConfigWidgets.hpp"
+#endif
 #include "build_info.h"
 #include "os/Logger.hpp"
+
+/**
+ * @file src/os/app/http/httpserver.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
 
 
 WiFiServer HomeLightHttpServer::server(80);
@@ -64,9 +75,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "dwlddevcfg",
   "loaddeicvcfg",
   "getExtendedControls",
-  "setStripColor",
-  "stripLoadFromMemory",
-  "stripOverwriteSlot",
+  "setAdvancedControls",
   "stRmChng",
   "segSwtch",
   "ledsLiveSwtch",
@@ -106,9 +115,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_downloadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_loadDeviceConfiguration, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_getExtendedControls, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_setStripColor, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripLoadFromMemory, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_stripSaveCurrent, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_setAdvancedControls, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_roomStateChange, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
@@ -573,7 +580,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2025 <a href=\"https://homecontrolstation.pl\">Home Control Station</a> · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 1.3</p></footer>");
+              client.println("<footer><p>&copy; 2025 <a href=\"https://homecontrolstation.pl\">Home Control Station</a> · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 2.0</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            
@@ -677,286 +684,55 @@ void HomeLightHttpServer::generateAsyncPageContentJson(WiFiClient& client)
   // Logger::log("}");
 }
 
-void generateExtraFieldsForOnOff(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
-{
-  client.println("<div class=\"extra-fields extra-43\">");
-  client.println("<label>Brightness support:");
-  client.println("<select id=\"brightnessSupported-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[0]){
-    client.println("<option value=\"0\" >No</option>");
-    client.println("<option value=\"1\" selected>Yes</option>");
-  }else {
-    client.println("<option value=\"0\" selected>No</option>");
-    client.println("<option value=\"1\">Yes</option>");
-  }
-  client.println("</select>");
-
-  client.println("</label>");
-
-
-  client.println("<label>Activation state:");
-  client.println("<select id=\"activationState-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[1]){
-    client.println("<option value=\"0\" >LOW</option>");
-    client.println("<option value=\"1\" selected>HIGH</option>");
-  }else {
-    client.println("<option value=\"0\" selected>LOW</option>");
-    client.println("<option value=\"1\">HIGH</option>");
-  }
-  client.println("</select>");
-
-  client.println("</label>");
-  client.println("<label>Min PWM:");
-
-  client.println("<input id=\"pwmMin-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[2]) +"\" >");
-
-  client.println("</label>");
- 
-
-  client.println("<label>Max PWM:");
-  client.println("<input id=\"pwmMax-"+String((int)slotNumber)+"\" type='range' min='0' max='255' step=\"1\" value=\""+String((int)slot.customBytes[3]) +"\" >");
-    
-  client.println("</label>");
-  client.println("</div>");
-}
-void generateExtraFieldsForLedStrip(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
-{
-  client.println("<div class=\"extra-fields extra-44\">");
-  client.println("<label>LEDs num.:");
-  int ledsCount = 0;
-  memcpy(&ledsCount, &slot.customBytes[0], sizeof(uint16_t));
-  client.println("<input id=\"ledsCount-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"35\" value=\""+ 
-  String((int)ledsCount) +"\">");
-
-  client.println("</label>");
-
-  client.println("<label>Sides flip:");
-  client.println("<select id=\"ledsSideFlip-"+String((int)slotNumber)+"\">");
-  if(slot.customBytes[2]){
-    client.println("<option value=\"0\" >Not inversed</option>");
-    client.println("<option value=\"1\" selected>Inversed</option>");
-  }else {
-    client.println("<option value=\"0\" selected>Not inversed</option>");
-    client.println("<option value=\"1\">Inversed</option>");
-  }
-  client.println("</select>");
-
-  client.println("</label>");
-
-
-  client.println("<label>Current limiter</label>");
-  int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
-  Logger::log("Current limiter value: " + String((int)slot.customBytes[3]) + " -> " + String(percentValue) + "%");
-  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"curLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
-  client.println("<input id=\"curLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
-  //client.println(String((int)slot.customBytes[3]) +"' onchange=\"updateCurLimVal('curLimVal-"+String((int)slotNumber)+"',this.value);\">");
-  client.println("</label>");
-
-  client.println("</div>");
-}
-void generateExtraFieldsForSegmentedLedStrip(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
-{
-  const String option1 = "<option value=\"0\" >Not inversed</option>";
-  const String option2 = "<option value=\"1\" selected>Inversed</option>";
-  const String option3 = "<option value=\"0\" selected>Not inversed</option>";
-  const String option4 = "<option value=\"1\">Inversed</option>";
-
-
-
-  client.println("<div class=\"extra-fields extra-46\">");
-
-  for(uint8_t segmentIndex = 0; segmentIndex < 5; segmentIndex++)
-  {
-    client.println("<label>");
-    client.println("<input id=\"seg"+String((int)(segmentIndex+1))+"Count-"+String((int)slotNumber)+"\" type=\"text\" placeholder=\"Diodes count (seg. "+String((int)(segmentIndex+1))+")\"");
-    if(slot.customBytes[5 + segmentIndex] > 0){
-      client.println(" value=\""+ String((int)slot.customBytes[5 + segmentIndex]) +"\">");
-    }else {
-      client.println(">");
-    }
-    client.println(" <select id=\"Seg"+String((int)(segmentIndex +1))+"Flip-"+String((int)slotNumber)+"\">");
-    if(slot.customBytes[10 + segmentIndex]){
-      client.println(option1);
-      client.println(option2);
-    }else {
-      client.println(option3);
-      client.println(option4);
-    }
-      
-    client.println("</select></label>");
-  }
-
-  client.println("<label>Current limiter</label>");
-  int percentValue = (int)((float)slot.customBytes[3] / (float)2.55); // Convert to percent value
-  client.println("<label><input disabled type=\"text\" style=\"width:40px;\"  id=\"SegcurLimVal-"+String((int)slotNumber)+"\" value=\""+String((int)percentValue)+"\">% ");
-  client.println("<input id=\"SegcurLim-"+String((int)slotNumber)+"\" type='range' min='15' max='255' value=\""+String((int)slot.customBytes[3]) +"\" onchange=\"updateCurLimVal('SegcurLimVal-"+String((int)slotNumber)+"',this.value);\">");
-  
-
-  client.println("</div>"); 
-}
-
-void generateExtraFieldsForDistanceSensor(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
-{
-  client.println("<div class=\"extra-fields extra-47\">");
-  client.println("<label>Pin Tx:");
-  client.println("<select id=\"pinTx-"+String((int)slotNumber)+"\" >");
-  for (int i = 0; i < 32; i++) {
-    String pinStr = "";
-    if(slot.customBytes[4] == i)
-    {
-      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
-    } else {
-      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
-    }
-  }
-  client.println("</select>");
-  client.println("</label>");
-  //Pole wyboru dla pinu Rx
-  client.println("<label>Pin Rx:");
-  client.println("<select id=\"pinRx-"+String((int)slotNumber)+"\" >");
-  for (int i = 0; i < 32; i++) {
-    String pinStr = "";
-    if(slot.customBytes[5] == i)
-    {
-      client.println("<option value=\"" + String(i) + "\" selected>" + String(i) + "</option>");
-    } else {
-      client.println("<option value=\"" + String(i) + "\">" + String(i) + "</option>");
-    }
-  }
-  client.println("</select>");
-  client.println("</label>");
-  client.println("</div>"); 
-}
-
 void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigSlotType& slot, WiFiClient& client)
 {
-  client.println("<div class=\"device-container\" id=\"device-"+String((int)slotNumber)+"\">");
-  
+  client.println("<div class=\"device-container\" id=\"device-" + String((int)slotNumber) + "\">");
+
   if(slot.isActive)
   {
-    /* Slot is active */
     client.println(labelStart);
-    client.println("<input id=\"enabled"+String((int)slotNumber)+"\" type=\"checkbox\" checked> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println("<input id=\"enabled" + String((int)slotNumber) + "\" type=\"checkbox\" checked> Memory slot " + String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
-
-  }else
+  }
+  else
   {
-    /* Slot is inactive */
     client.println(labelStart);
-    client.println("<input id=\"enabled"+String((int)slotNumber)+"\" type=\"checkbox\"> Memory slot " +String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
+    client.println("<input id=\"enabled" + String((int)slotNumber) + "\" type=\"checkbox\"> Memory slot " + String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
   }
 
-  /* intentionally hidden to prevent user from using IDs other than 0 - 5 */
-  client.println("<input type=\"text\" style=\"visibility:hidden;display:none;\" id=\"identifier"+String(slotNumber)+"\"\
-    value=\""+ String((int)slotNumber) + "\">");
+  client.println("<input type=\"text\" style=\"visibility:hidden;display:none;\" id=\"identifier" + String(slotNumber) + "\" value=\"" + String((int)slotNumber) + "\">");
 
   client.println(labelStart);
-  client.println("Name:<input type=\"text\" maxlength=\"24\" id=\"name"+String(slotNumber)+"\"\
-  value=\""+ String(slot.deviceName) +"\">");
+  client.println("Name:<input type=\"text\" maxlength=\"24\" id=\"name" + String(slotNumber) + "\" value=\"" + String(slot.deviceName) + "\">");
   client.println(labelEnd);
 
-  client.println(labelStart);
-  client.println("Type: <select onchange=\"showExtraFields(this, 'device-"+String((int)slotNumber)+"');\" id=\"type"+String(slotNumber)+"\" >");
-
-  if(slot.deviceType == type_ONOFFDEVICE){
-    client.println("<option value=\"43\" selected>On/Off Device</option>");
-  }else
-  {
-    client.println("<option value=\"43\">On/Off Device</option>");
-  }
-  
-  if(slot.deviceType == type_LED_STRIP){
-    client.println("<option value=\"44\" selected>LED strip</option>");
-  }else
-  {
-    client.println("<option value=\"44\">LED strip</option>");
-  }
-
-  if(slot.deviceType == type_TEMP_SENSOR){
-    client.println("<option value=\"45\" selected>Temperature sensor</option>");
-  }else
-  {
-    client.println("<option value=\"45\">Temperature sensor</option>");
-  }
-
-
-  if(slot.deviceType == type_DISTANCE_SENSOR){
-    client.println("<option value=\"47\" selected>Distance sensor</option>");
-  }else
-  {
-    client.println("<option value=\"47\">Distance sensor</option>");
-  }
-
-  if(slot.deviceType == type_LED_STRIP_SEGMENTED){
-    client.println("<option value=\"46\" selected>Segmented LED strip</option>");
-  }else
-  {
-    client.println("<option value=\"46\">Segmented LED strip</option>");
-
-  }
-
-  if(
-    slot.deviceType != type_ONOFFDEVICE &&
-    slot.deviceType != type_LED_STRIP && 
-    slot.deviceType != type_TEMP_SENSOR &&
-    slot.deviceType != type_DISTANCE_SENSOR &&
-    slot.deviceType != type_LED_STRIP_SEGMENTED){
-
-    client.println("<option value=\"255\" selected>UNKNOWN</option>");
-  }else {
-    client.println("<option value=\"255\">UNKNOWN</option>");
-  }
-  client.println("</select>");
-
-  client.println(labelEnd);
+  GeneratedDeviceConfigWidgets::emitTypeSelector(slotNumber, slot.deviceType, client);
 
   client.println(labelStart);
-  client.println("Pin:<select type=\"text\" id=\"pin"+String(slotNumber)+"\"\
-  value=\""+ String((int)slot.pinNumber) +"\">");
+  client.println("Pin:<select type=\"text\" id=\"pin" + String(slotNumber) + "\" value=\"" + String((int)slot.pinNumber) + "\">");
   const std::array<int, 34> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,12,13,14,22,23,24,27,26,25,33,32,35,34,15,18,19,21,39,40,41,42, 47, 48};
 
-  for(auto& val : pinsAllowed){
-    String pinStr = "";
+  for(auto& val : pinsAllowed)
+  {
     if(slot.pinNumber != val)
     {
-      pinStr = "<option value=\"" + String((int)val) + "\">" + String((int)val) + "</option>";
+      client.println("<option value=\"" + String((int)val) + "\">" + String((int)val) + "</option>");
     }
     else
     {
-      pinStr = "<option value=\"" + String((int)val) + "\" selected>" + String((int)val) + "</option>";
+      client.println("<option value=\"" + String((int)val) + "\" selected>" + String((int)val) + "</option>");
     }
-      client.println(pinStr);
   }
   client.println("</select>");
   client.println(labelEnd);
 
   client.println(labelStart);
-  client.println("Room ID:<input type=\"text\" id=\"room"+String(slotNumber)+"\"\
-  value=\""+ String((int)slot.roomId) +"\">");
+  client.println("Room ID:<input type=\"text\" id=\"room" + String(slotNumber) + "\" value=\"" + String((int)slot.roomId) + "\">");
   client.println(labelEnd);
 
-  /*<!-- Extra fields for ON/OFF -->*/
-
-  generateExtraFieldsForOnOff(slotNumber, slot, client);
-
-
-  /*<!-- Extra fields for Distance Sensor -->*/
-  generateExtraFieldsForDistanceSensor(slotNumber, slot, client);
-
-  /*<!-- Extra fields for LED Strip -->*/
-  generateExtraFieldsForLedStrip(slotNumber, slot, client);
-
-  /*<!-- Extra fields for Temperature sensor -->*/
-  // No extra fields for temperature sensor
-
-  /*<!-- Extra fields for Segmented LED Strip -->*/
-  generateExtraFieldsForSegmentedLedStrip(slotNumber, slot, client);
-
-
-
+  GeneratedDeviceConfigWidgets::emitGeneratedCustomFields(slotNumber, slot.deviceType, slot, client);
   client.println("</div>");
-
 }
 
 /* ========= CONFIG ==============*/

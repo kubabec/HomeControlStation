@@ -2,27 +2,39 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/Logger.hpp>
 #include <ArduinoJson.h>
-
-std::vector<OnOffDevice> DeviceManager::vecOnOffDevices = {};
-#ifdef LED_STRIP_SUPPORTED
-std::vector<LedWS1228bDeviceType> DeviceManager::ledws2812bDevices = {};
-std::vector<SegLedWS1228bDeviceType> DeviceManager::segmentedWs2812bDevices = {};
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-std::vector<TempSensorDHT11DeviceType> DeviceManager::tempSensorsDevices = {};
+#if __has_include("generated/GeneratedDeviceRegistry.hpp")
+#include "generated/GeneratedDeviceRegistry.hpp"
+#else
+#include "devices/fallback/DeviceRegistry.hpp"
 #endif
 
-std::vector<DistanceSensor> DeviceManager::distanceSensorsDevices = {};
-
-std::vector<HwButton> DeviceManager::hardwareButtons = {};
+/**
+ * @file src/os/app/devicemanager.cpp
+ * @brief Device manager: restores devices from NVM, manages lifecycle and service dispatch.
+ */
 
 ConfigSlotsDataType DeviceManager::pinConfigSlotsRamMirror = {};
 ExtendedDataAllocator DeviceManager::extDataAllocator;
+std::vector<std::unique_ptr<Device>> DeviceManager::devices;
+std::vector<uint32_t> DeviceManager::lastDeviceCycleTimes;
 
-/*TESTCODE*/
-std::vector<Device *> DeviceManager::devices;
-// TestDeviceType DeviceManager::testDev;
-/*TESTCODE*/
+namespace
+{
+constexpr size_t CONFIGURABLE_GPIO_COUNT = 49;
+
+bool validateConfigurationSet(const ConfigSlotsDataType& configuration)
+{
+    bool claimedPins[CONFIGURABLE_GPIO_COUNT] = {};
+    for (const auto& slot : configuration.slots)
+    {
+        if (slot.isActive && !GeneratedDeviceRegistry::validateConfiguration(slot, claimedPins, CONFIGURABLE_GPIO_COUNT))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+}
 
 void DeviceManager::deinit()
 {
@@ -56,6 +68,8 @@ void DeviceManager::flushNvmData()
 void DeviceManager::init()
 {
     Logger::log("DeviceManager init ...");
+    devices.clear();
+    lastDeviceCycleTimes.clear();
 
     /* Protection against PersistentDataBlock size modification without DeviceConfigSlotType update */
     if (PersistentDataBlock::getSize() == DeviceConfigSlotType::getSize())
@@ -67,6 +81,7 @@ void DeviceManager::init()
         {
 
             uint8_t numberOfSuccessfullyRetrievedDevices = 0;
+            bool claimedPins[CONFIGURABLE_GPIO_COUNT] = {};
 
             /* For each DEVICE relevant datablock */
             for (uint8_t datablock = e_BLOCK_DEVICE_1; datablock <= e_BLOCK_DEVICE_6; datablock++)
@@ -84,7 +99,7 @@ void DeviceManager::init()
                 /* Now NVM data of current datablock shall be inside of 'configBlock' variable */
 
                 /* Try to extract (add to devices vector) device based on NVM data */
-                if (extractDeviceInstanceBasedOnNvmData(*configBlock, datablock))
+                if (extractDeviceInstanceBasedOnNvmData(*configBlock, datablock, claimedPins, CONFIGURABLE_GPIO_COUNT))
                 {
                     numberOfSuccessfullyRetrievedDevices++;
                 }
@@ -119,43 +134,6 @@ void DeviceManager::init()
     for (auto &slot : pinConfigSlotsRamMirror.slots)
     {
         slot.print();
-    }
-
-    /* devices merging after NVM restoration */
-    {
-        for (OnOffDevice &device : vecOnOffDevices)
-        {
-            devices.push_back(&device);
-        }
-
-#ifdef LED_STRIP_SUPPORTED
-        /* Add LED strips to common devices vector*/
-        for (LedWS1228bDeviceType &device : ledws2812bDevices)
-        {
-            devices.push_back(&device);
-        }
-
-        for (SegLedWS1228bDeviceType &device : segmentedWs2812bDevices)
-        {
-            devices.push_back(&device);
-        }
-#endif
-
-#ifdef TEMP_SENSOR_SUPPORTED
-        /* Add temperature sensors to common devices vector*/
-        for (TempSensorDHT11DeviceType &device : tempSensorsDevices)
-        {
-            devices.push_back(&device);
-        }
-#endif
-
-#ifdef DISTANCE_SENSOR_SUPPORTED
-        /* Add distance sensors to common devices vector*/
-        for (DistanceSensor &device : distanceSensorsDevices)
-        {
-            devices.push_back(&device);
-        }
-#endif
     }
 
     if (devices.size() > 0)
@@ -213,13 +191,7 @@ void DeviceManager::init()
         }
     }
 
-    // HARDWARE buttons are not part of common 'devices' vector, must be called explicitly
-    for (auto &button : hardwareButtons)
-    {
-        button.init();
-    }
-
-    for (auto device : devices)
+    for (auto &device : devices)
     {
         device->init(); // to jest init() danego typu device np. onoffDevice
     }
@@ -296,21 +268,25 @@ void DeviceManager::init()
 
 void DeviceManager::cyclic()
 {
-    static long lastInternalDescriptionUpdateTime = 0;
+    static uint32_t lastInternalDescriptionUpdateTime = 0;
+    const uint32_t now = millis();
 
-    for(auto& button : hardwareButtons){
-        button.cyclic();
-    }
-    
-    for (auto device : devices)
+    for (size_t index = 0; index < devices.size(); ++index)
     {
-        device->cyclic();
+        auto &device = devices[index];
+        const auto *registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        const uint32_t intervalMs = registration != nullptr ? registration->cycleIntervalMs : 0;
+        if (intervalMs == 0 || static_cast<uint32_t>(now - lastDeviceCycleTimes[index]) >= intervalMs)
+        {
+            lastDeviceCycleTimes[index] = now;
+            device->cyclic();
+        }
     }
 
-    if (millis() - lastInternalDescriptionUpdateTime > 5000)
-    { /* 30sec */
+    if (static_cast<uint32_t>(now - lastInternalDescriptionUpdateTime) >= 1000)
+    {
         updateDeviceDescriptionSignal();
-        lastInternalDescriptionUpdateTime = millis();
+        lastInternalDescriptionUpdateTime = now;
     }
 }
 
@@ -318,16 +294,23 @@ void DeviceManager::updateDeviceDescriptionSignal()
 {
     std::vector<DeviceDescription> Descriptions;
 
-    for (Device *device : devices)
+    for (const auto &device : devices)
     {
-
-        Descriptions.push_back(device->getDeviceDescription());
+        const auto* registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        if (registration != nullptr && registration->includedInDeviceCollection)
+        {
+            Descriptions.push_back(device->getDeviceDescription());
+        }
     }
 
     DataContainer::setSignalValue(SIG_LOCAL_COLLECTION, Descriptions);
 }
 
-bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nvmData, uint8_t configSlotID)
+bool DeviceManager::extractDeviceInstanceBasedOnNvmData(
+    DeviceConfigSlotType &nvmData,
+    uint8_t configSlotID,
+    bool* claimedPins,
+    size_t claimedPinCount)
 {
     bool isValidDeviceGiven = false;
 
@@ -335,92 +318,54 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
     if (nvmData.isActive)
     {
         /* Is known and valid device type inside?*/
-        if (nvmData.isValid())
+        if (nvmData.isValid() && GeneratedDeviceRegistry::validateConfiguration(nvmData, claimedPins, claimedPinCount))
         {
 
-            switch (nvmData.deviceType)
+            GeneratedDeviceRegistry::RuntimeContext context = {
+                .persistentDataChanged = DeviceManager::persistentDataChanged,
+                .getRtcTime = DeviceManager::getRtcTimeWrapper,
+                .toggleLocalDevice = [](uint16_t deviceToggleId)
+                {
+                    std::vector<DeviceDescription> devicesVector =
+                        std::any_cast<std::vector<DeviceDescription>>(
+                            DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+                    ServiceParameters_set1 parameters;
+                    bool deviceExists = false;
+                    for (const auto &device : devicesVector)
+                    {
+                        if (device.deviceId == deviceToggleId)
+                        {
+                            parameters.a = !device.isEnabled;
+                            deviceExists = true;
+                            break;
+                        }
+                    }
+                    if (deviceExists)
+                    {
+                        ServiceRequestErrorCode errorCode =
+                            std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))
+                                .serviceCall_set1(deviceToggleId, DEVSERVICE_STATE_SWITCH, parameters);
+                        if (errorCode != SERV_SUCCESS)
+                        {
+                            Logger::log("Error toggling " + String((int)deviceToggleId) + " device via HW Button");
+                        }
+                    }
+                },
+                .fireDigitalEvent = [](uint64_t eventId)
+                {
+                    std::any callback = DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT);
+                    if (auto function = std::any_cast<std::function<void(uint64_t)>>(&callback))
+                    {
+                        (*function)(eventId);
+                    }
+                }};
+
+            std::unique_ptr<Device> device = GeneratedDeviceRegistry::create(nvmData.deviceType, nvmData, context);
+            if (device)
             {
-            case type_ONOFFDEVICE:
-                vecOnOffDevices.push_back(OnOffDevice(nvmData));
+                devices.push_back(std::move(device));
+                lastDeviceCycleTimes.push_back(millis());
                 isValidDeviceGiven = true;
-                break;
-
-            case type_LED_STRIP:
-#ifdef LED_STRIP_SUPPORTED
-                /* create WS2812b instance by forwarding NVM data to it */
-                ledws2812bDevices.push_back(LedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
-                isValidDeviceGiven = true;
-#endif
-                break;
-
-            case type_LED_STRIP_SEGMENTED:
-#ifdef LED_STRIP_SUPPORTED
-                /* create Segmented WS2812b instance by forwarding NVM data to it */
-                segmentedWs2812bDevices.push_back(SegLedWS1228bDeviceType(nvmData, DeviceManager::persistentDataChanged));
-                isValidDeviceGiven = true;
-#endif
-                break;
-
-            case type_TEMP_SENSOR:
-#ifdef TEMP_SENSOR_SUPPORTED
-                tempSensorsDevices.push_back(TempSensorDHT11DeviceType(nvmData, static_cast<std::function<RtcTime()>>(DeviceManager::getRtcTimeWrapper)));
-                isValidDeviceGiven = true;
-#endif
-                break;
-            case type_DISTANCE_SENSOR:
-
-                distanceSensorsDevices.push_back(DistanceSensor(nvmData));
-                isValidDeviceGiven = true;
-
-                break;
-
-            case type_HARDWARE_BUTTON:
-
-                hardwareButtons.emplace_back(nvmData, ([&](uint16_t deviceToggleId)
-                                                       {
-                                                 std::vector<DeviceDescription> devicesVector =
-                                                     std::any_cast<std::vector<DeviceDescription>>(
-                                                         DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-
-                                                 ServiceParameters_set1 parameters;
-                                                 bool deviceExists = false;
-                                                 for (auto &device : devicesVector)
-                                                 {
-                                                     if (device.deviceId == deviceToggleId)
-                                                     {
-                                                         parameters.a = !(device.isEnabled);
-                                                         deviceExists = true;
-                                                         break;
-                                                     }
-                                                 }
-
-                                                 if (deviceExists)
-                                                 {
-                                                     ServiceRequestErrorCode errorCode =
-                                                         std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(deviceToggleId, DEVSERVICE_STATE_SWITCH, parameters);
-                                                     if (errorCode != SERV_SUCCESS)
-                                                     {
-                                                         Logger::log(" Error toggling " + String((int)deviceToggleId) + " device via HW Button");
-                                                     }
-                                                 } }),
-                                             ([&](uint64_t eventId)
-                                              {
-                                                  // Fire event
-                                                  std::any localAny = DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT);
-                                                  if (auto p = std::any_cast<std::function<void(uint64_t)>>(&localAny))
-                                                  {
-                                                    (*p)(eventId);
-                                                  }
-                                                  else
-                                                  {
-                                                    
-                                                  } }));
-                isValidDeviceGiven = true;
-
-                break;
-
-            default:
-                break;
             }
             /* TODO more NVM Data to be extracted here ! */
 
@@ -443,7 +388,7 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(DeviceConfigSlotType &nv
             /* Handle errors only when device is properly configured */
             if (currentConfig.networkSSID[0] != '\0')
             {
-                Logger::log("Invalid Device type for config slot : " + String((int)configSlotID));
+                Logger::log("Invalid device type or GPIO configuration for config slot: " + String((int)configSlotID));
             }
         }
     }
@@ -565,6 +510,12 @@ bool DeviceManager::loadConfigFromFile(JsonDocument &doc)
         // configSlot.print();
     }
 
+    if (!validateConfigurationSet(receivedConfigurationSet))
+    {
+        Logger::log("DeviceManager: imported configuration contains invalid or conflicting GPIO assignments");
+        return true;
+    }
+
     pinConfigSlotsRamMirror = receivedConfigurationSet;
 
     /* no failure */
@@ -582,212 +533,83 @@ bool DeviceManager::setLocalSetupViaJson(String &json)
     Logger::log(json);
 
     JsonDocument doc;
-    deserializeJson(doc, json.c_str());
-
-    /* we will extract received JSON configuration to this instance, if is valid*/
-    ConfigSlotsDataType receivedConfigurationSet;
-
-    Logger::log("DeviceManager:// Following configuration slots found in JSON:");
-    /* Process JSON to extrac each device slot*/
-    for (uint16_t i = 0; i < 6; i++)
+    DeserializationError jsonError = deserializeJson(doc, json.c_str());
+    if (jsonError || !doc["devices"].is<JsonArray>())
     {
-        /*this exist for every slot*/
-        String type = String(doc["devices"][i]["type"]);
-        int id = doc["devices"][i]["id"];
-        bool isEnabled = doc["devices"][i]["enabled"];
+        Logger::log("DeviceManager: invalid device configuration JSON");
+        return false;
+    }
 
-        /*Validate identifier*/
-        if (id == (i + 1))
+    ConfigSlotsDataType receivedConfigurationSet;
+    JsonArray devicesJson = doc["devices"];
+    if (devicesJson.size() != receivedConfigurationSet.slots.size())
+    {
+        Logger::log("DeviceManager: wrong number of configuration slots");
+        return false;
+    }
+
+    for (uint16_t i = 0; i < devicesJson.size(); ++i)
+    {
+        JsonObject deviceJson = devicesJson[i];
+        if (!deviceJson["id"].is<uint8_t>() || !deviceJson["typeId"].is<uint8_t>() ||
+            !deviceJson["enabled"].is<bool>() || !deviceJson["name"].is<const char*>() ||
+            !deviceJson["pin"].is<uint8_t>() || !deviceJson["room"].is<uint8_t>() ||
+            !deviceJson["customBytes"].is<JsonArray>())
         {
-            DeviceConfigSlotType &configSlot = receivedConfigurationSet.slots.at(i);
-
-            if (type == "OnOff")
-            {
-                /* extract remaining OnOff data */
-                String name = String(doc["devices"][i]["name"]);
-                String pin = String(doc["devices"][i]["pin"]);
-                String room = String(doc["devices"][i]["room"]);
-                String brightnessSupport = String(doc["devices"][i]["briSup"]);
-                String activationState = String(doc["devices"][i]["activeState"]);
-                String minPwm = String(doc["devices"][i]["PwmMin"]);
-                String maxPwm = String(doc["devices"][i]["PwmMax"]);
-                Logger::log("DeviceManager: minPwm  " + String(minPwm));
-                Logger::log("DeviceManager: maxPwm  " + String(maxPwm));
-
-                /* Put data to config slot memory*/
-                configSlot.deviceType = (uint8_t)type_ONOFFDEVICE;
-                configSlot.isActive = isEnabled;
-                configSlot.deviceId = id;
-                if (name.length() < 25)
-                {
-                    memcpy(configSlot.deviceName, name.c_str(), name.length());
-                }
-                configSlot.pinNumber = pin.toInt();
-                configSlot.roomId = room.toInt();
-                configSlot.customBytes[0] = brightnessSupport.toInt();
-                configSlot.customBytes[1] = activationState.toInt();
-                configSlot.customBytes[2] = minPwm.toInt();
-                configSlot.customBytes[3] = maxPwm.toInt();
-            }
-            else if (type == "LedStrip")
-            {
-
-                /* extract remaining OnOff data */
-                String name = String(doc["devices"][i]["name"]);
-                String pin = String(doc["devices"][i]["pin"]);
-                String room = String(doc["devices"][i]["room"]);
-                String numberOfLeds = String(doc["devices"][i]["ledCount"]);
-                String sideFlp = String(doc["devices"][i]["sideFlp"]);
-                String currentLimiter = String(doc["devices"][i]["currLim"]);
-
-                /* Put data to config slot memory*/
-                configSlot.deviceType = (uint8_t)type_LED_STRIP;
-                configSlot.isActive = isEnabled;
-                configSlot.deviceId = id;
-                if (name.length() < 25)
-                {
-                    memcpy(configSlot.deviceName, name.c_str(), name.length());
-                }
-                configSlot.pinNumber = pin.toInt();
-                configSlot.roomId = room.toInt();
-                // configSlot.customBytes[0] = numberOfLeds.toInt();
-                uint16_t numberOfLedsUint = numberOfLeds.toInt();
-                memcpy(&configSlot.customBytes[0], &(numberOfLedsUint), sizeof(uint16_t));
-                configSlot.customBytes[2] = sideFlp.toInt();
-                if (currentLimiter.toInt() < 255)
-                {
-                    /* make info redundant due to safety reasons */
-                    configSlot.customBytes[3] = currentLimiter.toInt();
-                    configSlot.customBytes[19] = currentLimiter.toInt();
-                }
-                else
-                {
-                    configSlot.customBytes[3] = 0;
-                    configSlot.customBytes[19] = 0;
-                }
-            }
-            else if (type == "TempSensor")
-            {
-
-                /* extract remaining OnOff data */
-                String name = String(doc["devices"][i]["name"]);
-                String pin = String(doc["devices"][i]["pin"]);
-                String room = String(doc["devices"][i]["room"]);
-
-                /* Put data to config slot memory*/
-                configSlot.deviceType = (uint8_t)type_TEMP_SENSOR;
-                configSlot.isActive = isEnabled;
-                configSlot.deviceId = id;
-                if (name.length() < 25)
-                {
-                    memcpy(configSlot.deviceName, name.c_str(), name.length());
-                }
-                configSlot.pinNumber = pin.toInt();
-                configSlot.roomId = room.toInt();
-            }
-            else if (type == "DistanceSensor")
-            {
-
-                /* extract remaining OnOff data */
-                String name = String(doc["devices"][i]["name"]);
-                String pin = String(doc["devices"][i]["pin"]);
-                String room = String(doc["devices"][i]["room"]);
-                String txPin = String(doc["devices"][i]["pinTx"]);
-                String rxPin = String(doc["devices"][i]["pinRx"]);
-
-                /* Put data to config slot memory*/
-                configSlot.deviceType = (uint8_t)type_DISTANCE_SENSOR;
-                configSlot.isActive = isEnabled;
-                configSlot.deviceId = id;
-                if (name.length() < 25)
-                {
-                    memcpy(configSlot.deviceName, name.c_str(), name.length());
-                }
-                configSlot.pinNumber = pin.toInt();
-                configSlot.roomId = room.toInt();
-                configSlot.customBytes[2] = txPin.toInt();
-                configSlot.customBytes[3] = rxPin.toInt();
-            }
-            else if (type == "SegLedStrip")
-            {
-
-                /* extract remaining OnOff data */
-                String name = String(doc["devices"][i]["name"]);
-                String pin = String(doc["devices"][i]["pin"]);
-                String room = String(doc["devices"][i]["room"]);
-
-                /* Put data to config slot memory*/
-                configSlot.deviceType = (uint8_t)type_LED_STRIP_SEGMENTED;
-                configSlot.isActive = isEnabled;
-                configSlot.deviceId = id;
-                if (name.length() < 25)
-                {
-                    memcpy(configSlot.deviceName, name.c_str(), name.length());
-                }
-                configSlot.pinNumber = pin.toInt();
-                configSlot.roomId = room.toInt();
-
-                /* apply  segment led strip properties */
-                String currentLimiter = String(doc["devices"][i]["currLim"]);
-                configSlot.customBytes[0] = 0;
-                if (currentLimiter != "null")
-                {
-                    if (currentLimiter.toInt() < 255)
-                    {
-                        configSlot.customBytes[0] = currentLimiter.toInt();
-                    }
-                }
-
-                std::vector<uint8_t> segmentLedCount;
-                std::vector<uint8_t> segmentFlips;
-
-                if (doc["devices"][i]["ledCount"].is<JsonArray>())
-                {
-                    JsonArray segments = doc["devices"][i]["ledCount"];
-                    for (JsonVariant v : segments)
-                    {
-                        int count = v.as<String>() != "null" ? v.as<int>() : 0;
-                        segmentLedCount.push_back(count);
-                    }
-                }
-                else
-                {
-                    Logger::log("DeviceManager: Segmented LED strip does not have segments defined");
-                }
-
-                if (doc["devices"][i]["sideFlp"].is<JsonArray>())
-                {
-                    JsonArray flips = doc["devices"][i]["sideFlp"];
-                    for (JsonVariant v : flips)
-                    {
-                        int flip = v.as<String>() != "null" ? v.as<int>() : 0;
-                        segmentFlips.push_back(flip);
-                    }
-                }
-                else
-                {
-                    Logger::log("DeviceManager: Segmented LED strip does not have flips defined");
-                }
-
-                if (segmentLedCount.size() <= 5)
-                { /* only 5 segments allowed*/
-                    for (uint8_t j = 0; j < segmentLedCount.size(); j++)
-                    {
-                        configSlot.customBytes[5 + j] = segmentLedCount.at(j);
-                    }
-                }
-
-                if (segmentFlips.size() <= 5)
-                { /* only 5 segments allowed*/
-                    for (uint8_t j = 0; j < segmentFlips.size(); j++)
-                    {
-                        configSlot.customBytes[10 + j] = segmentFlips.at(j);
-                    }
-                }
-            }
-
-            configSlot.print();
+            Logger::log("DeviceManager: invalid configuration value type");
+            return false;
         }
+        const uint8_t id = deviceJson["id"] | 255;
+        const uint8_t typeId = deviceJson["typeId"] | 255;
+        if (id != i + 1)
+        {
+            Logger::log("DeviceManager: invalid slot identifier");
+            return false;
+        }
+
+        DeviceConfigSlotType &configSlot = receivedConfigurationSet.slots.at(i);
+        const auto* registration = GeneratedDeviceRegistry::find(typeId);
+        const bool enabled = deviceJson["enabled"].as<bool>();
+        if (enabled && registration == nullptr)
+        {
+            Logger::log("DeviceManager: active slot uses an unknown device type");
+            return false;
+        }
+        configSlot.deviceType = registration ? typeId : 255;
+        configSlot.isActive = registration && enabled;
+        configSlot.deviceId = id;
+        configSlot.pinNumber = deviceJson["pin"] | 255;
+        configSlot.roomId = deviceJson["room"] | 255;
+
+        String name = deviceJson["name"] | "";
+        if (name.length() >= sizeof(configSlot.deviceName))
+        {
+            Logger::log("DeviceManager: device name is too long");
+            return false;
+        }
+        name.toCharArray(configSlot.deviceName, sizeof(configSlot.deviceName));
+
+        JsonArray customBytes = deviceJson["customBytes"];
+        if (registration && customBytes.size() != sizeof(configSlot.customBytes))
+        {
+            Logger::log("DeviceManager: invalid custom byte payload");
+            return false;
+        }
+        for (uint8_t byte = 0; byte < customBytes.size() && byte < sizeof(configSlot.customBytes); ++byte)
+        {
+            if (!customBytes[byte].is<uint8_t>())
+            {
+                Logger::log("DeviceManager: invalid custom byte value");
+                return false;
+            }
+            configSlot.customBytes[byte] = customBytes[byte].as<uint8_t>();
+        }
+    }
+
+    if (!validateConfigurationSet(receivedConfigurationSet))
+    {
+        Logger::log("DeviceManager: invalid or conflicting GPIO configuration");
+        return false;
     }
 
     pinConfigSlotsRamMirror = receivedConfigurationSet;
@@ -809,6 +631,8 @@ ServiceRequestErrorCode DeviceManager::service(
     /* Go through the devices list */
     for (auto &device : devices)
     {
+        const auto* registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        if (registration == nullptr || !registration->includedInDeviceCollection) continue;
         /* Device with requested identifier found */
         if (device->getDeviceIdentifier() == deviceId)
         {
@@ -835,6 +659,8 @@ ServiceRequestErrorCode DeviceManager::service(
     /* Go through the devices list */
     for (auto &device : devices)
     {
+        const auto* registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        if (registration == nullptr || !registration->includedInDeviceCollection) continue;
         /* Device with requested identifier found */
         if (device->getDeviceIdentifier() == deviceId)
         {
@@ -860,6 +686,8 @@ ServiceRequestErrorCode DeviceManager::service(
     /* Go through the devices list */
     for (auto &device : devices)
     {
+        const auto* registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        if (registration == nullptr || !registration->includedInDeviceCollection) continue;
         /* Device with requested identifier found */
         if (device->getDeviceIdentifier() == deviceId)
         {
@@ -886,6 +714,8 @@ ServiceRequestErrorCode DeviceManager::service(
     /* Go through the devices list */
     for (auto &device : devices)
     {
+        const auto* registration = GeneratedDeviceRegistry::find(device->getDeviceType());
+        if (registration == nullptr || !registration->includedInDeviceCollection) continue;
         /* Device with requested identifier found */
         if (device->getDeviceIdentifier() == deviceId)
         {

@@ -2,6 +2,12 @@
 #include <os/drivers/networkdriver.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/DigitalEvent/DigitalEventReceiver.cpp
+ * @brief Digital event processing for the Home Control Station.
+ */
+
+
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
 std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
 std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;

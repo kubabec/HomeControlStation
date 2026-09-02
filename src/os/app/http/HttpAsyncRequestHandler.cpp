@@ -1,6 +1,17 @@
 #include <os/app/http/HttpAsyncRequestHandler.hpp>
 #include <os/app/http/AdvancedControlsLoader.hpp>
 #include "os/Logger.hpp"
+#if __has_include("generated/GeneratedDeviceStateSerializer.hpp")
+#include "generated/GeneratedDeviceStateSerializer.hpp"
+#else
+#include "devices/fallback/DeviceStateSerializer.hpp"
+#endif
+
+/**
+ * @file src/os/app/http/HttpAsyncRequestHandler.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
 
 HTTPAsyncRequestHandler::AsyncHttpRequest HTTPAsyncRequestHandler::currentRequest;
 String HTTPAsyncRequestHandler::jsonResponse = "";
@@ -148,7 +159,7 @@ void HTTPAsyncRequestHandler::downloadAdvancedControls()
     // Logger::log("Requesting controls for id " + String((int)deviceId));
     /* call loading processing function */
     ServiceRequestErrorCode errorCode =
-        AdvancedControlsLoader::loadAdvancedControlsToJavaScript(deviceId);
+        AdvancedControlsLoader::loadAdvancedControls(deviceId);
 
     switch (errorCode)
     {
@@ -289,76 +300,18 @@ void HTTPAsyncRequestHandler::createMainPageContentJson()
             jsonResponse += "\"name\":\"" + deviceInThisRoom->deviceName + "\",";
             if (deviceInThisRoom->isEnabled == 1)
             {
-                jsonResponse += "\"status\":\"on\",";
+                jsonResponse += "\"status\":\"on\"";
             }
             else if (deviceInThisRoom->isEnabled > 1)
             {
-                jsonResponse += "\"status\":\"alwaysOn\",";
+                jsonResponse += "\"status\":\"alwaysOn\"";
             }
             else
             {
-                jsonResponse += "\"status\":\"off\",";
+                jsonResponse += "\"status\":\"off\"";
             }
 
-            /*custom for types */
-            jsonResponse += "\"hasBrightness\":" + String((int)deviceInThisRoom->customBytes[0]) + ",";
-            if (deviceInThisRoom->deviceType == type_LED_STRIP)
-            {
-                String rgbColor = getHexColor(
-                    deviceInThisRoom->customBytes[2],
-                    deviceInThisRoom->customBytes[3],
-                    deviceInThisRoom->customBytes[4]);
-                jsonResponse += "\"avgColor\":\"#" + rgbColor + "\",";
-                jsonResponse += "\"liveStatus\":" + String((int)deviceInThisRoom->customBytes[15]) + ",";
-            }
-
-            if (deviceInThisRoom->deviceType == type_DISTANCE_SENSOR)
-            {
-                jsonResponse += "\"dist\":" + String((int)deviceInThisRoom->customBytes[0]) + ",";
-            }
-
-            if (deviceInThisRoom->deviceType == type_TEMP_SENSOR)
-            {
-                float temperature = 0.f;
-                memcpy(&temperature, &deviceInThisRoom->customBytes[3], sizeof(temperature));
-                jsonResponse += "\"temp\":" + String(temperature) + ",";
-                jsonResponse += "\"humid\":" + String((int)deviceInThisRoom->customBytes[2]) + ",";
-                jsonResponse += "\"Err\":" + String((int)deviceInThisRoom->customBytes[0]) + ",";
-            }
-
-            if (deviceInThisRoom->deviceType == type_LED_STRIP_SEGMENTED)
-            {
-                jsonResponse += "\"segCount\":" + String((int)deviceInThisRoom->customBytes[0]) + ",";
-
-                jsonResponse += "\"segments\":[";
-                for (uint8_t statusIdx = 1; statusIdx < 6; statusIdx++)
-                {
-                    uint8_t status = deviceInThisRoom->customBytes[statusIdx];
-                    jsonResponse += "\"" + String((int)status) + "\",";
-                }
-                jsonResponse += "$";
-                jsonResponse += "],";
-
-                uint8_t red = 0;
-                uint8_t green = 1;
-                uint8_t blue = 2;
-
-                jsonResponse += "\"colors\":[";
-                for (uint8_t color = 0; color < 5; color++)
-                {
-                    red = deviceInThisRoom->customBytes[7 + (color * 3)];
-                    green = deviceInThisRoom->customBytes[8 + (color * 3)];
-                    blue = deviceInThisRoom->customBytes[9 + (color * 3)];
-
-                    String rgbColor = getHexColor(red, green, blue);
-                    jsonResponse += "\"#" + rgbColor + "\",";
-                }
-                jsonResponse += "$";
-                jsonResponse.replace(",$", "");
-                jsonResponse += "],";
-            }
-
-            jsonResponse += "\"brightness\":" + String((int)deviceInThisRoom->customBytes[2]);
+            jsonResponse += GeneratedDeviceStateSerializer::serialize(*deviceInThisRoom);
 
             if (deviceIteratorCount < room.second.size())
             {
@@ -446,7 +399,7 @@ void HTTPAsyncRequestHandler::createDeviceConfigurationJson()
 
 void HTTPAsyncRequestHandler::createExtendedControls()
 {
-    jsonResponse += AdvancedControlsLoader::getOutpuJavaScript();
+    jsonResponse += AdvancedControlsLoader::getOutput();
 }
 
 void HTTPAsyncRequestHandler::createRedirectToMainJson()

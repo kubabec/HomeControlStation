@@ -3,6 +3,12 @@
 #include <ESPmDNS.h>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/wifiAdapter.cpp
+ * @brief WiFi adapter: connection management, mDNS responder, and DataContainer IP updates.
+ */
+
+
 bool WiFiAdapter::isConnectedFlag = false;
 bool WiFiAdapter::connectionInitialized = false;
 String WiFiAdapter::mSsid{"none"};

@@ -1,6 +1,12 @@
 #include <os/app/http/httpserver.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/http/requestCallbacks/parameterizedHandlers.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 void HomeLightHttpServer::parameterizedHandler_newConfigApply(String &request, WiFiClient &client)
 {
   // Configuration to be handled here

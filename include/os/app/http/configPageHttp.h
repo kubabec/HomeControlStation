@@ -1,6 +1,12 @@
 #ifndef CONFIGPAGEHTTP_H
 #define CONFIGPAGEHTTP_H
 
+/**
+ * @file include/os/app/http/configPageHttp.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 const char* popupContent = "<div class=\"popup-overlay hidden-popup\" id=\"popup-overlay\">\
         <div class=\"popup-content\" id=\"popup-content\">\
             <div class=\"popup-header\">Notification</div>\

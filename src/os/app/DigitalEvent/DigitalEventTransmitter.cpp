@@ -1,6 +1,12 @@
 #include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/drivers/networkdriver.hpp>
 
+/**
+ * @file src/os/app/DigitalEvent/DigitalEventTransmitter.cpp
+ * @brief Digital event processing for the Home Control Station.
+ */
+
+
 uint64_t DigitalEventTransmitter::lastTransmittedId = 0;
 long long DigitalEventTransmitter::lastTransmittedTime = 0;
 bool DigitalEventTransmitter::wasRequestRepeated = false;

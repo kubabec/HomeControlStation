@@ -1,6 +1,12 @@
 #include <os/app/NotificationHandler.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/NotificationHandler.cpp
+ * @brief Notification dispatch: stores and exposes UI notifications for display and retrieval.
+ */
+
+
 std::queue<UserInterfaceNotification> NotificationHandler::notifications;
 
 void NotificationHandler::init()

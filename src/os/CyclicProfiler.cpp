@@ -1,5 +1,11 @@
 #include <os/CyclicProfiler.hpp>
 
+/**
+ * @file src/os/CyclicProfiler.cpp
+ * @brief Profiling utilities for cyclic task timing, stats, and reporting.
+ */
+
+
 
   using FuncPtr = void(*)();
 

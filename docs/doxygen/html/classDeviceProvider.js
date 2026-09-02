@@ -1,0 +1,26 @@
+var classDeviceProvider =
+[
+    [ "addDeviceDescriptionToResponsePayload", "classDeviceProvider.html#a4a259fd2c445ba3deb9fe2359d5b0912", null ],
+    [ "cyclic", "classDeviceProvider.html#af175cb3fadb8c880967088603bfbc8a9", null ],
+    [ "deinit", "classDeviceProvider.html#a243c5fafdfcee3570c677528f7d22fc4", null ],
+    [ "deviceReset", "classDeviceProvider.html#ad0793ea672a6eb0b600574fff6be631a", null ],
+    [ "getOriginalIdFromUnique", "classDeviceProvider.html#a235561234f0bd4a6c444272d1d15db7f", null ],
+    [ "handelService3Request", "classDeviceProvider.html#ac79c9f6573529ad37d3126b8dfe18016", null ],
+    [ "init", "classDeviceProvider.html#a4cc2bc64f65b733723f87a16007cfc1e", null ],
+    [ "initLocalDevicesSetup", "classDeviceProvider.html#a7def09face3582e3da92c0a1e9606445", null ],
+    [ "initRemoteDevicesSetup", "classDeviceProvider.html#a67960ea4d96ca5b342e5d047ee27e775", null ],
+    [ "printIdMap", "classDeviceProvider.html#ad3fdd3de3d94be6957186f9dba4e85e2", null ],
+    [ "receiveRequest", "classDeviceProvider.html#a5ab42bd6f62090ab5cf05eb82cf9e720", null ],
+    [ "service", "classDeviceProvider.html#a64eef14ed1a833ba761375601f5395fd", null ],
+    [ "service", "classDeviceProvider.html#ad00bd09866f1e3e0606a37e021616941", null ],
+    [ "service", "classDeviceProvider.html#a2bc8b90dcca7c9ae2281bcdccd77bcb1", null ],
+    [ "service", "classDeviceProvider.html#a472e06a10235f147583c5aeb986c13fe", null ],
+    [ "updateDeviceDescriptionSignal", "classDeviceProvider.html#adf4c881c878f88b43f06dddb7f9b0937", null ],
+    [ "updateDeviceDescriptionSignal_onChange", "classDeviceProvider.html#a9975c2b39996aaf7a5885183e00eb86c", null ],
+    [ "isRCServer", "classDeviceProvider.html#a0642f9a9df069492b8233e9eeb474e5a", null ],
+    [ "requestedRoomState", "classDeviceProvider.html#ad58877ce6d3d76a295d11d881be23cd2", null ],
+    [ "requestResponseLong", "classDeviceProvider.html#ac7f3c3b29df6971008c46258867a8b22", null ],
+    [ "roomStateChangeDeviceIdQueue", "classDeviceProvider.html#a039ab8bd2ecfd64215dbda06db8b40c3", null ],
+    [ "sendResponse", "classDeviceProvider.html#a121bf22907ae36dbeb1dc06dfc942592", null ],
+    [ "uniqueDeviceIdToNormalDeviceIdMap", "classDeviceProvider.html#aad63f9b3c3a466b4dc477561ffc51519", null ]
+];

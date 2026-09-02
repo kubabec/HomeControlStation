@@ -4,6 +4,12 @@
 #include <Arduino.h>
 #include <devices/device.hpp>
 
+/**
+ * @file include/os/app/remoteControl/rc_dataTypes.hpp
+ * @brief Remote-control request and response definitions for the Home Control Station.
+ */
+
+
 typedef enum {
     REQUEST_NODE_INITIAL_DATA = 50,
     REQUEST_NODE_DETAILED_DATA,

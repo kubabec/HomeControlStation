@@ -3,6 +3,12 @@
 #include <os/Logger.hpp>
 #include "esp_adc_cal.h"
 
+/**
+ * @file src/os/HomeStation_os.cpp
+ * @brief Main OS loop, scheduler and lifecycle management for the Home Control Station.
+ */
+
+
 DHT tempSensor(21, DHT11);
 
 bool OperatingSystem::isHttpServerRunning = false;

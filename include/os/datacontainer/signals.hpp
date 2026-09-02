@@ -2,6 +2,12 @@
 #define SIGNALS_H
 
 #define NUMBER_OF_SIGNALS 48
+
+/**
+ * @file include/os/datacontainer/signals.hpp
+ * @brief Data container and persistence definitions for the Home Control Station operating system.
+ */
+
 enum Signal
 {
     /* Type: bool , somme description */

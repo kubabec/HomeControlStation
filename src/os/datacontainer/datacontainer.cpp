@@ -1,5 +1,11 @@
 #include <os/datacontainer/DataContainer.hpp>
 
+/**
+ * @file src/os/datacontainer/datacontainer.cpp
+ * @brief Data container: persistent storage and signal registry for runtime communication.
+ */
+
+
 
 
 std::array<std::any, NUMBER_OF_SIGNALS>  DataContainer::dataTable;

@@ -3,6 +3,10 @@
 
 #include <os/tools/ExtendedDataTypes.hpp>
 #include <vector>
+/**
+ * @class ExtendedDataAllocator
+ * @brief Allocates and tracks the extra memory region used by runtime device payloads.
+ */
 
 class ExtendedDataAllocator {
     private:

@@ -2,6 +2,12 @@
 #include <os/app/config/PersistentMemoryAccess.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/config/ExtendedMemoryManager.cpp
+ * @brief Configuration persistence and runtime configuration logic for the Home Control Station.
+ */
+
+
 ExtMemoryMetadataType ExtendedMemoryManager::extMemoryMetadata;
 uint16_t ExtendedMemoryManager::extMemoryInUse;
 std::vector<ExtMemoryData> ExtendedMemoryManager::extMemoryContainer;

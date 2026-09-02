@@ -3,6 +3,12 @@
 #include <os/drivers/networkdriver.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/app/remoteControl/RequestProcessor.cpp
+ * @brief Remote-control protocol implementation for the Home Control Station.
+ */
+
+
 RequestProcessor::RequestProcessor() {
 
 

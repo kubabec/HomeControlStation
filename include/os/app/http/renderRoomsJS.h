@@ -1,16 +1,24 @@
 #ifndef RENDER_ROOMS_JS_H
 #define RENDER_ROOMS_JS_H
 #include <Arduino.h>
-#include "deviceWidgets.h"
+#if __has_include("generated/GeneratedDeviceWidgets.hpp")
+#include "generated/GeneratedDeviceWidgets.hpp"
+#else
+#include "devices/fallback/DeviceWidgets.hpp"
+#endif
+
+/**
+ * @file include/os/app/http/renderRoomsJS.h
+ * @brief Dashboard shell that embeds the generated compile-time device widget bundle.
+ *
+ * Device widget functions and type dispatch are generated from device JSON descriptions. This file
+ * contains only common room layout, status, and refresh behavior.
+ */
+
 
 const String renderRoomsJS = "\
-<script>" + deviceWidgetsJS +
-"const onOffType = 43;\
-const ledStripType = 44;\
-const tempSensorType = 45;\
-const segLedStripType = 46;\
-const distSensType = 47;\
-\
+<script>" + generatedDeviceWidgetsJs +
+"\
 function generateCommonDevInterface(deviceContainer, deviceId, deviceName, status) {\
     const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
     const loadingOverlay = document.createElement('div');\
@@ -63,19 +71,8 @@ function renderRooms(data) {\
             deviceContainer.className = 'container';\
             deviceContainer.id = `container${device.id}`;\
                 \
-            if(device.devType == onOffType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
-                generateOnOffWidget(deviceContainer, device);\
-            }else if(device.devType == ledStripType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
-                generateLedStripWidget(deviceContainer, device);\
-            }else if(device.devType == distSensType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
-                generateDistSensWidget(deviceContainer, device);\             
-            }else if(device.devType == tempSensorType){\
-                generateCommonDevInterface( deviceContainer, device.id, device.name, device.status);\
-                generateTempWidget(deviceContainer, device);\
-            }else{\
+            generateCommonDevInterface(deviceContainer, device.id, device.name, device.status);\
+            if(!renderGeneratedDeviceWidget(deviceContainer, device)){\
                 const header = document.createElement('div');\
                 header.className = 'header';\
                 header.textContent = 'UnknownDeviceType';\

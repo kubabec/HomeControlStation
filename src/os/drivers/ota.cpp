@@ -7,6 +7,12 @@
 #endif
 
 #include "esp_task_wdt.h"
+
+/**
+ * @file src/os/drivers/ota.cpp
+ * @brief Driver implementations for the Home Control Station OS.
+ */
+
 void OTA::init(const String hostname, const String password)
 {
     // Port defaults to 3232

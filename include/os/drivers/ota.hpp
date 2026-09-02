@@ -3,6 +3,10 @@
 
 
 #include <ArduinoOTA.h>
+/**
+ * @class OTA
+ * @brief Manages the over-the-air firmware update flow used by the station.
+ */
 
 class OTA
 {

@@ -1,0 +1,25 @@
+var generate__device__registry_8py =
+[
+    [ "generate_device_registry.cpp_identifier", "namespacegenerate__device__registry.html#a935979e5e42b52d430fe1aa012113f43", null ],
+    [ "generate_device_registry.generate", "namespacegenerate__device__registry.html#a913873cf89f388d70a28de0b77d68884", null ],
+    [ "generate_device_registry.generate_advanced_controls", "namespacegenerate__device__registry.html#a8591109a3064be30adfdba12f19f3c80", null ],
+    [ "generate_device_registry.generate_configuration_javascript", "namespacegenerate__device__registry.html#a93fb38de478cc3ca9bb2e84c9605bf95", null ],
+    [ "generate_device_registry.generate_device_widgets", "namespacegenerate__device__registry.html#abd3460b2ad34ce8aa7b44e917bac3d26", null ],
+    [ "generate_device_registry.generate_registry", "namespacegenerate__device__registry.html#ad50f4ae932682fb5a8228aed65e21d3f", null ],
+    [ "generate_device_registry.generate_state_serializer", "namespacegenerate__device__registry.html#ac94e77dd59746ec4be160c992543de90", null ],
+    [ "generate_device_registry.generate_types", "namespacegenerate__device__registry.html#a3a0ab8bab6954e429ac54076c37c2633", null ],
+    [ "generate_device_registry.generate_widget_javascript", "namespacegenerate__device__registry.html#ad0d01530e2c9cf84634493871f588835", null ],
+    [ "generate_device_registry.guard_block", "namespacegenerate__device__registry.html#aa73fdb097ef7b069b268e85840b02298", null ],
+    [ "generate_device_registry.load_descriptions", "namespacegenerate__device__registry.html#a619cf80676f669f2ed6fc5c3f2b540d7", null ],
+    [ "generate_device_registry.parse_source", "namespacegenerate__device__registry.html#a32059fea74dc9e43a13b5c981ab6d682", null ],
+    [ "generate_device_registry.state_field_code", "namespacegenerate__device__registry.html#a6a43db4c79b4e8bb3d5f50b7b2a97cc4", null ],
+    [ "generate_device_registry.state_offset", "namespacegenerate__device__registry.html#acdd1df58388875f41cd5cc35f2c8e503", null ],
+    [ "generate_device_registry.validate_description", "namespacegenerate__device__registry.html#aacfc6ea7d8de5bdb201ce68e5b687260", null ],
+    [ "generate_device_registry.write_if_changed", "namespacegenerate__device__registry.html#ae33a8d278b6981238d1c9cc835c82048", null ],
+    [ "generate_device_registry.DEVICES_DIR", "namespacegenerate__device__registry.html#a6b9f69ea06e1f17d32e3e4158e874f03", null ],
+    [ "generate_device_registry.FACTORY_ARGUMENTS", "namespacegenerate__device__registry.html#ae1c9b9170c3d29411548640a88c5cc84", null ],
+    [ "generate_device_registry.GENERATED_INCLUDE_DIR", "namespacegenerate__device__registry.html#a0640cc3916cc56560177ae03938efc62", null ],
+    [ "generate_device_registry.MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE", "namespacegenerate__device__registry.html#a71649a4ce9a8451feca45f8ec8e8be1e", null ],
+    [ "generate_device_registry.PROJECT_DIR", "namespacegenerate__device__registry.html#a6fa111dc94a5e8adc44d01c7e465428f", null ],
+    [ "generate_device_registry.RESERVED_TYPE_IDS", "namespacegenerate__device__registry.html#a3468b0a3df6bf0da00ed96301272e13c", null ]
+];

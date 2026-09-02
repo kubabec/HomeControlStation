@@ -1,8 +1,23 @@
 #ifndef JAVASCRIPT_H
 #define JAVASCRIPT_H
+#include <Arduino.h>
+#if __has_include("generated/GeneratedDeviceConfiguration.hpp")
+#include "generated/GeneratedDeviceConfiguration.hpp"
+#else
+#include "devices/fallback/DeviceConfiguration.hpp"
+#endif
+
+/**
+ * @file include/os/app/http/javascript.h
+ * @brief Device-independent browser helpers used by the Home Control Station HTTP interface.
+ *
+ * Device configuration serialization is appended from GeneratedDeviceConfiguration.hpp and is not
+ * maintained as handwritten per-device JavaScript in this file.
+ */
 
 
-const char* javascript = "\
+
+const String legacyJavascript = "\
 <script>\
 let interfaceVisible = true;\
 document.addEventListener('visibilitychange', () => {\
@@ -11,8 +26,7 @@ document.addEventListener('visibilitychange', () => {\
   } else {\
     interfaceVisible = true;\
     currentData = {};\
-    hash = 0;\
-    fetchData();\
+    if (typeof fetchData === 'function') fetchData();\
 }});\
 function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
     const xhr = new XMLHttpRequest();\
@@ -26,10 +40,9 @@ function createAsyncRequestWithRenderRoomsResponse(url, container = null){\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
                 console.log(xhr.responseText);\
-                const [newData, hashObj] = JSON.parse(xhr.responseText);\
+                const [newData] = JSON.parse(xhr.responseText);\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
-                    hash = hashObj.hash;\
                     renderRooms(currentData);\
                 }\
             } else { \
@@ -76,8 +89,11 @@ let isNotificationPollingActive = 1;\
         createAsyncRequestWithRenderRoomsResponse(url, container);\
     }\
     function toggleDeviceConfig(checkbox) {\
+        if (!checkbox) return;\
         var container = checkbox.closest('.device-container');\
+        if (!container) return;\
         var statusText = container.querySelector('.status-text');\
+        if (!statusText) return;\
         if (checkbox.checked) {\
             container.classList.remove('disabled');\
             statusText.textContent = 'Enabled';\
@@ -90,6 +106,7 @@ let isNotificationPollingActive = 1;\
     }\
     function showExtraFields(select, deviceId) {\
         const deviceContainer = document.getElementById(deviceId);\
+        if (!select || !deviceContainer) return;\
         const extraFields = deviceContainer.querySelectorAll('.extra-fields');\
         extraFields.forEach(field => {\
             field.classList.remove('visible');\
@@ -100,169 +117,6 @@ let isNotificationPollingActive = 1;\
             fieldsToShow.classList.add('visible');\
         }\
     };\
-    function getOnOffConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var brightnessSupport =  document.getElementById('brightnessSupported-' + id).value;\
-        var activeSt = document.getElementById('activationState-' + id).value;\
-        var pwmMin = document.getElementById('pwmMin-' + id).value;\
-        var pwmMax = document.getElementById('pwmMax-' + id).value;\
-        return {\
-        type:\"OnOff\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        briSup:brightnessSupport,\
-        activeState:activeSt,\
-        PwmMin:pwmMin,\
-        PwmMax:pwmMax\
-      };\
-    }\
-    function getLedStripConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var ledsCnt =  document.getElementById('ledsCount-' + id).value;\
-        var sideFlip =  document.getElementById('ledsSideFlip-' + id).value;\ 
-        var curLim =  document.getElementById('curLim-' + id).value;\ 
-        return {\
-        type:\"LedStrip\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        ledCount:ledsCnt,\
-        sideFlp:sideFlip,\
-        currLim:curLim\
-        };\
-    }\
-    function getSegStripConfigJson(id){\
-        const segments = [];\
-        const flips = [];\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var curLim =  document.getElementById('SegcurLimVal-' + id).value;\ 
-        \
-        for (let i = 1; i <= 5; i++) {\
-          var segCnt =  document.getElementById('seg'+i+'Count-' + id).value;\ 
-          var segFlip =  document.getElementById('Seg'+i+'Flip-' + id).value;\
-          if (segCnt) {\
-            segments.push(segCnt);\
-          }\
-          if(segFlip) {\
-            flips.push(segFlip);\
-          }\
-        }\
-        return {\
-        type:\"SegLedStrip\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        ledCount:segments,\
-        sideFlp:flips,\
-        currLim:curLim\
-        };\
-    }\
-    function getTempSensorConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        return {\
-        type:\"TempSensor\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-      };\
-    }\
-    function getDistSensorConfigurationJson(id){\
-        var enable = \"enabled\" + id;\
-        var enableValue = document.getElementById(enable).checked;\
-        var dataName = document.getElementById('name' + id).value;\
-        var dataPin = document.getElementById('pin' + id).value;\
-        var dataRoom = document.getElementById('room' + id).value;\
-        var tx = document.getElementById('pinTx-' + id).value;\
-        var rx = document.getElementById('pinRx-' + id).value;\
-        return {\
-        type:\"DistanceSensor\",\
-        id:id,\
-        enabled:enableValue,\
-        name:dataName,\
-        pin:dataPin,\
-        room:dataRoom,\
-        pinTx:tx,\
-        pinRx:rx\
-      };\
-    }\
-    function getEmptyConfigurationJson(id){\
-        return {\
-        type:\"Empty\",\
-        id:id,\
-        enabled:false,\
-      };\
-    }\
-    function createConfigurationStringJson()\
-    {\
-        let devices = [];\
-\
-        for (let i = 1; i <= 6; i++) {\
-            var deviceTypeValue = document.getElementById('type' + i).value;\
-\
-            if(deviceTypeValue == 43){\
-                devices.push(getOnOffConfigurationJson(i));\
-            } else if(deviceTypeValue == 44) {\
-                devices.push(getLedStripConfigurationJson(i));\
-            } else if(deviceTypeValue == 45) {\
-                devices.push(getTempSensorConfigurationJson(i));\
-            } else if(deviceTypeValue == 46) {\
-                devices.push(getSegStripConfigJson(i));\
-            } else if(deviceTypeValue == 47) {\
-                devices.push(getDistSensorConfigurationJson(i));\
-            } else {\
-                devices.push(getEmptyConfigurationJson(i));\
-            }\
-        }\
-\
-        let finalJson = {\
-            devices: devices\
-        };\
-    \
-        let jsonString = JSON.stringify(finalJson);\
-        console.log(\"Wygenerowany JSON:\", jsonString);\
-        var url = '/lclSetupJson&' + jsonString;\
-\
-        const xhr = new XMLHttpRequest();\
-        xhr.timeout = 10000;\
-        xhr.open(\"POST\", url, true);\
-        xhr.onreadystatechange = function() {\
-            if (xhr.readyState === 4) { \
-                if (xhr.status === 200) { \
-                    console.log('Config changed');\
-                } else { \
-                    console.log('Error with AJAX request');\
-                }\
-            }\
-            url = '/';\
-            window.location.href = url;\
-        };\
-        xhr.send();\
-    }\
     function roomMappingCreateString(count)\
     {\
         let roomMappings = [];\
@@ -289,18 +143,16 @@ let isNotificationPollingActive = 1;\
     window.onload = function() {\
         document.querySelectorAll('.device-container').forEach(container => {\
             var checkbox = container.querySelector('input[type=\"checkbox\"]');\
+            if (!checkbox || !container.querySelector('.status-text')) return;\
             toggleDeviceConfig(checkbox);\
             checkbox.addEventListener('change', function() {\
                 toggleDeviceConfig(this);\
             });\
         });\
 \
-        showExtraFields(document.getElementById('type1'), 'device-1');\
-        showExtraFields(document.getElementById('type2'), 'device-2');\
-        showExtraFields(document.getElementById('type3'), 'device-3');\
-        showExtraFields(document.getElementById('type4'), 'device-4');\
-        showExtraFields(document.getElementById('type5'), 'device-5');\
-        showExtraFields(document.getElementById('type6'), 'device-6');\
+        for (let slot = 1; slot <= 6; slot++) {\
+            showExtraFields(document.getElementById('type' + slot), 'device-' + slot);\
+        }\
     };\
 \
 \
@@ -359,13 +211,19 @@ let isNotificationPollingActive = 1;\
                 document.getElementById(\"password-input\").focus();\
             }, 0);\
         }\
+        let advancedControlsCleanup = [];\
+        function closeAdvancedControls() {\
+            advancedControlsCleanup.forEach(cleanup => { try { cleanup(); } catch (error) { console.error(error); } });\
+            advancedControlsCleanup = [];\
+            hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+        }\
         function showAdvancedControls() {\
             const popupOverlay = document.getElementById('advanced-ctrl-overlay');\
             const popupContent = document.getElementById('advanced-ctrl-popup');\
             const popupMessage = document.getElementById('advanced-ctrl-popup-msg');\
 \
             document.getElementById('advanced-ctrl-popup-close').onclick = function () {\
-                hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
+                closeAdvancedControls();\
             };\
 \
             popupOverlay.classList.remove('hidden-popup');\
@@ -417,37 +275,6 @@ let isNotificationPollingActive = 1;\
         function closePopup() {\
             const backdrop = document.querySelector(\".popup-backdrop\");\
             colorPickerPopup.style.display = \"none\";\
-            backdrop.style.display = \"none\";\
-        }\
-        function openLedStripMemorySlots() {\
-            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
-            const composClose = document.getElementById(\"composClose\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            composClose.addEventListener(\"click\", closeCompositions);\
-            FavouritesPopup.style.display = \"flex\";\
-            backdrop.style.display = \"block\";\
-        }\
-\
-        function closeCompositions() {\
-            const FavouritesPopup = document.getElementById(\"FavouritesPopup\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            FavouritesPopup.style.display = \"none\";\
-            backdrop.style.display = \"none\";\
-        }\
-        function openSaveCompositions() {\
-            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
-            const composClose = document.getElementById(\"composSaveClose\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            composClose.addEventListener(\"click\", closeSaveCompositions);\
-            colorInput.value = 0xFF00FA;\
-            FavouritesPopup.style.display = \"flex\";\
-            backdrop.style.display = \"block\";\
-        }\
-\
-        function closeSaveCompositions() {\
-            const FavouritesPopup = document.getElementById(\"SaveFavouritesPopup\");\
-            const backdrop = document.querySelector(\".popup-backdrop\");\
-            FavouritesPopup.style.display = \"none\";\
             backdrop.style.display = \"none\";\
         }\
         function rgbToHex(rgb) {\
@@ -646,8 +473,11 @@ function getExtendedControlsRequest(id, devContainer){\
         if (xhr.readyState === 4) { \
             if (xhr.status === 200) { \
                 console.log('Advanced controls respose:' + xhr.responseText);\
-                showAdvancedControls();\
-                window.eval(xhr.responseText);\
+                try {\
+                    mountAdvancedControls(JSON.parse(xhr.responseText));\
+                } catch (error) {\
+                    console.error('Invalid advanced-controls response:', error);\
+                }\
             } else { \
                 console.log('Error with AJAX request');\
             }\
@@ -656,21 +486,40 @@ function getExtendedControlsRequest(id, devContainer){\
     };\
     xhr.send();\
 }\
-function overWriteMemSlot(memSlotId, ledStripDevId){\
-    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
-    let jsonString = JSON.stringify(json);\
-    var url = '/stripOverwriteSlot&' + jsonString;\
-    createAsyncRequestWithRenderRoomsResponse(url);\
-    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
-    closeCompositions();\
+async function sendAdvancedControls(deviceId, payload, additionalParam = 255){\
+    const bytes = Array.from(payload, value => Math.max(0, Math.min(255, Number(value) || 0)));\
+    const request = JSON.stringify({devId:deviceId, additionalParam:additionalParam, payload:bytes});\
+    try {\
+        const response = await fetch('/setAdvancedControls&' + request, {method:'POST'});\
+        if (!response.ok) return false;\
+        if (typeof fetchData === 'function') await fetchData();\
+        return true;\
+    } catch (error) {\
+        console.error('Advanced-controls update failed:', error);\
+        return false;\
+    }\
 }\
-function loadMemSlot(memSlotId, ledStripDevId){\
-    let json = {\"devId\":ledStripDevId, \"slot\":memSlotId};\
-    let jsonString = JSON.stringify(json);\
-    var url = '/stripLoadFromMemory&' + jsonString;\
-    createAsyncRequestWithRenderRoomsResponse(url);\
-    hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
-    closeCompositions();\
+function mountAdvancedControls(response){\
+    showAdvancedControls();\
+    const root = document.getElementById('advanced-ctrl-popup-msg');\
+    const header = document.getElementById('adv-ctrl-head');\
+    if (response.error) { header.textContent = 'Advanced controls'; root.textContent = response.error; return; }\
+    header.textContent = response.deviceName;\
+    root.innerHTML = response.template;\
+    const script = root.querySelector('script[type=\"application/x-hcs-advanced-controls\"]');\
+    if (!script) { root.textContent = 'Advanced-controls template has no controller script.'; return; }\
+    const context = {\
+        root: root, deviceId: response.deviceId, deviceType: response.deviceType, deviceName: response.deviceName,\
+        payload: Uint8Array.from(response.payload || []),\
+        descriptionBytes: Uint8Array.from(response.descriptionBytes || []),\
+        save: payload => sendAdvancedControls(response.deviceId, payload, 255),\
+        action: additionalParam => sendAdvancedControls(response.deviceId, [], additionalParam),\
+        close: closeAdvancedControls,\
+        onCleanup: cleanup => advancedControlsCleanup.push(cleanup),\
+        showError: message => { root.textContent = message; }\
+    };\
+    try { new Function('context', script.textContent)(context); }\
+    catch (error) { console.error(error); root.textContent = 'Advanced-controls template failed to initialize.'; }\
 }\
 function updateCurLimVal(id, val) {\
     var value = Math.round((val/255)*100);\
@@ -726,6 +575,8 @@ function updateLocalDateTime(initialDateTime, elementId = 'currentDateTime') {\
     return setInterval(updateDateTime, 1000);\
 }\
 </script>";
+
+const String javascript = legacyJavascript + generatedDeviceConfigurationJs;
 
 #endif
 

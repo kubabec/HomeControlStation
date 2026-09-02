@@ -1,6 +1,12 @@
 #include <os/tools/UdpAdapter.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/udpAdapter.cpp
+ * @brief UDP adapter: send/receive MessageUDP packets and deliver to registered callbacks.
+ */
+
+
 const unsigned int UDPAdapter::senderPort = 9001;
 const char *UDPAdapter::broadcastIP = "192.168.1.255";
 WiFiUDP UDPAdapter::udp;

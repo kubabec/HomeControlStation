@@ -3,6 +3,12 @@
 
 #include <EEPROM.h>
 
+/**
+ * @file src/os/app/config/persistentMemoryAccess.cpp
+ * @brief Configuration persistence and runtime configuration logic for the Home Control Station.
+ */
+
+
 const uint8_t START_OF_DATA = 0b10101010;
 const uint8_t END_OF_DATA = 0b01010101;
 
@@ -54,8 +60,8 @@ bool PersistentMemoryAccess::saveData(uint8_t* data, uint16_t size)
 
         checkSum += END_OF_DATA;
 
-        // Save checksum on the last position;
-        EEPROM.write(currentAddress, checkSum);
+        // Store the complete checksum in the sizeof(int) bytes reserved by init().
+        EEPROM.put(currentAddress, checkSum);
 
         if(EEPROM.commit())
         {
@@ -100,12 +106,15 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
                 checkSum += END_OF_DATA;
 
                 currentAddress++;
-                // Compare calculated checkSum to memory read value
-                if(checkSum == EEPROM.read(currentAddress))
+                int storedCheckSum = 0;
+                EEPROM.get(currentAddress, storedCheckSum);
+                if(checkSum == storedCheckSum)
                 {
                     Logger::log("Data read successfully!");
                     return true;
                 }
+                Logger::log("Cannot read persistent data. Checksum mismatch");
+                return false;
             }else
             {
                 Logger::log("Cannot read persistant data. END_OF_DATA missing");
@@ -117,6 +126,8 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
             Logger::log("Cannot read persistant data. START_OF_DATA missing");
             return false;
         }
+
+        return false;
         
 
     }

@@ -1,6 +1,12 @@
 #ifndef STYLE_H
 #define STYLE_H
 
+/**
+ * @file include/os/app/http/style.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 
 const char* style_css = " \
 <style>\
@@ -183,7 +189,7 @@ transform: translateY(20px);\
 animation: fadeInSlide 2s forwards;\
 transition: background-color 0.3s, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;\
 overflow: hidden;\
-max-height: 650px;\
+max-height: 1100px;\
 }\
 .device-container.disabled {\
 background-color: #1d2530;\
@@ -215,7 +221,7 @@ opacity: 0;\
 transition: max-height 1.5s ease, opacity 1.5s ease;\
 }\
 .visible {\
-max-height: 500px;\
+max-height: 900px;\
 opacity: 1;\
 }\
 hr.custom-hr {\
@@ -829,6 +835,129 @@ content: '\\1F5C3';\
 }\
 .icon-btn.ok::before {\
 content: '\\2714';\
+}\
+.device-readouts {\
+display:grid;\
+grid-template-columns:repeat(2,minmax(0,1fr));\
+gap:9px;\
+width:100%;\
+margin:2px 0 10px;\
+}\
+.device-readout {\
+display:flex;\
+flex-direction:column;\
+justify-content:center;\
+min-height:52px;\
+padding:9px 11px;\
+box-sizing:border-box;\
+background:#2A2E35;\
+border:1px solid rgba(90,141,238,.18);\
+border-radius:12px;\
+box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 3px 9px rgba(0,0,0,.18);\
+}\
+.device-readout:last-child:nth-child(odd) { grid-column:1 / -1; }\
+.device-readout-label {\
+color:#8A94A6;\
+font-size:10px;\
+font-weight:600;\
+letter-spacing:.08em;\
+line-height:1.2;\
+text-transform:uppercase;\
+}\
+.device-readout-value {\
+margin-top:4px;\
+color:#ECEFF4;\
+font-size:15px;\
+font-weight:600;\
+line-height:1.25;\
+overflow-wrap:anywhere;\
+}\
+.device-readout-value.tone-accent { color:#86AEFF; }\
+.device-readout-value.tone-success { color:#6EDC8C; }\
+.device-readout-value.tone-warning { color:#F3C969; }\
+.device-readout-value.tone-danger { color:#FF7B7B; }\
+.advanced-controls-form {\
+display:flex;\
+flex-direction:column;\
+gap:14px;\
+padding:6px 2px 2px;\
+text-align:left;\
+}\
+.advanced-status-card {\
+display:grid;\
+grid-template-columns:repeat(2,minmax(0,1fr));\
+gap:8px;\
+padding:12px;\
+background:#20242A;\
+border:1px solid rgba(90,141,238,.22);\
+border-radius:12px;\
+}\
+.advanced-status-item { display:flex;flex-direction:column;gap:3px;min-width:0; }\
+.advanced-status-item.wide { grid-column:1 / -1; }\
+.advanced-status-label { color:#8A94A6;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase; }\
+.advanced-status-value { color:#ECEFF4;font-size:14px;font-weight:600;overflow-wrap:anywhere; }\
+.advanced-status-value.good { color:#6EDC8C; }\
+.advanced-status-value.warn { color:#F3C969; }\
+.advanced-status-value.danger { color:#FF7B7B; }\
+.advanced-field {\
+display:grid;\
+grid-template-columns:minmax(0,1fr) minmax(150px,1.25fr);\
+gap:14px;\
+align-items:center;\
+margin:0;\
+}\
+.advanced-field > span { color:#95BAFF;font-size:14px; }\
+.advanced-field select,.advanced-field input[type=\"number\"] { width:100%;margin:0;box-sizing:border-box; }\
+.advanced-switch {\
+display:flex;\
+align-items:center;\
+justify-content:space-between;\
+min-height:42px;\
+margin:0;\
+padding:0 12px;\
+background:#343942;\
+border-radius:11px;\
+color:#DCE5F5;\
+}\
+.advanced-switch input[type=\"checkbox\"] { width:19px;height:19px;accent-color:#5A8DEE;order:2; }\
+.advanced-actions { display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:2px; }\
+.advanced-action,.advanced-primary {\
+min-height:42px;\
+padding:9px 12px;\
+border:0;\
+border-radius:12px;\
+background:#3C4148;\
+color:#ECEFF4;\
+font-family:inherit;\
+font-size:14px;\
+font-weight:600;\
+cursor:pointer;\
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 4px 10px rgba(0,0,0,.2);\
+}\
+.advanced-action:hover { background:#484F5A; }\
+.advanced-action.primary,.advanced-primary { background:#5A8DEE;color:white; }\
+.advanced-action.danger { background:#61373B;color:#FFD9D9; }\
+.advanced-primary { width:100%;margin-top:2px; }\
+input[type=\"number\"] {\
+width:200px;\
+padding:10px 12px;\
+margin-top:5px;\
+border:1px solid rgba(90,141,238,.25);\
+border-radius:18px;\
+box-sizing:border-box;\
+font-family:inherit;\
+font-size:14px;\
+color:#ECEFF4;\
+background:#2A2E35;\
+}\
+input[type=\"number\"]:focus { border-color:#5A8DEE;outline:none;box-shadow:0 0 0 2px rgba(90,141,238,.15); }\
+@media (max-width:520px) {\
+.popup-content { width:calc(100% - 36px);max-height:85vh;overflow-y:auto;box-sizing:border-box; }\
+.advanced-field { grid-template-columns:1fr;gap:5px; }\
+.advanced-actions { grid-template-columns:1fr; }\
+.device-container { width:calc(100vw - 56px); }\
+.device-container label { gap:10px; }\
+.device-container input[type=\"number\"],.device-container select,.device-container input[type=\"text\"] { width:min(200px,55vw); }\
 }\
 </style>\
 ";

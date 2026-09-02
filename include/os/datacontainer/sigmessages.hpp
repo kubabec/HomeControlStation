@@ -1,6 +1,12 @@
 #ifndef SIGMESSAGES_H
 #define SIGMESSAGES_H
 
+/**
+ * @file include/os/datacontainer/sigmessages.hpp
+ * @brief Data container and persistence definitions for the Home Control Station operating system.
+ */
+
+
 
 typedef enum {
     STATE_SLAVE_KEEP_ALIVE,

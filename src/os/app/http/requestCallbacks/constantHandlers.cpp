@@ -2,6 +2,12 @@
 #include "os/Logger.hpp"
 #include <Esp.h>
 
+/**
+ * @file src/os/app/http/requestCallbacks/constantHandlers.cpp
+ * @brief HTTP server implementation and request callbacks for the Home Control Station.
+ */
+
+
 void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
 {
   client.println("<div id=\"rooms\"></div>");
@@ -25,20 +31,6 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
         <div class=\"popup-message\" id=\"advanced-ctrl-popup-msg\"></div>\
     </div>\
 </div>");
-
-  client.println("<div class=\"popup-backdrop\"></div><script>var ledStripExtCtrlId = 255;</script>\
-  <div class=\"color-picker-popup\" id=\"FavouritesPopup\">\
-      <div class=\"header2\">Saved compositions</div>\
-        <div id=\"ledStripExt1\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx1\"></button><button onclick=\"loadMemSlot(1, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx1\"></button></div>\
-        <br>\
-        <div id=\"ledStripExt2\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn save\"id=\"overWrEx2\"></button><button onclick=\"loadMemSlot(2, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx2\"></button></div>\
-        <br>\
-        <div id=\"ledStripExt3\" class=\"color-display\" style=\"background-color: rgb(130, 70, 170);\"></div>\
-        <div class=\"button-container\"><button onclick=\"overWriteMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn save\" id=\"overWrEx3\"></button><button onclick=\"loadMemSlot(3, ledStripExtCtrlId);\" class=\"icon-btn play\" id=\"loadEx3\"></button></div>\
-        <button class=\"button\" id=\"composClose\">Close</button>\
-  </div>");
 
   client.println("<script>document.getElementById(\"password-input\").addEventListener(\"keydown\", function(event) {\
   if (event.key === \"Enter\") {\
@@ -73,10 +65,9 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
   if(interfaceVisible){\
             try {\
                 const response = await fetch('/getPageContent');\
-                const [newData, hashObj, notificationCnt] = await response.json();\
+                const [newData, , notificationCnt] = await response.json();\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
-                    hash = hashObj.hash;\
                     renderRooms(currentData);\
                 }\
                 if(notificationCnt.ntcnt > 0){\
@@ -90,33 +81,11 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
   }\
         }\
 \
-let hash = 0;\
-    async function getHash(){\
-  if(interfaceVisible){\
-  try {\
-      const response = await fetch('/getHash');\
-      const respJson = await response.json();\
-      const hashValue = respJson[0]?.hash;\
-      const ntcntValue = respJson[1]?.ntcnt;\
-      if(hashValue != hash){\
-          hash = hashValue;\
-          fetchData();}\
-      if(ntcntValue > 0){\
-          getNotifications();\
-      }\
-  } catch (error) {\
-      console.error('Error fetching hash:', error);\
-  }\
-  }else {\
-    renderRooms({});\
-  }\
-    }\
-\
-        getHash();\
+    fetchData();\
         hidePopup('advanced-ctrl-overlay', 'advanced-ctrl-popup');\
         getNotifications();\
 \
-        setInterval(getHash, 700);\
+    setInterval(fetchData, 1000);\
 \
 \
 \

@@ -1,6 +1,12 @@
 #ifndef TEMP_GAUGE_JS_H
 #define TEMP_GAUGE_JS_H
 
+/**
+ * @file include/os/app/http/tempGauge/tempGaugeJS.h
+ * @brief Embedded web UI asset used by the Home Control Station HTTP interface.
+ */
+
+
 
 const char* tempGaugeJS = "\
 <script>\

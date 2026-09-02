@@ -1,9 +1,23 @@
+/**
+ * @file include/os/datacontainer/NvmConfigSlotDefinition.hpp
+ * @brief Operating-system runtime and networking support for the Home Control Station.
+ */
+
 #ifndef CONFIG_SLOT_DEFINITION_H
 #define CONFIG_SLOT_DEFINITION_H
 #include <Arduino.h>
 #include "os/Logger.hpp"
+#if __has_include("generated/GeneratedDeviceTypes.hpp")
+#include "generated/GeneratedDeviceTypes.hpp"
+#else
+#include "devices/fallback/DeviceTypes.hpp"
+#endif
 
 /* Description of single configuration NVM slot */
+/**
+ * @class DeviceConfigSlotType
+ * @brief Represents the Device Config Slot Type data structure.
+ */
 struct DeviceConfigSlotType
 {
     bool isActive = false;            /* 1 byte */
@@ -29,13 +43,7 @@ struct DeviceConfigSlotType
         String logMsg = "--> Config SLOT <-- | ";
         logMsg += "isActive: " + String(isActive ? "YES" : "NO") + " | ";
         logMsg += "Device Type: ";
-        switch(deviceType)
-        {
-            case 43: logMsg += "ON/OFF"; break;
-            case 44: logMsg += "LED STRIP"; break;
-            case 255: logMsg += "Not configured"; break;
-            default: logMsg += "UNKNOWN"; break;
-        }
+        logMsg += deviceType == 255 ? "Not configured" : GeneratedDeviceTypes::nameOf(deviceType);
         logMsg += " | Device ID: " + String(deviceId);
         logMsg += " | Name: " + String(deviceName);
         logMsg += " | PIN: " + String((int)pinNumber);
@@ -50,7 +58,7 @@ struct DeviceConfigSlotType
 
     bool isValid()
     {
-        return (deviceType >= 43 || deviceType <= 45);
+        return GeneratedDeviceTypes::isKnown(deviceType);
     }
 
     static uint8_t getSize()

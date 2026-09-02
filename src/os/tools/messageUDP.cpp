@@ -1,6 +1,12 @@
 #include <os/tools/MessageUDP.hpp>
 #include "os/Logger.hpp"
 
+/**
+ * @file src/os/tools/messageUDP.cpp
+ * @brief MessageUDP helpers: construction, validation and serialization for UDP transport.
+ */
+
+
 MessageUDP::MessageUDP()
 {
     /* Initialize as empty message with unknown type */
