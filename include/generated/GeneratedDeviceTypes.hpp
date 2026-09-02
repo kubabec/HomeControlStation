@@ -11,12 +11,7 @@
 
 enum DevType : uint8_t
 {
-    type_ONOFFDEVICE = 43,
-    type_LED_STRIP = 44,
-    type_TEMP_SENSOR = 45,
-    type_LED_STRIP_SEGMENTED = 46,
-    type_DISTANCE_SENSOR = 47,
-    type_HARDWARE_BUTTON = 48
+    type_ONOFFDEVICE = 43
 };
 
 namespace GeneratedDeviceTypes
@@ -29,12 +24,7 @@ struct DeviceTypeInfo
 };
 
 inline constexpr DeviceTypeInfo kKnownTypes[] = {
-    {43, "OnOff"},
-    {44, "LedStrip"},
-    {45, "TempSensor"},
-    {46, "SegLedStrip"},
-    {47, "DistanceSensor"},
-    {48, "HardwareButton"}
+    {43, "OnOff"}
 };
 
 /** @brief Finds known type metadata by persistent numeric identifier. */

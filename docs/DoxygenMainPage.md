@@ -32,7 +32,7 @@ The generated Doxygen pages provide cross-links between classes, methods, and da
 
 ## Schema-driven device architecture
 
-The operating-system layer does not maintain a handwritten list of concrete device classes. Each device implementation is accompanied by a JSON description under `include/devices/<device>/`. The description conforms to `include/devices/device.schema.json` and is the source of truth for:
+The operating-system layer does not maintain a handwritten list of concrete device classes. A clean checkout stores optional include/source overlays under `DevicesPredefined/<device>/`, where they are inert. A firmware author copies both trees of only wanted packages into active `include/devices/<device>/` and `src/device/<device>/` locations. Each active implementation is accompanied by a JSON description that conforms to `include/devices/device.schema.json` and is the source of truth for:
 
 - the persistent numeric device type and C++ enum symbol,
 - implementation header, class name, build guard, and factory arguments,
@@ -47,9 +47,11 @@ Device type identifiers are part of persisted and network-visible data. Existing
 
 ## Build-time generation
 
-PlatformIO invokes `extra/generate_device_registry.py` and `extra/generate_device_config_widgets.py` before every compilation. Before loading any descriptions, the registry generator removes the complete `include/generated/` directory. Both generators then validate the discovered JSON descriptions and recreate every device-dependent integration artifact under `include/generated/`. This prevents removed or renamed devices from surviving through stale files during incremental builds.
+PlatformIO invokes `extra/generate_device_registry.py` and `extra/generate_device_config_widgets.py` before every compilation. Before loading any descriptions, the registry generator removes the complete `include/generated/` directory. When active descriptions exist, both generators validate them and recreate device-dependent integration artifacts under `include/generated/`. PlatformIO discovers matching selected sources through the normal `src/` tree. This prevents removed or renamed devices from surviving through stale files and keeps unselected predefined sources out of compilation.
 
-An empty device catalog is valid. If `include/devices/` contains no concrete device description directories and no concrete device sources are compiled, generation emits empty registries and generic fallback handlers. The firmware still compiles and runs, but persisted or handshaked device identifiers are treated as unknown and no concrete device instance is created.
+An empty device catalog is valid. If `include/devices/` contains no concrete descriptions and `src/device/` contains no concrete sources, generation leaves `include/generated/` absent. Static no-device handlers under `include/devices/fallback/` keep the platform buildable; persisted or handshaked device identifiers are treated as unknown and no concrete device instance is created.
+
+To create a preset, overlay both package trees from `DevicesPredefined` onto `include/` and `src/` before building. LED device types additionally require both trees from the `LedStrip` support package. Removing both active halves and rebuilding removes a type's generated factory, serializers, widgets, and compiled implementation. Selection details are documented in `DevicesPredefined/README.md`.
 
 The generated artifacts include:
 
@@ -103,8 +105,8 @@ The pattern controller is placed in a `<script type="application/x-hcs-advanced-
 
 To add a device without modifying the operating-system implementation:
 
-1. Implement a class derived from `Device`.
-2. Add a JSON description beside the implementation header.
+1. Select an existing complete package from `DevicesPredefined`, or implement a new class derived from `Device` in a self-contained active package.
+2. Add the JSON description beside the implementation header under `include/devices/<device>/` and the implementation source under `src/device/<device>/`.
 3. Assign a new, explicit, previously unused type identifier and enum symbol.
 4. Describe constructor dependencies with the supported factory argument names.
 5. Define configuration-byte and description-state layouts with non-overlapping offsets.
@@ -112,5 +114,6 @@ To add a device without modifying the operating-system implementation:
 7. Describe dashboard controls and readouts in the `ui` section.
 8. For advanced controls, implement the common get/set services, add the HTML pattern, and reference its path and payload size in `ui.advancedControls`.
 9. Run a PlatformIO build and inspect generator validation errors.
+10. Place a reusable finished include/source overlay under `DevicesPredefined/<device>/` while keeping the clean-checkout active catalog empty.
 
 No concrete device include, factory branch, HTTP state branch, configuration parser, or dashboard type dispatch should be added manually under `include/os` or `src/os`.

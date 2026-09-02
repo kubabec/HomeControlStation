@@ -1,5 +1,9 @@
 #include <os/app/http/AdvancedControlsLoader.hpp>
+#if __has_include("generated/GeneratedAdvancedControlTemplates.hpp")
 #include "generated/GeneratedAdvancedControlTemplates.hpp"
+#else
+#include "devices/fallback/AdvancedControlTemplates.hpp"
+#endif
 #include "os/Logger.hpp"
 #include <SystemDefinition.hpp>
 
@@ -16,7 +20,9 @@ uint16_t AdvancedControlsLoader::getControlsSizeBasedOnDevType(uint8_t deviceTyp
 {
     switch (deviceType)
     {
+#if __has_include("generated/GeneratedAdvancedControlsSize.inc")
 #include "generated/GeneratedAdvancedControlsSize.inc"
+#endif
     default:
         return 0;
     }

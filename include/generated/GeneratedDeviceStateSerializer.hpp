@@ -34,67 +34,6 @@ inline String serialize(const DeviceDescription& description)
             result += String((int)description.customBytes[2]);
             break;
         }
-    #ifdef LED_STRIP_SUPPORTED
-    case type_LED_STRIP:
-        {
-            result += ",\"avgColor\":";
-            result += "\"#" + rgbHex(description.customBytes[2], description.customBytes[3], description.customBytes[4]) + "\"";
-            result += ",\"liveStatus\":";
-            result += String((int)description.customBytes[15]);
-            break;
-        }
-    #endif
-    #ifdef TEMP_SENSOR_SUPPORTED
-    case type_TEMP_SENSOR:
-        {
-            result += ",\"temp\":";
-            float value0 = 0.0f;
-            memcpy(&value0, &description.customBytes[3], sizeof(value0));
-            result += String(value0);
-            result += ",\"humid\":";
-            result += String((int)description.customBytes[2]);
-            result += ",\"Err\":";
-            result += String((int)description.customBytes[0]);
-            break;
-        }
-    #endif
-    #ifdef LED_STRIP_SUPPORTED
-    case type_LED_STRIP_SEGMENTED:
-        {
-            result += ",\"segCount\":";
-            result += String((int)description.customBytes[0]);
-            result += ",\"segments\":";
-            result += "[";
-            for (uint8_t item = 0; item < 5; ++item)
-            {
-                if (item) result += ",";
-                result += String((int)description.customBytes[1 + item]);
-            }
-            result += "]";
-            result += ",\"colors\":";
-            result += "[";
-            for (uint8_t item = 0; item < 5; ++item)
-            {
-                if (item) result += ",";
-                result += "\"#" + rgbHex(description.customBytes[7 + item * 3], description.customBytes[8 + item * 3], description.customBytes[9 + item * 3]) + "\"";
-            }
-            result += "]";
-            break;
-        }
-    #endif
-    #ifdef DISTANCE_SENSOR_SUPPORTED
-    case type_DISTANCE_SENSOR:
-        {
-            result += ",\"dist\":";
-            result += String((int)description.customBytes[0]);
-            break;
-        }
-    #endif
-    case type_HARDWARE_BUTTON:
-        {
-            
-            break;
-        }
     default:
         break;
     }

@@ -1,7 +1,11 @@
 #include <os/app/http/HttpAsyncRequestHandler.hpp>
 #include <os/app/http/AdvancedControlsLoader.hpp>
 #include "os/Logger.hpp"
+#if __has_include("generated/GeneratedDeviceStateSerializer.hpp")
 #include "generated/GeneratedDeviceStateSerializer.hpp"
+#else
+#include "devices/fallback/DeviceStateSerializer.hpp"
+#endif
 
 /**
  * @file src/os/app/http/HttpAsyncRequestHandler.cpp

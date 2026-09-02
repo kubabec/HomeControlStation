@@ -7,7 +7,11 @@
 #define CONFIG_SLOT_DEFINITION_H
 #include <Arduino.h>
 #include "os/Logger.hpp"
+#if __has_include("generated/GeneratedDeviceTypes.hpp")
 #include "generated/GeneratedDeviceTypes.hpp"
+#else
+#include "devices/fallback/DeviceTypes.hpp"
+#endif
 
 /* Description of single configuration NVM slot */
 /**

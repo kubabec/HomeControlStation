@@ -1,7 +1,11 @@
 #ifndef JAVASCRIPT_H
 #define JAVASCRIPT_H
 #include <Arduino.h>
+#if __has_include("generated/GeneratedDeviceConfiguration.hpp")
 #include "generated/GeneratedDeviceConfiguration.hpp"
+#else
+#include "devices/fallback/DeviceConfiguration.hpp"
+#endif
 
 /**
  * @file include/os/app/http/javascript.h

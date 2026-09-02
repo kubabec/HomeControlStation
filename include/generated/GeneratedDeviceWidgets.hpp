@@ -8,42 +8,13 @@
 #include <Arduino.h>
 #include "SystemDefinition.hpp"
 #include "generated/widgets/GeneratedOnOffWidget.hpp"
-#ifdef LED_STRIP_SUPPORTED
-#include "generated/widgets/GeneratedLedStripWidget.hpp"
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-#include "generated/widgets/GeneratedTempSensorWidget.hpp"
-#endif
-#ifdef DISTANCE_SENSOR_SUPPORTED
-#include "generated/widgets/GeneratedDistanceSensorWidget.hpp"
-#endif
 
 /** @brief Builds the JavaScript widget bundle and generated type dispatcher. */
 inline String buildGeneratedDeviceWidgetsJs()
 {
     String widgets;
     widgets += generatedOnOffWidgetJs;
-#ifdef LED_STRIP_SUPPORTED
-widgets += generatedLedStripWidgetJs;
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-widgets += generatedTempSensorWidgetJs;
-#endif
-#ifdef DISTANCE_SENSOR_SUPPORTED
-widgets += generatedDistanceSensorWidgetJs;
-#endif
-    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){";
-    widgets += "case 43: generateOnOffWidget(deviceContainer,device); return true;";
-    #ifdef LED_STRIP_SUPPORTED
-widgets += "case 44: generateLedStripWidget(deviceContainer,device); return true;";
-#endif
-    #ifdef TEMP_SENSOR_SUPPORTED
-widgets += "case 45: generateTempWidget(deviceContainer,device); return true;";
-#endif
-    #ifdef DISTANCE_SENSOR_SUPPORTED
-widgets += "case 47: generateDistSensWidget(deviceContainer,device); return true;";
-#endif
-    widgets += "default:return false;}}";
+    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){case 43: generateOnOffWidget(deviceContainer,device); return true;default:return false;}}";
     return widgets;
 }
 

@@ -8,6 +8,8 @@ This page is the shortest path from an empty checkout to understanding how the p
 flowchart TB
     Developer["Developer adds a device type"]
 
+    Catalog["DevicesPredefined<br/>inert opt-in packages"]
+
     subgraph DevicePack["DEVICE PACK — replaceable and extendable"]
         HPP["DeviceName.hpp<br/>Device class and binary contract"]
         CPP["DeviceName.cpp<br/>GPIO, sensor logic, state, services"]
@@ -45,6 +47,10 @@ flowchart TB
     Developer --> CPP
     Developer --> JSON
     Developer -. optional .-> HTML
+    Catalog -->|"copy selected package"| HPP
+    Catalog -->|"copy selected package"| CPP
+    Catalog -->|"copy selected package"| JSON
+    Catalog -. "copy optional template" .-> HTML
     HPP --> Validate
     CPP --> Validate
     JSON --> Validate
@@ -82,7 +88,11 @@ flowchart TD
     BIO --> Registry["2. generate_device_registry.py"]
     Registry --> Delete["Delete the entire include/generated directory"]
     Delete --> Scan["Scan include/devices/*/*.json"]
-    Scan --> Check{"Every registered description valid?"}
+    Scan --> Found{"Any active descriptions?"}
+    Found -- no --> Fallback["Generate nothing<br/>compile static no-device fallbacks"]
+    Fallback --> Compile
+    Found -- yes --> Check
+    Check{"Every registered description valid?"}
     Check -- no --> Fail["Stop the build with a validation error"]
     Check -- yes --> Core["Generate core device integration"]
     Core --> Config["3. generate_device_config_widgets.py"]
@@ -100,7 +110,13 @@ flowchart TD
     ConfigOut --> ConfigWidgets["GeneratedDeviceConfigWidgets.hpp"]
 ```
 
-All device-dependent outputs are recreated under `include/generated/`. Deleting or renaming a device cannot leave a stale factory case, widget, or serializer in an incremental build. An empty concrete-device catalog is valid: it produces empty registries, compiles successfully, and treats every received or persisted device type as unknown.
+When active descriptions exist, all device-dependent outputs are recreated under `include/generated/`. Deleting or renaming a device cannot leave a stale factory case, widget, or serializer in an incremental build. With an empty concrete-device catalog, `include/generated/` remains absent and the platform uses static no-device fallbacks from `include/devices/fallback/`. The firmware still compiles and treats every received or persisted device type as unknown.
+
+### Active catalog versus predefined catalog
+
+A clean checkout keeps only the shared interface files in `include/devices` and no concrete sources under `src/device`; packages under `DevicesPredefined` are inert. Before building a firmware preset, overlay both the `include/` and `src/` trees of each wanted package onto the project. The registry generator scans only the active descriptions, while PlatformIO compiles only active sources under `src`. This keeps unrelated device implementations out of compilation.
+
+For example, an OnOff-only preset contains active `include/devices/OnOffDevice` and `src/device/OnOffDevice` trees copied from the matching predefined overlay. LED device packages also require both trees from the `DevicesPredefined/LedStrip` support package. See `DevicesPredefined/README.md` for exact selection and dependency instructions.
 
 ### Inputs and generated consumers
 
@@ -284,7 +300,7 @@ Device-specific byte interpretation stays in the concrete device implementation 
 
 ## 6. Adding a new device type
 
-Create one matching directory under `include/devices/` and one under `src/device/`:
+Create matching active include and source directories:
 
 ```text
 include/devices/MyDevice/
@@ -295,6 +311,8 @@ include/devices/MyDevice/
 src/device/MyDevice/
 └── MyDevice.cpp
 ```
+
+Ready-made packages are not active in a clean checkout. Select only the required entries from `DevicesPredefined` and copy both their `include/` and `src/` overlays before building. When a newly developed package is ready for reuse, store both path trees under `DevicesPredefined/MyDevice`.
 
 Then follow this flow:
 
@@ -330,7 +348,7 @@ The class derives from `Device` and owns:
 
 ### JSON responsibilities
 
-Use `include/devices/device.schema.json` and an existing description such as the OnOff device as references. At minimum, verify:
+Use `include/devices/device.schema.json` and a predefined description such as `DevicesPredefined/OnOffDevice/include/devices/OnOffDevice/OnOffDevice.json` as references. At minimum, verify:
 
 1. `deviceType.enumValue` is stable and unique; `255` is reserved.
 2. `implementation.header` and `implementation.source` point to real files.
@@ -369,7 +387,8 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Slave discovery responses and RC handling | `src/os/app/remoteControl/remoteControlClient.cpp` |
 | Master remote ID mapping | `src/os/app/RemoteDevicesManager.cpp` |
 | HTTP server and dashboard | `src/os/app/http/` and `include/os/app/http/` |
-| Device examples | `include/devices/OnOffDevice/` and `include/devices/LedWS1228bDeviceType/` |
+| Predefined device examples | `DevicesPredefined/OnOffDevice/` and `DevicesPredefined/LedWS1228bDeviceType/` |
+| Preset selection instructions | `DevicesPredefined/README.md` |
 
 ## 8. Timing and limits quick reference
 

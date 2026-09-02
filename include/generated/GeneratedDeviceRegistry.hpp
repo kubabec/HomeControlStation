@@ -12,19 +12,6 @@
 #include "devices/device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "devices/OnOffDevice/OnOffDevice.hpp"
-#ifdef LED_STRIP_SUPPORTED
-#include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-#include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
-#endif
-#ifdef LED_STRIP_SUPPORTED
-#include "devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp"
-#endif
-#ifdef DISTANCE_SENSOR_SUPPORTED
-#include "devices/DistanceSensor/DistanceSensor.hpp"
-#endif
-#include "devices/HwButton/HwButton.hpp"
 
 namespace GeneratedDeviceRegistry
 {
@@ -49,19 +36,6 @@ struct Registration
 
 inline constexpr Registration kEnabledTypes[] = {
     {43, "OnOff", true, 0u},
-    #ifdef LED_STRIP_SUPPORTED
-    {44, "LedStrip", true, 0u},
-    #endif
-    #ifdef TEMP_SENSOR_SUPPORTED
-    {45, "TempSensor", true, 60000u},
-    #endif
-    #ifdef LED_STRIP_SUPPORTED
-    {46, "SegLedStrip", true, 0u},
-    #endif
-    #ifdef DISTANCE_SENSOR_SUPPORTED
-    {47, "DistanceSensor", true, 0u},
-    #endif
-    {48, "HardwareButton", false, 0u},
 };
 
 /** @brief Finds an implementation enabled in the current firmware build. */
@@ -84,24 +58,6 @@ inline std::unique_ptr<Device> create(
     {
     case type_ONOFFDEVICE:
             return std::unique_ptr<Device>(new OnOffDevice(config));
-    #ifdef LED_STRIP_SUPPORTED
-    case type_LED_STRIP:
-            return std::unique_ptr<Device>(new LedWS1228bDeviceType(config, context.persistentDataChanged));
-    #endif
-    #ifdef TEMP_SENSOR_SUPPORTED
-    case type_TEMP_SENSOR:
-            return std::unique_ptr<Device>(new TempSensorDHT11DeviceType(config, context.getRtcTime));
-    #endif
-    #ifdef LED_STRIP_SUPPORTED
-    case type_LED_STRIP_SEGMENTED:
-            return std::unique_ptr<Device>(new SegLedWS1228bDeviceType(config, context.persistentDataChanged));
-    #endif
-    #ifdef DISTANCE_SENSOR_SUPPORTED
-    case type_DISTANCE_SENSOR:
-            return std::unique_ptr<Device>(new DistanceSensor(config));
-    #endif
-    case type_HARDWARE_BUTTON:
-            return std::unique_ptr<Device>(new HwButton(config, context.toggleLocalDevice, context.fireDigitalEvent));
     default:
         return nullptr;
     }

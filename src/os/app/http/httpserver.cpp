@@ -8,7 +8,11 @@
 #include "os/app/http/tempGauge/tempGaugeJS.h"
 #include "os/app/http/tempGauge/tempGaugeCSS.h"
 #include "os/app/http/renderRoomsJS.h"
+#if __has_include("generated/GeneratedDeviceConfigWidgets.hpp")
 #include "generated/GeneratedDeviceConfigWidgets.hpp"
+#else
+#include "devices/fallback/DeviceConfigWidgets.hpp"
+#endif
 #include "build_info.h"
 #include "os/Logger.hpp"
 

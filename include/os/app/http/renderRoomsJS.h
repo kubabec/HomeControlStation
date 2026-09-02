@@ -1,7 +1,11 @@
 #ifndef RENDER_ROOMS_JS_H
 #define RENDER_ROOMS_JS_H
 #include <Arduino.h>
+#if __has_include("generated/GeneratedDeviceWidgets.hpp")
 #include "generated/GeneratedDeviceWidgets.hpp"
+#else
+#include "devices/fallback/DeviceWidgets.hpp"
+#endif
 
 /**
  * @file include/os/app/http/renderRoomsJS.h

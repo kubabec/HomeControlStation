@@ -785,6 +785,9 @@ def generate():
     # Never allow stale device integration files to survive an incremental build.
     shutil.rmtree(GENERATED_INCLUDE_DIR, ignore_errors=True)
     descriptions = load_descriptions()
+    if not descriptions:
+        print("No registered device descriptions; generated device integration directory removed")
+        return
     generate_types(descriptions)
     generate_registry(descriptions)
     generate_state_serializer(descriptions)

@@ -237,6 +237,10 @@ inline void emitGeneratedCustomFields(uint8_t slotNumber, uint8_t deviceType, co
 
 def generate():
     descriptions = load_device_descriptions()
+    if not descriptions:
+        OUTPUT_FILE.unlink(missing_ok=True)
+        print("No configurable device descriptions; no configuration widgets generated")
+        return
     specs = "\n    ".join(device_initializer(description) for description in descriptions)
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_FILE.write_text(

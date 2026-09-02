@@ -9,6 +9,10 @@
 
 > **New to the project?** Start with the [architecture and end-to-end flow guide](ARCHITECTURE.md) for the Platform/Devices boundary, build-time generation, runtime lifecycle, and ESP32 UDP network diagrams.
 
+> **Adding hardware support?** Follow [Adding a new device type](ADDING_A_NEW_DEVICE_TYPE.md) for the C++ interface, JSON metadata, services, generated UI, byte layouts, and optional advanced controls.
+
+> **Building a device preset?** A clean checkout contains no active concrete devices. Overlay both the `include/` and `src/` trees of only the required packages from [DevicesPredefined](DevicesPredefined) before running `platformio run`.
+
 **HomeControlStation** is an open source project developed in order to simplify usage of cheap ESP32 board to control popular home automation usecases, e.g.:
 - Light switching
 - Color LED strip with customization

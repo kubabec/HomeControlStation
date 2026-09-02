@@ -12,18 +12,6 @@ inline String buildGeneratedDeviceConfigurationJs()
 {
     String script = "<script>function createConfigurationStringJson(){const devices=[];for(let id=1;id<=6;id++){const typeId=Number(document.getElementById('type'+id).value);const bytes=new Array(20).fill(0);switch(typeId){";
     script += "case 43:{let value=Number(document.getElementById('brightnessSupported-'+id).value)||0;bytes[0]=(value>>0)&255;}{let value=Number(document.getElementById('activationState-'+id).value)||0;bytes[1]=(value>>0)&255;}{let value=Number(document.getElementById('pwmMin-'+id).value)||0;bytes[2]=(value>>0)&255;}{let value=Number(document.getElementById('pwmMax-'+id).value)||0;bytes[3]=(value>>0)&255;}break;";
-#ifdef LED_STRIP_SUPPORTED
-script += "case 44:{let value=Number(document.getElementById('ledsCount-'+id).value)||0;bytes[0]=(value>>0)&255;bytes[1]=(value>>8)&255;}{let value=Number(document.getElementById('ledsSideFlip-'+id).value)||0;bytes[2]=(value>>0)&255;}{let value=Number(document.getElementById('curLim-'+id).value)||0;bytes[3]=(value>>0)&255;}bytes[19]=bytes[3];break;";
-#endif
-#ifdef TEMP_SENSOR_SUPPORTED
-script += "case 45:break;";
-#endif
-#ifdef LED_STRIP_SUPPORTED
-script += "case 46:{let value=Number(document.getElementById('SegcurLimVal-'+id).value)||0;bytes[0]=(value>>0)&255;}for(let item=0;item<5;item++){bytes[5+item]=Number(document.getElementById('seg'+(item+1)+'Count-'+id).value)||0;}for(let item=0;item<5;item++){bytes[10+item]=Number(document.getElementById('Seg'+(item+1)+'Flip-'+id).value)||0;}break;";
-#endif
-#ifdef DISTANCE_SENSOR_SUPPORTED
-script += "case 47:{let value=Number(document.getElementById('pinTx-'+id).value)||0;bytes[2]=(value>>0)&255;}{let value=Number(document.getElementById('pinRx-'+id).value)||0;bytes[3]=(value>>0)&255;}break;";
-#endif
     script += "default:break;}devices.push({typeId:typeId,id:id,enabled:document.getElementById('enabled'+id).checked,name:document.getElementById('name'+id).value,pin:Number(document.getElementById('pin'+id).value),room:Number(document.getElementById('room'+id).value),customBytes:bytes});}const url='/lclSetupJson&'+JSON.stringify({devices:devices});const xhr=new XMLHttpRequest();xhr.timeout=10000;xhr.open('POST',url,true);xhr.onreadystatechange=function(){if(xhr.readyState===4){window.location.href='/';}};xhr.send();}</script>";
     return script;
 }

@@ -98,26 +98,6 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
 }
 
 inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
-    #ifdef DISTANCE_SENSOR_SUPPORTED
-    {47, "DistanceSensor", "type_DISTANCE_SENSOR", {{"pinTx", "Pin Tx", "gpio-select", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0},
-        {"pinRx", "Pin Rx", "gpio-select", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 2},
-    #endif
-    #ifdef LED_STRIP_SUPPORTED
-    {44, "LedStrip", "type_LED_STRIP", {{"ledsCount", "LEDs num.", "number", 0, 2, 1, 255, {"", ""}, {"", ""}, 0, 0},
-        {"ledsSideFlip", "Sides flip", "select", 2, 1, 0, 255, {"0", "1"}, {"Not inversed", "Inversed"}, 2, 0},
-        {"curLim", "Current limiter", "range", 3, 1, 15, 254, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 3},
-    #endif
     {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1"}, {"No", "Yes"}, 2, 0},
         {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1"}, {"LOW (0)", "HIGH (1)"}, 2, 0},
         {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0},
@@ -126,26 +106,6 @@ inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 4},
-    #ifdef LED_STRIP_SUPPORTED
-    {46, "SegLedStrip", "type_LED_STRIP_SEGMENTED", {{"SegcurLimVal", "Current limiter", "range", 0, 1, 15, 254, {"", ""}, {"", ""}, 0, 0},
-        {"segmentLedCounts", "Segment counts", "segment-array", 5, 5, 1, 100, {"", ""}, {"", ""}, 0, 5},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 2},
-    #endif
-    #ifdef TEMP_SENSOR_SUPPORTED
-    {45, "TempSensor", "type_TEMP_SENSOR", {{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0}}, 0},
-    #endif
 };
 
 /** @brief Emits the device type selector for one NVM configuration slot. */

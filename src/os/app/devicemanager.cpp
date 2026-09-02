@@ -2,7 +2,11 @@
 #include <os/datacontainer/DataContainer.hpp>
 #include <os/Logger.hpp>
 #include <ArduinoJson.h>
+#if __has_include("generated/GeneratedDeviceRegistry.hpp")
 #include "generated/GeneratedDeviceRegistry.hpp"
+#else
+#include "devices/fallback/DeviceRegistry.hpp"
+#endif
 
 /**
  * @file src/os/app/devicemanager.cpp

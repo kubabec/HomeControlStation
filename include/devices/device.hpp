@@ -8,7 +8,11 @@
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "AdvancedControls.hpp"
 #include "os/Logger.hpp"
+#if __has_include("generated/GeneratedDeviceTypes.hpp")
 #include "generated/GeneratedDeviceTypes.hpp"
+#else
+#include "devices/fallback/DeviceTypes.hpp"
+#endif
 
 #define NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION 50
 #define DEVICE_NAME_MAX_LENGHT 25
