@@ -2,6 +2,7 @@
 #include <os/app/remoteControl/RemoteControlServer.hpp>
 #include <os/app/remoteControl/RemoteControlClient.hpp>
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+#include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/app/display/DisplayServer.hpp>
 #include <esp_wifi.h>
 #ifdef SUPERMINI
@@ -90,12 +91,18 @@ void NetworkDriver::init()
         packetReceivers.push_back(RemoteControlClient::receiveUDP);
     }
 
+    packetRanges.push_back(DIGITAL_BUTTON_RANGE);
     if (isRcServer)
     {
-        packetRanges.push_back(DIGITAL_BUTTON_RANGE);
         packetReceivers.push_back(DigitalEventReceiver::receiveUDP);
+    }
+    else
+    {
+        packetReceivers.push_back(DigitalEventTransmitter::receiveUdp);
+    }
 
-
+    if (isRcServer)
+    {
         packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
         packetReceivers.push_back(DisplayServer::receiveUDP);
     }

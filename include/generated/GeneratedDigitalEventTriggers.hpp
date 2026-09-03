@@ -20,7 +20,8 @@ struct Trigger
 };
 
 inline constexpr Trigger kTriggers[] = {
-
+    {50, 1, "Opened" },
+    {50, 2, "Closed" },
 };
 
 inline const Trigger* find(uint8_t deviceType, uint8_t triggerId)

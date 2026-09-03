@@ -1,0 +1,34 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": { "name": "WindowDoorSensor", "className": "WindowDoorSensor", "enumSymbol": "type_WINDOW_DOOR_SENSOR", "enumValue": 50 },
+  "implementation": {
+    "header": "include/devices/WindowDoorSensor/WindowDoorSensor.hpp", "source": "src/device/WindowDoorSensor/WindowDoorSensor.cpp", "buildGuard": null,
+    "dependencies": ["Arduino GPIO", "reed switch or dry contact"], "factory": { "arguments": ["config", "fireDeviceEvent"] },
+    "manager": { "registered": true, "collection": "DeviceManager::devices", "includedInDeviceCollection": true }
+  },
+  "lifecycle": { "init": { "actions": ["configure contact input", "capture initial state"] }, "update": { "entryPoint": "cyclic", "schedule": { "mode": "every_manager_cycle" } } },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" }, { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "sensorPin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" }, { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" }, { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": [
+      { "name": "closedActiveHigh", "type": "boolean", "label": "Closed contact level", "fieldId": "contactClosedLevel", "htmlType": "select", "offset": 0, "size": 1, "default": 0, "widget": "select", "options": [{ "value": 0, "label": "LOW = closed" }, { "value": 1, "label": "HIGH = closed" }] },
+      { "name": "internalPullup", "type": "boolean", "label": "Input mode", "fieldId": "contactPullup", "htmlType": "select", "offset": 1, "size": 1, "default": 1, "widget": "select", "options": [{ "value": 0, "label": "External bias" }, { "value": 1, "label": "Internal pull-up" }] },
+      { "name": "debounceMs", "type": "uint16", "label": "Debounce [ms]", "fieldId": "contactDebounce", "htmlType": "number", "offset": 2, "size": 2, "minimum": 10, "maximum": 5000, "default": 50, "widget": "number" }
+    ]
+  },
+  "services": [],
+  "digitalEventTriggers": [
+    { "id": 1, "label": "Opened" },
+    { "id": 2, "label": "Closed" }
+  ],
+  "state": {
+    "enabledSemantics": "always-on read-only sensor", "descriptionCustomBytes": [{ "name": "closed", "type": "boolean", "offset": 0, "size": 1 }, { "name": "rawClosed", "type": "boolean", "offset": 1, "size": 1 }],
+    "httpFields": [{ "name": "closed", "type": "boolean", "source": "customBytes[0]" }]
+  },
+  "ui": { "roomWidget": "generateWindowDoorSensorWidget", "controls": [], "readouts": [{ "name": "contact", "widget": "status-label", "source": "closed", "label": "Contact", "trueLabel": "Closed", "falseLabel": "Open", "trueTone": "success", "falseTone": "warning" }] },
+  "extendedMemory": { "required": false, "size": 0 },
+  "limitations": ["External wiring must protect the 3.3 V GPIO from ESD and overvoltage."]
+}

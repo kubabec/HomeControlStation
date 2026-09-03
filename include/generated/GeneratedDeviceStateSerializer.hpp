@@ -58,6 +58,12 @@ inline String serialize(const DeviceDescription& description)
             break;
         }
     #endif
+    case type_WINDOW_DOOR_SENSOR:
+        {
+            result += ",\"closed\":";
+            result += String((int)description.customBytes[0]);
+            break;
+        }
     default:
         break;
     }

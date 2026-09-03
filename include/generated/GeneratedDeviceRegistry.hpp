@@ -19,6 +19,7 @@
 #ifdef TEMP_SENSOR_SUPPORTED
 #include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
 #endif
+#include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
 
 namespace GeneratedDeviceRegistry
 {
@@ -51,6 +52,7 @@ inline constexpr Registration kEnabledTypes[] = {
     #ifdef TEMP_SENSOR_SUPPORTED
     {45, "TempSensor", true, 60000u},
     #endif
+    {50, "WindowDoorSensor", true, 0u},
 };
 
 /** @brief Finds an implementation enabled in the current firmware build. */
@@ -121,6 +123,12 @@ inline bool validateConfiguration(const DeviceConfigSlotType& config, bool* clai
             if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
             break;
     #endif
+    case type_WINDOW_DOOR_SENSOR:
+            if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
+            if (config.customBytes[0] != 0 && config.customBytes[0] != 1) return false;
+            if (config.customBytes[1] != 0 && config.customBytes[1] != 1) return false;
+            if (readU16(config.customBytes, 2) < 10 || readU16(config.customBytes, 2) > 5000) return false;
+            break;
     default:
         return false;
     }
@@ -146,6 +154,8 @@ inline std::unique_ptr<Device> create(
     case type_TEMP_SENSOR:
             return std::unique_ptr<Device>(new TempSensorDHT11DeviceType(config, context.getRtcTime));
     #endif
+    case type_WINDOW_DOOR_SENSOR:
+            return std::unique_ptr<Device>(new WindowDoorSensor(config, GeneratedDigitalEventTriggers::bind(config.deviceType, config.deviceId, config.deviceName, context.getNodeMacAddress, context.fireDigitalEventWithSource)));
     default:
         return nullptr;
     }

@@ -18,6 +18,7 @@ script += "case 44:{let value=Math.round((Number(document.getElementById('ledsCo
 #ifdef TEMP_SENSOR_SUPPORTED
 script += "case 45:break;";
 #endif
+script += "case 50:{let value=Math.round((Number(document.getElementById('contactClosedLevel-'+id).value)||0)*1.0);bytes[0]=(value>>0)&255;}{let value=Math.round((Number(document.getElementById('contactPullup-'+id).value)||0)*1.0);bytes[1]=(value>>0)&255;}{let value=Math.round((Number(document.getElementById('contactDebounce-'+id).value)||0)*1.0);bytes[2]=(value>>0)&255;bytes[3]=(value>>8)&255;}break;";
     script += "default:break;}devices.push({typeId:typeId,id:id,enabled:document.getElementById('enabled'+id).checked,name:document.getElementById('name'+id).value,pin:Number(document.getElementById('pin'+id).value),room:Number(document.getElementById('room'+id).value),customBytes:bytes});}const url='/lclSetupJson&'+JSON.stringify({devices:devices});const xhr=new XMLHttpRequest();xhr.timeout=10000;xhr.open('POST',url,true);xhr.onreadystatechange=function(){if(xhr.readyState===4){window.location.href='/';}};xhr.send();}</script>";
     return script;
 }

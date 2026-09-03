@@ -14,6 +14,16 @@
 
 class DigitalEventTransmitter
 {
+    struct PendingEvent
+    {
+        uint64_t eventId;
+        String source;
+        bool sourceAware;
+    };
+
+    /** Events waiting until the current occurrence is confirmed or abandoned. */
+    static std::queue<PendingEvent> pendingEvents;
+
     /**
      * Identifier of the last event that was transmitted.
      */
@@ -36,6 +46,21 @@ class DigitalEventTransmitter
      * Current transmission identifier assigned to the outgoing event frame.
      */
     static uint8_t transmissionIdentifier;
+
+    /** Earliest time at which another queued event may become active. */
+    static unsigned long nextTransmissionTime;
+
+    /** Sends the active occurrence without changing its transmission identifier. */
+    static void sendActiveEvent();
+
+    /** Activates and sends the oldest queued occurrence when the transmitter is idle. */
+    static void startNextEvent();
+
+    /** Completes the active occurrence and advances the transmission identifier. */
+    static void completeActiveEvent();
+
+    /** Adds an occurrence to the bounded pending queue. */
+    static void enqueueEvent(uint64_t eventId, const String &source, bool sourceAware);
 
 public:
     /**

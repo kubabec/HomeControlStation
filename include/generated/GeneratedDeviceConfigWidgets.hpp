@@ -139,6 +139,14 @@ inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 0},
     #endif
+    {50, "WindowDoorSensor", "type_WINDOW_DOOR_SENSOR", {{"contactClosedLevel", "Closed contact level", "select", 0, 1, 0, 255, {"0", "1"}, {"LOW = closed", "HIGH = closed"}, 2, 0, 1.0, 0},
+        {"contactPullup", "Input mode", "select", 1, 1, 0, 255, {"0", "1"}, {"External bias", "Internal pull-up"}, 2, 0, 1.0, 1},
+        {"contactDebounce", "Debounce [ms]", "number", 2, 2, 10, 5000, {"", ""}, {"", ""}, 0, 0, 1.0, 50},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
 };
 
 /** @brief Emits the device type selector for one NVM configuration slot. */

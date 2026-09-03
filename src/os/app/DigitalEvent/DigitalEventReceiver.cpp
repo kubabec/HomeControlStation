@@ -340,12 +340,12 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
                     senderState->second = transmissionIdentfier;
                 }
                 fireEvent(triggeredEvent, source);
-
-                // Send back the handling confirmation
-                MessageUDP confirmationMessage(DIGITAL_EVENT_CONFIRMED_MSG_ID, msg.getIPAddress(), 9001);
-                confirmationMessage.pushData((uint8_t *)&triggeredEvent, sizeof(uint64_t));
-                NetworkDriver::send(confirmationMessage);
             }
+
+            // Re-acknowledge duplicate retries as well. Processing remains idempotent.
+            MessageUDP confirmationMessage(DIGITAL_EVENT_CONFIRMED_MSG_ID, msg.getIPAddress(), 9001);
+            confirmationMessage.pushData((uint8_t *)&triggeredEvent, sizeof(uint64_t));
+            NetworkDriver::send(confirmationMessage);
         }
         else
         {
