@@ -12,33 +12,38 @@ const char* tempGaugeCSS = "\
 <style>\
         .temperature-container {\
             display: flex;\
-            justify-content: space-around;\
+            justify-content: center;\
             align-items: center;\
-            padding: 0px;\
-            border-radius: 10px;\
-            margin: 0px auto;\
-            flex-wrap: wrap;\
+            gap:12px;\
+            width:100%;\
+            min-width:0;\
+            padding: 2px 0;\
+            margin: 0 auto;\
+            flex-wrap: nowrap;\
         }\
         .temperature-widget, .humidity-widget  {\
+            flex:1 1 0;\
+            min-width:0;\
             text-align: center;\
-            color:#5A8DEE;\
+            color:#76A8FF;\
             position: relative;\
         }\
         .temperature-widget canvas, .humidity-widget canvas {\
-            width: 120px;\
-            height: 110px;\
+            width: min(120px,100%);\
+            height: 104px;\
         }\
         .temperature-value, .value-display{\
-            font-size: 21px;\
-            font-family: Arial, sans-serif;\
-            color: #b2cdff;\
-            text-shadow:0 4px 12px rgba(0,0,0,0.3);\
+            font-size: 20px;\
+            font-family:inherit;\
+            font-weight:600;\
+            color: #D5E2F8;\
+            text-shadow:none;\
         }\
         .value-display{\
-            font-size: 21px;\
-            font-family: Arial, sans-serif;\
-            color:#b2cdff;\
-            text-shadow:0 4px 12px rgba(0,0,0,0.3);\
+            font-size: 20px;\
+            font-family:inherit;\
+            color:#D5E2F8;\
+            text-shadow:none;\
         }\
     </style>\
 ";

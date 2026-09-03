@@ -20,7 +20,6 @@ const String renderRoomsJS = "\
 <script>" + generatedDeviceWidgetsJs +
 "\
 function generateCommonDevInterface(deviceContainer, deviceId, deviceName, status) {\
-    const faviconUrl = 'https://github.com/kubabec/HomeControlStation/blob/faviconsCreation/res/';\
     const loadingOverlay = document.createElement('div');\
     loadingOverlay.className = 'loading-overlay';\
     loadingOverlay.style.display = 'none';\
@@ -40,7 +39,7 @@ function generateCommonDevInterface(deviceContainer, deviceId, deviceName, statu
     deviceContainer.appendChild(statusLight);\
 }\
 function renderRooms(data) {\
-    const roomsContainer = document.getElementById('rooms');\\
+    const roomsContainer = document.getElementById('rooms');\
     roomsContainer.innerHTML = '';\
 \
     for (const [roomId, devices] of Object.entries(data)) {\
@@ -78,7 +77,7 @@ function renderRooms(data) {\
                 header.textContent = 'UnknownDeviceType';\
                 deviceContainer.appendChild(header);\
             }\
-\           if(device.status == 'on'){\
+            if(device.status == 'on'){\
                 anyOn = true;\
             }\
             roomContainer.appendChild(deviceContainer);\
@@ -99,7 +98,6 @@ function renderRooms(data) {\
     listOfHumidWidgets = [];\
     listOfHumidValues = [];\
     listOfTempValues = [];\
-    fixPwrBtn();\
 }\
 </script>";
 

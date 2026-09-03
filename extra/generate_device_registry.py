@@ -937,7 +937,11 @@ def generate_widget_javascript(description):
             widget = control["widget"]
             if widget == "toggle-button":
                 rows.append(
-                    "const power=document.createElement('a');power.className=device.status=='on'?'icon-btn off':'icon-btn on';"
+                    "const power=document.createElement('a');const isEnabled=device.status=='on';"
+                    "power.className=`icon-btn device-state ${isEnabled?'state-enabled':'state-disabled'}`;"
+                    "power.textContent=isEnabled?'OFF':'ON';"
+                    "power.setAttribute('aria-label',isEnabled?'Device enabled. Turn off':'Device disabled. Turn on');"
+                    "power.title=isEnabled?'Turn off':'Turn on';"
                     "power.onclick=()=>asyncDeviceStateSwitch(device.id,device.status=='off'?1:0);"
                     "power.id=`switchBtn${device.id}`;buttons.appendChild(power);"
                 )

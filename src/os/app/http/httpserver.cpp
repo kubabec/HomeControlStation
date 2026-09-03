@@ -592,7 +592,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2025 <a href=\"https://homecontrolstation.pl\">Home Control Station</a> · Jakub Becmer · <a href=\"https://github.com/kubabec/HomeControlStation\">GitHub</a> · version 2.0</p></footer>");
+              client.println("<footer><p>&copy; 2026 Home Control Station · Jakub Becmer · version 2.0</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            
@@ -702,13 +702,13 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 
   if(slot.isActive)
   {
-    client.println(labelStart);
+    client.println("<label class=\"slot-header\">");
     client.println("<input id=\"enabled" + String((int)slotNumber) + "\" type=\"checkbox\" checked> Memory slot " + String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
   }
   else
   {
-    client.println(labelStart);
+    client.println("<label class=\"slot-header\">");
     client.println("<input id=\"enabled" + String((int)slotNumber) + "\" type=\"checkbox\"> Memory slot " + String((int)slotNumber) + "<span class=\"status-text\">Enabled</span>");
     client.println(labelEnd);
   }
@@ -932,6 +932,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" disabled></label>");
 
   client.println("<hr class=\"custom-hr\">");
+  client.println("<div class=\"settings-section-title\">Configuration pages</div>");
 
 
   /* display room settings only if there are devices already configured */
@@ -954,6 +955,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
     client.println("<hr class=\"custom-hr\">");
+    client.println("<div class=\"settings-section-title\">Maintenance</div>");
 
     /* Temporary disabled */
     // client.println("<div class=\"button-link\" onclick=\"downloadDeviceConfiguration()\">Download config file</div>");
@@ -961,10 +963,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     // client.println("<hr class=\"custom-hr\">");
 
   /* Reboot button*/
-  client.println("<div class=\"error-button\" style=\"background-color: yellow;\" onclick=\"showMessage('You really want to reboot this device?', resetDevice)\">Restart</div>");
+  client.println("<div class=\"maintenance-button restart-button\" onclick=\"showMessage('You really want to reboot this device?', resetDevice)\">Restart</div>");
   
     /* Clear all settings */
-    client.println("<div class=\"error-button\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
+  client.println("<div class=\"maintenance-button danger\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
   }
 
   /* Common HTML tags closure */
