@@ -11,8 +11,8 @@
     "header": "include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp",
     "source": "src/device/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.cpp",
     "buildGuard": "TEMP_SENSOR_SUPPORTED",
-    "dependencies": ["DHT sensor library", "RTC callback"],
-    "factory": { "arguments": ["config", "getRtcTime"] },
+    "dependencies": ["DHT sensor library", "RTC callback", "ExtendedMemory"],
+    "factory": { "arguments": ["config", "getRtcTime", "persistentDataChanged"] },
     "manager": {
       "registered": true,
       "collection": "DeviceManager::tempSensorsDevices",
@@ -28,7 +28,7 @@
         "intervalMs": 60000,
         "internalTasks": [
           { "name": "temperature and humidity sample", "minimumIntervalMs": 60000 },
-          { "name": "historical sample", "minimumIntervalMs": 30000, "enabled": false }
+          { "name": "half-day statistics aggregate", "minimumIntervalMs": 60000 }
         ],
         "constructorSample": true
       }
@@ -44,7 +44,24 @@
     ],
     "customBytes": []
   },
-  "services": [],
+  "services": [
+    {
+      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "history", "type": "byte[352]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": 352 }
+      ]
+    },
+    {
+      "name": "DEVSERVICE_SET_EXT_MEMORY_PTR",
+      "overload": "serviceCall_3",
+      "status": "implemented",
+      "parameters": [
+        { "name": "history", "type": "byte[352]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": 352 }
+      ]
+    }
+  ],
   "enablingConditions": [
     { "id": 1, "label": "Cold (below 18 C)", "source": "customBytes[3..6]", "type": "float32", "comparator": "lessThan", "value": 18 },
     { "id": 2, "label": "Normal (18-24 C)", "source": "customBytes[3..6]", "type": "float32", "comparator": "between", "minimum": 18, "maximum": 24 },
@@ -65,7 +82,14 @@
   },
   "ui": {
     "roomWidget": "generateTempWidget",
-    "controls": [],
+    "advancedControls": {
+      "template": "include/devices/TempSensorDHT11DeviceType/AdvancedControls.html",
+      "payloadSize": { "fixedBytes": 352 },
+      "readOnly": true
+    },
+    "controls": [
+      { "name": "statistics", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" }
+    ],
     "readouts": [
       { "name": "temperature", "widget": "temperature-gauge", "source": "temp", "unit": "degrees Celsius" },
       { "name": "humidity", "widget": "humidity-gauge", "source": "humid", "unit": "percent" },
@@ -73,12 +97,14 @@
     ]
   },
   "extendedMemory": {
-    "required": false,
-    "size": 0
+    "required": true,
+    "size": 352,
+    "layout": "16-byte header followed by 14 x 24-byte half-day aggregate records"
   },
   "limitations": [
     "The class name says DHT11 but the implementation instantiates the sensor as DHT22.",
-    "Historical recording exists but is disabled in cyclic().",
+    "Statistics become visible after measurements span at least two distinct calendar days.",
+    "History persistence is requested when a 12-hour aggregate period closes.",
     "The temperature jump filter rejects changes greater than 2 degrees Celsius from the last accepted sample."
   ]
 }

@@ -168,7 +168,10 @@ def validate_description(description):
             if maximum_size > MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE:
                 raise ValueError(f"{path}: dynamic advanced-controls payload exceeds transport capacity")
 
-        for service_name in ("DEVSERVICE_GET_ADVANCED_CONTROLS", "DEVSERVICE_SET_ADVANCED_CONTROLS"):
+        required_services = ["DEVSERVICE_GET_ADVANCED_CONTROLS"]
+        if not advanced_controls.get("readOnly", False):
+            required_services.append("DEVSERVICE_SET_ADVANCED_CONTROLS")
+        for service_name in required_services:
             service = services.get(service_name)
             if not service or service.get("status") != "implemented" or service.get("overload") != "serviceCall_3":
                 raise ValueError(f"{path}: advanced controls require implemented {service_name} with serviceCall_3")

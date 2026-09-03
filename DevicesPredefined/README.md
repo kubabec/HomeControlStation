@@ -10,9 +10,9 @@ The active catalog is [../include/devices](../include/devices). It always contai
 
 | Package | Role | Main behavior | Extra dependency or hardware |
 |---|---|---|---|
-| `OnOffDevice` | Room device | Relay/output switching, brightness support, advanced settings | Isolated output driver |
+| `OnOffDevice` | Room device | Relay/output switching and optional brightness support | Isolated output driver |
 | `HwButton` | Local input/helper | Maps hardware button actions to device toggles or digital events | None; review its package limitations |
-| `TempSensorDHT11DeviceType` | Room sensor | Periodic temperature and humidity publication | Bundled DHT library and matching build guard |
+| `TempSensorDHT11DeviceType` | Room sensor | Temperature/humidity publication and seven-day persistent trends | Bundled DHT library, matching build guard, and 352 bytes of shared extended memory |
 | `LedStrip` | Support library | Shared LED-strip animation/runtime implementation | Required by `LedWS1228bDeviceType`; not a selectable device by itself |
 | `LedWS1228bDeviceType` | Room device | Addressable LED strip, segments, colors, animations, extended memory | `LedStrip` and a correctly powered WS2812-compatible strip |
 | `WindowBlinder` | Room device | Interlocked Open/Stop/Close, optional endpoints, estimated position, travel timeouts | Interlocked reversible motor driver |
@@ -54,7 +54,7 @@ platformio run
 |---|---|
 | `OnOffDevice` | none |
 | `HwButton` | none |
-| `TempSensorDHT11DeviceType` | none; requires its build guard and bundled DHT library |
+| `TempSensorDHT11DeviceType` | none; requires its build guard, bundled DHT library, and 352 bytes of shared extended memory |
 | `LedWS1228bDeviceType` | `LedStrip` |
 | `WindowBlinder` | none; requires an interlocked two-direction motor driver |
 | `WindowDoorSensor` | none; requires a dry contact/reed switch |

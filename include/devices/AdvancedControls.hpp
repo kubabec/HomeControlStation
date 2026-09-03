@@ -13,26 +13,6 @@ enum class Direction {
 };
 
 /**
- * @brief Configuration describing how an on/off device transitions between states.
- */
-struct AdvancedControlsOnOff{
-    /** Animation variants available for on/off transitions. */
-    enum OnOffAnimations{
-        ONOFF_SWITCH = 0,
-        ONOFF_FADE,
-        ONOFF_BLINK
-    };
-
-    /** Animation used when switching the device on. */
-    uint8_t switchOnAnimation = OnOffAnimations::ONOFF_SWITCH;
-    /** Animation used when switching the device off. */
-    uint8_t switchOffAnimation = OnOffAnimations::ONOFF_SWITCH;
-    /** Duration of the selected animation in milliseconds. */
-    uint16_t switchAnimationTime = 0;
-
-};
-
-/**
  * @brief Runtime configuration of LED strip animation behavior.
  */
 struct LedStripAnimationProperties{

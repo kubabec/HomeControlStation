@@ -152,7 +152,7 @@ inline std::unique_ptr<Device> create(
     #endif
     #ifdef TEMP_SENSOR_SUPPORTED
     case type_TEMP_SENSOR:
-            return std::unique_ptr<Device>(new TempSensorDHT11DeviceType(config, context.getRtcTime));
+            return std::unique_ptr<Device>(new TempSensorDHT11DeviceType(config, context.getRtcTime, context.persistentDataChanged));
     #endif
     case type_WINDOW_DOOR_SENSOR:
             return std::unique_ptr<Device>(new WindowDoorSensor(config, GeneratedDigitalEventTriggers::bind(config.deviceType, config.deviceId, config.deviceName, context.getNodeMacAddress, context.fireDigitalEventWithSource)));

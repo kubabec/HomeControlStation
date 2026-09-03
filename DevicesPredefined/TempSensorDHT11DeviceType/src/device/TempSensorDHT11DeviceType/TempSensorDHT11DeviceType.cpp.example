@@ -4,11 +4,31 @@
 
 #ifdef TEMP_SENSOR_SUPPORTED
 
-TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData, std::function<RtcTime(void)> getTimeCallback)
+namespace
+{
+template <typename Value>
+Value readValue(const uint8_t *data, uint16_t offset)
+{
+    Value value;
+    memcpy(&value, data + offset, sizeof(value));
+    return value;
+}
+
+template <typename Value>
+void writeValue(uint8_t *data, uint16_t offset, Value value)
+{
+    memcpy(data + offset, &value, sizeof(value));
+}
+}
+
+TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData,
+                                                     std::function<RtcTime(void)> getTimeCallback,
+                                                     std::function<void(void)> reportNvmDataChangedCallback)
 {
     isOn = false;
     /* save pointer to getRTCTime callback */
     getTime = getTimeCallback;
+    reportNvmDataChanged = reportNvmDataChangedCallback;
 
     pinNumber = nvmData.pinNumber;
     deviceId = nvmData.deviceId;
@@ -34,46 +54,71 @@ TempSensorDHT11DeviceType::TempSensorDHT11DeviceType(DeviceConfigSlotType nvmDat
     }
 }
 
-void TempSensorDHT11DeviceType::printSensorData(float temp, float humid, SensorReading reading)
+uint16_t TempSensorDHT11DeviceType::recordOffset(uint8_t index) const
 {
-    Logger::log(".....................................................");
-    Logger::log(".....................................................");
-    Logger::log(".....................................................");
-    Logger::log("Dodano nowy pomiar do wektora:");
-    Serial.print("Temp: ");
-    Serial.print(temp);
-    Serial.print("°C, Hum: ");
-    Serial.print(humid);
-    Serial.print("%, Rok: ");
-    Serial.print(reading.timestamp.year);
-    Serial.print(", Godzina: ");
-    Serial.print(reading.timestamp.hour);
-    Serial.print(":");
-    Serial.print(reading.timestamp.min);
-    Serial.print(":");
-    Logger::log(String((int)reading.timestamp.sec));
-    Logger::log(".....................................................");
-    Serial.print("Laczna liczba pomiarow: ");
-    Logger::log(String((int)sensorData.size()));
-    Logger::log("Zawartosc wektora sensorData:");
-    for (const auto &r : sensorData)
+    return HISTORY_HEADER_SIZE + static_cast<uint16_t>(index) * HISTORY_RECORD_SIZE;
+}
+
+void TempSensorDHT11DeviceType::initializeHistory()
+{
+    memset(historyData, 0, HISTORY_SIZE);
+    writeValue<uint32_t>(historyData, 0, HISTORY_MAGIC);
+    historyData[4] = HISTORY_VERSION;
+}
+
+void TempSensorDHT11DeviceType::recordStatistics()
+{
+    if (historyData == nullptr || !getTime || temHumSensError || currentHumid > 100) return;
+
+    const RtcTime time = getTime();
+    if (time.year < 2000 || time.year > 2200 || time.yday < 0 || time.yday > 366 || time.hour < 0 || time.hour > 23) return;
+
+    uint8_t writeIndex = historyData[5];
+    uint8_t recordCount = historyData[6];
+    uint16_t offset = recordOffset(writeIndex);
+    const uint8_t halfDay = time.hour >= 12 ? 1 : 0;
+    const bool samePeriod = historyData[offset + 5] != 0 &&
+                            readValue<uint16_t>(historyData, offset) == static_cast<uint16_t>(time.year) &&
+                            readValue<uint16_t>(historyData, offset + 2) == static_cast<uint16_t>(time.yday) &&
+                            historyData[offset + 4] == halfDay;
+
+    if (!samePeriod)
     {
-        // Format czasu z zerowaniem minut (np. 10:05)
-        Serial.print("Czas: ");
-        Serial.print(r.timestamp.hour);
-        Serial.print(":");
-        if (r.timestamp.min < 10)
-            Serial.print("0");
-        Serial.print(r.timestamp.min);
-        // Dane pomiarowe
-        Serial.print(" | Temperatura: ");
-        Serial.print(r.temperature);
-        Serial.print(" °C");
-        Serial.print(" | Wilgotnosc: ");
-        Serial.print(r.humidity);
-        Logger::log(" %");
-        Logger::log(".....................................................");
+        const bool completedPeriod = historyData[offset + 5] != 0;
+        if (completedPeriod)
+        {
+            writeIndex = static_cast<uint8_t>((writeIndex + 1) % HISTORY_RECORD_COUNT);
+            historyData[5] = writeIndex;
+            if (recordCount < HISTORY_RECORD_COUNT) historyData[6] = ++recordCount;
+            offset = recordOffset(writeIndex);
+        }
+        else if (recordCount == 0)
+        {
+            historyData[6] = recordCount = 1;
+        }
+
+        memset(historyData + offset, 0, HISTORY_RECORD_SIZE);
+        writeValue<uint16_t>(historyData, offset, static_cast<uint16_t>(time.year));
+        writeValue<uint16_t>(historyData, offset + 2, static_cast<uint16_t>(time.yday));
+        historyData[offset + 4] = halfDay;
+        historyData[offset + 5] = 1;
+        writeValue<int16_t>(historyData, offset + 12, static_cast<int16_t>(currentTemp * 100.0f));
+        writeValue<int16_t>(historyData, offset + 14, static_cast<int16_t>(currentTemp * 100.0f));
+        historyData[offset + 20] = currentHumid;
+        historyData[offset + 21] = currentHumid;
+
+        if (completedPeriod && reportNvmDataChanged) reportNvmDataChanged();
     }
+
+    const uint16_t sampleCount = readValue<uint16_t>(historyData, offset + 6);
+    writeValue<uint16_t>(historyData, offset + 6, sampleCount + 1);
+    writeValue<float>(historyData, offset + 8, readValue<float>(historyData, offset + 8) + currentTemp);
+    const int16_t temperature = static_cast<int16_t>(currentTemp * 100.0f);
+    if (temperature < readValue<int16_t>(historyData, offset + 12)) writeValue<int16_t>(historyData, offset + 12, temperature);
+    if (temperature > readValue<int16_t>(historyData, offset + 14)) writeValue<int16_t>(historyData, offset + 14, temperature);
+    writeValue<uint32_t>(historyData, offset + 16, readValue<uint32_t>(historyData, offset + 16) + currentHumid);
+    if (currentHumid < historyData[offset + 20]) historyData[offset + 20] = currentHumid;
+    if (currentHumid > historyData[offset + 21]) historyData[offset + 21] = currentHumid;
 }
 
 void TempSensorDHT11DeviceType::temHumReading()
@@ -107,47 +152,6 @@ void TempSensorDHT11DeviceType::temHumReading()
     }
 }
 
-void TempSensorDHT11DeviceType::dhtSensorRecords()
-{
-    RtcTime time;
-    if (getTime)
-    {
-        time = getTime();
-    }
-    // Sprawdzaj co 30 sekund
-    if (millis() - lastCheckedTime >= TIME_STORE_PERIOD && (time.year != 1970))
-    {
-        // Zapisz tylko jesli:
-        // 1. Minuta jest podzielna przez 15 (czyli 00, 15, 30, 45)
-        // 2. Jeszcze nie zapisywalismy w tej minucie
-        // 3. Rok inny niż 1970 - brak internetu po resecie
-        if ((time.min % 2 == 0) && (time.min != lastLoggedMinute))
-        {
-            float h = dht->readHumidity();
-            float t = dht->readTemperature();
-            if (!isnan(t))
-            {
-                if (sensorData.size() >= MAX_ENTRIES)
-                {
-                    sensorData.erase(sensorData.begin());
-                }
-                SensorReading reading;
-                reading.temperature = t;
-                reading.humidity = h;
-                reading.timestamp = time;
-                sensorData.push_back(reading);
-                lastLoggedMinute = time.min;
-                printSensorData(t, h, reading);
-            }
-            else
-            {
-                Logger::log("Blad czujnika DHT");
-            }
-        }
-        lastCheckedTime = millis();
-    }
-}
-
 void TempSensorDHT11DeviceType::init()
 {
 }
@@ -155,12 +159,12 @@ void TempSensorDHT11DeviceType::init()
 void TempSensorDHT11DeviceType::cyclic()
 {
     temHumReading();
-    // dhtSensorRecords();
+    recordStatistics();
 }
 
 uint16_t TempSensorDHT11DeviceType::getExtendedMemoryLength()
 {
-    return 0;
+    return HISTORY_SIZE;
 }
 
 uint8_t TempSensorDHT11DeviceType::getDeviceIdentifier()
@@ -200,6 +204,22 @@ ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType se
 {
     switch (serviceType)
     {
+    case DEVSERVICE_SET_EXT_MEMORY_PTR:
+        if (param.buff == nullptr || param.size != HISTORY_SIZE) return SERV_EXECUTION_FAILURE;
+        historyData = param.buff;
+        if (readValue<uint32_t>(historyData, 0) != HISTORY_MAGIC || historyData[4] != HISTORY_VERSION ||
+            historyData[5] >= HISTORY_RECORD_COUNT || historyData[6] > HISTORY_RECORD_COUNT)
+        {
+            initializeHistory();
+        }
+        return SERV_SUCCESS;
+    case DEVSERVICE_GET_ADVANCED_CONTROLS:
+        if (param.buff == nullptr || param.size != HISTORY_SIZE || param.direction != e_OUT_from_DEVICE || historyData == nullptr)
+        {
+            return SERV_EXECUTION_FAILURE;
+        }
+        memcpy(param.buff, historyData, HISTORY_SIZE);
+        return SERV_SUCCESS;
     case DEVSERVICE_CHECK_ENABLING_CONDITION:
         temHumReading();
         if (temHumSensError) return SERV_EXECUTION_FAILURE;

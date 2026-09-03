@@ -11,56 +11,6 @@
 
 namespace GeneratedAdvancedControlTemplates
 {
-inline const char advancedControlsTemplate_type_ONOFFDEVICE[] = R"HCSADV(<div class="advanced-controls-form" data-role="onoff-controls">
-  <label>Enable animation
-    <select data-field="switchOnAnimation">
-      <option value="0">switch</option>
-      <option value="1">fade</option>
-      <option value="2">blink</option>
-    </select>
-  </label>
-  <label>Disable animation
-    <select data-field="switchOffAnimation">
-      <option value="0">switch</option>
-      <option value="1">fade</option>
-      <option value="2">blink</option>
-    </select>
-  </label>
-  <label data-role="animation-time-label">Switch animation time [ms]
-    <input data-field="switchAnimationTime" type="number" min="0" max="65535">
-  </label>
-  <button class="popup-button" data-action="save">Save</button>
-</div>
-<script type="application/x-hcs-advanced-controls">
-const payload = context.payload;
-if (payload.length < 4) {
-  context.showError('Invalid OnOff advanced-controls payload.');
-  return;
-}
-const onAnimation = context.root.querySelector('[data-field="switchOnAnimation"]');
-const offAnimation = context.root.querySelector('[data-field="switchOffAnimation"]');
-const animationTime = context.root.querySelector('[data-field="switchAnimationTime"]');
-const animationTimeLabel = context.root.querySelector('[data-role="animation-time-label"]');
-onAnimation.value = String(payload[0]);
-offAnimation.value = String(payload[1]);
-animationTime.value = String(payload[2] | (payload[3] << 8));
-const updateVisibility = () => {
-  animationTimeLabel.style.display = onAnimation.value === '0' && offAnimation.value === '0' ? 'none' : '';
-};
-onAnimation.addEventListener('change', updateVisibility);
-offAnimation.addEventListener('change', updateVisibility);
-updateVisibility();
-context.root.querySelector('[data-action="save"]').addEventListener('click', async () => {
-  const nextPayload = new Uint8Array(4);
-  const duration = Math.max(0, Math.min(65535, Number(animationTime.value) || 0));
-  nextPayload[0] = Number(onAnimation.value);
-  nextPayload[1] = Number(offAnimation.value);
-  nextPayload[2] = duration & 255;
-  nextPayload[3] = (duration >> 8) & 255;
-  if (await context.save(nextPayload)) context.close();
-});
-</script>
-)HCSADV";
 #ifdef LED_STRIP_SUPPORTED
 inline const char advancedControlsTemplate_type_LED_STRIP[] = R"HCSADV(<style>
   .advanced-led-controls .advanced-led-actions,
@@ -192,15 +142,122 @@ context.root.querySelector('[data-action="save"]').addEventListener('click', asy
 </script>
 )HCSADV";
 #endif
+#ifdef TEMP_SENSOR_SUPPORTED
+inline const char advancedControlsTemplate_type_TEMP_SENSOR[] = R"HCSADV(<style>
+  .sensor-history { color: #17211b; font-family: "Trebuchet MS", sans-serif; min-width: min(680px, 82vw); }
+  .sensor-history header { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .sensor-history h3 { font-size: 20px; margin: 0; }
+  .sensor-history .period { color: #617068; font-size: 13px; }
+  .sensor-history .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .sensor-history .metric { border-left: 3px solid #e0523f; padding: 7px 10px; background: #f3f5f1; }
+  .sensor-history .metric.humidity { border-color: #168aad; }
+  .sensor-history .metric strong { display: block; font-size: 21px; }
+  .sensor-history .metric span { color: #617068; font-size: 12px; }
+  .sensor-history .chart { margin: 0 0 14px; }
+  .sensor-history .chart-title { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; font-weight: 700; }
+  .sensor-history canvas { width: 100%; height: 150px; display: block; background: #f8faf7; border: 1px solid #dce3dc; }
+  .sensor-history .empty { padding: 34px 18px; text-align: center; color: #617068; background: #f3f5f1; }
+  @media (max-width: 620px) { .sensor-history { min-width: 0; } .sensor-history header { align-items: start; flex-direction: column; } }
+</style>
+<div class="sensor-history" data-role="sensor-history">
+  <header><h3>Seven-day climate trend</h3><span class="period" data-role="period"></span></header>
+  <div data-role="content"></div>
+</div>
+<script type="application/x-hcs-advanced-controls">
+const bytes = Uint8Array.from(context.payload);
+const view = new DataView(bytes.buffer);
+const content = context.root.querySelector('[data-role="content"]');
+const period = context.root.querySelector('[data-role="period"]');
+const magic = bytes.length >= 352 ? view.getUint32(0, true) : 0;
+if (magic !== 0x54485331 || bytes[4] !== 1) {
+  context.showError('Temperature history is unavailable or has an unsupported format.');
+  return;
+}
+
+const records = [];
+for (let index = 0; index < 14; index += 1) {
+  const offset = 16 + index * 24;
+  const valid = bytes[offset + 5] !== 0;
+  const samples = view.getUint16(offset + 6, true);
+  if (!valid || samples === 0) continue;
+  const year = view.getUint16(offset, true);
+  const day = view.getUint16(offset + 2, true);
+  if (year < 2000 || year > 2200 || day > 366) continue;
+  records.push({
+    year, day, samples,
+    date: new Date(year, 0, day + 1),
+    tempSum: view.getFloat32(offset + 8, true),
+    tempMin: view.getInt16(offset + 12, true) / 100,
+    tempMax: view.getInt16(offset + 14, true) / 100,
+    humidSum: view.getUint32(offset + 16, true),
+    humidMin: bytes[offset + 20],
+    humidMax: bytes[offset + 21]
+  });
+}
+
+const byDay = new Map();
+records.forEach(record => {
+  const key = `${record.year}-${record.day}`;
+  const day = byDay.get(key) || { date: record.date, samples: 0, tempSum: 0, tempMin: Infinity, tempMax: -Infinity, humidSum: 0, humidMin: 101, humidMax: 0 };
+  day.samples += record.samples;
+  day.tempSum += record.tempSum;
+  day.tempMin = Math.min(day.tempMin, record.tempMin);
+  day.tempMax = Math.max(day.tempMax, record.tempMax);
+  day.humidSum += record.humidSum;
+  day.humidMin = Math.min(day.humidMin, record.humidMin);
+  day.humidMax = Math.max(day.humidMax, record.humidMax);
+  byDay.set(key, day);
+});
+const days = Array.from(byDay.values()).sort((left, right) => left.date - right.date).slice(-7);
+if (days.length < 2) {
+  content.innerHTML = '<div class="empty"><strong>Building your trend</strong><br>Statistics will appear after two days of measurements.</div>';
+  period.textContent = `${days.length} of 2 days collected`;
+  return;
+}
+days.forEach(day => { day.tempAvg = day.tempSum / day.samples; day.humidAvg = day.humidSum / day.samples; });
+const formatDay = date => date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' });
+period.textContent = `${formatDay(days[0].date)} - ${formatDay(days[days.length - 1].date)}`;
+const latest = days[days.length - 1];
+const previous = days[days.length - 2];
+const signed = value => `${value >= 0 ? '+' : ''}${value.toFixed(1)}`;
+content.innerHTML = `<div class="summary"><div class="metric"><strong>${latest.tempAvg.toFixed(1)}&deg;C</strong><span>${signed(latest.tempAvg - previous.tempAvg)}&deg;C from previous day</span></div><div class="metric humidity"><strong>${latest.humidAvg.toFixed(0)}%</strong><span>${signed(latest.humidAvg - previous.humidAvg)}% from previous day</span></div></div><div class="chart"><div class="chart-title"><span>Temperature</span><span>daily min / average / max</span></div><canvas data-chart="temperature"></canvas></div><div class="chart"><div class="chart-title"><span>Humidity</span><span>daily min / average / max</span></div><canvas data-chart="humidity"></canvas></div>`;
+
+const drawChart = (canvas, averageKey, minKey, maxKey, color, suffix) => {
+  const ratio = window.devicePixelRatio || 1;
+  const width = Math.max(300, canvas.clientWidth);
+  const height = 150;
+  canvas.width = width * ratio; canvas.height = height * ratio;
+  const draw = canvas.getContext('2d'); draw.scale(ratio, ratio);
+  const padding = { left: 38, right: 12, top: 15, bottom: 28 };
+  const values = days.flatMap(day => [day[minKey], day[maxKey]]);
+  let low = Math.floor(Math.min(...values) - 1); let high = Math.ceil(Math.max(...values) + 1);
+  if (low === high) high += 1;
+  const x = index => padding.left + index * (width - padding.left - padding.right) / (days.length - 1);
+  const y = value => padding.top + (high - value) * (height - padding.top - padding.bottom) / (high - low);
+  draw.font = '11px Trebuchet MS'; draw.fillStyle = '#617068'; draw.strokeStyle = '#dce3dc'; draw.lineWidth = 1;
+  [0, 0.5, 1].forEach(step => { const value = high - (high - low) * step; const position = y(value); draw.beginPath(); draw.moveTo(padding.left, position); draw.lineTo(width - padding.right, position); draw.stroke(); draw.fillText(`${Math.round(value)}${suffix}`, 3, position + 4); });
+  draw.fillStyle = color; draw.globalAlpha = 0.13; draw.beginPath();
+  days.forEach((day, index) => index ? draw.lineTo(x(index), y(day[maxKey])) : draw.moveTo(x(index), y(day[maxKey])));
+  [...days].reverse().forEach((day, reverseIndex) => { const index = days.length - reverseIndex - 1; draw.lineTo(x(index), y(day[minKey])); });
+  draw.closePath(); draw.fill(); draw.globalAlpha = 1; draw.strokeStyle = color; draw.lineWidth = 2.5; draw.beginPath();
+  days.forEach((day, index) => index ? draw.lineTo(x(index), y(day[averageKey])) : draw.moveTo(x(index), y(day[averageKey]))); draw.stroke();
+  days.forEach((day, index) => { draw.fillStyle = color; draw.beginPath(); draw.arc(x(index), y(day[averageKey]), 3, 0, Math.PI * 2); draw.fill(); draw.fillStyle = '#617068'; draw.textAlign = 'center'; draw.fillText(formatDay(day.date), x(index), height - 8); });
+};
+drawChart(content.querySelector('[data-chart="temperature"]'), 'tempAvg', 'tempMin', 'tempMax', '#e0523f', ' C');
+drawChart(content.querySelector('[data-chart="humidity"]'), 'humidAvg', 'humidMin', 'humidMax', '#168aad', '%');
+</script>)HCSADV";
+#endif
 
 /** @brief Returns the device-provided advanced-controls template, or nullptr. */
 inline const char* find(uint8_t typeId)
 {
     switch (typeId)
     {
-    case type_ONOFFDEVICE: return advancedControlsTemplate_type_ONOFFDEVICE;
     #ifdef LED_STRIP_SUPPORTED
     case type_LED_STRIP: return advancedControlsTemplate_type_LED_STRIP;
+    #endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+    case type_TEMP_SENSOR: return advancedControlsTemplate_type_TEMP_SENSOR;
     #endif
     default:
         return nullptr;

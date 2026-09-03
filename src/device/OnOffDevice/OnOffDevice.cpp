@@ -2,8 +2,6 @@
 #include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 
-static_assert(sizeof(AdvancedControlsOnOff) == 4, "OnOff advanced-controls JSON payload size is out of sync");
-
 OnOffDevice::OnOffDevice(int pin, String devName, uint8_t a_deviceId, uint8_t a_roomId)
 {
     pinNumber = pin;
@@ -170,7 +168,6 @@ void OnOffDevice::init()
         analogWrite(pinNumber, mapBrightness(brightnessLevel));
     }
 
-    controls.switchAnimationTime = 200 + deviceId;
     // Logger::log("Device " + deviceName + " initialized on pin " + String(pinNumber));
 }
 
@@ -311,28 +308,6 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
     {
     case DEVSERVICE_CHECK_ENABLING_CONDITION:
         return GeneratedEnablingConditions::evaluateService(getDeviceDescription(), param);
-
-    case DEVSERVICE_GET_ADVANCED_CONTROLS:
-        Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS");
-        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr ||
-            param.direction != e_OUT_from_DEVICE)
-        {
-            return SERV_EXECUTION_FAILURE;
-        }
-        memcpy(param.buff, &controls, sizeof(AdvancedControlsOnOff));
-
-        Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS completed");
-        return SERV_SUCCESS;
-
-    case DEVSERVICE_SET_ADVANCED_CONTROLS:
-        Logger::log("<"+deviceName+"> Service: DEVSERVICE_SET_ADVANCED_CONTROLS");
-        if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr ||
-            param.direction != e_IN_to_DEVICE)
-        {
-            return SERV_EXECUTION_FAILURE;
-        }
-        memcpy(&controls, param.buff, sizeof(AdvancedControlsOnOff));
-        return SERV_SUCCESS;
 
     default:
         Logger::log("Device_" + String((int)deviceId) + ":Service {" + String((int)serviceType) + "} is not supported (param3)");

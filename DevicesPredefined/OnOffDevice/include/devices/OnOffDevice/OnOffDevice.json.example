@@ -74,22 +74,6 @@
       "parameters": [
         { "name": "brightness", "type": "uint8", "source": "ServiceParameters_set1.a", "minimum": 0, "maximum": 100, "unit": "percent" }
       ]
-    },
-    {
-      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
-      "overload": "serviceCall_3",
-      "status": "implemented",
-      "parameters": [
-        { "name": "controls", "type": "AdvancedControlsOnOff", "source": "ServiceParameters_set3.buff", "direction": "out", "size": "sizeof(AdvancedControlsOnOff)" }
-      ]
-    },
-    {
-      "name": "DEVSERVICE_SET_ADVANCED_CONTROLS",
-      "overload": "serviceCall_3",
-      "status": "implemented",
-      "parameters": [
-        { "name": "controls", "type": "AdvancedControlsOnOff", "source": "ServiceParameters_set3.buff", "direction": "in", "size": "sizeof(AdvancedControlsOnOff)" }
-      ]
     }
   ],
   "digitalEventActions": [
@@ -119,13 +103,8 @@
   },
   "ui": {
     "roomWidget": "generateOnOffWidget",
-    "advancedControls": {
-      "template": "include/devices/OnOffDevice/AdvancedControls.html",
-      "payloadSize": { "fixedBytes": 4 }
-    },
     "controls": [
       { "name": "power", "widget": "toggle-button", "service": "DEVSERVICE_STATE_SWITCH", "overload": "serviceCall_1", "parameter": "state" },
-      { "name": "advanced", "widget": "settings-button", "service": "DEVSERVICE_GET_ADVANCED_CONTROLS", "overload": "serviceCall_3" },
       { "name": "brightness", "widget": "range", "minimum": 0, "maximum": 100, "unit": "percent", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "overload": "serviceCall_1", "parameter": "brightness", "visibleWhen": "hasBrightness == true" }
     ],
     "readouts": []
@@ -135,7 +114,6 @@
     "size": 0
   },
   "limitations": [
-    "The light-duration timer handler is currently disabled.",
-    "Advanced-control values are runtime-only and are not currently persisted in NVM."
+    "The light-duration timer handler is currently disabled."
   ]
 }

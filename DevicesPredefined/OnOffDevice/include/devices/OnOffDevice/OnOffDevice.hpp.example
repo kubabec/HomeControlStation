@@ -15,9 +15,6 @@
 class OnOffDevice : public Device
 {
 private:
-    /** Animation and timing configuration for switching operations. */
-    AdvancedControlsOnOff controls;
-
     /** Current logical state of the device. */
     bool isOn = false;
     /** GPIO pin connected to the load control output. */

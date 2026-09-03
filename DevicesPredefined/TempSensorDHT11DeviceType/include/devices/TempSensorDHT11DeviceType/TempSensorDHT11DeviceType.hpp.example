@@ -11,7 +11,6 @@
 #include "devices/device.hpp"
 #include "Arduino.h"
 #include <DHT.h>
-#include <vector>
 
 /**
  * @class TempSensorDHT11DeviceType
@@ -19,15 +18,12 @@
  */
 class TempSensorDHT11DeviceType : public Device
 {
-    /** Stores a single temperature/humidity sample together with a timestamp. */
-    struct SensorReading{
-        /** Temperature in degrees Celsius. */
-        float temperature;
-        /** Relative humidity in percent. */
-        float humidity;
-        /** Measurement time. */
-        RtcTime timestamp;
-    };
+    static constexpr uint32_t HISTORY_MAGIC = 0x54485331;
+    static constexpr uint8_t HISTORY_VERSION = 1;
+    static constexpr uint8_t HISTORY_RECORD_COUNT = 14;
+    static constexpr uint16_t HISTORY_HEADER_SIZE = 16;
+    static constexpr uint16_t HISTORY_RECORD_SIZE = 24;
+    static constexpr uint16_t HISTORY_SIZE = HISTORY_HEADER_SIZE + HISTORY_RECORD_COUNT * HISTORY_RECORD_SIZE;
 
     /** Indicates whether the sensor is currently enabled. */
     bool isOn = true;
@@ -47,31 +43,23 @@ class TempSensorDHT11DeviceType : public Device
     uint8_t temHumSensError = 0;
     /** Previous temperature value retained for comparisons. */
     float lastTemp = 0;
-
-    /** Maximum number of entries retained when history recording is enabled. */
-    const size_t MAX_ENTRIES = 288;
-    /** Minimum interval between history-recording checks. */
-    const unsigned long TIME_STORE_PERIOD = 30 * 1000;
-    /** Last timestamp when data was stored into the history buffer. */
-    unsigned long lastStoredTime = 0;
-    /** Last timestamp when the sensor check was evaluated. */
-    unsigned long lastCheckedTime = 0;
-    /** Minute value of the last logged record. */
-    uint8_t lastLoggedMinute = 255;
+    /** Persistent ring buffer supplied by ExtendedMemoryManager. */
+    uint8_t *historyData = nullptr;
 
     /** Concrete DHT sensor object used for reading the environment. */
     DHT *dht = nullptr;
     /** Callback used to obtain the current system time. */
     std::function<RtcTime(void)> getTime;
+    /** Requests a deferred NVM flush after a half-day statistics period closes. */
+    std::function<void(void)> reportNvmDataChanged;
     /** Reads raw temperature and humidity from the DHT sensor. */
     virtual void temHumReading();
-    /** Converts the last reading into a serializable log entry. */
-    virtual void printSensorData(float temp, float humid, SensorReading reading);
-    /** Stores a new sample into the historical sensor buffer. */
-    virtual void dhtSensorRecords();
-    
-    /** History list used when sensor-recording support is enabled. */
-    std::vector<SensorReading> sensorData;
+    /** Adds the current reading to the active half-day aggregate. */
+    void recordStatistics();
+    /** Initializes an empty, versioned history buffer. */
+    void initializeHistory();
+    /** Returns the offset of a ring-buffer record. */
+    uint16_t recordOffset(uint8_t index) const;
     
 public:
     /**
@@ -79,7 +67,9 @@ public:
      * @param nvmData Persisted device configuration.
      * @param getTimeCallback Callback returning the current RTC time.
      */
-    TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData, std::function<RtcTime(void)> getTimeCallback);
+    TempSensorDHT11DeviceType(DeviceConfigSlotType nvmData,
+                              std::function<RtcTime(void)> getTimeCallback,
+                              std::function<void(void)> reportNvmDataChangedCallback = {});
 
     /**
         * @brief Performs device initialization.

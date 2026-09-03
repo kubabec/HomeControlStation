@@ -5,6 +5,7 @@
 #include "devices/HwButton/HwButton.hpp"
 #include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
 
+#include <array>
 #include <cstring>
 #include <limits>
 #include <vector>
@@ -18,6 +19,11 @@ DeviceConfigSlotType predefinedConfig(uint8_t pin, uint8_t id)
 }
 void writeU16(uint8_t* output, uint16_t value) { std::memcpy(output, &value, sizeof(value)); }
 void writeU64(uint8_t* output, uint64_t value) { std::memcpy(output, &value, sizeof(value)); }
+ServiceParameters_set3 bufferParams(uint8_t* data, uint16_t size, ServiceDirectionType direction)
+{
+    ServiceParameters_set3 parameters; parameters.buff = data; parameters.size = size; parameters.direction = direction;
+    return parameters;
+}
 }
 
 TEST_CASE("HwButton reports identity and unsupported services")
@@ -71,4 +77,31 @@ TEST_CASE("DHT predefined device flags failed and implausible samples")
     auto description = sensor.getDeviceDescription(); float temperature = 0;
     std::memcpy(&temperature, &description.customBytes[3], sizeof(temperature));
     EXPECT_NEAR(temperature, 20.0f, 0.01f);
+}
+
+TEST_CASE("DHT predefined device stores half-day statistics in extended memory")
+{
+    ArduinoFake::reset(); DHT::temperature = 20.0f; DHT::humidity = 50.0f;
+    RtcTime now; now.year = 2026; now.yday = 100; now.hour = 8;
+    int saveRequests = 0; auto cfg = predefinedConfig(26, 14);
+    TempSensorDHT11DeviceType sensor(cfg, [&] { return now; }, [&] { ++saveRequests; });
+    EXPECT_EQ(sensor.getExtendedMemoryLength(), uint16_t(352));
+
+    std::array<uint8_t, 352> history; history.fill(0xff);
+    EXPECT_EQ(sensor.service(DEVSERVICE_SET_EXT_MEMORY_PTR,
+                             bufferParams(history.data(), history.size(), e_IN_to_DEVICE)), SERV_SUCCESS);
+    sensor.cyclic();
+    EXPECT_EQ(history[4], uint8_t(1)); EXPECT_EQ(history[6], uint8_t(1)); EXPECT_EQ(saveRequests, 0);
+
+    DHT::temperature = 21.0f; DHT::humidity = 52.0f; now.hour = 12; sensor.cyclic();
+    EXPECT_EQ(history[6], uint8_t(2)); EXPECT_EQ(saveRequests, 1);
+    DHT::temperature = 22.0f; DHT::humidity = 54.0f; now.yday = 101; now.hour = 0; sensor.cyclic();
+    EXPECT_EQ(history[6], uint8_t(3)); EXPECT_EQ(saveRequests, 2);
+
+    std::array<uint8_t, 352> output = {};
+    EXPECT_EQ(sensor.service(DEVSERVICE_GET_ADVANCED_CONTROLS,
+                             bufferParams(output.data(), output.size(), e_OUT_from_DEVICE)), SERV_SUCCESS);
+    EXPECT_TRUE(std::memcmp(history.data(), output.data(), history.size()) == 0);
+    EXPECT_EQ(sensor.service(DEVSERVICE_GET_ADVANCED_CONTROLS,
+                             bufferParams(output.data(), output.size() - 1, e_OUT_from_DEVICE)), SERV_EXECUTION_FAILURE);
 }

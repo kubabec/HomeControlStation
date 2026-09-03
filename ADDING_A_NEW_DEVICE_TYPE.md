@@ -832,7 +832,7 @@ List real restrictions, incomplete behavior, hardware assumptions, non-persisten
 
 Advanced controls are appropriate for palettes, animations, grouped settings, or another interaction too complex for the generated room widget. A device owns an HTML fragment plus JavaScript that decodes and encodes an opaque byte payload.
 
-A complete implementation needs all of the following:
+A complete writable implementation needs all of the following:
 
 1. `ui.advancedControls` in JSON;
 2. an implemented `DEVSERVICE_GET_ADVANCED_CONTROLS` using `serviceCall_3`;
@@ -841,12 +841,15 @@ A complete implementation needs all of the following:
 5. an HTML file containing exactly an HCS controller script tag;
 6. C++ and JavaScript that agree on every payload byte.
 
+For a read-only statistics or diagnostics panel, set `"readOnly": true` next to `payloadSize`, implement only `DEVSERVICE_GET_ADVANCED_CONTROLS`, and omit save controls from the HTML controller.
+
 ### 6.1 JSON for a fixed payload
 
 ```json
 "advancedControls": {
   "template": "include/devices/MyDevice/AdvancedControls.html",
-  "payloadSize": { "fixedBytes": 4 }
+  "payloadSize": { "fixedBytes": 4 },
+  "readOnly": false
 }
 ```
 
@@ -952,7 +955,7 @@ ServiceRequestErrorCode MyDevice::service(
 }
 ```
 
-If a POD struct is copied directly, add a `static_assert(sizeof(StructName) == fixedBytes)` and make its byte order/padding part of the contract. See [include/devices/AdvancedControls.hpp](include/devices/AdvancedControls.hpp) and [DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example](DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example).
+If a POD struct is copied directly, add a `static_assert(sizeof(StructName) == fixedBytes)` and make its byte order/padding part of the contract. Prefer explicit byte offsets for persistent or cross-language formats; the temperature sensor history is an example.
 
 Advanced-control changes are runtime-only unless the class explicitly copies them into persistent storage and invokes the `persistentDataChanged` callback.
 
@@ -1118,8 +1121,8 @@ The safest multi-node deployment is to build the same device catalog into every 
 
 ## 10. Best predefined examples
 
-- [DevicesPredefined/OnOffDevice/include/devices/OnOffDevice/OnOffDevice.json.example](DevicesPredefined/OnOffDevice/include/devices/OnOffDevice/OnOffDevice.json.example) and [DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example](DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example): configuration fields, switch/brightness services, fixed-size advanced controls.
-- [DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.json.example](DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.json.example): fixed-interval read-only sensor, float state, gauges, callback factory argument, build guard.
+- [DevicesPredefined/OnOffDevice/include/devices/OnOffDevice/OnOffDevice.json.example](DevicesPredefined/OnOffDevice/include/devices/OnOffDevice/OnOffDevice.json.example) and [DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example](DevicesPredefined/OnOffDevice/src/device/OnOffDevice/OnOffDevice.cpp.example): configuration fields and switch/brightness services without advanced controls.
+- [DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.json.example](DevicesPredefined/TempSensorDHT11DeviceType/include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.json.example): fixed-interval sensor, persistent ExtendedMemory statistics, read-only advanced controls, gauges, callback factory arguments, and a build guard.
 - [DevicesPredefined/LedWS1228bDeviceType/include/devices/LedWS1228bDeviceType/LedWS1228bDeviceType.json.example](DevicesPredefined/LedWS1228bDeviceType/include/devices/LedWS1228bDeviceType/LedWS1228bDeviceType.json.example): dynamic advanced payload, colors, persistent callback, extended memory, and shared `LedStrip` support.
 - [DevicesPredefined/HwButton/include/devices/HwButton/HwButton.json.example](DevicesPredefined/HwButton/include/devices/HwButton/HwButton.json.example): callbacks and a device intentionally excluded from the common room collection. Read its listed limitations before copying its byte layout.
 
