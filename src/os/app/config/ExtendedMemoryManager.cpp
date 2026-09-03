@@ -152,9 +152,12 @@ bool ExtendedMemoryManager::requestNewExtendedMemorySpace(uint8_t deviceId, uint
 {
     bool success = false;
     if(deviceId > 0 && deviceId < 10){
-        uint16_t spaceWithRequestedNeeds = extMemoryInUse + spaceSize;
+        const uint16_t previousSpaceSize = extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId - 1];
+        const uint16_t spaceWithRequestedNeeds = extMemoryInUse - previousSpaceSize + spaceSize;
         if(spaceWithRequestedNeeds <= MAX_EXT_MEMORY_SIZE_TOTAL){
+            extMemoryInUse -= previousSpaceSize;
             extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId-1] = spaceSize;
+            extMemoryInUse += spaceSize;
             success = true;
         }else {
             Logger::log("ExtendedMemoryManager//ERROR: Cannot allocate space length: "+String((int)spaceSize)+", already in use: "+String((int)extMemoryInUse));

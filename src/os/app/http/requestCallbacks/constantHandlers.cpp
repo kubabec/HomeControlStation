@@ -69,7 +69,10 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
   if(interfaceVisible){\
             try {\
                 const response = await fetch('/getPageContent');\
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);\
                 const [newData, , notificationCnt] = await response.json();\
+            if (!newData || typeof newData !== 'object' || Array.isArray(newData)) throw new Error('Invalid device data');\
+            document.body.classList.remove('connection-lost');\
                 if (JSON.stringify(newData) !== JSON.stringify(currentData)) {\
                     currentData = newData;\
                     renderRooms(currentData);\
@@ -78,6 +81,7 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
                     getNotifications();\
                 }\
             } catch (error) {\
+              document.body.classList.add('connection-lost');\
                 console.error('Error fetching data:', error);\
             }\
   }else {\
@@ -734,7 +738,7 @@ document.getElementById('save-conditions').onclick=()=>{
 void HomeLightHttpServer::constantHandler_unmappedEvents(WiFiClient &client)
 {
   client.println("<div class=\"wrapper\"><div class=\"header\">Unmapped events</div>");
-  client.println("<table class=\"table-graphite\"><thead><tr><th>Source</th><th>Event ID</th><th>&nbsp;</th></tr></thead><tbody>");
+  client.println("<table class=\"table-graphite\" id=\"unmapped-event-table\"><thead><tr><th>Source</th><th>Event ID</th><th>&nbsp;</th></tr></thead><tbody>");
 
   const auto &events = DigitalEventReceiver::getUnmappedEvents();
   if (events.empty())

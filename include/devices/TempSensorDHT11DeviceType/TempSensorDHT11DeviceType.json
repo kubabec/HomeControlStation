@@ -50,7 +50,7 @@
       "overload": "serviceCall_3",
       "status": "implemented",
       "parameters": [
-        { "name": "history", "type": "byte[352]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": 352 }
+        { "name": "history", "type": "byte[376]", "source": "ServiceParameters_set3.buff", "direction": "out", "size": 376 }
       ]
     },
     {
@@ -58,7 +58,7 @@
       "overload": "serviceCall_3",
       "status": "implemented",
       "parameters": [
-        { "name": "history", "type": "byte[352]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": 352 }
+        { "name": "history", "type": "byte[376]", "source": "ServiceParameters_set3.buff", "direction": "in", "size": 376 }
       ]
     }
   ],
@@ -84,7 +84,7 @@
     "roomWidget": "generateTempWidget",
     "advancedControls": {
       "template": "include/devices/TempSensorDHT11DeviceType/AdvancedControls.html",
-      "payloadSize": { "fixedBytes": 352 },
+      "payloadSize": { "fixedBytes": 376 },
       "readOnly": true
     },
     "controls": [
@@ -98,8 +98,8 @@
   },
   "extendedMemory": {
     "required": true,
-    "size": 352,
-    "layout": "16-byte header followed by 14 x 24-byte half-day aggregate records"
+    "size": 376,
+    "layout": "40-byte extrema header followed by 14 x 24-byte half-day aggregate records"
   },
   "limitations": [
     "The class name says DHT11 but the implementation instantiates the sensor as DHT22.",

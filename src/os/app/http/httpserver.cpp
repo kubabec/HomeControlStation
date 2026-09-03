@@ -934,26 +934,35 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("<hr class=\"custom-hr\">");
   client.println("<div class=\"settings-section-title\">Configuration pages</div>");
 
-
   /* display room settings only if there are devices already configured */
   std::vector<DeviceDescription>  deviceCollection = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
 
+  if(currentConfig.isRcServer){
+    client.println("<div class=\"settings-menu-section\"><div class=\"settings-menu-title\">Network</div>");
+    client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+    client.println("</div>");
+  }
+
+  client.println("<div class=\"settings-menu-section\"><div class=\"settings-menu-title\">Hardware setup</div>");
   if(deviceCollection.size() > 0){
     /* Room mapping button */
     client.println("<div class=\"button-link\" onclick=\"goToRoomSettings()\">Room settings</div>");
   }
-
-  if(currentConfig.isRcServer){
-    client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
-    client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital Events</div>");
-    client.println("<div class=\"button-link\" onclick=\"enablingConditions()\">Enabling Conditions</div>");
-    client.println("<div class=\"button-link\" onclick=\"unmappedEvents()\">Unmapped events</div>");
-    client.println("<div class=\"button-link\" onclick=\"rtcEvents()\">RTC Events</div>");
-  }
-    
-  /* Devices setup button */
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<div class=\"button-link\" onclick=\"goToDevicesManagement()\">Devices management</div>");
+  }
+  client.println("</div>");
+
+  if(currentConfig.isRcServer){
+    client.println("<div class=\"settings-menu-section\"><div class=\"settings-menu-title\">Events configuration</div>");
+    client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital Events</div>");
+    client.println("<div class=\"button-link\" onclick=\"unmappedEvents()\">Unmapped events</div>");
+    client.println("<div class=\"button-link\" onclick=\"rtcEvents()\">RTC Events</div>");
+    client.println("<div class=\"button-link\" onclick=\"enablingConditions()\">Enabling Conditions</div>");
+    client.println("</div>");
+  }
+
+  if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<hr class=\"custom-hr\">");
     client.println("<div class=\"settings-section-title\">Maintenance</div>");
 

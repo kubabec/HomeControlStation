@@ -41,6 +41,8 @@ padding-top: 20px;\
 opacity: 0;\
 animation: fadeInBody 1s forwards;\
 }\
+.connection-lost .wrapper > *:not(.popup-overlay) { filter:blur(5px);pointer-events:none; }\
+.connection-lost::after { content:\"Connection with the server was lost\";position:fixed;z-index:1000;top:50%;left:50%;width:min(90vw,360px);padding:16px 18px;border:1px solid #D7A83B;border-radius:8px;background:rgba(22,28,35,.96);color:#FFD44F;font-size:16px;font-weight:700;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.45);transform:translate(-50%,-50%);pointer-events:none; }\
 .wrapper {\
 display: flex;\
 flex-direction: column;\
@@ -720,7 +722,8 @@ footer a {\
   width:100%; border-collapse:collapse;\
   background:var(--g-dark); color:var(--fg);\
   font-family:sans-serif;\
-  width:70%;\
+.table-graphite thead,.table-graphite tbody { display:table;width:max-content;min-width:100%;table-layout:fixed; }\
+.table-graphite tr { width:100%; }\
   border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.5);\
   overflow:hidden;\
 }\
@@ -1033,7 +1036,8 @@ background:var(--surface-1);border:1px solid var(--steel-soft);border-radius:8px
 .cell-conditions { display:grid;gap:6px; }\
 .rtc-interval label,.rtc-days label { margin:6px 0; }\
 .rtc-days { display:flex;flex-wrap:wrap;gap:5px; }\
-.rtc-days label { justify-content:flex-start;gap:4px;padding:5px 7px;background:var(--surface-2);border:1px solid var(--steel-soft);border-radius:4px; }\
+.rtc-days label { display:inline-flex;align-items:center;justify-content:flex-start;gap:5px;min-width:52px;padding:6px 8px;background:var(--surface-2);border:1px solid var(--steel-soft);border-radius:4px;color:var(--text-strong);white-space:nowrap; }\
+.rtc-days input[type=\"checkbox\"] { display:block;visibility:visible;opacity:1;width:20px;height:20px;margin:0; }\
 .sensor-error { min-height:64px;height:auto;background:var(--surface-1);border:1px solid #8F434A;border-radius:6px;box-shadow:none; }\
 footer { color:#647283;padding:18px 0 6px; }\
 footer a { color:#8195AD; }\
@@ -1060,6 +1064,8 @@ body .advanced-action.danger { background:#783E45;border-color:#D7787D;color:#FF
 .container > form > .button-link { align-self:center;width:min(100%,300px);margin:0; }\
 .container > form > .error-button { align-self:flex-start;margin:0; }\
 .settings-section-title { margin:4px 0 2px;color:var(--text-muted);font-size:11px;font-weight:700;text-align:center;text-transform:uppercase; }\
+.settings-menu-section { display:flex;flex-direction:column;align-items:stretch;width:min(100%,460px);margin:14px auto 0;padding-top:10px;border-top:1px solid var(--steel-soft); }\
+.settings-menu-title { margin:0 0 5px;color:var(--text-muted);font-size:11px;font-weight:750;letter-spacing:.04em;text-align:center;text-transform:uppercase; }\
 .maintenance-button { display:inline-flex;align-items:center;justify-content:center;align-self:center;width:min(100%,300px);min-height:44px;padding:9px 16px;border:1px solid #667587;border-radius:6px;background:#3A4653;color:var(--text-strong);font-weight:650;cursor:pointer; }\
 .maintenance-button:hover { background:#465464;border-color:#7A8B9F; }\
 .maintenance-button.danger { border-color:#9E555D;background:#713E45;color:#FFE9EA; }\
@@ -1074,8 +1080,35 @@ body .room-container { padding:8px; }\
 body .container,body .device-container { width:100%;padding:14px; }\
 body .device-container label { gap:8px; }\
 body .device-container input[type=\"number\"],body .device-container select,body .device-container input[type=\"text\"] { width:min(190px,58%); }\
-body .table-graphite { border-radius:6px; }\
-body .table-graphite th,body .table-graphite td { min-width:128px;padding:9px; }\
+body .table-graphite { display:block;border-radius:6px;overflow:visible;background:transparent;border:0;box-shadow:none; }\
+body .table-graphite thead { display:none; }\
+body .table-graphite tbody { display:grid;width:100%;min-width:0;gap:10px; }\
+body .table-graphite tbody tr { display:grid;grid-template-columns:1fr;gap:8px;padding:12px;background:var(--surface-1);border:1px solid var(--steel-soft);border-radius:6px; }\
+body .table-graphite th,body .table-graphite td { display:grid;grid-template-columns:minmax(92px,.42fr) minmax(0,1fr);align-items:center;min-width:0;padding:0;border:0;text-align:left; }\
+body .table-graphite td::before { color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase; }\
+body .table-graphite td > input,body .table-graphite td > select,body .table-graphite td > button,body .table-graphite td > div { width:100%;min-width:0; }\
+body #data-table td:nth-child(1)::before { content:\"Mapping ID\"; }\
+body #data-table td:nth-child(2)::before { content:\"Event ID\"; }\
+body #data-table td:nth-child(3)::before { content:\"Device\"; }\
+body #data-table td:nth-child(4)::before { content:\"Action\"; }\
+body #data-table td:nth-child(5)::before { content:\"Conditions\"; }\
+body #data-table td:nth-child(6)::before { content:\"\"; }\
+body #condition-table td:nth-child(1)::before { content:\"Condition ID\"; }\
+body #condition-table td:nth-child(2)::before { content:\"Device\"; }\
+body #condition-table td:nth-child(3)::before { content:\"Condition\"; }\
+body #condition-table td:nth-child(4)::before { content:\"\"; }\
+body #rtc-event-table td:nth-child(1)::before { content:\"Event ID\"; }\
+body #rtc-event-table td:nth-child(2)::before { content:\"Repeats\"; }\
+body #rtc-event-table td:nth-child(3)::before { content:\"Schedule\"; }\
+body #rtc-event-table td:nth-child(4)::before { content:\"\"; }\
+body #unmapped-event-table td:nth-child(1)::before { content:\"Source\"; }\
+body #unmapped-event-table td:nth-child(2)::before { content:\"Event ID\"; }\
+body #unmapped-event-table td:nth-child(3)::before { content:\"\"; }\
+body .table-graphite td:last-child:has(.error-button),body .table-graphite td:last-child:has(.button) { display:block; }\
+body .table-graphite td:last-child::before { display:none; }\
+body .rtc-weekly { min-width:0; }\
+body .rtc-days { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px; }\
+body .rtc-days label { min-width:0;margin:0;padding:6px 4px;font-size:12px; }\
 body .wrapper > .button,body .wrapper > .button-link { width:min(100%,420px);flex:none; }\
 .container > form > .button-link,.container > form > .error-button,.maintenance-button { width:100%;align-self:stretch; }\
 }\

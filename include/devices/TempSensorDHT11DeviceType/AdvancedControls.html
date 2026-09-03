@@ -4,6 +4,10 @@
   .sensor-history h3 { font-size:16px; line-height:1.25; margin:0; }
   .sensor-history .period { color:#98A6B8; font-size:11px; white-space:nowrap; }
   .sensor-history .summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+  .sensor-history .extremes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+  .sensor-history .extreme { min-width:0; padding:8px 9px; background:#1D232B; border:1px solid #3B4654; border-radius:5px; }
+  .sensor-history .extreme strong { display:block; font-size:14px; line-height:1.2; }
+  .sensor-history .extreme span { display:block; margin-top:3px; color:#98A6B8; font-size:10px; line-height:1.25; }
   .sensor-history .metric { min-width:0; border-top:2px solid #FF796B; padding:8px 9px; background:#1D232B; border-radius:5px; }
   .sensor-history .metric.humidity { border-color:#45B9DE; }
   .sensor-history .metric strong { display:block; font-size:18px; line-height:1.2; }
@@ -25,15 +29,15 @@ const bytes = Uint8Array.from(context.payload);
 const view = new DataView(bytes.buffer);
 const content = context.root.querySelector('[data-role="content"]');
 const period = context.root.querySelector('[data-role="period"]');
-const magic = bytes.length >= 352 ? view.getUint32(0, true) : 0;
-if (magic !== 0x54485331 || bytes[4] !== 1) {
+const magic = bytes.length >= 376 ? view.getUint32(0, true) : 0;
+if (magic !== 0x54485331 || bytes[4] !== 3) {
   context.showError('Temperature history is unavailable or has an unsupported format.');
   return;
 }
 
 const records = [];
 for (let index = 0; index < 14; index += 1) {
-  const offset = 16 + index * 24;
+  const offset = 40 + index * 24;
   const valid = bytes[offset + 5] !== 0;
   const samples = view.getUint16(offset + 6, true);
   if (!valid || samples === 0) continue;
@@ -52,6 +56,20 @@ for (let index = 0; index < 14; index += 1) {
   });
 }
 
+const readExtreme = (offset, value, suffix, decimals) => {
+  const year = view.getUint16(offset, true);
+  if (year < 2000) return null;
+  const day = view.getUint16(offset + 2, true);
+  const date = new Date(year, 0, day + 1, bytes[offset + 4], bytes[offset + 5]);
+  return { value, suffix, date, decimals };
+};
+const extrema = [
+  ['Lowest temperature', readExtreme(8, view.getInt16(14, true) / 100, '&deg;C', 1)],
+  ['Highest temperature', readExtreme(16, view.getInt16(22, true) / 100, '&deg;C', 1)],
+  ['Lowest humidity', readExtreme(24, bytes[30], '%', 0)],
+  ['Highest humidity', readExtreme(32, bytes[38], '%', 0)]
+];
+
 const byDay = new Map();
 records.forEach(record => {
   const key = `${record.year}-${record.day}`;
@@ -66,18 +84,15 @@ records.forEach(record => {
   byDay.set(key, day);
 });
 const days = Array.from(byDay.values()).sort((left, right) => left.date - right.date).slice(-7);
-if (days.length < 2) {
-  content.innerHTML = '<div class="empty"><strong>Building your trend</strong><br>Statistics will appear after two days of measurements.</div>';
-  period.textContent = `${days.length} of 2 days collected`;
-  return;
-}
 days.forEach(day => { day.tempAvg = day.tempSum / day.samples; day.humidAvg = day.humidSum / day.samples; });
 const formatDay = date => date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' });
-period.textContent = `${formatDay(days[0].date)} - ${formatDay(days[days.length - 1].date)}`;
+period.textContent = days.length > 1 ? `${formatDay(days[0].date)} - ${formatDay(days[days.length - 1].date)}` : `${days.length} day collected`;
 const latest = days[days.length - 1];
-const previous = days[days.length - 2];
+const previous = days[days.length - 2] || latest;
 const signed = value => `${value >= 0 ? '+' : ''}${value.toFixed(1)}`;
-content.innerHTML = `<div class="summary"><div class="metric"><strong>${latest.tempAvg.toFixed(1)}&deg;C</strong><span>${signed(latest.tempAvg - previous.tempAvg)}&deg;C from previous day</span></div><div class="metric humidity"><strong>${latest.humidAvg.toFixed(0)}%</strong><span>${signed(latest.humidAvg - previous.humidAvg)}% from previous day</span></div></div><div class="chart"><div class="chart-title"><span>Temperature</span><span>daily min / average / max</span></div><canvas data-chart="temperature"></canvas></div><div class="chart"><div class="chart-title"><span>Humidity</span><span>daily min / average / max</span></div><canvas data-chart="humidity"></canvas></div>`;
+const formatExtremeDate = date => date.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+const extremeMarkup = extrema.map(([label, item]) => item ? `<div class="extreme"><strong>${item.value.toFixed(item.decimals)}${item.suffix}</strong><span>${label}<br>${formatExtremeDate(item.date)}</span></div>` : '').join('');
+content.innerHTML = `${extremeMarkup ? `<div class="extremes">${extremeMarkup}</div>` : ''}<div class="summary"><div class="metric"><strong>${latest ? latest.tempAvg.toFixed(1) : '--'}&deg;C</strong><span>${days.length > 1 ? `${signed(latest.tempAvg - previous.tempAvg)}&deg;C from previous day` : 'Current average'}</span></div><div class="metric humidity"><strong>${latest ? latest.humidAvg.toFixed(0) : '--'}%</strong><span>${days.length > 1 ? `${signed(latest.humidAvg - previous.humidAvg)}% from previous day` : 'Current average'}</span></div></div>${days.length > 1 ? '<div class="chart"><div class="chart-title"><span>Seven-day temperature</span><span>daily min / average / max</span></div><canvas data-chart="temperature"></canvas></div><div class="chart"><div class="chart-title"><span>Seven-day humidity</span><span>daily min / average / max</span></div><canvas data-chart="humidity"></canvas></div>' : '<div class="empty">Weekly averages will appear after two days of measurements.</div>'}`;
 
 const drawChart = (canvas, averageKey, minKey, maxKey, color, suffix) => {
   const ratio = window.devicePixelRatio || 1;
@@ -100,6 +115,8 @@ const drawChart = (canvas, averageKey, minKey, maxKey, color, suffix) => {
   days.forEach((day, index) => index ? draw.lineTo(x(index), y(day[averageKey])) : draw.moveTo(x(index), y(day[averageKey]))); draw.stroke();
   days.forEach((day, index) => { draw.fillStyle = color; draw.beginPath(); draw.arc(x(index), y(day[averageKey]), 2.5, 0, Math.PI * 2); draw.fill(); draw.fillStyle = '#98A6B8'; draw.textAlign = 'center'; draw.fillText(formatDay(day.date), x(index), height - 7); });
 };
-drawChart(content.querySelector('[data-chart="temperature"]'), 'tempAvg', 'tempMin', 'tempMax', '#FF796B', ' C');
-drawChart(content.querySelector('[data-chart="humidity"]'), 'humidAvg', 'humidMin', 'humidMax', '#45B9DE', '%');
+if (days.length > 1) {
+  drawChart(content.querySelector('[data-chart="temperature"]'), 'tempAvg', 'tempMin', 'tempMax', '#FF796B', ' C');
+  drawChart(content.querySelector('[data-chart="humidity"]'), 'humidAvg', 'humidMin', 'humidMax', '#45B9DE', '%');
+}
 </script>

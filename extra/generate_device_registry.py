@@ -20,7 +20,7 @@ except NameError:
 DEVICES_DIR = PROJECT_DIR / "include" / "devices"
 GENERATED_INCLUDE_DIR = PROJECT_DIR / "include" / "generated"
 RESERVED_TYPE_IDS = {255}
-MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE = 391
+MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE = 1048
 AREA_BYTE_CAPACITIES = {"configuration": 20, "state": 50}
 FACTORY_ARGUMENTS = {
     "config": "config",

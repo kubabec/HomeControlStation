@@ -3,5 +3,5 @@
 case type_LED_STRIP: return (currentlyRequestedDeviceDescription.customBytes[0] <= 100u) ? ((currentlyRequestedDeviceDescription.customBytes[0] * 3u) + 5u) : 0;
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
-case type_TEMP_SENSOR: return 352;
+case type_TEMP_SENSOR: return 376;
 #endif

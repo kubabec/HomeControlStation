@@ -19,9 +19,9 @@
 class TempSensorDHT11DeviceType : public Device
 {
     static constexpr uint32_t HISTORY_MAGIC = 0x54485331;
-    static constexpr uint8_t HISTORY_VERSION = 1;
+    static constexpr uint8_t HISTORY_VERSION = 3;
     static constexpr uint8_t HISTORY_RECORD_COUNT = 14;
-    static constexpr uint16_t HISTORY_HEADER_SIZE = 16;
+    static constexpr uint16_t HISTORY_HEADER_SIZE = 40;
     static constexpr uint16_t HISTORY_RECORD_SIZE = 24;
     static constexpr uint16_t HISTORY_SIZE = HISTORY_HEADER_SIZE + HISTORY_RECORD_COUNT * HISTORY_RECORD_SIZE;
 

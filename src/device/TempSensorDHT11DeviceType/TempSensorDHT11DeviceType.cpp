@@ -66,12 +66,54 @@ void TempSensorDHT11DeviceType::initializeHistory()
     historyData[4] = HISTORY_VERSION;
 }
 
+namespace
+{
+void writeOccurrence(uint8_t *data, uint16_t offset, const RtcTime &time)
+{
+    writeValue<uint16_t>(data, offset, static_cast<uint16_t>(time.year));
+    writeValue<uint16_t>(data, offset + 2, static_cast<uint16_t>(time.yday));
+    data[offset + 4] = static_cast<uint8_t>(time.hour);
+    data[offset + 5] = static_cast<uint8_t>(time.min);
+}
+
+bool validOccurrence(const uint8_t *data, uint16_t offset)
+{
+    return readValue<uint16_t>(data, offset) >= 2000;
+}
+}
+
 void TempSensorDHT11DeviceType::recordStatistics()
 {
     if (historyData == nullptr || !getTime || temHumSensError || currentHumid > 100) return;
 
     const RtcTime time = getTime();
-    if (time.year < 2000 || time.year > 2200 || time.yday < 0 || time.yday > 366 || time.hour < 0 || time.hour > 23) return;
+    if (time.year < 2000 || time.year > 2200 || time.yday < 0 || time.yday > 366 || time.hour < 0 || time.hour > 23 || time.min < 0 || time.min > 59 || currentTemp < -100.0f || currentTemp > 100.0f) return;
+
+    const int16_t temperature = static_cast<int16_t>(currentTemp * 100.0f);
+    const uint16_t temperatureMinOffset = 8;
+    const uint16_t temperatureMaxOffset = 16;
+    const uint16_t humidityMinOffset = 24;
+    const uint16_t humidityMaxOffset = 32;
+    if (!validOccurrence(historyData, temperatureMinOffset) || temperature < readValue<int16_t>(historyData, temperatureMinOffset + 6))
+    {
+        writeValue<int16_t>(historyData, temperatureMinOffset + 6, temperature);
+        writeOccurrence(historyData, temperatureMinOffset, time);
+    }
+    if (!validOccurrence(historyData, temperatureMaxOffset) || temperature > readValue<int16_t>(historyData, temperatureMaxOffset + 6))
+    {
+        writeValue<int16_t>(historyData, temperatureMaxOffset + 6, temperature);
+        writeOccurrence(historyData, temperatureMaxOffset, time);
+    }
+    if (!validOccurrence(historyData, humidityMinOffset) || currentHumid < historyData[humidityMinOffset + 6])
+    {
+        historyData[humidityMinOffset + 6] = currentHumid;
+        writeOccurrence(historyData, humidityMinOffset, time);
+    }
+    if (!validOccurrence(historyData, humidityMaxOffset) || currentHumid > historyData[humidityMaxOffset + 6])
+    {
+        historyData[humidityMaxOffset + 6] = currentHumid;
+        writeOccurrence(historyData, humidityMaxOffset, time);
+    }
 
     uint8_t writeIndex = historyData[5];
     uint8_t recordCount = historyData[6];
@@ -113,12 +155,12 @@ void TempSensorDHT11DeviceType::recordStatistics()
     const uint16_t sampleCount = readValue<uint16_t>(historyData, offset + 6);
     writeValue<uint16_t>(historyData, offset + 6, sampleCount + 1);
     writeValue<float>(historyData, offset + 8, readValue<float>(historyData, offset + 8) + currentTemp);
-    const int16_t temperature = static_cast<int16_t>(currentTemp * 100.0f);
     if (temperature < readValue<int16_t>(historyData, offset + 12)) writeValue<int16_t>(historyData, offset + 12, temperature);
     if (temperature > readValue<int16_t>(historyData, offset + 14)) writeValue<int16_t>(historyData, offset + 14, temperature);
     writeValue<uint32_t>(historyData, offset + 16, readValue<uint32_t>(historyData, offset + 16) + currentHumid);
     if (currentHumid < historyData[offset + 20]) historyData[offset + 20] = currentHumid;
     if (currentHumid > historyData[offset + 21]) historyData[offset + 21] = currentHumid;
+
 }
 
 void TempSensorDHT11DeviceType::temHumReading()
