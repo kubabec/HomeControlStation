@@ -16,17 +16,7 @@
 
 void setup()
 {
-#ifdef SUPERMINI
-  esp_task_wdt_config_t wdt_config = {
-      .timeout_ms = 15000,        // 5 sekund
-      .idle_core_mask = (1 << 0), // Core 0
-      .trigger_panic = true       // reset przy timeout
-  };
-
-  esp_task_wdt_init(&wdt_config);
-#else
   esp_task_wdt_init(15, true);
-#endif
   esp_task_wdt_add(NULL);
   Serial.begin(115200);
   randomSeed(analogRead(0));
