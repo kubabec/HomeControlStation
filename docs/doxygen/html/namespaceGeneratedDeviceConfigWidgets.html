@@ -114,76 +114,14 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespaceGener
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:DeviceTypeSpec" id="r_DeviceTypeSpec"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html">DeviceTypeSpec</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration widget metadata for one enabled device type.  <a href="structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html#details">More...</a><br /></td></tr>
-<tr class="memitem:FieldSpec" id="r_FieldSpec"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rendering and byte-layout metadata for one configuration field.  <a href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#details">More...</a><br /></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5c8f89e348366c46bd865b590f4f76d8" id="r_a5c8f89e348366c46bd865b590f4f76d8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5c8f89e348366c46bd865b590f4f76d8">emitField</a> (uint8_t slotNumber, const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;field, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:aea9439c0e30b43df08bd6ed263834e29" id="r_aea9439c0e30b43df08bd6ed263834e29"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aea9439c0e30b43df08bd6ed263834e29">emitGeneratedCustomFields</a> (uint8_t slotNumber, uint8_t deviceType, const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, WiFiClient &amp;client)</td></tr>
-<tr class="memdesc:aea9439c0e30b43df08bd6ed263834e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits every generated type-specific field container for a configuration slot.  <br /></td></tr>
-<tr class="memitem:a33a2d06089dad56b0e58d1145ec48623" id="r_a33a2d06089dad56b0e58d1145ec48623"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a33a2d06089dad56b0e58d1145ec48623">emitGpioSelect</a> (uint8_t slotNumber, const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;field, uint16_t value, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:a5539175b1da3f38319d270c43d161e69" id="r_a5539175b1da3f38319d270c43d161e69"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5539175b1da3f38319d270c43d161e69">emitSelect</a> (uint8_t slotNumber, const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;field, uint16_t value, WiFiClient &amp;client)</td></tr>
-<tr class="memitem:a155ba5858bb4965f0da16881bf98fae9" id="r_a155ba5858bb4965f0da16881bf98fae9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a155ba5858bb4965f0da16881bf98fae9">emitTypeSelector</a> (uint8_t slotNumber, uint8_t selectedType, WiFiClient &amp;client)</td></tr>
-<tr class="memdesc:a155ba5858bb4965f0da16881bf98fae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits the device type selector for one NVM configuration slot.  <br /></td></tr>
-<tr class="memitem:a7b447cffff7f09a27009c5fe3a289d32" id="r_a7b447cffff7f09a27009c5fe3a289d32"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="#a7b447cffff7f09a27009c5fe3a289d32">readValue</a> (const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;slot, const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;field)</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:aadef3fdd300127cee47eba72069c8fb6" id="r_aadef3fdd300127cee47eba72069c8fb6"><td class="memItemLeft">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html">DeviceTypeSpec</a>&#160;</td><td class="memItemRight"><a class="el" href="#aadef3fdd300127cee47eba72069c8fb6">kKnownDeviceTypeWidgetSpecs</a> []</td></tr>
+<tr class="memitem:abe63878571fb3c93e4dd5715fa37cfb4" id="r_abe63878571fb3c93e4dd5715fa37cfb4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#abe63878571fb3c93e4dd5715fa37cfb4">emitGeneratedCustomFields</a> (uint8_t, uint8_t, const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;, WiFiClient &amp;)</td></tr>
+<tr class="memitem:a6410010a3c7dae6f018c98161d252686" id="r_a6410010a3c7dae6f018c98161d252686"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6410010a3c7dae6f018c98161d252686">emitTypeSelector</a> (uint8_t slotNumber, uint8_t, WiFiClient &amp;client)</td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a5c8f89e348366c46bd865b590f4f76d8" name="a5c8f89e348366c46bd865b590f4f76d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c8f89e348366c46bd865b590f4f76d8">&#9670;&#160;</a></span>emitField()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GeneratedDeviceConfigWidgets::emitField </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>field</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">73</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00031">GeneratedDeviceConfigWidgets::FieldSpec::arrayLength</a>, <a class="el" href="httpserver_8cpp_source.html#l00023">client</a>, <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00063">emitGpioSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00052">emitSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00023">GeneratedDeviceConfigWidgets::FieldSpec::htmlType</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00021">GeneratedDeviceConfigWidgets::FieldSpec::key</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00022">GeneratedDeviceConfigWidgets::FieldSpec::label</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00027">GeneratedDeviceConfigWidgets::FieldSpec::maximum</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00026">GeneratedDeviceConfigWidgets::FieldSpec::minimum</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00024">GeneratedDeviceConfigWidgets::FieldSpec::offset</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00044">readValue()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">emitGeneratedCustomFields()</a>.</p>
-
-</div>
-</div>
-<a id="aea9439c0e30b43df08bd6ed263834e29" name="aea9439c0e30b43df08bd6ed263834e29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea9439c0e30b43df08bd6ed263834e29">&#9670;&#160;</a></span>emitGeneratedCustomFields()</h2>
+<a id="abe63878571fb3c93e4dd5715fa37cfb4" name="abe63878571fb3c93e4dd5715fa37cfb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe63878571fb3c93e4dd5715fa37cfb4">&#9670;&#160;</a></span>emitGeneratedCustomFields()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -194,22 +132,22 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void GeneratedDeviceConfigWidgets::emitGeneratedCustomFields </td>
           <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>deviceType</em></span>, </td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
+          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -219,108 +157,16 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Emits every generated type-specific field container for a configuration slot. </p>
+<p class="definition">Definition at line <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00017">17</a> of file <a class="el" href="DeviceConfigWidgets_8hpp_source.html">DeviceConfigWidgets.hpp</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">167</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
+<p class="reference">References <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00017">emitGeneratedCustomFields()</a>.</p>
 
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00023">client</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">emitGeneratedCustomFields()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00100">kKnownDeviceTypeWidgetSpecs</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">emitGeneratedCustomFields()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00683">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00017">emitGeneratedCustomFields()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00690">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
 
 </div>
 </div>
-<a id="a33a2d06089dad56b0e58d1145ec48623" name="a33a2d06089dad56b0e58d1145ec48623"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33a2d06089dad56b0e58d1145ec48623">&#9670;&#160;</a></span>emitGpioSelect()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GeneratedDeviceConfigWidgets::emitGpioSelect </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>field</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>value</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00063">63</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00023">client</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00063">emitGpioSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00021">GeneratedDeviceConfigWidgets::FieldSpec::key</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00022">GeneratedDeviceConfigWidgets::FieldSpec::label</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00063">emitGpioSelect()</a>.</p>
-
-</div>
-</div>
-<a id="a5539175b1da3f38319d270c43d161e69" name="a5539175b1da3f38319d270c43d161e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5539175b1da3f38319d270c43d161e69">&#9670;&#160;</a></span>emitSelect()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GeneratedDeviceConfigWidgets::emitSelect </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>slotNumber</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>field</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>value</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">WiFiClient &amp;</td>          <td class="paramname"><span class="paramname"><em>client</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00052">52</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00023">client</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00052">emitSelect()</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00021">GeneratedDeviceConfigWidgets::FieldSpec::key</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00022">GeneratedDeviceConfigWidgets::FieldSpec::label</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00030">GeneratedDeviceConfigWidgets::FieldSpec::optionCount</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00029">GeneratedDeviceConfigWidgets::FieldSpec::optionLabels</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00028">GeneratedDeviceConfigWidgets::FieldSpec::optionValues</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00052">emitSelect()</a>.</p>
-
-</div>
-</div>
-<a id="a155ba5858bb4965f0da16881bf98fae9" name="a155ba5858bb4965f0da16881bf98fae9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a155ba5858bb4965f0da16881bf98fae9">&#9670;&#160;</a></span>emitTypeSelector()</h2>
+<a id="a6410010a3c7dae6f018c98161d252686" name="a6410010a3c7dae6f018c98161d252686"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6410010a3c7dae6f018c98161d252686">&#9670;&#160;</a></span>emitTypeSelector()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -336,7 +182,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>selectedType</em></span>, </td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -351,75 +197,11 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Emits the device type selector for one NVM configuration slot. </p>
+<p class="definition">Definition at line <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00010">10</a> of file <a class="el" href="DeviceConfigWidgets_8hpp_source.html">DeviceConfigWidgets.hpp</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00152">152</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
+<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00028">client</a>, and <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00010">emitTypeSelector()</a>.</p>
 
-<p class="reference">References <a class="el" href="httpserver_8cpp_source.html#l00023">client</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00152">emitTypeSelector()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00100">kKnownDeviceTypeWidgetSpecs</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00152">emitTypeSelector()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00683">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
-
-</div>
-</div>
-<a id="a7b447cffff7f09a27009c5fe3a289d32" name="a7b447cffff7f09a27009c5fe3a289d32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b447cffff7f09a27009c5fe3a289d32">&#9670;&#160;</a></span>readValue()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t GeneratedDeviceConfigWidgets::readValue </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slot</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1FieldSpec.html">FieldSpec</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>field</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00044">44</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="NvmConfigSlotDefinition_8hpp_source.html#l00025">DeviceConfigSlotType::customBytes</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00024">GeneratedDeviceConfigWidgets::FieldSpec::offset</a>, <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00044">readValue()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00025">GeneratedDeviceConfigWidgets::FieldSpec::size</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00073">emitField()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00044">readValue()</a>.</p>
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="aadef3fdd300127cee47eba72069c8fb6" name="aadef3fdd300127cee47eba72069c8fb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadef3fdd300127cee47eba72069c8fb6">&#9670;&#160;</a></span>kKnownDeviceTypeWidgetSpecs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html">DeviceTypeSpec</a> GeneratedDeviceConfigWidgets::kKnownDeviceTypeWidgetSpecs[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00100">100</a> of file <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html">GeneratedDeviceConfigWidgets.hpp</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00167">emitGeneratedCustomFields()</a>, and <a class="el" href="GeneratedDeviceConfigWidgets_8hpp_source.html#l00152">emitTypeSelector()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DeviceConfigWidgets_8hpp_source.html#l00010">emitTypeSelector()</a>, and <a class="el" href="httpserver_8cpp_source.html#l00690">HomeLightHttpServer::generateConfigSlotUi()</a>.</p>
 
 </div>
 </div>

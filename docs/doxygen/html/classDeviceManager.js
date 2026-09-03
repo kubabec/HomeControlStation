@@ -2,7 +2,7 @@ var classDeviceManager =
 [
     [ "cyclic", "classDeviceManager.html#abede853a2004bc9a48d3b2a68d1b8cb1", null ],
     [ "deinit", "classDeviceManager.html#ada6b112849143ca893cabe765d410718", null ],
-    [ "extractDeviceInstanceBasedOnNvmData", "classDeviceManager.html#acc7c90ea6c943f89203ffdda9520abb1", null ],
+    [ "extractDeviceInstanceBasedOnNvmData", "classDeviceManager.html#a32f08818ad21b272e2ac62893e83f112", null ],
     [ "flushNvmData", "classDeviceManager.html#a8fab75625581e3633b23f48a63d2fc5d", null ],
     [ "getLocalSetupJson", "classDeviceManager.html#a3079d22dd0e36c7604c23690e5f39492", null ],
     [ "getRtcTimeWrapper", "classDeviceManager.html#a81fdbe1c8f8005b5927b2bbb89259108", null ],

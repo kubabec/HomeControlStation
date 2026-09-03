@@ -7,6 +7,6 @@ var searchData=
   ['allocatememoryforcontrolsbasedondevicetype_4',['allocateMemoryForControlsBasedOnDeviceType',['../classAdvancedControlsLoader.html#a192474537716298f68b1effaee4c1dd1',1,'AdvancedControlsLoader']]],
   ['appendjsonstring_5',['appendJsonString',['../classAdvancedControlsLoader.html#ae877c422903f010b1bf7179ac3b1328a',1,'AdvancedControlsLoader']]],
   ['applycolors_6',['applyColors',['../classLedWS1228bDeviceType.html#a7534ad4a22e83b9ecdcb088907ac5864',1,'LedWS1228bDeviceType']]],
-  ['applycontent_7',['applyContent',['../classLedWS1228bDeviceType.html#a32cb343423ad4ea83dc4da07ba9d2871',1,'LedWS1228bDeviceType::applyContent()'],['../classSegLedWS1228bDeviceType.html#a2a6058aaec51a4004a0ee1500f92153f',1,'SegLedWS1228bDeviceType::applyContent()']]],
-  ['applyvirtualtorealdiodes_8',['applyVirtualToRealDiodes',['../classLedWS1228bDeviceType.html#a97beaf63bcaad5bda96e1acff133fb3c',1,'LedWS1228bDeviceType::applyVirtualToRealDiodes()'],['../classSegLedWS1228bDeviceType.html#a7b932478184e6d784c753c6057244d23',1,'SegLedWS1228bDeviceType::applyVirtualToRealDiodes()']]]
+  ['applycontent_7',['applyContent',['../classLedWS1228bDeviceType.html#a32cb343423ad4ea83dc4da07ba9d2871',1,'LedWS1228bDeviceType']]],
+  ['applyvirtualtorealdiodes_8',['applyVirtualToRealDiodes',['../classLedWS1228bDeviceType.html#a97beaf63bcaad5bda96e1acff133fb3c',1,'LedWS1228bDeviceType']]]
 ];

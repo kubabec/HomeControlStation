@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('rcResponse_8cp
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
 <div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="classRcResponse.html#a9de314b28bc9545f91425c813b7d349b">  112</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classRcResponse.html#a9de314b28bc9545f91425c813b7d349b">RcResponse::toByteArray</a>(uint8_t* buffer, uint16_t size) {</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordflow">if</span> (buffer == <span class="keyword">nullptr</span> ) {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordflow">if</span> (buffer == <span class="keyword">nullptr</span> || size != <a class="code hl_function" href="classRcResponse.html#ad826bc4dffad0c437e33d1cab7ad4117">getSize</a>()) {</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>; </div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    }  </div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <a class="code hl_variable" href="classRcResponse.html#a63e3f642c89a49d16b49d0a02429fb52">crc</a> = <a class="code hl_function" href="classRcResponse.html#af06ecf11f394aac5bed91ee7357f0c3b">calculateCrc</a>();</div>

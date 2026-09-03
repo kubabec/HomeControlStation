@@ -13,6 +13,7 @@ var classHomeLightHttpServer =
     [ "constantHandler_resetDevice", "classHomeLightHttpServer.html#a85840ad67d4aee679bc99b3b6fff8c7c", null ],
     [ "constantHandler_roomAssignment", "classHomeLightHttpServer.html#aa522b7c77f3ec54700fa235def6a5f03", null ],
     [ "constantHandler_systemDetails", "classHomeLightHttpServer.html#a0558d0112a95f59e40cdcb56fe9947a4", null ],
+    [ "constantHandler_unmappedEvents", "classHomeLightHttpServer.html#a1bfa3354c6e348bea8560889e5971997", null ],
     [ "cyclic", "classHomeLightHttpServer.html#a6dd3c05caeada744c8f355a3f77f9e6b", null ],
     [ "deinit", "classHomeLightHttpServer.html#a10b069a17048a424149794f34fd5eced", null ],
     [ "escapeSpecialCharsInJson", "classHomeLightHttpServer.html#a85e3000afaed04a831f832e1b0cf349c", null ],

@@ -4,6 +4,7 @@
 
 #include "Arduino.h"
 #include "devices/device.hpp"
+#include <functional>
 
 class WindowDoorSensor : public Device
 {
@@ -18,11 +19,12 @@ private:
     bool rawClosed = false;
     bool stableClosed = false;
     unsigned long rawChangedAt = 0;
+    std::function<void(uint8_t)> fireDeviceEvent;
 
     bool readClosed() const;
 
 public:
-    explicit WindowDoorSensor(DeviceConfigSlotType config);
+    WindowDoorSensor(DeviceConfigSlotType config, std::function<void(uint8_t)> fireDeviceEventCallback);
     void init() override;
     void cyclic() override;
     DeviceDescription getDeviceDescription() override;

@@ -13,6 +13,7 @@
 #else
 #include "devices/fallback/DeviceConfigWidgets.hpp"
 #endif
+#include "generated/GeneratedDeviceRegistry.hpp"
 #include "build_info.h"
 #include "os/Logger.hpp"
 
@@ -55,7 +56,8 @@ std::vector<String> constantRequests = {
   "asyncRequestTest",
   "networkInspection",
   "sysDetails",
-  "digBtn"
+  "digBtn",
+  "unmappedEvents"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -95,7 +97,8 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_unmappedEvents, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -711,18 +714,11 @@ void HomeLightHttpServer::generateConfigSlotUi(uint8_t slotNumber, DeviceConfigS
 
   client.println(labelStart);
   client.println("Pin:<select type=\"text\" id=\"pin" + String(slotNumber) + "\" value=\"" + String((int)slot.pinNumber) + "\">");
-  const std::array<int, 34> pinsAllowed = {1,2,3,4,5,6,7,8,9,10,12,13,14,22,23,24,27,26,25,33,32,35,34,15,18,19,21,39,40,41,42, 47, 48};
-
-  for(auto& val : pinsAllowed)
+  for(uint8_t pin = 1; pin < 49; ++pin)
   {
-    if(slot.pinNumber != val)
-    {
-      client.println("<option value=\"" + String((int)val) + "\">" + String((int)val) + "</option>");
-    }
-    else
-    {
-      client.println("<option value=\"" + String((int)val) + "\" selected>" + String((int)val) + "</option>");
-    }
+    if (!GeneratedDeviceRegistry::isConfigurableGpio(pin)) continue;
+    const String selected = slot.pinNumber == pin ? " selected" : "";
+    client.println("<option value=\"" + String((int)pin) + "\"" + selected + ">" + String((int)pin) + "</option>");
   }
   client.println("</select>");
   client.println(labelEnd);
@@ -765,6 +761,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     function digitalBtn(){\
         var url = `/digBtn`;\
         window.location.href = url;\
+    }\
+    function unmappedEvents(){\
+      var url = `/unmappedEvents`;\
+      window.location.href = url;\
     }\
     function resetDevice(){\
         var url = `/resetDevice`;\
@@ -928,6 +928,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
     client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital Events</div>");
+    client.println("<div class=\"button-link\" onclick=\"unmappedEvents()\">Unmapped events</div>");
   }
     
   /* Devices setup button */

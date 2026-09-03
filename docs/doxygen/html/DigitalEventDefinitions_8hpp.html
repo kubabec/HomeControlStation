@@ -116,13 +116,21 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('DigitalEventDe
 
 <p>Digital event definitions and handlers for the Home Control Station.  
 <a href="#details">More...</a></p>
-
+<div class="textblock"><code>#include &lt;Arduino.h&gt;</code><br />
+</div>
 <p><a href="DigitalEventDefinitions_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:DigitalEventOccurrence" id="r_DigitalEventOccurrence"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structDigitalEventOccurrence.html">DigitalEventOccurrence</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One source-aware event occurrence used by runtime queues and diagnostics.  <a href="structDigitalEventOccurrence.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a2d28fcacc9f8a979ba4cc21fc5d58611" id="r_a2d28fcacc9f8a979ba4cc21fc5d58611"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a2d28fcacc9f8a979ba4cc21fc5d58611">DIGITAL_EVENT_CONFIRMED_MSG_ID</a>&#160;&#160;&#160;101</td></tr>
 <tr class="memitem:a05b2eb9e46f3c3dd1cbf0ea089e97671" id="r_a05b2eb9e46f3c3dd1cbf0ea089e97671"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a05b2eb9e46f3c3dd1cbf0ea089e97671">DIGITAL_EVENT_FIRED_MSG_ID</a>&#160;&#160;&#160;100</td></tr>
+<tr class="memitem:afbbfc0d7a267a3e3f98ffeb0f5e36cae" id="r_afbbfc0d7a267a3e3f98ffeb0f5e36cae"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afbbfc0d7a267a3e3f98ffeb0f5e36cae">DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID</a>&#160;&#160;&#160;102</td></tr>
+<tr class="memitem:ac4875cbc0d1564877a0eb2a2bf1af962" id="r_ac4875cbc0d1564877a0eb2a2bf1af962"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac4875cbc0d1564877a0eb2a2bf1af962">DIGITAL_EVENT_SOURCE_MAX_LENGTH</a>&#160;&#160;&#160;31</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Digital event definitions and handlers for the Home Control Station. </p>
@@ -143,7 +151,7 @@ Macros</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00005">5</a> of file <a class="el" href="DigitalEventDefinitions_8hpp_source.html">DigitalEventDefinitions.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00261">DigitalEventReceiver::receiveUDP()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">DigitalEventTransmitter::receiveUdp()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00290">DigitalEventReceiver::receiveUDP()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">DigitalEventTransmitter::receiveUdp()</a>.</p>
 
 </div>
 </div>
@@ -161,7 +169,43 @@ Macros</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00004">4</a> of file <a class="el" href="DigitalEventDefinitions_8hpp_source.html">DigitalEventDefinitions.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">DigitalEventTransmitter::fireEvent()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00261">DigitalEventReceiver::receiveUDP()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">DigitalEventTransmitter::fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">DigitalEventTransmitter::fireEvent()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00290">DigitalEventReceiver::receiveUDP()</a>.</p>
+
+</div>
+</div>
+<a id="afbbfc0d7a267a3e3f98ffeb0f5e36cae" name="afbbfc0d7a267a3e3f98ffeb0f5e36cae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbbfc0d7a267a3e3f98ffeb0f5e36cae">&#9670;&#160;</a></span>DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID&#160;&#160;&#160;102</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00006">6</a> of file <a class="el" href="DigitalEventDefinitions_8hpp_source.html">DigitalEventDefinitions.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">DigitalEventTransmitter::fireEvent()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00290">DigitalEventReceiver::receiveUDP()</a>.</p>
+
+</div>
+</div>
+<a id="ac4875cbc0d1564877a0eb2a2bf1af962" name="ac4875cbc0d1564877a0eb2a2bf1af962"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4875cbc0d1564877a0eb2a2bf1af962">&#9670;&#160;</a></span>DIGITAL_EVENT_SOURCE_MAX_LENGTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DIGITAL_EVENT_SOURCE_MAX_LENGTH&#160;&#160;&#160;31</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00007">7</a> of file <a class="el" href="DigitalEventDefinitions_8hpp_source.html">DigitalEventDefinitions.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00236">DigitalEventReceiver::fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">DigitalEventTransmitter::fireEvent()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00290">DigitalEventReceiver::receiveUDP()</a>.</p>
 
 </div>
 </div>

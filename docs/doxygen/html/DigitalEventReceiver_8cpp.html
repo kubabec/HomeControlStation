@@ -118,36 +118,92 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('DigitalEventRe
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="DigitalEventReceiver_8hpp_source.html">os/app/DigitalEvent/DigitalEventReceiver.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="networkdriver_8hpp_source.html">os/drivers/networkdriver.hpp</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="GeneratedDigitalEventActions_8hpp_source.html">generated/GeneratedDigitalEventActions.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Logger_8hpp_source.html">os/Logger.hpp</a>&quot;</code><br />
+<code>#include &lt;algorithm&gt;</code><br />
 </div>
 <p><a href="DigitalEventReceiver_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aa08776906880260f8aaef4ef28171a02" id="r_aa08776906880260f8aaef4ef28171a02"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#aa08776906880260f8aaef4ef28171a02">nextMappingId</a> (const std::vector&lt; std::pair&lt; uint64_t, DigitalEvent::Event &gt; &gt; &amp;mappings)</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a295ea2d1010ab0abb3d243f6ca259155" id="r_a295ea2d1010ab0abb3d243f6ca259155"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a295ea2d1010ab0abb3d243f6ca259155">deviceOrRoomIdIndex</a> = 2</td></tr>
+<tr class="memitem:a64dbc8a7c343c986a1bd38c114d31450" id="r_a64dbc8a7c343c986a1bd38c114d31450"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a64dbc8a7c343c986a1bd38c114d31450">LEGACY_DEVICE_TYPE</a> = 12</td></tr>
+<tr class="memitem:af2e5d3d00311a1378fd7702e6f000303" id="r_af2e5d3d00311a1378fd7702e6f000303"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#af2e5d3d00311a1378fd7702e6f000303">LEGACY_ROOM_TYPE</a> = 11</td></tr>
 <tr class="memitem:ac4659bb02dcb2db7ca4075eb64192741" id="r_ac4659bb02dcb2db7ca4075eb64192741"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#ac4659bb02dcb2db7ca4075eb64192741">NVM_VALID</a> = 0xCD</td></tr>
-<tr class="memitem:a6612832ff9f915545226a29da821e884" id="r_a6612832ff9f915545226a29da821e884"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a6612832ff9f915545226a29da821e884">serviceOverloadingIndex</a> = 1</td></tr>
-<tr class="memitem:a0cd17db166f3d8991e3f34c085b2107e" id="r_a0cd17db166f3d8991e3f34c085b2107e"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a0cd17db166f3d8991e3f34c085b2107e">serviceTypeIndex</a> = 0</td></tr>
-<tr class="memitem:a1f856fbfba41e80f197503fd6f2db9c7" id="r_a1f856fbfba41e80f197503fd6f2db9c7"><td class="memItemLeft">const uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a1f856fbfba41e80f197503fd6f2db9c7">valueIndex</a> = 3</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Digital event processing for the Home Control Station. </p>
 
 <p class="definition">Definition in file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
-</div><a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a295ea2d1010ab0abb3d243f6ca259155" name="a295ea2d1010ab0abb3d243f6ca259155"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a295ea2d1010ab0abb3d243f6ca259155">&#9670;&#160;</a></span>deviceOrRoomIdIndex</h2>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="aa08776906880260f8aaef4ef28171a02" name="aa08776906880260f8aaef4ef28171a02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa08776906880260f8aaef4ef28171a02">&#9670;&#160;</a></span>nextMappingId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t nextMappingId </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::pair&lt; uint64_t, DigitalEvent::Event &gt; &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>mappings</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00024">24</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00022">LEGACY_DEVICE_TYPE</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00021">LEGACY_ROOM_TYPE</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00024">nextMappingId()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00043">DigitalEventReceiver::init()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00024">nextMappingId()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00121">DigitalEventReceiver::updateDigitalEventMappingViaJson()</a>.</p>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a64dbc8a7c343c986a1bd38c114d31450" name="a64dbc8a7c343c986a1bd38c114d31450"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64dbc8a7c343c986a1bd38c114d31450">&#9670;&#160;</a></span>LEGACY_DEVICE_TYPE</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const uint8_t deviceOrRoomIdIndex = 2</td>
+          <td class="memname">const uint8_t LEGACY_DEVICE_TYPE = 12</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00323">323</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00022">22</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00043">DigitalEventReceiver::init()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00024">nextMappingId()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00121">DigitalEventReceiver::updateDigitalEventMappingViaJson()</a>.</p>
+
+</div>
+</div>
+<a id="af2e5d3d00311a1378fd7702e6f000303" name="af2e5d3d00311a1378fd7702e6f000303"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2e5d3d00311a1378fd7702e6f000303">&#9670;&#160;</a></span>LEGACY_ROOM_TYPE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t LEGACY_ROOM_TYPE = 11</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00021">21</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00043">DigitalEventReceiver::init()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00024">nextMappingId()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00121">DigitalEventReceiver::updateDigitalEventMappingViaJson()</a>.</p>
 
 </div>
 </div>
@@ -163,57 +219,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00018">18</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00020">20</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00221">DigitalEventReceiver::deinit()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00020">DigitalEventReceiver::init()</a>.</p>
-
-</div>
-</div>
-<a id="a6612832ff9f915545226a29da821e884" name="a6612832ff9f915545226a29da821e884"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6612832ff9f915545226a29da821e884">&#9670;&#160;</a></span>serviceOverloadingIndex</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t serviceOverloadingIndex = 1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00324">324</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a0cd17db166f3d8991e3f34c085b2107e" name="a0cd17db166f3d8991e3f34c085b2107e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cd17db166f3d8991e3f34c085b2107e">&#9670;&#160;</a></span>serviceTypeIndex</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t serviceTypeIndex = 0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00325">325</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a1f856fbfba41e80f197503fd6f2db9c7" name="a1f856fbfba41e80f197503fd6f2db9c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1f856fbfba41e80f197503fd6f2db9c7">&#9670;&#160;</a></span>valueIndex</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t valueIndex = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00326">326</a> of file <a class="el" href="DigitalEventReceiver_8cpp_source.html">DigitalEventReceiver.cpp</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00250">DigitalEventReceiver::deinit()</a>, and <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00043">DigitalEventReceiver::init()</a>.</p>
 
 </div>
 </div>

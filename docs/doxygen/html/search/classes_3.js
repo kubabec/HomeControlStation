@@ -12,11 +12,10 @@ var searchData=
   ['deviceservicesapi_9',['DeviceServicesAPI',['../structDeviceServicesAPI.html',1,'']]],
   ['devicetranslationdetails_10',['DeviceTranslationDetails',['../structDeviceTranslationDetails.html',1,'']]],
   ['devicetypeinfo_11',['DeviceTypeInfo',['../structGeneratedDeviceTypes_1_1DeviceTypeInfo.html',1,'GeneratedDeviceTypes']]],
-  ['devicetypespec_12',['DeviceTypeSpec',['../structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html',1,'GeneratedDeviceConfigWidgets']]],
+  ['digitaleventoccurrence_12',['DigitalEventOccurrence',['../structDigitalEventOccurrence.html',1,'']]],
   ['digitaleventreceiver_13',['DigitalEventReceiver',['../classDigitalEventReceiver.html',1,'']]],
   ['digitaleventtransmitter_14',['DigitalEventTransmitter',['../classDigitalEventTransmitter.html',1,'']]],
   ['display_15',['Display',['../classDisplay.html',1,'']]],
   ['displayinfo_16',['DisplayInfo',['../structDisplayInfo.html',1,'']]],
-  ['displayserver_17',['DisplayServer',['../classDisplayServer.html',1,'']]],
-  ['distancesensor_18',['DistanceSensor',['../classDistanceSensor.html',1,'']]]
+  ['displayserver_17',['DisplayServer',['../classDisplayServer.html',1,'']]]
 ];

@@ -34,54 +34,30 @@ inline String serialize(const DeviceDescription& description)
             result += String((int)description.customBytes[2]);
             break;
         }
-    case type_WINDOW_BLINDER:
+    #ifdef LED_STRIP_SUPPORTED
+    case type_LED_STRIP:
         {
-            result += ",\"motion\":";
-            result += String((int)description.customBytes[0]);
-            result += ",\"position\":";
-            result += String((int)description.customBytes[1]);
-            result += ",\"fault\":";
-            result += String((int)description.customBytes[4]);
+            result += ",\"avgColor\":";
+            result += "\"#" + rgbHex(description.customBytes[2], description.customBytes[3], description.customBytes[4]) + "\"";
+            result += ",\"liveStatus\":";
+            result += String((int)description.customBytes[15]);
             break;
         }
-    case type_WINDOW_DOOR_SENSOR:
+    #endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+    case type_TEMP_SENSOR:
         {
-            result += ",\"closed\":";
-            result += String((int)description.customBytes[0]);
-            break;
-        }
-    case type_GATE:
-        {
-            result += ",\"motion\":";
-            result += String((int)description.customBytes[0]);
-            result += ",\"opened\":";
-            result += String((int)description.customBytes[1]);
-            result += ",\"closed\":";
-            result += String((int)description.customBytes[2]);
-            result += ",\"fault\":";
-            result += String((int)description.customBytes[3]);
-            break;
-        }
-    case type_AQUARIUM_CONTROLLER:
-        {
-            result += ",\"temperature\":";
+            result += ",\"temp\":";
             float value0 = 0.0f;
-            memcpy(&value0, &description.customBytes[0], sizeof(value0));
+            memcpy(&value0, &description.customBytes[3], sizeof(value0));
             result += String(value0);
-            result += ",\"temperatureValid\":";
-            result += String((int)description.customBytes[4]);
-            result += ",\"waterLow\":";
-            result += String((int)description.customBytes[5]);
-            result += ",\"heaterOn\":";
-            result += String((int)description.customBytes[6]);
-            result += ",\"lightOn\":";
-            result += String((int)description.customBytes[7]);
-            result += ",\"filterOn\":";
-            result += String((int)description.customBytes[8]);
-            result += ",\"fault\":";
-            result += String((int)description.customBytes[10]);
+            result += ",\"humid\":";
+            result += String((int)description.customBytes[2]);
+            result += ",\"Err\":";
+            result += String((int)description.customBytes[0]);
             break;
         }
+    #endif
     default:
         break;
     }

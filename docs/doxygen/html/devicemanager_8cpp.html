@@ -120,13 +120,22 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('devicemanager_
 <code>#include &lt;os/datacontainer/DataContainer.hpp&gt;</code><br />
 <code>#include &lt;<a class="el" href="Logger_8hpp_source.html">os/Logger.hpp</a>&gt;</code><br />
 <code>#include &lt;ArduinoJson.h&gt;</code><br />
-<code>#include &quot;<a class="el" href="GeneratedDeviceRegistry_8hpp_source.html">generated/GeneratedDeviceRegistry.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="DeviceRegistry_8hpp_source.html">devices/fallback/DeviceRegistry.hpp</a>&quot;</code><br />
 </div>
 <p><a href="devicemanager_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:anonymous_5Fnamespace_7Bdevicemanager_2Ecpp_7D" id="r_anonymous_5Fnamespace_7Bdevicemanager_2Ecpp_7D"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespaceanonymous__namespace_02devicemanager_8cpp_03.html">anonymous_namespace{devicemanager.cpp}</a></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a9f22d9639a3869473f0e87723b50bc21" id="r_a9f22d9639a3869473f0e87723b50bc21"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a9f22d9639a3869473f0e87723b50bc21">isNull</a> (const String &amp;str)</td></tr>
+<tr class="memitem:af053c8e8dc4b729bf23f33da7837aa6d" id="r_af053c8e8dc4b729bf23f33da7837aa6d"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespaceanonymous__namespace_02devicemanager_8cpp_03.html#af053c8e8dc4b729bf23f33da7837aa6d">anonymous_namespace{devicemanager.cpp}::validateConfigurationSet</a> (const <a class="el" href="structConfigSlotsDataType.html">ConfigSlotsDataType</a> &amp;configuration)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a346f30bb42382ce91ac26dac2cc56f38" id="r_a346f30bb42382ce91ac26dac2cc56f38"><td class="memItemLeft">constexpr size_t&#160;</td><td class="memItemRight"><a class="el" href="namespaceanonymous__namespace_02devicemanager_8cpp_03.html#a346f30bb42382ce91ac26dac2cc56f38">anonymous_namespace{devicemanager.cpp}::CONFIGURABLE_GPIO_COUNT</a> = 49</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> manager: restores devices from NVM, manages lifecycle and service dispatch. </p>
@@ -148,11 +157,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00419">419</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="devicemanager_8cpp_source.html#l00460">460</a> of file <a class="el" href="devicemanager_8cpp_source.html">devicemanager.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="devicemanager_8cpp_source.html#l00419">isNull()</a>.</p>
+<p class="reference">References <a class="el" href="devicemanager_8cpp_source.html#l00460">isNull()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00419">isNull()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00424">DeviceManager::loadConfigFromFile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="devicemanager_8cpp_source.html#l00460">isNull()</a>, and <a class="el" href="devicemanager_8cpp_source.html#l00465">DeviceManager::loadConfigFromFile()</a>.</p>
 
 </div>
 </div>

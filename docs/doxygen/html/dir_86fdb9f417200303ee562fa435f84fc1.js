@@ -5,7 +5,6 @@ var dir_86fdb9f417200303ee562fa435f84fc1 =
     [ "FadeIn.hpp", "FadeIn_8hpp.html", "FadeIn_8hpp" ],
     [ "FadeOut.hpp", "FadeOut_8hpp.html", "FadeOut_8hpp" ],
     [ "ILedAnimation.hpp", "ILedAnimation_8hpp.html", "ILedAnimation_8hpp" ],
-    [ "ILiveAnimation.hpp", "ILiveAnimation_8hpp.html", null ],
     [ "RollInAnimation.hpp", "RollInAnimation_8hpp.html", "RollInAnimation_8hpp" ],
     [ "RollOutAnimation.hpp", "RollOutAnimation_8hpp.html", "RollOutAnimation_8hpp" ],
     [ "SparkleInAnimation.hpp", "SparkleInAnimation_8hpp.html", "SparkleInAnimation_8hpp" ],

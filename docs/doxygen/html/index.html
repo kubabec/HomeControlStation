@@ -144,7 +144,7 @@ Main modules</h1>
 <p>The generated Doxygen pages provide cross-links between classes, methods, and data structures to make the firmware easier to understand and extend.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
 Schema-driven device architecture</h1>
-<p>The operating-system layer does not maintain a handwritten list of concrete device classes. Each device implementation is accompanied by a JSON description under <span class="tt">include/devices/&lt;device&gt;/</span>. The description conforms to <span class="tt">include/devices/device.schema.json</span> and is the source of truth for:</p>
+<p>The operating-system layer does not maintain a handwritten list of concrete device classes. A clean checkout stores optional include/source overlays under <span class="tt">DevicesPredefined/&lt;device&gt;/</span>, where they are inert. A firmware author copies both trees of only wanted packages into active <span class="tt">include/devices/&lt;device&gt;/</span> and <span class="tt">src/device/&lt;device&gt;/</span> locations. Each active implementation is accompanied by a JSON description that conforms to <span class="tt">include/devices/device.schema.json</span> and is the source of truth for:</p>
 <ul>
 <li>the persistent numeric device type and C++ enum symbol,</li>
 <li>implementation header, class name, build guard, and factory arguments,</li>
@@ -158,14 +158,15 @@ Schema-driven device architecture</h1>
 <p><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a> type identifiers are part of persisted and network-visible data. Existing identifiers must remain stable, <span class="tt">255</span> is reserved for an unknown or unconfigured device, and duplicate identifiers cause generation to fail.</p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 Build-time generation</h1>
-<p>PlatformIO invokes <span class="tt"><a class="el" href="generate__device__registry_8py.html">extra/generate_device_registry.py</a></span> and <span class="tt"><a class="el" href="generate__device__config__widgets_8py.html">extra/generate_device_config_widgets.py</a></span> before every compilation. Before loading any descriptions, the registry generator removes the complete <span class="tt">include/generated/</span> directory. Both generators then validate the discovered JSON descriptions and recreate every device-dependent integration artifact under <span class="tt">include/generated/</span>. This prevents removed or renamed devices from surviving through stale files during incremental builds.</p>
-<p>An empty device catalog is valid. If <span class="tt">include/devices/</span> contains no concrete device description directories and no concrete device sources are compiled, generation emits empty registries and generic fallback handlers. The firmware still compiles and runs, but persisted or handshaked device identifiers are treated as unknown and no concrete device instance is created.</p>
+<p>PlatformIO invokes <span class="tt"><a class="el" href="generate__device__registry_8py.html">extra/generate_device_registry.py</a></span> and <span class="tt"><a class="el" href="generate__device__config__widgets_8py.html">extra/generate_device_config_widgets.py</a></span> before every compilation. Before loading any descriptions, the registry generator removes the complete <span class="tt">include/generated/</span> directory. When active descriptions exist, both generators validate them and recreate device-dependent integration artifacts under <span class="tt">include/generated/</span>. PlatformIO discovers matching selected sources through the normal <span class="tt">src/</span> tree. This prevents removed or renamed devices from surviving through stale files and keeps unselected predefined sources out of compilation.</p>
+<p>An empty device catalog is valid. If <span class="tt">include/devices/</span> contains no concrete descriptions and <span class="tt">src/device/</span> contains no concrete sources, generation leaves <span class="tt">include/generated/</span> absent. Static no-device handlers under <span class="tt">include/devices/fallback/</span> keep the platform buildable; persisted or handshaked device identifiers are treated as unknown and no concrete device instance is created.</p>
+<p>To create a preset, overlay both package trees from <span class="tt">DevicesPredefined</span> onto <span class="tt">include/</span> and <span class="tt">src/</span> before building. LED device types additionally require both trees from the <span class="tt">LedStrip</span> support package. Removing both active halves and rebuilding removes a type's generated factory, serializers, widgets, and compiled implementation. Selection details are documented in <span class="tt">DevicesPredefined/README.md</span>.</p>
 <p>The generated artifacts include:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Artifact  </th><th class="markdownTableHeadNone">Responsibility  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceTypes_8hpp.html" title="Schema-derived stable device identifiers and human-readable type metadata.">GeneratedDeviceTypes.hpp</a></span>  </td><td class="markdownTableBodyNone">Stable <span class="tt"><a class="el" href="GeneratedDeviceTypes_8hpp.html#af4988302c4a294490815e684de36255c">DevType</a></span> constants and type-name lookup  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceTypes_8hpp.html" title="Schema-derived stable device identifiers and human-readable type metadata.">GeneratedDeviceTypes.hpp</a></span>  </td><td class="markdownTableBodyNone">Stable <span class="tt"><a class="el" href="DeviceTypes_8hpp.html#af4988302c4a294490815e684de36255c">DevType</a></span> constants and type-name lookup  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceRegistry_8hpp.html" title="Build-profile-specific device factories and runtime participation metadata.">GeneratedDeviceRegistry.hpp</a></span>  </td><td class="markdownTableBodyNone">Enabled implementations, factory construction, and collection participation  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -177,7 +178,7 @@ Build-time generation</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">generated/widgets/Generated*Widget.hpp</span>  </td><td class="markdownTableBodyNone">One independently generated dashboard widget per device type  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="GeneratedDeviceConfigWidgets_8hpp.html" title="Schema-derived configuration-page controls for enabled device types.">GeneratedDeviceConfigWidgets.hpp</a></span>  </td><td class="markdownTableBodyNone">Configuration-page selectors and type-specific field controls  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">GeneratedDeviceConfigWidgets.hpp</span>  </td><td class="markdownTableBodyNone">Configuration-page selectors and type-specific field controls  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">GeneratedAdvancedControlsSize.inc</span>  </td><td class="markdownTableBodyNone">Advanced-control payload-size dispatch  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -214,8 +215,8 @@ Generic advanced controls</h1>
 Adding a device type</h1>
 <p>To add a device without modifying the operating-system implementation:</p>
 <ol type="1">
-<li>Implement a class derived from <span class="tt"><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a></span>.</li>
-<li>Add a JSON description beside the implementation header.</li>
+<li>Select an existing complete package from <span class="tt">DevicesPredefined</span>, or implement a new class derived from <span class="tt"><a class="el" href="classDevice.html" title="Abstract base interface implemented by all runtime devices.">Device</a></span> in a self-contained active package.</li>
+<li>Add the JSON description beside the implementation header under <span class="tt">include/devices/&lt;device&gt;/</span> and the implementation source under <span class="tt">src/device/&lt;device&gt;/</span>.</li>
 <li>Assign a new, explicit, previously unused type identifier and enum symbol.</li>
 <li>Describe constructor dependencies with the supported factory argument names.</li>
 <li>Define configuration-byte and description-state layouts with non-overlapping offsets.</li>
@@ -223,6 +224,7 @@ Adding a device type</h1>
 <li>Describe dashboard controls and readouts in the <span class="tt">ui</span> section.</li>
 <li>For advanced controls, implement the common get/set services, add the HTML pattern, and reference its path and payload size in <span class="tt">ui.advancedControls</span>.</li>
 <li>Run a PlatformIO build and inspect generator validation errors.</li>
+<li>Place a reusable finished include/source overlay under <span class="tt">DevicesPredefined/&lt;device&gt;/</span> while keeping the clean-checkout active catalog empty.</li>
 </ol>
 <p>No concrete device include, factory branch, HTTP state branch, configuration parser, or dashboard type dispatch should be added manually under <span class="tt">include/os</span> or <span class="tt">src/os</span>. </p>
 </div></div><!-- PageDoc -->

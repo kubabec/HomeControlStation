@@ -8,21 +8,33 @@
 #include <Arduino.h>
 #include "SystemDefinition.hpp"
 #include "generated/widgets/GeneratedOnOffWidget.hpp"
-#include "generated/widgets/GeneratedWindowBlinderWidget.hpp"
-#include "generated/widgets/GeneratedWindowDoorSensorWidget.hpp"
-#include "generated/widgets/GeneratedGateWidget.hpp"
-#include "generated/widgets/GeneratedAquariumControllerWidget.hpp"
+#ifdef LED_STRIP_SUPPORTED
+#include "generated/widgets/GeneratedLedStripWidget.hpp"
+#endif
+#ifdef TEMP_SENSOR_SUPPORTED
+#include "generated/widgets/GeneratedTempSensorWidget.hpp"
+#endif
 
 /** @brief Builds the JavaScript widget bundle and generated type dispatcher. */
 inline String buildGeneratedDeviceWidgetsJs()
 {
     String widgets;
     widgets += generatedOnOffWidgetJs;
-widgets += generatedWindowBlinderWidgetJs;
-widgets += generatedWindowDoorSensorWidgetJs;
-widgets += generatedGateWidgetJs;
-widgets += generatedAquariumControllerWidgetJs;
-    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){case 43: generateOnOffWidget(deviceContainer,device); return true;case 49: generateWindowBlinderWidget(deviceContainer,device); return true;case 50: generateWindowDoorSensorWidget(deviceContainer,device); return true;case 51: generateGateWidget(deviceContainer,device); return true;case 52: generateAquariumControllerWidget(deviceContainer,device); return true;default:return false;}}";
+#ifdef LED_STRIP_SUPPORTED
+widgets += generatedLedStripWidgetJs;
+#endif
+#ifdef TEMP_SENSOR_SUPPORTED
+widgets += generatedTempSensorWidgetJs;
+#endif
+    widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){";
+    widgets += "case 43: generateOnOffWidget(deviceContainer,device); return true;";
+    #ifdef LED_STRIP_SUPPORTED
+widgets += "case 44: generateLedStripWidget(deviceContainer,device); return true;";
+#endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+widgets += "case 45: generateTempWidget(deviceContainer,device); return true;";
+#endif
+    widgets += "default:return false;}}";
     return widgets;
 }
 

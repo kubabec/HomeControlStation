@@ -1,8 +1,7 @@
 var DigitalEventReceiver_8cpp =
 [
-    [ "deviceOrRoomIdIndex", "DigitalEventReceiver_8cpp.html#a295ea2d1010ab0abb3d243f6ca259155", null ],
-    [ "NVM_VALID", "DigitalEventReceiver_8cpp.html#ac4659bb02dcb2db7ca4075eb64192741", null ],
-    [ "serviceOverloadingIndex", "DigitalEventReceiver_8cpp.html#a6612832ff9f915545226a29da821e884", null ],
-    [ "serviceTypeIndex", "DigitalEventReceiver_8cpp.html#a0cd17db166f3d8991e3f34c085b2107e", null ],
-    [ "valueIndex", "DigitalEventReceiver_8cpp.html#a1f856fbfba41e80f197503fd6f2db9c7", null ]
+    [ "nextMappingId", "DigitalEventReceiver_8cpp.html#aa08776906880260f8aaef4ef28171a02", null ],
+    [ "LEGACY_DEVICE_TYPE", "DigitalEventReceiver_8cpp.html#a64dbc8a7c343c986a1bd38c114d31450", null ],
+    [ "LEGACY_ROOM_TYPE", "DigitalEventReceiver_8cpp.html#af2e5d3d00311a1378fd7702e6f000303", null ],
+    [ "NVM_VALID", "DigitalEventReceiver_8cpp.html#ac4659bb02dcb2db7ca4075eb64192741", null ]
 ];

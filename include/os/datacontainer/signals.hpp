@@ -100,7 +100,11 @@ enum Signal
 
     SIG_STARTUP_TIME,
 
+    /* Type: std::function<void(uint64_t)> - backward-compatible event callback */
     CBK_FIRE_DIGITAL_EVENT,
+
+    /* Type: std::function<void(uint64_t, const String&)> - source-aware event callback */
+    CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE,
 
     SIG_DIGITAL_EVNT_MAPPING,
 

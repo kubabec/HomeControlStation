@@ -111,22 +111,16 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
 }
 
 inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
-    {52, "AquariumController", "type_AQUARIUM_CONTROLLER", {{"aquariumHeaterPin", "Heater GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"aquariumLightPin", "Light GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"aquariumFilterPin", "Filter GPIO", "gpio-select", 2, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"aquariumWaterPin", "Low-water GPIO (255 = none)", "number", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
-        {"aquariumOutputLevel", "Output active level", "select", 4, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
-        {"aquariumSetpoint", "Temperature setpoint [\u00b0C]", "number", 5, 2, 50, 400, {"", ""}, {"", ""}, 0, 0, 10.0, 250},
-        {"aquariumHysteresis", "Thermostat hysteresis [\u00b0C]", "number", 7, 2, 1, 50, {"", ""}, {"", ""}, 0, 0, 10.0, 5},
-        {"aquariumMaximum", "Heater cutoff [\u00b0C]", "number", 9, 2, 50, 600, {"", ""}, {"", ""}, 0, 0, 10.0, 320}}, 8},
-    {51, "Gate", "type_GATE", {{"gateM1Close", "Motor 1 CLOSE GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"gateM2Open", "Motor 2 OPEN GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"gateM2Close", "Motor 2 CLOSE GPIO", "gpio-select", 2, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"gateOpenedLimit", "Opened limit GPIO (255 = none)", "number", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
-        {"gateClosedLimit", "Closed limit GPIO (255 = none)", "number", 4, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
-        {"gateMotorCount", "Motor count", "select", 5, 1, 0, 255, {"1", "2"}, {"Single motor", "Double motor"}, 2, 0, 1.0, 1},
-        {"gateOutputLevel", "Motor output level", "select", 6, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
-        {"gateTimeout", "Travel safety timeout [s]", "number", 7, 2, 1, 900, {"", ""}, {"", ""}, 0, 0, 1.0, 60}}, 8},
+    #ifdef LED_STRIP_SUPPORTED
+    {44, "LedStrip", "type_LED_STRIP", {{"ledsCount", "LEDs num.", "number", 0, 2, 1, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"ledsSideFlip", "Sides flip", "select", 2, 1, 0, 255, {"0", "1"}, {"Not inversed", "Inversed"}, 2, 0, 1.0, 0},
+        {"curLim", "Current limiter", "range", 3, 1, 15, 254, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
+    #endif
     {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1"}, {"No", "Yes"}, 2, 0, 1.0, 1},
         {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1"}, {"LOW (0)", "HIGH (1)"}, 2, 0, 1.0, 0},
         {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
@@ -135,22 +129,16 @@ inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 4},
-    {49, "WindowBlinder", "type_WINDOW_BLINDER", {{"blindDownPin", "Motor DOWN GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"blindUpperLimit", "Upper limit GPIO (255 = none)", "number", 1, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
-        {"blindLowerLimit", "Lower limit GPIO (255 = none)", "number", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 255},
-        {"blindOutputLevel", "Motor output level", "select", 3, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
-        {"blindLimitLevel", "Limit active level", "select", 4, 1, 0, 255, {"0", "1"}, {"Active LOW", "Active HIGH"}, 2, 0, 1.0, 0},
-        {"blindOpenTimeout", "Open safety timeout [s]", "number", 5, 2, 1, 600, {"", ""}, {"", ""}, 0, 0, 1.0, 30},
-        {"blindCloseTimeout", "Close safety timeout [s]", "number", 7, 2, 1, 600, {"", ""}, {"", ""}, 0, 0, 1.0, 30},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 7},
-    {50, "WindowDoorSensor", "type_WINDOW_DOOR_SENSOR", {{"contactClosedLevel", "Closed contact level", "select", 0, 1, 0, 255, {"0", "1"}, {"LOW = closed", "HIGH = closed"}, 2, 0, 1.0, 0},
-        {"contactPullup", "Input mode", "select", 1, 1, 0, 255, {"0", "1"}, {"External bias", "Internal pull-up"}, 2, 0, 1.0, 1},
-        {"contactDebounce", "Debounce [ms]", "number", 2, 2, 10, 5000, {"", ""}, {"", ""}, 0, 0, 1.0, 50},
+    #ifdef TEMP_SENSOR_SUPPORTED
+    {45, "TempSensor", "type_TEMP_SENSOR", {{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
         {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 0},
+    #endif
 };
 
 /** @brief Emits the device type selector for one NVM configuration slot. */

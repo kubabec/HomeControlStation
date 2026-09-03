@@ -308,6 +308,12 @@ public:
     static void constantHandler_digitalEvents(WiFiClient& client);
 
     /**
+     * Renders recent unmapped digital events retained for this power cycle.
+     * @param client HTTP client receiving the response.
+     */
+    static void constantHandler_unmappedEvents(WiFiClient& client);
+
+    /**
      * Handles a fallback pending response route.
      * @param client HTTP client receiving the response.
      */

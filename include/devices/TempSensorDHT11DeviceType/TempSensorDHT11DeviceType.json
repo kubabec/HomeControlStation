@@ -1,0 +1,79 @@
+{
+  "$schema": "../device.schema.json",
+  "schemaVersion": 1,
+  "deviceType": {
+    "name": "TempSensor",
+    "className": "TempSensorDHT11DeviceType",
+    "enumSymbol": "type_TEMP_SENSOR",
+    "enumValue": 45
+  },
+  "implementation": {
+    "header": "include/devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp",
+    "source": "src/device/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.cpp",
+    "buildGuard": "TEMP_SENSOR_SUPPORTED",
+    "dependencies": ["DHT sensor library", "RTC callback"],
+    "factory": { "arguments": ["config", "getRtcTime"] },
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::tempSensorsDevices",
+      "includedInDeviceCollection": true
+    }
+  },
+  "lifecycle": {
+    "init": { "actions": [] },
+    "update": {
+      "entryPoint": "cyclic",
+      "schedule": {
+        "mode": "fixed_interval",
+        "intervalMs": 60000,
+        "internalTasks": [
+          { "name": "temperature and humidity sample", "minimumIntervalMs": 60000 },
+          { "name": "historical sample", "minimumIntervalMs": 30000, "enabled": false }
+        ],
+        "constructorSample": true
+      }
+    }
+  },
+  "configuration": {
+    "commonFields": [
+      { "name": "enabled", "type": "boolean", "source": "isActive", "widget": "checkbox" },
+      { "name": "name", "type": "string", "source": "deviceName", "maximumLength": 24, "widget": "text" },
+      { "name": "pin", "type": "uint8", "source": "pinNumber", "widget": "gpio-select" },
+      { "name": "id", "type": "uint8", "source": "deviceId", "widget": "device-slot" },
+      { "name": "room", "type": "uint8", "source": "roomId", "widget": "room-select" }
+    ],
+    "customBytes": []
+  },
+  "services": [],
+  "state": {
+    "enabledSemantics": "alwaysOn; does not participate in room power state",
+    "descriptionCustomBytes": [
+      { "name": "sensorError", "type": "boolean", "offset": 0, "size": 1 },
+      { "name": "humidity", "type": "uint8", "offset": 2, "size": 1, "minimum": 0, "maximum": 100, "unit": "percent" },
+      { "name": "temperature", "type": "float32", "offset": 3, "size": 4, "unit": "degrees Celsius", "byteOrder": "native" }
+    ],
+    "httpFields": [
+      { "name": "temp", "type": "float32", "source": "customBytes[3..6]", "unit": "degrees Celsius" },
+      { "name": "humid", "type": "uint8", "source": "customBytes[2]", "unit": "percent" },
+      { "name": "Err", "type": "boolean", "source": "customBytes[0]" }
+    ]
+  },
+  "ui": {
+    "roomWidget": "generateTempWidget",
+    "controls": [],
+    "readouts": [
+      { "name": "temperature", "widget": "temperature-gauge", "source": "temp", "unit": "degrees Celsius" },
+      { "name": "humidity", "widget": "humidity-gauge", "source": "humid", "unit": "percent" },
+      { "name": "error", "widget": "error-message", "source": "Err", "visibleWhen": "Err != 0" }
+    ]
+  },
+  "extendedMemory": {
+    "required": false,
+    "size": 0
+  },
+  "limitations": [
+    "The class name says DHT11 but the implementation instantiates the sensor as DHT22.",
+    "Historical recording exists but is disabled in cyclic().",
+    "The temperature jump filter rejects changes greater than 2 degrees Celsius from the last accepted sample."
+  ]
+}

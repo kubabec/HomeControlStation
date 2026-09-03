@@ -1,6 +1,8 @@
 var structGeneratedDeviceConfigWidgets_1_1FieldSpec =
 [
     [ "arrayLength", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a114f24b043a0c0b085419593209b1f33", null ],
+    [ "defaultValue", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#aa0584d59b0d3fc74c61761a14c817d0c", null ],
+    [ "displayScale", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#ab2b4b3ca7d66cfb0ed70399fdc50e65c", null ],
     [ "htmlType", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a5e80ac7ee0097d216e9c85580d966c92", null ],
     [ "key", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a2ab279008ddd71af019980b8e7e8be5e", null ],
     [ "label", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a8deb36b423fb625f186bbc25deccae8f", null ],

@@ -1,9 +1,10 @@
 #include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
 
-WindowDoorSensor::WindowDoorSensor(DeviceConfigSlotType config)
+WindowDoorSensor::WindowDoorSensor(DeviceConfigSlotType config, std::function<void(uint8_t)> fireDeviceEventCallback)
     : sensorPin(config.pinNumber), deviceId(config.deviceId), roomId(config.roomId), deviceName(config.deviceName),
       closedActiveHigh(config.customBytes[0] != 0), internalPullup(config.customBytes[1] != 0),
-      debounceMs(static_cast<uint16_t>(config.customBytes[2]) | (static_cast<uint16_t>(config.customBytes[3]) << 8))
+    debounceMs(static_cast<uint16_t>(config.customBytes[2]) | (static_cast<uint16_t>(config.customBytes[3]) << 8)),
+    fireDeviceEvent(fireDeviceEventCallback)
 {
     if (debounceMs == 0) debounceMs = 50;
 }
@@ -32,6 +33,7 @@ void WindowDoorSensor::cyclic()
     else if (stableClosed != rawClosed && static_cast<uint32_t>(now - rawChangedAt) >= debounceMs)
     {
         stableClosed = rawClosed;
+        if (fireDeviceEvent) fireDeviceEvent(stableClosed ? 2 : 1);
     }
 }
 

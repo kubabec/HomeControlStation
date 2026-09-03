@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['name_0',['name',['../structGeneratedDeviceRegistry_1_1Registration.html#a6a71def2bfa1d0a78b5a909668ede689',1,'GeneratedDeviceRegistry::Registration::name'],['../structGeneratedDeviceTypes_1_1DeviceTypeInfo.html#a040bf36412d866cd3ee6a79ee5338874',1,'GeneratedDeviceTypes::DeviceTypeInfo::name']]],
+  ['name_0',['name',['../structGeneratedDeviceRegistry_1_1Registration.html#a13dd070e99fbdaa787995fa5b15547a1',1,'GeneratedDeviceRegistry::Registration::name'],['../structGeneratedDeviceTypes_1_1DeviceTypeInfo.html#a040bf36412d866cd3ee6a79ee5338874',1,'GeneratedDeviceTypes::DeviceTypeInfo::name']]],
   ['network_5fbroadcast_1',['NETWORK_BROADCAST',['../networkdriver_8hpp.html#ad162c0062351c96ed6c183eacaa6fcf8',1,'networkdriver.hpp']]],
   ['networkcredentialsavailable_2',['networkCredentialsAvailable',['../structNodeConfiguration.html#a7eaea0aafa4482a22ec7637a936cd329',1,'NodeConfiguration::networkCredentialsAvailable'],['../classNetworkDriver.html#a0766dff847d3614ddb983849ebd6c213',1,'NetworkDriver::networkCredentialsAvailable']]],
   ['networkpassword_3',['networkPassword',['../structConfigData.html#afac82d6e486b519d5666504b87b4a0f7',1,'ConfigData::networkPassword'],['../structNodeConfiguration.html#a3ba66f26dfff041b267a5a3887f790c9',1,'NodeConfiguration::networkPassword']]],
@@ -11,14 +11,15 @@ var searchData=
   ['nodeip_8',['nodeIP',['../structNetworkNodeInfo.html#ac723b1d0b00ec1d21e8c343eb2a68564',1,'NetworkNodeInfo']]],
   ['nodeipaddress_9',['nodeIpAddress',['../structRemoteNodeInformation.html#a58345865e4a89267d780888b21f3df99',1,'RemoteNodeInformation']]],
   ['nodetype_10',['nodeType',['../structConfigData.html#a75004c1ae3349ef078c5f6401dbb7359',1,'ConfigData::nodeType'],['../structNodeConfiguration.html#a4a62ae08d2f007d52b3fc6159e446312',1,'NodeConfiguration::nodeType'],['../structNetworkNodeInfo.html#a16663df79256728b6711d42da047ec7f',1,'NetworkNodeInfo::nodeType']]],
-  ['notifications_11',['notifications',['../classNotificationHandler.html#a8d4b4114d9d2958dd1c59b3438f2300a',1,'NotificationHandler']]],
-  ['ntpavailable_12',['ntpAvailable',['../classTimeMaster.html#adf5b50d68e783cb7d0c9ff0703bf7e9e',1,'TimeMaster']]],
-  ['ntpudp_13',['ntpUDP',['../classTimeMaster.html#ac79aaf9f91e99b52d06da10d1e21fa0b',1,'TimeMaster']]],
-  ['numberofdevices_14',['numberOfDevices',['../structNodeInitialData.html#a3fac23a5b27345844933eaca74fddafc',1,'NodeInitialData::numberOfDevices'],['../structRemoteNodeInformation.html#a4cb0c1f97b0babc7ac83b8fbe8a046c9',1,'RemoteNodeInformation::numberOfDevices']]],
-  ['numberoftranslations_15',['numberOfTranslations',['../structHomeLightHttpServer_1_1HttpServerNvmMetadata.html#a9d48ab70510fc22d052cdcd66e996a29',1,'HomeLightHttpServer::HttpServerNvmMetadata']]],
-  ['nvm_5fvalid_16',['NVM_VALID',['../DigitalEventReceiver_8cpp.html#ac4659bb02dcb2db7ca4075eb64192741',1,'DigitalEventReceiver.cpp']]],
-  ['nvm_5fvalid_5fflag_17',['NVM_VALID_FLAG',['../RemoteDevicesManager_8cpp.html#a00fda3cce09efe418a41f99796d070c7',1,'RemoteDevicesManager.cpp']]],
-  ['nvmdataavailable_18',['nvmDataAvailable',['../classConfigProvider.html#a84c8e96a0736817e3523addd7fea51a5',1,'ConfigProvider']]],
-  ['nvmmetadata_19',['nvmMetadata',['../classHomeLightHttpServer.html#ae127a5127030eabaa849c6ad485b2214',1,'HomeLightHttpServer']]],
-  ['nvmsavetimervalue_20',['nvmSaveTimerValue',['../classOperatingSystem.html#a54fcd509987466ee3d892dcc09d026c1',1,'OperatingSystem']]]
+  ['notification_11',['notification',['../structNotificationHandler_1_1PendingNotification.html#a9dd5fe07440828d219e44b0543cd8bf5',1,'NotificationHandler::PendingNotification']]],
+  ['notifications_12',['notifications',['../classNotificationHandler.html#a763bbb3344e7e31efc4a41df7c56ee5a',1,'NotificationHandler']]],
+  ['ntpavailable_13',['ntpAvailable',['../classTimeMaster.html#adf5b50d68e783cb7d0c9ff0703bf7e9e',1,'TimeMaster']]],
+  ['ntpudp_14',['ntpUDP',['../classTimeMaster.html#ac79aaf9f91e99b52d06da10d1e21fa0b',1,'TimeMaster']]],
+  ['numberofdevices_15',['numberOfDevices',['../structNodeInitialData.html#a3fac23a5b27345844933eaca74fddafc',1,'NodeInitialData::numberOfDevices'],['../structRemoteNodeInformation.html#a4cb0c1f97b0babc7ac83b8fbe8a046c9',1,'RemoteNodeInformation::numberOfDevices']]],
+  ['numberoftranslations_16',['numberOfTranslations',['../structHomeLightHttpServer_1_1HttpServerNvmMetadata.html#a9d48ab70510fc22d052cdcd66e996a29',1,'HomeLightHttpServer::HttpServerNvmMetadata']]],
+  ['nvm_5fvalid_17',['NVM_VALID',['../DigitalEventReceiver_8cpp.html#ac4659bb02dcb2db7ca4075eb64192741',1,'DigitalEventReceiver.cpp']]],
+  ['nvm_5fvalid_5fflag_18',['NVM_VALID_FLAG',['../RemoteDevicesManager_8cpp.html#a00fda3cce09efe418a41f99796d070c7',1,'RemoteDevicesManager.cpp']]],
+  ['nvmdataavailable_19',['nvmDataAvailable',['../classConfigProvider.html#a84c8e96a0736817e3523addd7fea51a5',1,'ConfigProvider']]],
+  ['nvmmetadata_20',['nvmMetadata',['../classHomeLightHttpServer.html#ae127a5127030eabaa849c6ad485b2214',1,'HomeLightHttpServer']]],
+  ['nvmsavetimervalue_21',['nvmSaveTimerValue',['../classOperatingSystem.html#a54fcd509987466ee3d892dcc09d026c1',1,'OperatingSystem']]]
 ];

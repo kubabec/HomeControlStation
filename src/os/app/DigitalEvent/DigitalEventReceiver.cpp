@@ -1,6 +1,8 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/drivers/networkdriver.hpp>
+#include "generated/GeneratedDigitalEventActions.hpp"
 #include "os/Logger.hpp"
+#include <algorithm>
 
 /**
  * @file src/os/app/DigitalEvent/DigitalEventReceiver.cpp
@@ -9,13 +11,34 @@
 
 
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
-std::queue<uint64_t> DigitalEventReceiver::eventsQueue;
+std::queue<DigitalEventOccurrence> DigitalEventReceiver::eventsQueue;
+std::vector<DigitalEventOccurrence> DigitalEventReceiver::unmappedEvents;
 std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;
 
-uint8_t DigitalEventReceiver::lastReceivedTransmissionId = 0;
-long DigitalEventReceiver::lastEventOccurrenceTime{0};
+std::vector<std::pair<uint32_t, uint8_t>> DigitalEventReceiver::receivedTransmissionIds;
 
 const uint8_t NVM_VALID = 0xCD;
+const uint8_t LEGACY_ROOM_TYPE = 11;
+const uint8_t LEGACY_DEVICE_TYPE = 12;
+
+static uint8_t nextMappingId(const std::vector<std::pair<uint64_t, DigitalEvent::Event>> &mappings)
+{
+    for (uint16_t candidate = 1; candidate <= 255; ++candidate)
+    {
+        if (candidate == LEGACY_ROOM_TYPE || candidate == LEGACY_DEVICE_TYPE) continue;
+        bool used = false;
+        for (const auto &mapping : mappings)
+        {
+            if (mapping.second.mappingId == candidate)
+            {
+                used = true;
+                break;
+            }
+        }
+        if (!used) return static_cast<uint8_t>(candidate);
+    }
+    return 0;
+}
 
 void DigitalEventReceiver::init()
 {
@@ -59,7 +82,19 @@ void DigitalEventReceiver::init()
                     // Copy corresponding Event event
                     memcpy(&event, &(nvmData[2 + (i * (sizeof(EventUniqueId) + sizeof(event))) + sizeof(EventUniqueId)]), sizeof(event));
 
-                    digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
+                    if (event.mappingId == LEGACY_ROOM_TYPE)
+                    {
+                        Logger::log("DigitalEventReceiver:// Ignoring legacy room mapping");
+                        continue;
+                    }
+                    if (event.mappingId == LEGACY_DEVICE_TYPE)
+                    {
+                        event.mappingId = nextMappingId(digitalEventsMapping);
+                    }
+                    if (event.mappingId != 0)
+                    {
+                        digitalEventsMapping.push_back(std::pair<uint64_t, DigitalEvent::Event>(EventUniqueId, event));
+                    }
                 }
 
                 Logger::log("DigitalEventReceiver:// Restored " + String((int)numberOfElementsInNvm) + " Event events");
@@ -74,14 +109,11 @@ void DigitalEventReceiver::init()
 
     DataContainer::setSignalValue(
         CBK_FIRE_DIGITAL_EVENT,
-        static_cast<std::function<void(uint64_t)>>(DigitalEventReceiver::fireEvent));
-
-    // for(auto& mapping : digitalEventsMapping){
-    //     Logger::log("Mapping ID: " + String((int) mapping.first) + " ");
-    //     Logger::log("Mapping affectedType: " + String((int) mapping.second.affectedType) + " ");
-    //     Logger::log("Mapping affectedId: " + String((int) mapping.second.affectedId) + " ");
-    //     Logger::log("Mapping actionType: " + String((int) mapping.second.actionType) + " ");
-    // }
+        std::function<void(uint64_t)>(static_cast<void (*)(uint64_t)>(&DigitalEventReceiver::fireEvent)));
+    DataContainer::setSignalValue(
+        CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE,
+        std::function<void(uint64_t, const String &)>(
+            static_cast<void (*)(uint64_t, const String &)>(&DigitalEventReceiver::fireEvent)));
 
     Logger::log("... done");
 }
@@ -103,35 +135,7 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
         // iteracja po tablicy obiektów
         for (JsonObject obj : arr)
         {
-            uint8_t requiredKeysCnt = 0;
-            // domyślne puste Stringi
-            uint64_t id = 0;
-            uint8_t type = 0;
-            uint32_t targetId = 0;
-            uint8_t action = 0;
-
-            // sprawdzamy czy klucz istnieje i przypisujemy
-            if (obj.containsKey("id"))
-            {
-                id = obj["id"].as<uint64_t>();
-                requiredKeysCnt++;
-            }
-            if (obj.containsKey("type"))
-            {
-                type = obj["type"].as<uint8_t>();
-                requiredKeysCnt++;
-            }
-            if (obj.containsKey("targetId"))
-            {
-                targetId = obj["targetId"].as<uint32_t>();
-                requiredKeysCnt++;
-            }
-            if (obj.containsKey("action"))
-            {
-                action = obj["action"].as<uint8_t>();
-                requiredKeysCnt++;
-            }
-            if (requiredKeysCnt < 4)
+            if (!obj.containsKey("eventId") || !obj.containsKey("deviceId") || !obj.containsKey("actionId"))
             {
                 Logger::log("DigitalEventReceiver:// Missing keys in JSON object, skipping");
                 continue;
@@ -139,24 +143,44 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
 
             if (digitalEventsMapping.size() < 25)
             {
-                DigitalEvent::Event ev;
-                uint8_t affectedType = type == DigitalEvent::AffectedType::ROOM ? type : (uint8_t)DigitalEvent::AffectedType::DEVICE;
-                uint8_t actionType;
-                if (action >= DigitalEvent::ActionType::ON && action <= DigitalEvent::ActionType::TOGGLE)
+                uint64_t eventId = obj["eventId"].as<uint64_t>();
+                uint32_t deviceId = obj["deviceId"].as<uint32_t>();
+                uint8_t actionId = obj["actionId"].as<uint8_t>();
+                uint8_t mappingId = obj.containsKey("mappingId") ? obj["mappingId"].as<uint8_t>() : nextMappingId(digitalEventsMapping);
+                if (mappingId == 0 || mappingId == LEGACY_ROOM_TYPE || mappingId == LEGACY_DEVICE_TYPE)
                 {
-                    actionType = action;
-                }
-                else
-                {
-                    actionType = (int8_t)DigitalEvent::ActionType::OFF;
+                    mappingId = nextMappingId(digitalEventsMapping);
                 }
 
-                ev.actionType = actionType;
-                ev.affectedType = affectedType;
-                ev.affectedId = targetId;
+                uint8_t deviceType = 255;
+                auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+                for (const auto &device : devices)
+                {
+                    if (device.deviceId == deviceId)
+                    {
+                        deviceType = device.deviceType;
+                        break;
+                    }
+                }
+                if (mappingId == 0 || GeneratedDigitalEventActions::find(deviceType, actionId) == nullptr)
+                {
+                    Logger::log("DigitalEventReceiver:// Invalid device or action, skipping mapping");
+                    continue;
+                }
+                bool duplicateMappingId = false;
+                for (const auto &mapping : digitalEventsMapping)
+                {
+                    if (mapping.second.mappingId == mappingId) duplicateMappingId = true;
+                }
+                if (duplicateMappingId)
+                {
+                    Logger::log("DigitalEventReceiver:// Duplicate mapping ID, skipping mapping");
+                    continue;
+                }
 
-                Logger::log("DigitalEventReceiver://Adding mapping ID: " + String((int)id) + " " + " affectedType: " + String((int)ev.affectedType) + " " + " affectedId: " + String((int)ev.affectedId) + " " + " actionType: " + String((int)ev.actionType) + " ");
-                digitalEventsMapping.push_back({id, ev});
+                DigitalEvent::Event event{mappingId, deviceId, actionId};
+                Logger::log("DigitalEventReceiver:// Adding mapping ID: " + String((int)mappingId) + " device ID: " + String((int)deviceId) + " action ID: " + String((int)actionId));
+                digitalEventsMapping.push_back({eventId, event});
             }else {
                 UserInterfaceNotification notif;
                 notif.title = "Problem occured";
@@ -165,6 +189,15 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
             }
         }
+
+        unmappedEvents.erase(
+            std::remove_if(unmappedEvents.begin(), unmappedEvents.end(), [](const DigitalEventOccurrence &occurrence)
+                           {
+                               return std::any_of(digitalEventsMapping.begin(), digitalEventsMapping.end(),
+                                                  [&occurrence](const auto &mapping)
+                                                  { return mapping.first == occurrence.eventId; });
+                           }),
+            unmappedEvents.end());
 
         // Update data container
         DataContainer::setSignalValue(SIG_DIGITAL_EVNT_MAPPING, digitalEventsMapping);
@@ -188,9 +221,9 @@ void DigitalEventReceiver::cyclic()
         Logger::log("DigitalEventReceiver:// Processing pending service call, queue size: " + String((int)pendingServiceCalls.size()));
         ServiceCallData &callData = pendingServiceCalls.front();
 
-        Logger::log("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceOrRoomId) + " with param value : " + String((int)callData.parameters.a));
+        Logger::log("Triggering service : " + String((int)callData.serviceType) + " on ID " + String((int)callData.deviceId) + " with param value : " + String((int)callData.parameters.a));
         ServiceRequestErrorCode errorCode =
-            std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(callData.deviceOrRoomId, callData.serviceType, callData.parameters);
+            std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(callData.deviceId, callData.serviceType, callData.parameters);
 
         // Logger::log("Service error code : " + String((int)errorCode));
         if (errorCode != SERV_BUSY && errorCode != SERV_PENDING)
@@ -206,16 +239,21 @@ void DigitalEventReceiver::cyclic()
 
 void DigitalEventReceiver::fireEvent(uint64_t eventId)
 {
-    if((millis() - lastEventOccurrenceTime) < 1000){
-        Logger::log("DigitalEventReceiver:// Ignoring event fire request due to debounce time");
-        return;
-    }
+    fireEvent(eventId, "Legacy");
+}
 
-    Logger::log("DigitalEventReceiver:// Event with ID: " + String((unsigned long long)eventId) + " fired");
+void DigitalEventReceiver::fireEvent(uint64_t eventId, const String &source)
+{
+    String normalizedSource = source.length() ? source.substring(0, DIGITAL_EVENT_SOURCE_MAX_LENGTH) : "Unknown";
+    Logger::log("DigitalEventReceiver:// Event with ID: " + String((unsigned long long)eventId) + " fired by " + normalizedSource);
     // Push event to the queue
-    eventsQueue.push(eventId);
+    eventsQueue.push({eventId, normalizedSource});
 
-    lastEventOccurrenceTime = millis();
+}
+
+const std::vector<DigitalEventOccurrence> &DigitalEventReceiver::getUnmappedEvents()
+{
+    return unmappedEvents;
 }
 
 void DigitalEventReceiver::deinit()
@@ -262,22 +300,46 @@ void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
 {
     /* Received UDP Message */
     // Process the received digital Event message here
-    if (msg.getId() == DIGITAL_EVENT_FIRED_MSG_ID)
+    if (msg.getId() == DIGITAL_EVENT_FIRED_MSG_ID || msg.getId() == DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID)
     {
         std::vector<uint8_t> &payload = msg.getPayload();
-        if (payload.size() == (sizeof(uint8_t) + sizeof(uint64_t)))
+        const size_t legacyPayloadSize = sizeof(uint8_t) + sizeof(uint64_t);
+        const bool legacyMessage = msg.getId() == DIGITAL_EVENT_FIRED_MSG_ID;
+        if ((legacyMessage && payload.size() == legacyPayloadSize) ||
+            (!legacyMessage && payload.size() > legacyPayloadSize &&
+             payload.size() <= legacyPayloadSize + DIGITAL_EVENT_SOURCE_MAX_LENGTH))
         {
             uint8_t transmissionIdentfier = 0x00;
             memcpy(&transmissionIdentfier, &(payload.at(0)), sizeof(transmissionIdentfier));
             uint64_t triggeredEvent = 0;
             memcpy(&triggeredEvent, &(payload.at(1)), sizeof(triggeredEvent));
 
-            // Protection against repeated request fake activation
-            if (transmissionIdentfier != lastReceivedTransmissionId)
+            const auto &sender = msg.getIPAddress();
+            const uint32_t senderKey = (static_cast<uint32_t>(sender.octet1) << 24) |
+                                       (static_cast<uint32_t>(sender.octet2) << 16) |
+                                       (static_cast<uint32_t>(sender.octet3) << 8) |
+                                       sender.octet4;
+            auto senderState = std::find_if(receivedTransmissionIds.begin(), receivedTransmissionIds.end(),
+                                            [senderKey](const auto &entry) { return entry.first == senderKey; });
+            if (senderState == receivedTransmissionIds.end() || senderState->second != transmissionIdentfier)
             {
-                Logger::log("DigitalEventReceiver:// Received DIGITAL_EVENT_FIRED_MSG_ID for event ID: " + String((unsigned long long)triggeredEvent) + " with transmission ID: " + String((int)transmissionIdentfier));
-                lastReceivedTransmissionId = transmissionIdentfier;
-                fireEvent(triggeredEvent);
+                String source = "Legacy remote";
+                if (!legacyMessage)
+                {
+                    source = "";
+                    for (size_t i = legacyPayloadSize; i < payload.size(); ++i) source += static_cast<char>(payload[i]);
+                }
+                Logger::log("DigitalEventReceiver:// Received digital event ID: " + String((unsigned long long)triggeredEvent) + " from " + source + " with transmission ID: " + String((int)transmissionIdentfier));
+                if (senderState == receivedTransmissionIds.end())
+                {
+                    if (receivedTransmissionIds.size() >= 32) receivedTransmissionIds.erase(receivedTransmissionIds.begin());
+                    receivedTransmissionIds.push_back({senderKey, transmissionIdentfier});
+                }
+                else
+                {
+                    senderState->second = transmissionIdentfier;
+                }
+                fireEvent(triggeredEvent, source);
 
                 // Send back the handling confirmation
                 MessageUDP confirmationMessage(DIGITAL_EVENT_CONFIRMED_MSG_ID, msg.getIPAddress(), 9001);
@@ -297,11 +359,11 @@ void DigitalEventReceiver::processEvents()
 
     if (eventsQueue.size() > 0)
     {
-        uint64_t eventHappened = eventsQueue.front();
+        DigitalEventOccurrence occurrence = eventsQueue.front();
         bool found = false;
         for (auto &mapping : digitalEventsMapping)
         {
-            if (mapping.first == eventHappened)
+            if (mapping.first == occurrence.eventId)
             {
                 executeAction(mapping.second);
                 found = true;
@@ -309,100 +371,44 @@ void DigitalEventReceiver::processEvents()
         }
 
         if(!found){
-            UserInterfaceNotification notif;
-                notif.title = "Unmapped Event";
-                notif.body = "Event with ID: " + String((unsigned long long)eventHappened) + " has been fired but there is no action mapped to it.";
-                notif.type = UserInterfaceNotification::INFO;
-                std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+            unmappedEvents.insert(unmappedEvents.begin(), occurrence);
+            if (unmappedEvents.size() > 10) unmappedEvents.pop_back();
         }
 
         eventsQueue.pop();
     }
 }
 
-const uint8_t deviceOrRoomIdIndex = 2;
-const uint8_t serviceOverloadingIndex = 1;
-const uint8_t serviceTypeIndex = 0;
-const uint8_t valueIndex = 3;
 void DigitalEventReceiver::executeAction(DigitalEvent::Event &action)
 {
-    switch (action.affectedType)
-    {
-    case DigitalEvent::AffectedType::DEVICE:
-        deviceAction(action);
-        break;
-
-    case DigitalEvent::AffectedType::ROOM:
-        roomAction(action);
-        break;
-
-    default:
-        break;
-    }
+    deviceAction(action);
 }
 
 void DigitalEventReceiver::deviceAction(DigitalEvent::Event &action)
 {
-    ServiceParameters_set1 parameters;
-
-    if (action.actionType == DigitalEvent::ActionType::TOGGLE)
+    uint8_t deviceType = 255;
+    bool currentState = false;
+    std::vector<DeviceDescription> devicesVector =
+        std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+    for (const auto &device : devicesVector)
     {
-        // We need device current status in order to toggle it
-        std::vector<DeviceDescription> devicesVector =
-            std::any_cast<std::vector<DeviceDescription>>(
-                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-        for (auto &device : devicesVector)
+        if (device.deviceId == action.deviceId)
         {
-            if (device.deviceId == action.affectedId)
-            {
-                parameters.a = !(device.isEnabled);
-                break;
-            }
+            deviceType = device.deviceType;
+            currentState = device.isEnabled;
+            break;
         }
     }
-    else
+
+    const auto *eventAction = GeneratedDigitalEventActions::find(deviceType, action.actionId);
+    if (eventAction == nullptr)
     {
-        parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
+        Logger::log("DigitalEventReceiver:// Action is not supported by target device");
+        return;
     }
 
+    ServiceParameters_set1 parameters = eventAction->parameters;
+    if (eventAction->toggleState) parameters.a = !currentState;
     Logger::log("DigitalEventReceiver:// Added DEVICE action");
-    pendingServiceCalls.push({action.affectedId, DEVSERVICE_STATE_SWITCH, parameters});
-    // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_STATE_SWITCH, parameters);
-}
-
-void DigitalEventReceiver::roomAction(DigitalEvent::Event &action)
-{
-    ServiceParameters_set1 parameters;
-
-    if (action.actionType == DigitalEvent::ActionType::TOGGLE)
-    {
-        // We need to evaluate current room state to toggle it
-        std::vector<DeviceDescription> devicesVector =
-            std::any_cast<std::vector<DeviceDescription>>(
-                DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-        uint8_t isRoomOn = 0;
-
-        for (auto &device : devicesVector)
-        {
-            if (device.roomId == action.affectedId)
-            {
-                // Found at least 1 device enabled in target ROOM
-                if (device.isEnabled == 1)
-                {
-                    isRoomOn = 1;
-                    break;
-                }
-            }
-        }
-
-        parameters.a = !(isRoomOn);
-    }
-    else
-    {
-        parameters.a = action.actionType == DigitalEvent::ActionType::ON ? 1 : 0;
-    }
-
-    Logger::log("DigitalEventReceiver:// Added ROOM action");
-    pendingServiceCalls.push({action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters});
-    // std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES)).serviceCall_set1(action.affectedId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
+    pendingServiceCalls.push({action.deviceId, eventAction->service, parameters});
 }

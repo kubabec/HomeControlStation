@@ -1,15 +1,10 @@
 var namespaces_dup =
 [
+    [ "anonymous_namespace{devicemanager.cpp}", "namespaceanonymous__namespace_02devicemanager_8cpp_03.html", [
+      [ "validateConfigurationSet", "namespaceanonymous__namespace_02devicemanager_8cpp_03.html#af053c8e8dc4b729bf23f33da7837aa6d", null ],
+      [ "CONFIGURABLE_GPIO_COUNT", "namespaceanonymous__namespace_02devicemanager_8cpp_03.html#a346f30bb42382ce91ac26dac2cc56f38", null ]
+    ] ],
     [ "DigitalEvent", "namespaceDigitalEvent.html", [
-      [ "ActionType", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170", [
-        [ "ON", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a4c70268a9468353da108b11ffe135980", null ],
-        [ "OFF", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a2b903c410ef8147354d4bc909fb85604", null ],
-        [ "TOGGLE", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a850d3cc071850f0910ea73abf5d95baa", null ]
-      ] ],
-      [ "AffectedType", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0", [
-        [ "ROOM", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a62c49e46befbccd092c63cf31015113e", null ],
-        [ "DEVICE", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a2a392ba76123bb1863423602d70d587b", null ]
-      ] ],
       [ "__attribute__", "namespaceDigitalEvent.html#ad53a4fbe154c87bc52471aed6488c316", null ]
     ] ],
     [ "generate_build_info", "namespacegenerate__build__info.html", [
@@ -35,6 +30,8 @@ var namespaces_dup =
       [ "generate_advanced_controls", "namespacegenerate__device__registry.html#a8591109a3064be30adfdba12f19f3c80", null ],
       [ "generate_configuration_javascript", "namespacegenerate__device__registry.html#a93fb38de478cc3ca9bb2e84c9605bf95", null ],
       [ "generate_device_widgets", "namespacegenerate__device__registry.html#abd3460b2ad34ce8aa7b44e917bac3d26", null ],
+      [ "generate_digital_event_actions", "namespacegenerate__device__registry.html#aa9ea5333909da427a33306ea53a64239", null ],
+      [ "generate_digital_event_triggers", "namespacegenerate__device__registry.html#a20a0538b4e56cb5c1307a506b711bbef", null ],
       [ "generate_registry", "namespacegenerate__device__registry.html#ad50f4ae932682fb5a8228aed65e21d3f", null ],
       [ "generate_state_serializer", "namespacegenerate__device__registry.html#ac94e77dd59746ec4be160c992543de90", null ],
       [ "generate_types", "namespacegenerate__device__registry.html#a3a0ab8bab6954e429ac54076c37c2633", null ],
@@ -46,6 +43,7 @@ var namespaces_dup =
       [ "state_offset", "namespacegenerate__device__registry.html#acdd1df58388875f41cd5cc35f2c8e503", null ],
       [ "validate_description", "namespacegenerate__device__registry.html#aacfc6ea7d8de5bdb201ce68e5b687260", null ],
       [ "write_if_changed", "namespacegenerate__device__registry.html#ae33a8d278b6981238d1c9cc835c82048", null ],
+      [ "AREA_BYTE_CAPACITIES", "namespacegenerate__device__registry.html#a98ae96bee02a35d91346171d3c1d5b16", null ],
       [ "DEVICES_DIR", "namespacegenerate__device__registry.html#a6b9f69ea06e1f17d32e3e4158e874f03", null ],
       [ "FACTORY_ARGUMENTS", "namespacegenerate__device__registry.html#ae1c9b9170c3d29411548640a88c5cc84", null ],
       [ "GENERATED_INCLUDE_DIR", "namespacegenerate__device__registry.html#a0640cc3916cc56560177ae03938efc62", null ],
@@ -58,12 +56,17 @@ var namespaces_dup =
       [ "advancedControlsTemplate_type_LED_STRIP", "namespaceGeneratedAdvancedControlTemplates.html#aeb188df5176d3c709d0c766ad0d43c71", null ],
       [ "advancedControlsTemplate_type_ONOFFDEVICE", "namespaceGeneratedAdvancedControlTemplates.html#a1feefed933400a44337df00750deba08", null ]
     ] ],
-    [ "GeneratedDeviceConfigWidgets", "namespaceGeneratedDeviceConfigWidgets.html", "namespaceGeneratedDeviceConfigWidgets" ],
+    [ "GeneratedDeviceConfigWidgets", "namespaceGeneratedDeviceConfigWidgets.html", [
+      [ "emitGeneratedCustomFields", "namespaceGeneratedDeviceConfigWidgets.html#abe63878571fb3c93e4dd5715fa37cfb4", null ],
+      [ "emitTypeSelector", "namespaceGeneratedDeviceConfigWidgets.html#a6410010a3c7dae6f018c98161d252686", null ]
+    ] ],
     [ "GeneratedDeviceRegistry", "namespaceGeneratedDeviceRegistry.html", "namespaceGeneratedDeviceRegistry" ],
     [ "GeneratedDeviceStateSerializer", "namespaceGeneratedDeviceStateSerializer.html", [
       [ "hexDigit", "namespaceGeneratedDeviceStateSerializer.html#a1ee73ac750752004417ea9baf8bb05df", null ],
       [ "rgbHex", "namespaceGeneratedDeviceStateSerializer.html#ad9978daaeca76b4da095836f94667034", null ],
       [ "serialize", "namespaceGeneratedDeviceStateSerializer.html#ae702e2ac6582691d83c42b1a27228486", null ]
     ] ],
-    [ "GeneratedDeviceTypes", "namespaceGeneratedDeviceTypes.html", "namespaceGeneratedDeviceTypes" ]
+    [ "GeneratedDeviceTypes", "namespaceGeneratedDeviceTypes.html", "namespaceGeneratedDeviceTypes" ],
+    [ "GeneratedDigitalEventActions", "namespaceGeneratedDigitalEventActions.html", "namespaceGeneratedDigitalEventActions" ],
+    [ "GeneratedDigitalEventTriggers", "namespaceGeneratedDigitalEventTriggers.html", "namespaceGeneratedDigitalEventTriggers" ]
 ];

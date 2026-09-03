@@ -11,11 +11,14 @@
 #include "SystemDefinition.hpp"
 #include "devices/device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include "generated/GeneratedDigitalEventTriggers.hpp"
 #include "devices/OnOffDevice/OnOffDevice.hpp"
-#include "devices/WindowBlinder/WindowBlinder.hpp"
-#include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
-#include "devices/Gate/Gate.hpp"
-#include "devices/AquariumController/AquariumController.hpp"
+#ifdef LED_STRIP_SUPPORTED
+#include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
+#endif
+#ifdef TEMP_SENSOR_SUPPORTED
+#include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
+#endif
 
 namespace GeneratedDeviceRegistry
 {
@@ -26,6 +29,8 @@ struct RuntimeContext
     std::function<RtcTime()> getRtcTime;
     std::function<void(uint16_t)> toggleLocalDevice;
     std::function<void(uint64_t)> fireDigitalEvent;
+    std::function<uint64_t()> getNodeMacAddress;
+    std::function<void(uint64_t, const String&)> fireDigitalEventWithSource;
 };
 
 /** @brief Runtime behavior associated with one enabled device implementation. */
@@ -40,10 +45,12 @@ struct Registration
 
 inline constexpr Registration kEnabledTypes[] = {
     {43, "OnOff", true, 0u},
-    {49, "WindowBlinder", true, 0u},
-    {50, "WindowDoorSensor", true, 0u},
-    {51, "Gate", true, 0u},
-    {52, "AquariumController", true, 0u},
+    #ifdef LED_STRIP_SUPPORTED
+    {44, "LedStrip", true, 0u},
+    #endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+    {45, "TempSensor", true, 60000u},
+    #endif
 };
 
 /** @brief Finds an implementation enabled in the current firmware build. */
@@ -56,12 +63,18 @@ inline const Registration* find(uint8_t typeId)
     return nullptr;
 }
 
+/** @brief Reports whether a GPIO can be assigned to a configurable device on this board. */
+inline bool isConfigurableGpio(uint8_t pin)
+{
+    // GPIO 0 is the station reset input; 22-32 are absent or used by flash/PSRAM.
+    return pin > 0 && pin < 49 && !(pin >= 22 && pin <= 32);
+}
+
 /** @brief Claims one configured GPIO and rejects invalid or duplicate assignments. */
 inline bool claimPin(uint8_t pin, bool optional, bool* claimedPins, size_t claimedPinCount)
 {
     if (optional && pin == 255) return true;
-    // ESP32-S3 has no GPIO 22-25; GPIO 26-32 are used by module flash/PSRAM.
-    if (claimedPins == nullptr || pin >= claimedPinCount || (pin >= 22 && pin <= 32) || claimedPins[pin]) return false;
+    if (claimedPins == nullptr || pin >= claimedPinCount || !isConfigurableGpio(pin) || claimedPins[pin]) return false;
     claimedPins[pin] = true;
     return true;
 }
@@ -95,57 +108,19 @@ inline bool validateConfiguration(const DeviceConfigSlotType& config, bool* clai
             if (config.customBytes[2] < 0 || config.customBytes[2] > 255) return false;
             if (config.customBytes[3] < 0 || config.customBytes[3] > 255) return false;
             break;
-    case type_WINDOW_BLINDER:
+    #ifdef LED_STRIP_SUPPORTED
+    case type_LED_STRIP:
             if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[0] < 0 || config.customBytes[0] > 48) return false;
-            if (!claimPin(config.customBytes[0], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[1] < 0 || config.customBytes[1] > 255) return false;
-            if (!claimPin(config.customBytes[1], true, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[2] < 0 || config.customBytes[2] > 255) return false;
-            if (!claimPin(config.customBytes[2], true, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[3] != 0 && config.customBytes[3] != 1) return false;
-            if (config.customBytes[4] != 0 && config.customBytes[4] != 1) return false;
-            if (readU16(config.customBytes, 5) < 1 || readU16(config.customBytes, 5) > 600) return false;
-            if (readU16(config.customBytes, 7) < 1 || readU16(config.customBytes, 7) > 600) return false;
+            if (readU16(config.customBytes, 0) < 1 || readU16(config.customBytes, 0) > 65535) return false;
+            if (config.customBytes[2] != 0 && config.customBytes[2] != 1) return false;
+            if (config.customBytes[3] < 15 || config.customBytes[3] > 254) return false;
             break;
-    case type_WINDOW_DOOR_SENSOR:
+    #endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+    case type_TEMP_SENSOR:
             if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[0] != 0 && config.customBytes[0] != 1) return false;
-            if (config.customBytes[1] != 0 && config.customBytes[1] != 1) return false;
-            if (readU16(config.customBytes, 2) < 10 || readU16(config.customBytes, 2) > 5000) return false;
             break;
-    case type_GATE:
-            if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[0] < 0 || config.customBytes[0] > 48) return false;
-            if (!claimPin(config.customBytes[0], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[1] < 0 || config.customBytes[1] > 48) return false;
-            if (config.customBytes[5] == 2 && !claimPin(config.customBytes[1], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[2] < 0 || config.customBytes[2] > 48) return false;
-            if (config.customBytes[5] == 2 && !claimPin(config.customBytes[2], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[3] < 0 || config.customBytes[3] > 255) return false;
-            if (!claimPin(config.customBytes[3], true, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[4] < 0 || config.customBytes[4] > 255) return false;
-            if (!claimPin(config.customBytes[4], true, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[5] != 1 && config.customBytes[5] != 2) return false;
-            if (config.customBytes[6] != 0 && config.customBytes[6] != 1) return false;
-            if (readU16(config.customBytes, 7) < 1 || readU16(config.customBytes, 7) > 900) return false;
-            break;
-    case type_AQUARIUM_CONTROLLER:
-            if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
-            if (!isWifiSafeAdcPin(config.pinNumber)) return false;
-            if (config.customBytes[0] < 0 || config.customBytes[0] > 48) return false;
-            if (!claimPin(config.customBytes[0], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[1] < 0 || config.customBytes[1] > 48) return false;
-            if (!claimPin(config.customBytes[1], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[2] < 0 || config.customBytes[2] > 48) return false;
-            if (!claimPin(config.customBytes[2], false, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[3] < 0 || config.customBytes[3] > 255) return false;
-            if (!claimPin(config.customBytes[3], true, candidatePins, claimedPinCount)) return false;
-            if (config.customBytes[4] != 0 && config.customBytes[4] != 1) return false;
-            if (readU16(config.customBytes, 5) < 50 || readU16(config.customBytes, 5) > 400) return false;
-            if (readU16(config.customBytes, 7) < 1 || readU16(config.customBytes, 7) > 50) return false;
-            if (readU16(config.customBytes, 9) < 50 || readU16(config.customBytes, 9) > 600) return false;
-            break;
+    #endif
     default:
         return false;
     }
@@ -163,14 +138,14 @@ inline std::unique_ptr<Device> create(
     {
     case type_ONOFFDEVICE:
             return std::unique_ptr<Device>(new OnOffDevice(config));
-    case type_WINDOW_BLINDER:
-            return std::unique_ptr<Device>(new WindowBlinder(config));
-    case type_WINDOW_DOOR_SENSOR:
-            return std::unique_ptr<Device>(new WindowDoorSensor(config));
-    case type_GATE:
-            return std::unique_ptr<Device>(new Gate(config));
-    case type_AQUARIUM_CONTROLLER:
-            return std::unique_ptr<Device>(new AquariumController(config));
+    #ifdef LED_STRIP_SUPPORTED
+    case type_LED_STRIP:
+            return std::unique_ptr<Device>(new LedWS1228bDeviceType(config, context.persistentDataChanged));
+    #endif
+    #ifdef TEMP_SENSOR_SUPPORTED
+    case type_TEMP_SENSOR:
+            return std::unique_ptr<Device>(new TempSensorDHT11DeviceType(config, context.getRtcTime));
+    #endif
     default:
         return nullptr;
     }

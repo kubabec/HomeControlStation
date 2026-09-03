@@ -127,6 +127,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:ae0a59a59f7fd373ac835357327ec200d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases runtime state attached to the sender.  <br /></td></tr>
 <tr class="memitem:a18427fd331fc8c5768946b0bcbeffff0" id="r_a18427fd331fc8c5768946b0bcbeffff0"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a18427fd331fc8c5768946b0bcbeffff0">fireEvent</a> (uint64_t eventId)</td></tr>
 <tr class="memdesc:a18427fd331fc8c5768946b0bcbeffff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a digital event with the supplied identifier.  <br /></td></tr>
+<tr class="memitem:ab7453257cdd9b26ab7cacce52f55ca54" id="r_ab7453257cdd9b26ab7cacce52f55ca54"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ab7453257cdd9b26ab7cacce52f55ca54">fireEvent</a> (uint64_t eventId, const String &amp;source)</td></tr>
+<tr class="memdesc:ab7453257cdd9b26ab7cacce52f55ca54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a source-aware event using the additive network protocol.  <br /></td></tr>
 <tr class="memitem:a1ac1b3e136cab8fc4279f9bd8364878c" id="r_a1ac1b3e136cab8fc4279f9bd8364878c"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a1ac1b3e136cab8fc4279f9bd8364878c">init</a> ()</td></tr>
 <tr class="memdesc:a1ac1b3e136cab8fc4279f9bd8364878c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the digital-event transmitter and prepares its runtime state.  <br /></td></tr>
 <tr class="memitem:a8e772376d2633ba26867adb34b44d330" id="r_a8e772376d2633ba26867adb34b44d330"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8e772376d2633ba26867adb34b44d330">receiveUdp</a> (<a class="el" href="classMessageUDP.html">MessageUDP</a> &amp;msg)</td></tr>
@@ -136,6 +138,8 @@ Static Public Member Functions</h2></td></tr>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a8726955031b7fdd511b6c93f82b5bea4" id="r_a8726955031b7fdd511b6c93f82b5bea4"><td class="memItemLeft">static uint64_t&#160;</td><td class="memItemRight"><a class="el" href="#a8726955031b7fdd511b6c93f82b5bea4">lastTransmittedId</a> = 0</td></tr>
 <tr class="memdesc:a8726955031b7fdd511b6c93f82b5bea4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifier of the last event that was transmitted.  <br /></td></tr>
+<tr class="memitem:ac89c2eb3996c6e18af10db95d7f0cfdc" id="r_ac89c2eb3996c6e18af10db95d7f0cfdc"><td class="memItemLeft">static String&#160;</td><td class="memItemRight"><a class="el" href="#ac89c2eb3996c6e18af10db95d7f0cfdc">lastTransmittedSource</a> = &quot;&quot;</td></tr>
+<tr class="memdesc:ac89c2eb3996c6e18af10db95d7f0cfdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Source associated with the event while awaiting confirmation.  <br /></td></tr>
 <tr class="memitem:a8363c578e94de0fa5d301841f6752108" id="r_a8363c578e94de0fa5d301841f6752108"><td class="memItemLeft">static long long&#160;</td><td class="memItemRight"><a class="el" href="#a8363c578e94de0fa5d301841f6752108">lastTransmittedTime</a> = 0</td></tr>
 <tr class="memdesc:a8363c578e94de0fa5d301841f6752108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp of the last outbound transmission.  <br /></td></tr>
 <tr class="memitem:afc09560493f6cc14852634c01e80f4a1" id="r_afc09560493f6cc14852634c01e80f4a1"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#afc09560493f6cc14852634c01e80f4a1">transmissionIdentifier</a> = 1</td></tr>
@@ -174,9 +178,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Runs periodic maintenance for the digital-event transmitter. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">55</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">60</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00025">lastTransmittedTime</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00035">transmissionIdentifier</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00030">wasRequestRepeated</a>.</p>
+<p class="reference">References <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00023">lastTransmittedSource</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00028">lastTransmittedTime</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00038">transmissionIdentifier</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00033">wasRequestRepeated</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00179">OperatingSystem::task100ms()</a>.</p>
 
@@ -207,14 +211,14 @@ Static Private Attributes</h2></td></tr>
 
 <p>Releases runtime state attached to the sender. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00081">81</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00087">87</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00270">OperatingSystem::performReset()</a>.</p>
 
 </div>
 </div>
 <a id="a18427fd331fc8c5768946b0bcbeffff0" name="a18427fd331fc8c5768946b0bcbeffff0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18427fd331fc8c5768946b0bcbeffff0">&#9670;&#160;</a></span>fireEvent()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a18427fd331fc8c5768946b0bcbeffff0">&#9670;&#160;</a></span>fireEvent() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -244,11 +248,53 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">85</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">91</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00004">DIGITAL_EVENT_FIRED_MSG_ID</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00025">lastTransmittedTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00027">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00042">MessageUDP::IPAddr::octet4</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="signals_8hpp_source.html#l00111">SIG_LAST_KNOWN_MASTER_IP_ADDR</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00035">transmissionIdentifier</a>.</p>
+<p class="reference">References <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00004">DIGITAL_EVENT_FIRED_MSG_ID</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00023">lastTransmittedSource</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00028">lastTransmittedTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="signals_8hpp_source.html#l00115">SIG_LAST_KNOWN_MASTER_IP_ADDR</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00038">transmissionIdentifier</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">cyclic()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00016">init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00017">init()</a>.</p>
+
+</div>
+</div>
+<a id="ab7453257cdd9b26ab7cacce52f55ca54" name="ab7453257cdd9b26ab7cacce52f55ca54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7453257cdd9b26ab7cacce52f55ca54">&#9670;&#160;</a></span>fireEvent() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void DigitalEventTransmitter::fireEvent </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>eventId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;</td>          <td class="paramname"><span class="paramname"><em>source</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sends a source-aware event using the additive network protocol. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">eventId</td><td>Event identifier to transmit. </td></tr>
+    <tr><td class="paramname">source</td><td>Human-readable application, device, or abstraction name. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">111</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00004">DIGITAL_EVENT_FIRED_MSG_ID</a>, <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00006">DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID</a>, <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00007">DIGITAL_EVENT_SOURCE_MAX_LENGTH</a>, <a class="el" href="datacontainer_8cpp_source.html#l00035">DataContainer::getSignalValue()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00023">lastTransmittedSource</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00028">lastTransmittedTime</a>, <a class="el" href="Logger_8cpp_source.html#l00047">Logger::log()</a>, <a class="el" href="messageUDP_8hpp_source.html#l00027">MessageUDP::IPAddr::octet1</a>, <a class="el" href="messageUDP_8hpp_source.html#l00032">MessageUDP::IPAddr::octet2</a>, <a class="el" href="messageUDP_8hpp_source.html#l00037">MessageUDP::IPAddr::octet3</a>, <a class="el" href="messageUDP_8hpp_source.html#l00042">MessageUDP::IPAddr::octet4</a>, <a class="el" href="messageUDP_8cpp_source.html#l00114">MessageUDP::pushData()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00196">NetworkDriver::send()</a>, <a class="el" href="networkdriver_8cpp_source.html#l00212">NetworkDriver::sendBroadcast()</a>, <a class="el" href="signals_8hpp_source.html#l00115">SIG_LAST_KNOWN_MASTER_IP_ADDR</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00038">transmissionIdentifier</a>.</p>
 
 </div>
 </div>
@@ -277,9 +323,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Initializes the digital-event transmitter and prepares its runtime state. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00016">16</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00017">17</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00103">CBK_FIRE_DIGITAL_EVENT</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">fireEvent()</a>, and <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>.</p>
+<p class="reference">References <a class="el" href="signals_8hpp_source.html#l00104">CBK_FIRE_DIGITAL_EVENT</a>, <a class="el" href="signals_8hpp_source.html#l00107">CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, and <a class="el" href="datacontainer_8hpp_source.html#l00034">DataContainer::setSignalValue()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="HomeStation__os_8cpp_source.html#l00051">OperatingSystem::init()</a>.</p>
 
@@ -316,9 +362,9 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">27</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">32</a> of file <a class="el" href="DigitalEventTransmitter_8cpp_source.html">DigitalEventTransmitter.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00005">DIGITAL_EVENT_CONFIRMED_MSG_ID</a>, <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00025">lastTransmittedTime</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00035">transmissionIdentifier</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00030">wasRequestRepeated</a>.</p>
+<p class="reference">References <a class="el" href="DigitalEventDefinitions_8hpp_source.html#l00005">DIGITAL_EVENT_CONFIRMED_MSG_ID</a>, <a class="el" href="messageUDP_8cpp_source.html#l00109">MessageUDP::getId()</a>, <a class="el" href="messageUDP_8cpp_source.html#l00339">MessageUDP::getPayload()</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">lastTransmittedId</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00028">lastTransmittedTime</a>, <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00038">transmissionIdentifier</a>, and <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00033">wasRequestRepeated</a>.</p>
 
 </div>
 </div>
@@ -347,7 +393,35 @@ Static Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00020">20</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">receiveUdp()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">receiveUdp()</a>.</p>
+
+</div>
+</div>
+<a id="ac89c2eb3996c6e18af10db95d7f0cfdc" name="ac89c2eb3996c6e18af10db95d7f0cfdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac89c2eb3996c6e18af10db95d7f0cfdc">&#9670;&#160;</a></span>lastTransmittedSource</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">String DigitalEventTransmitter::lastTransmittedSource = &quot;&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Source associated with the event while awaiting confirmation. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00023">23</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">fireEvent()</a>.</p>
 
 </div>
 </div>
@@ -373,9 +447,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Timestamp of the last outbound transmission. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00025">25</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00028">28</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">receiveUdp()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">receiveUdp()</a>.</p>
 
 </div>
 </div>
@@ -401,9 +475,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Current transmission identifier assigned to the outgoing event frame. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00035">35</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00038">38</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00085">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">receiveUdp()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00091">fireEvent()</a>, <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00111">fireEvent()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">receiveUdp()</a>.</p>
 
 </div>
 </div>
@@ -429,9 +503,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>true when a request was already repeated and the system should avoid duplicate sends. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00030">30</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitalEventTransmitter_8hpp_source.html#l00033">33</a> of file <a class="el" href="DigitalEventTransmitter_8hpp_source.html">DigitalEventTransmitter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00055">cyclic()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00027">receiveUdp()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00060">cyclic()</a>, and <a class="el" href="DigitalEventTransmitter_8cpp_source.html#l00032">receiveUdp()</a>.</p>
 
 </div>
 </div>

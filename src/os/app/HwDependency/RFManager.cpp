@@ -131,7 +131,8 @@ void RFManager::evaluateButtonEvent()
         Logger::log("RFManager:// Long press event detected for button: " + String((unsigned long)currentReceptionEvent.buttonUniqueNumber));
     }
 
-    std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(systemDigitalEventId);
+    std::any_cast<std::function<void(uint64_t, const String &)>>(
+        DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE))(systemDigitalEventId, "RFManager");
 }
 
 void RFManager::handleIdleState()
@@ -206,7 +207,8 @@ void RFManager::handleIdleState()
                 resetReceptionEvent();
                 completionCounter = 0;
                 lastEventCompletionTime = millis();
-                std::any_cast<std::function<void(uint64_t)>>(DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT))(systemDigitalEventId);
+                std::any_cast<std::function<void(uint64_t, const String &)>>(
+                    DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE))(systemDigitalEventId, "RFManager");
             }
         }
     }

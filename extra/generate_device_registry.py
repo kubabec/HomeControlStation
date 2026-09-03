@@ -28,6 +28,10 @@ FACTORY_ARGUMENTS = {
     "getRtcTime": "context.getRtcTime",
     "toggleLocalDevice": "context.toggleLocalDevice",
     "fireDigitalEvent": "context.fireDigitalEvent",
+    "fireDeviceEvent": (
+        "GeneratedDigitalEventTriggers::bind(config.deviceType, config.deviceId, config.deviceName, "
+        "context.getNodeMacAddress, context.fireDigitalEventWithSource)"
+    ),
 }
 
 
@@ -67,6 +71,40 @@ def validate_description(description):
             raise ValueError(f"{path}: missing {key}")
     implementation = description["implementation"]
     manager = implementation.get("manager", {})
+    services = {service.get("name"): service for service in description.get("services", [])}
+    action_ids = set()
+    for action in description.get("digitalEventActions", []):
+        action_id = action.get("id")
+        if not isinstance(action_id, int) or isinstance(action_id, bool) or not 1 <= action_id <= 255:
+            raise ValueError(f"{path}: digital event action ID must be from 1 to 255")
+        if action_id in action_ids:
+            raise ValueError(f"{path}: duplicate digital event action ID {action_id}")
+        action_ids.add(action_id)
+        service = services.get(action.get("service"))
+        if not service or service.get("status") != "implemented" or service.get("overload") != "serviceCall_1":
+            raise ValueError(
+                f"{path}: digital event action {action_id} requires an implemented serviceCall_1 service"
+            )
+        if action.get("toggleState") and action.get("service") != "DEVSERVICE_STATE_SWITCH":
+            raise ValueError(f"{path}: toggleState is only valid for DEVSERVICE_STATE_SWITCH")
+        for parameter_name, value in action.get("parameters", {}).items():
+            if parameter_name not in "abcde" or not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= 255:
+                raise ValueError(f"{path}: invalid digital event action parameter {parameter_name}")
+    trigger_ids = set()
+    for trigger in description.get("digitalEventTriggers", []):
+        trigger_id = trigger.get("id")
+        if not isinstance(trigger_id, int) or isinstance(trigger_id, bool) or not 1 <= trigger_id <= 255:
+            raise ValueError(f"{path}: digital event trigger ID must be from 1 to 255")
+        if trigger_id in trigger_ids:
+            raise ValueError(f"{path}: duplicate digital event trigger ID {trigger_id}")
+        if not isinstance(trigger.get("label"), str) or not trigger["label"]:
+            raise ValueError(f"{path}: digital event trigger {trigger_id} requires a label")
+        trigger_ids.add(trigger_id)
+    factory_arguments = implementation.get("factory", {}).get("arguments", []) if implementation.get("factory") else []
+    if trigger_ids and "fireDeviceEvent" not in factory_arguments:
+        raise ValueError(f"{path}: digitalEventTriggers require the fireDeviceEvent factory argument")
+    if "fireDeviceEvent" in factory_arguments and not trigger_ids:
+        raise ValueError(f"{path}: fireDeviceEvent requires at least one digitalEventTrigger")
     advanced_controls = description["ui"].get("advancedControls")
     if advanced_controls:
         template_path = advanced_controls.get("template")
@@ -96,7 +134,6 @@ def validate_description(description):
             if maximum_size > MAX_ADVANCED_CONTROLS_PAYLOAD_SIZE:
                 raise ValueError(f"{path}: dynamic advanced-controls payload exceeds transport capacity")
 
-        services = {service.get("name"): service for service in description.get("services", [])}
         for service_name in ("DEVSERVICE_GET_ADVANCED_CONTROLS", "DEVSERVICE_SET_ADVANCED_CONTROLS"):
             service = services.get(service_name)
             if not service or service.get("status") != "implemented" or service.get("overload") != "serviceCall_3":
@@ -312,6 +349,7 @@ def generate_registry(descriptions):
 #include "SystemDefinition.hpp"
 #include "devices/device.hpp"
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
+#include "generated/GeneratedDigitalEventTriggers.hpp"
 {chr(10).join(includes)}
 
 namespace GeneratedDeviceRegistry
@@ -323,6 +361,8 @@ struct RuntimeContext
     std::function<RtcTime()> getRtcTime;
     std::function<void(uint16_t)> toggleLocalDevice;
     std::function<void(uint64_t)> fireDigitalEvent;
+    std::function<uint64_t()> getNodeMacAddress;
+    std::function<void(uint64_t, const String&)> fireDigitalEventWithSource;
 }};
 
 /** @brief Runtime behavior associated with one enabled device implementation. */
@@ -349,12 +389,18 @@ inline const Registration* find(uint8_t typeId)
     return nullptr;
 }}
 
+/** @brief Reports whether a GPIO can be assigned to a configurable device on this board. */
+inline bool isConfigurableGpio(uint8_t pin)
+{{
+    // GPIO 0 is the station reset input; 22-32 are absent or used by flash/PSRAM.
+    return pin > 0 && pin < 49 && !(pin >= 22 && pin <= 32);
+}}
+
 /** @brief Claims one configured GPIO and rejects invalid or duplicate assignments. */
 inline bool claimPin(uint8_t pin, bool optional, bool* claimedPins, size_t claimedPinCount)
 {{
     if (optional && pin == 255) return true;
-    // ESP32-S3 has no GPIO 22-25; GPIO 26-32 are used by module flash/PSRAM.
-    if (claimedPins == nullptr || pin >= claimedPinCount || (pin >= 22 && pin <= 32) || claimedPins[pin]) return false;
+    if (claimedPins == nullptr || pin >= claimedPinCount || !isConfigurableGpio(pin) || claimedPins[pin]) return false;
     claimedPins[pin] = true;
     return true;
 }}
@@ -407,6 +453,144 @@ inline std::unique_ptr<Device> create(
 #endif
 '''
     write_if_changed(GENERATED_INCLUDE_DIR / "GeneratedDeviceRegistry.hpp", content)
+
+
+def generate_digital_event_actions(descriptions):
+    rows = []
+    for description in descriptions:
+        type_id = description["deviceType"]["enumValue"]
+        for action in description.get("digitalEventActions", []):
+            parameters = action.get("parameters", {})
+            values = ", ".join(str(parameters.get(name, 255)) for name in "abcde")
+            row = (
+                f'{{{type_id}, {action["id"]}, {json.dumps(action["label"])}, {action["service"]}, '
+                f'{{{values}}}, {str(action.get("toggleState", False)).lower()}}},'
+            )
+            rows.append(guard_block(description, row))
+
+    content = f'''// Auto-generated by extra/generate_device_registry.py. Do not edit.
+/**
+ * @file GeneratedDigitalEventActions.hpp
+ * @brief Device-owned actions that can be persisted in compact digital-event mappings.
+ */
+#ifndef GENERATED_DIGITAL_EVENT_ACTIONS_HPP
+#define GENERATED_DIGITAL_EVENT_ACTIONS_HPP
+
+#include <cstdint>
+#include "SystemDefinition.hpp"
+#include "devices/device.hpp"
+
+namespace GeneratedDigitalEventActions
+{{
+struct Action
+{{
+    uint8_t deviceType;
+    uint8_t id;
+    const char* label;
+    DeviceServicesType service;
+    ServiceParameters_set1 parameters;
+    bool toggleState;
+}};
+
+inline constexpr Action kActions[] = {{
+{chr(10).join('    ' + row.replace(chr(10), chr(10) + '    ') for row in rows)}
+}};
+
+inline const Action* find(uint8_t deviceType, uint8_t actionId)
+{{
+    for (const auto& action : kActions)
+    {{
+        if (action.deviceType == deviceType && action.id == actionId) return &action;
+    }}
+    return nullptr;
+}}
+}}
+
+#endif
+'''
+    write_if_changed(GENERATED_INCLUDE_DIR / "GeneratedDigitalEventActions.hpp", content)
+
+
+def generate_digital_event_triggers(descriptions):
+    rows = []
+    for description in descriptions:
+        type_id = description["deviceType"]["enumValue"]
+        for trigger in description.get("digitalEventTriggers", []):
+            row = f'{{{type_id}, {trigger["id"]}, {json.dumps(trigger["label"])} }},'
+            rows.append(guard_block(description, row))
+
+    content = f'''// Auto-generated by extra/generate_device_registry.py. Do not edit.
+/**
+ * @file GeneratedDigitalEventTriggers.hpp
+ * @brief Device-owned event triggers and stable network-wide event ID generation.
+ */
+#ifndef GENERATED_DIGITAL_EVENT_TRIGGERS_HPP
+#define GENERATED_DIGITAL_EVENT_TRIGGERS_HPP
+
+#include <cstdint>
+#include <functional>
+#include "Arduino.h"
+
+namespace GeneratedDigitalEventTriggers
+{{
+struct Trigger
+{{
+    uint8_t deviceType;
+    uint8_t id;
+    const char* label;
+}};
+
+inline constexpr Trigger kTriggers[] = {{
+{chr(10).join('    ' + row.replace(chr(10), chr(10) + '    ') for row in rows)}
+}};
+
+inline const Trigger* find(uint8_t deviceType, uint8_t triggerId)
+{{
+    for (const auto& trigger : kTriggers)
+    {{
+        if (trigger.deviceType == deviceType && trigger.id == triggerId) return &trigger;
+    }}
+    return nullptr;
+}}
+
+inline uint64_t makeEventId(uint64_t nodeMac, uint8_t deviceType, uint8_t deviceId, uint8_t triggerId)
+{{
+    uint64_t hash = 14695981039346656037ULL;
+    for (uint8_t shift = 0; shift < 64; shift += 8)
+    {{
+        hash ^= static_cast<uint8_t>(nodeMac >> shift);
+        hash *= 1099511628211ULL;
+    }}
+    const uint8_t identity[] = {{deviceType, deviceId, triggerId}};
+    for (uint8_t value : identity)
+    {{
+        hash ^= value;
+        hash *= 1099511628211ULL;
+    }}
+    return hash == 0 ? 1 : hash;
+}}
+
+inline std::function<void(uint8_t)> bind(
+    uint8_t deviceType,
+    uint8_t deviceId,
+    const String& deviceName,
+    const std::function<uint64_t()>& getNodeMac,
+    const std::function<void(uint64_t, const String&)>& fireEvent)
+{{
+    return [deviceType, deviceId, deviceName, getNodeMac, fireEvent](uint8_t triggerId)
+    {{
+        if (!fireEvent || !getNodeMac || find(deviceType, triggerId) == nullptr) return;
+        const uint64_t nodeMac = getNodeMac();
+        if (nodeMac == 0) return;
+        String source = deviceName.length() ? deviceName : "Device " + String((int)deviceId);
+        fireEvent(makeEventId(nodeMac, deviceType, deviceId, triggerId), source);
+    }};
+}}
+}}
+
+#endif
+'''
+    write_if_changed(GENERATED_INCLUDE_DIR / "GeneratedDigitalEventTriggers.hpp", content)
 
 
 def parse_source(source):
@@ -920,6 +1104,8 @@ def generate():
         return
     generate_types(descriptions)
     generate_registry(descriptions)
+    generate_digital_event_actions(descriptions)
+    generate_digital_event_triggers(descriptions)
     generate_state_serializer(descriptions)
     generate_device_widgets(descriptions)
     generate_advanced_controls(descriptions)

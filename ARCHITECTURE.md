@@ -406,6 +406,50 @@ Use `include/devices/device.schema.json` and a predefined description such as `D
 11. Every nonzero-constrained generated control has a safe `default`.
 12. GPIO fields declare valid bounds and optionality; ADC common pins use `hardwareRole: "adc"`, and conditional GPIOs use `claimWhen` when needed.
 
+### Digital-event actions
+
+Digital events map one external 64-bit event ID to one action on one concrete device. Room targets are not supported. The `/digBtn` page obtains the target device type from `DeviceDescription` and shows only that type's `digitalEventActions` entries.
+
+Each device JSON may declare named, fixed actions:
+
+```json
+"digitalEventActions": [
+    { "id": 21, "label": "Turn on", "service": "DEVSERVICE_STATE_SWITCH", "parameters": { "a": 1 } },
+    { "id": 23, "label": "Toggle", "service": "DEVSERVICE_STATE_SWITCH", "toggleState": true }
+]
+```
+
+The generator accepts only implemented `serviceCall_1` services because a mapping persists only an action ID, not a variable payload. Values `a` through `e` are fixed bytes copied into `ServiceParameters_set1`; `toggleState` derives `a` from the current device state when the event fires. Variable-sized `serviceCall_3` operations must be represented by a device-owned preset service or another compact `serviceCall_1` command.
+
+The NVM contract is fixed. Blocks `e_BLOCK_DIGITAL_EVENT_1` through `e_BLOCK_DIGITAL_EVENT_6` and the packed six-byte record must not move or grow. Its byte layout is `mappingId`, `uint32_t deviceId`, `actionId`. Legacy byte-zero values `11` (room) and `12` (device) are reserved: room mappings are ignored, while legacy device mappings are assigned a new mapping ID in RAM and retain action IDs `21`/`22`/`23`. New mapping IDs therefore never use `11` or `12`.
+
+### Event occurrence and compatibility
+
+An event occurrence consists of a 64-bit event ID and a human-readable Source. Platform producers use the source-aware callback `CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE`; the original `CBK_FIRE_DIGITAL_EVENT` callback remains available and assigns a legacy source.
+
+Network compatibility is additive:
+
+- Message ID `100` retains its exact legacy payload: one transmission byte followed by the 64-bit event ID.
+- Message ID `102` carries the same prefix followed by 1-31 source bytes.
+- Message ID `101` confirmations remain the original 64-bit event ID payload for both forms.
+- New receivers accept both event message IDs. Old software can therefore continue sending events without modification.
+- A source-aware transmitter sends `102` first and an unchanged `100` companion with the same transmission byte. New receivers deduplicate the companion; old receivers ignore `102` and execute `100`.
+
+Retries are deduplicated by sender IPv4 address plus transmission byte, allowing different nodes to generate events at nearly the same time. A global event debounce is intentionally not used.
+
+When an occurrence has no mapping, the receiver stores it in a newest-first, ten-entry RAM list instead of creating a UI notification. The list is not persisted and clears on reboot. Settings exposes it at `/unmappedEvents`, where the user can copy an ID and configure it at `/digBtn`. Saving the mapping table removes every occurrence whose event ID is present in the final validated mapping set; rejected rows do not clear history.
+
+### Device-generated events
+
+Device JSON may declare `digitalEventTriggers`, each with a stable one-byte `id` and a label. A matching `fireDeviceEvent` factory argument injects `std::function<void(uint8_t)>` into that device. `GeneratedDigitalEventTriggers.hpp` validates the trigger and derives its 64-bit event ID with FNV-1a over:
+
+1. the node MAC address;
+2. the stable device type;
+3. the configured device instance ID;
+4. the stable trigger ID.
+
+The configured device name becomes Source. This keeps event identity unique across nodes and multiple same-type sensors without exposing network code to device implementations. The legacy raw `fireDigitalEvent` factory argument remains supported for existing packages.
+
 ### Network deployment rule
 
 The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not C++ implementations or JSON metadata. Therefore:
@@ -427,6 +471,9 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | NVM restoration, factory use and scheduling | `src/os/app/devicemanager.cpp` |
 | In-process signals and APIs | `include/os/datacontainer/signals.hpp` |
 | Public local/remote device routing | `src/os/app/deviceProvider.cpp` |
+| Digital-event action registry | `include/generated/GeneratedDigitalEventActions.hpp` |
+| Device event trigger registry and ID derivation | `include/generated/GeneratedDigitalEventTriggers.hpp` |
+| Digital-event mapping and NVM compatibility | `src/os/app/DigitalEvent/DigitalEventReceiver.cpp` |
 | Wi-Fi, UDP dispatch and OTA | `src/os/drivers/networkdriver.cpp` |
 | Master discovery and RC transport | `src/os/app/remoteControl/remotecontrolserver.cpp` |
 | Slave discovery responses and RC handling | `src/os/app/remoteControl/remoteControlClient.cpp` |

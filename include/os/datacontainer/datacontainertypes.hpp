@@ -194,22 +194,15 @@ struct ServiceInformation{
 };
 
 namespace DigitalEvent{
-    enum AffectedType {
-        ROOM = 11,
-        DEVICE
-    };
-
-    enum ActionType {
-        ON = 21,
-        OFF,
-        TOGGLE
-    };
-
     struct __attribute__((packed)) Event{
-        uint8_t affectedType;
-        uint32_t affectedId;
-        uint8_t actionType;
+        uint8_t mappingId;
+        uint32_t deviceId;
+        uint8_t actionId;
     };
+
+    static_assert(sizeof(Event) == 6, "DigitalEvent NVM record size must remain backwards compatible");
+    static_assert(offsetof(Event, mappingId) == 0 && offsetof(Event, deviceId) == 1 && offsetof(Event, actionId) == 5,
+                  "DigitalEvent NVM field offsets must not change");
 }
 
 #endif 

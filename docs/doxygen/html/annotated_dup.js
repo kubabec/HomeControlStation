@@ -1,15 +1,17 @@
 var annotated_dup =
 [
-    [ "GeneratedDeviceConfigWidgets", "namespaceGeneratedDeviceConfigWidgets.html", [
-      [ "DeviceTypeSpec", "structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html", "structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec" ],
-      [ "FieldSpec", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html", "structGeneratedDeviceConfigWidgets_1_1FieldSpec" ]
-    ] ],
     [ "GeneratedDeviceRegistry", "namespaceGeneratedDeviceRegistry.html", [
       [ "Registration", "structGeneratedDeviceRegistry_1_1Registration.html", "structGeneratedDeviceRegistry_1_1Registration" ],
       [ "RuntimeContext", "structGeneratedDeviceRegistry_1_1RuntimeContext.html", "structGeneratedDeviceRegistry_1_1RuntimeContext" ]
     ] ],
     [ "GeneratedDeviceTypes", "namespaceGeneratedDeviceTypes.html", [
       [ "DeviceTypeInfo", "structGeneratedDeviceTypes_1_1DeviceTypeInfo.html", "structGeneratedDeviceTypes_1_1DeviceTypeInfo" ]
+    ] ],
+    [ "GeneratedDigitalEventActions", "namespaceGeneratedDigitalEventActions.html", [
+      [ "Action", "structGeneratedDigitalEventActions_1_1Action.html", "structGeneratedDigitalEventActions_1_1Action" ]
+    ] ],
+    [ "GeneratedDigitalEventTriggers", "namespaceGeneratedDigitalEventTriggers.html", [
+      [ "Trigger", "structGeneratedDigitalEventTriggers_1_1Trigger.html", "structGeneratedDigitalEventTriggers_1_1Trigger" ]
     ] ],
     [ "AdvancedControlsLoader", "classAdvancedControlsLoader.html", "classAdvancedControlsLoader" ],
     [ "AdvancedControlsOnOff", "structAdvancedControlsOnOff.html", "structAdvancedControlsOnOff" ],
@@ -31,12 +33,12 @@ var annotated_dup =
     [ "DeviceProvider", "classDeviceProvider.html", "classDeviceProvider" ],
     [ "DeviceServicesAPI", "structDeviceServicesAPI.html", "structDeviceServicesAPI" ],
     [ "DeviceTranslationDetails", "structDeviceTranslationDetails.html", "structDeviceTranslationDetails" ],
+    [ "DigitalEventOccurrence", "structDigitalEventOccurrence.html", "structDigitalEventOccurrence" ],
     [ "DigitalEventReceiver", "classDigitalEventReceiver.html", "classDigitalEventReceiver" ],
     [ "DigitalEventTransmitter", "classDigitalEventTransmitter.html", "classDigitalEventTransmitter" ],
     [ "Display", "classDisplay.html", "classDisplay" ],
     [ "DisplayInfo", "structDisplayInfo.html", "structDisplayInfo" ],
     [ "DisplayServer", "classDisplayServer.html", "classDisplayServer" ],
-    [ "DistanceSensor", "classDistanceSensor.html", "classDistanceSensor" ],
     [ "ExtendedData", "structExtendedData.html", "structExtendedData" ],
     [ "ExtendedDataAllocator", "classExtendedDataAllocator.html", "classExtendedDataAllocator" ],
     [ "ExtendedMemoryCtrlAPI", "structExtendedMemoryCtrlAPI.html", "structExtendedMemoryCtrlAPI" ],
@@ -48,7 +50,6 @@ var annotated_dup =
     [ "FadeOutAnimation", "classFadeOutAnimation.html", "classFadeOutAnimation" ],
     [ "HomeLightHttpServer", "classHomeLightHttpServer.html", "classHomeLightHttpServer" ],
     [ "HTTPAsyncRequestHandler", "classHTTPAsyncRequestHandler.html", "classHTTPAsyncRequestHandler" ],
-    [ "HwButton", "classHwButton.html", "classHwButton" ],
     [ "ILedAnimation", "classILedAnimation.html", "classILedAnimation" ],
     [ "ILiveAnimation", "classILiveAnimation.html", "classILiveAnimation" ],
     [ "KeepAliveData", "structKeepAliveData.html", "structKeepAliveData" ],
@@ -84,8 +85,6 @@ var annotated_dup =
     [ "RollOutAnimation", "classRollOutAnimation.html", "classRollOutAnimation" ],
     [ "RtcTime", "structRtcTime.html", "structRtcTime" ],
     [ "SafeResetManager", "classSafeResetManager.html", "classSafeResetManager" ],
-    [ "SegLedWS1228bDeviceType", "classSegLedWS1228bDeviceType.html", "classSegLedWS1228bDeviceType" ],
-    [ "SegmentData", "structSegmentData.html", "structSegmentData" ],
     [ "ServiceCallData", "structServiceCallData.html", "structServiceCallData" ],
     [ "ServiceInformation", "structServiceInformation.html", "structServiceInformation" ],
     [ "ServiceParameters_set1", "structServiceParameters__set1.html", "structServiceParameters__set1" ],
@@ -96,7 +95,6 @@ var annotated_dup =
     [ "SparkleInAnimation", "classSparkleInAnimation.html", "classSparkleInAnimation" ],
     [ "SystemErrorType", "structSystemErrorType.html", "structSystemErrorType" ],
     [ "TempSensorDHT11DeviceType", "classTempSensorDHT11DeviceType.html", "classTempSensorDHT11DeviceType" ],
-    [ "TestDeviceType", "classTestDeviceType.html", "classTestDeviceType" ],
     [ "TimeMaster", "classTimeMaster.html", "classTimeMaster" ],
     [ "Transaction", "structTransaction.html", "structTransaction" ],
     [ "TwinkleInAnimation", "classTwinkleInAnimation.html", "classTwinkleInAnimation" ],

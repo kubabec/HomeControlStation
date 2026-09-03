@@ -14,15 +14,6 @@ var datacontainertypes_8hpp =
     [ "UserInterfaceNotification", "structUserInterfaceNotification.html", "structUserInterfaceNotification" ],
     [ "NUMBER_OF_CONFIG_SLOTS", "datacontainertypes_8hpp.html#ac3d98dbef116359490d60108fbc455b0", null ],
     [ "PERSISTENT_DATABLOCK_SIZE", "datacontainertypes_8hpp.html#a762799e1dd238f750906efaf0853812a", null ],
-    [ "DigitalEvent::ActionType", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170", [
-      [ "DigitalEvent::ON", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a4c70268a9468353da108b11ffe135980", null ],
-      [ "DigitalEvent::OFF", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a2b903c410ef8147354d4bc909fb85604", null ],
-      [ "DigitalEvent::TOGGLE", "namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a850d3cc071850f0910ea73abf5d95baa", null ]
-    ] ],
-    [ "DigitalEvent::AffectedType", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0", [
-      [ "DigitalEvent::ROOM", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a62c49e46befbccd092c63cf31015113e", null ],
-      [ "DigitalEvent::DEVICE", "namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a2a392ba76123bb1863423602d70d587b", null ]
-    ] ],
     [ "PersistentDatablockID", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48", [
       [ "e_PERSISTENT_BLOCK_FIRST", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a2bebec921baa90c0e3bad1179ce086e2", null ],
       [ "e_BLOCK_DEVICE_1", "datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a7742f5cb5202af03c75420a4dd404e4c", null ],

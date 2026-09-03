@@ -1,5 +1,6 @@
 var hierarchy =
 [
+    [ "GeneratedDigitalEventActions::Action", "structGeneratedDigitalEventActions_1_1Action.html", null ],
     [ "AdvancedControlsLoader", "classAdvancedControlsLoader.html", null ],
     [ "AdvancedControlsOnOff", "structAdvancedControlsOnOff.html", null ],
     [ "HTTPAsyncRequestHandler::AsyncHttpRequest", "structHTTPAsyncRequestHandler_1_1AsyncHttpRequest.html", null ],
@@ -11,13 +12,9 @@ var hierarchy =
     [ "CyclicProfiler", "classCyclicProfiler.html", null ],
     [ "DataContainer", "classDataContainer.html", null ],
     [ "Device", "classDevice.html", [
-      [ "DistanceSensor", "classDistanceSensor.html", null ],
-      [ "HwButton", "classHwButton.html", null ],
       [ "LedWS1228bDeviceType", "classLedWS1228bDeviceType.html", null ],
       [ "OnOffDevice", "classOnOffDevice.html", null ],
-      [ "SegLedWS1228bDeviceType", "classSegLedWS1228bDeviceType.html", null ],
-      [ "TempSensorDHT11DeviceType", "classTempSensorDHT11DeviceType.html", null ],
-      [ "TestDeviceType", "classTestDeviceType.html", null ]
+      [ "TempSensorDHT11DeviceType", "classTempSensorDHT11DeviceType.html", null ]
     ] ],
     [ "DeviceConfigManipulationAPI", "structDeviceConfigManipulationAPI.html", null ],
     [ "DeviceConfigSlotType", "structDeviceConfigSlotType.html", null ],
@@ -29,7 +26,7 @@ var hierarchy =
     [ "DeviceServicesAPI", "structDeviceServicesAPI.html", null ],
     [ "DeviceTranslationDetails", "structDeviceTranslationDetails.html", null ],
     [ "GeneratedDeviceTypes::DeviceTypeInfo", "structGeneratedDeviceTypes_1_1DeviceTypeInfo.html", null ],
-    [ "GeneratedDeviceConfigWidgets::DeviceTypeSpec", "structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html", null ],
+    [ "DigitalEventOccurrence", "structDigitalEventOccurrence.html", null ],
     [ "DigitalEventReceiver", "classDigitalEventReceiver.html", null ],
     [ "DigitalEventTransmitter", "classDigitalEventTransmitter.html", null ],
     [ "Display", "classDisplay.html", null ],
@@ -42,7 +39,6 @@ var hierarchy =
     [ "ExternalNodeMapping", "structExternalNodeMapping.html", null ],
     [ "ExtMemoryData", "structExtMemoryData.html", null ],
     [ "ExtMemoryMetadataType", "structExtMemoryMetadataType.html", null ],
-    [ "GeneratedDeviceConfigWidgets::FieldSpec", "structGeneratedDeviceConfigWidgets_1_1FieldSpec.html", null ],
     [ "HomeLightHttpServer", "classHomeLightHttpServer.html", null ],
     [ "HTTPAsyncRequestHandler", "classHTTPAsyncRequestHandler.html", null ],
     [ "HomeLightHttpServer::HttpServerNvmMetadata", "structHomeLightHttpServer_1_1HttpServerNvmMetadata.html", null ],
@@ -74,6 +70,7 @@ var hierarchy =
     [ "NotificationHandler", "classNotificationHandler.html", null ],
     [ "OperatingSystem", "classOperatingSystem.html", null ],
     [ "OTA", "classOTA.html", null ],
+    [ "NotificationHandler::PendingNotification", "structNotificationHandler_1_1PendingNotification.html", null ],
     [ "PersistentDataBlock", "structPersistentDataBlock.html", null ],
     [ "PersistentMemoryAccess", "classPersistentMemoryAccess.html", null ],
     [ "RcRequest", "classRcRequest.html", null ],
@@ -93,7 +90,6 @@ var hierarchy =
     [ "RtcTime", "structRtcTime.html", null ],
     [ "GeneratedDeviceRegistry::RuntimeContext", "structGeneratedDeviceRegistry_1_1RuntimeContext.html", null ],
     [ "SafeResetManager", "classSafeResetManager.html", null ],
-    [ "SegmentData", "structSegmentData.html", null ],
     [ "TempSensorDHT11DeviceType::SensorReading", "structTempSensorDHT11DeviceType_1_1SensorReading.html", null ],
     [ "ServiceCallData", "structServiceCallData.html", null ],
     [ "RemoteDevicesManager::ServiceCallFingerprint", "structRemoteDevicesManager_1_1ServiceCallFingerprint.html", null ],
@@ -105,6 +101,7 @@ var hierarchy =
     [ "SystemErrorType", "structSystemErrorType.html", null ],
     [ "TimeMaster", "classTimeMaster.html", null ],
     [ "Transaction", "structTransaction.html", null ],
+    [ "GeneratedDigitalEventTriggers::Trigger", "structGeneratedDigitalEventTriggers_1_1Trigger.html", null ],
     [ "UDPAdapter", "classUDPAdapter.html", null ],
     [ "UINotificationsControlAPI", "structUINotificationsControlAPI.html", null ],
     [ "UserInterfaceNotification", "structUserInterfaceNotification.html", null ],

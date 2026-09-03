@@ -19,6 +19,9 @@ class DigitalEventTransmitter
      */
     static uint64_t lastTransmittedId;
 
+    /** Source associated with the event while awaiting confirmation. */
+    static String lastTransmittedSource;
+
     /**
      * Timestamp of the last outbound transmission.
      */
@@ -55,6 +58,13 @@ public:
      * @param eventId Event identifier to transmit.
      */
     static void fireEvent(uint64_t eventId);
+
+    /**
+     * Sends a source-aware event using the additive network protocol.
+     * @param eventId Event identifier to transmit.
+     * @param source Human-readable application, device, or abstraction name.
+     */
+    static void fireEvent(uint64_t eventId, const String &source);
 
     /**
      * Receives a UDP packet and routes it through the transmitter logic if needed.

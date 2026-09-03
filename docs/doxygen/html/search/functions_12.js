@@ -9,7 +9,7 @@ var searchData=
   ['updatedevicedescriptionsignal_6',['updateDeviceDescriptionSignal',['../classDeviceManager.html#aadb1e0ca4205944ae186c02d4844fb89',1,'DeviceManager::updateDeviceDescriptionSignal()'],['../classDeviceProvider.html#adf4c881c878f88b43f06dddb7f9b0937',1,'DeviceProvider::updateDeviceDescriptionSignal()'],['../classRemoteControlServer.html#a43dbfc1c1ac991778bea7ead8cce0e93',1,'RemoteControlServer::updateDeviceDescriptionSignal()']]],
   ['updatedevicedescriptionsignal_5fonchange_7',['updateDeviceDescriptionSignal_onChange',['../classDeviceProvider.html#a9975c2b39996aaf7a5885183e00eb86c',1,'DeviceProvider']]],
   ['updatedigitaleventmappingviajson_8',['updateDigitalEventMappingViaJson',['../classDigitalEventReceiver.html#a10d752a88994b0167a6add623252d896',1,'DigitalEventReceiver']]],
-  ['updateextendedmemoryptr_9',['updateExtendedMemoryPtr',['../classLedWS1228bDeviceType.html#a66f98bc9b86f3dd5496e115390e81ab7',1,'LedWS1228bDeviceType::updateExtendedMemoryPtr()'],['../classSegLedWS1228bDeviceType.html#a74531121852f7abc1a09377c347dccef',1,'SegLedWS1228bDeviceType::updateExtendedMemoryPtr()']]],
+  ['updateextendedmemoryptr_9',['updateExtendedMemoryPtr',['../classLedWS1228bDeviceType.html#a66f98bc9b86f3dd5496e115390e81ab7',1,'LedWS1228bDeviceType']]],
   ['updatelastknownmasterip_10',['updateLastKnownMasterIp',['../classRemoteControlClient.html#af920c8215fadbb26e2086d0a46915577',1,'RemoteControlClient']]],
   ['updatenetworknodesinformationsignal_11',['updateNetworkNodesInformationSignal',['../classRemoteControlServer.html#a8f77dc4f545f6c421b4a3be8c4a3ef15',1,'RemoteControlServer']]],
   ['updatenodeconfigurationsignal_12',['updateNodeConfigurationSignal',['../classConfigProvider.html#af43ad9482b604b9da54aeb8419b7143f',1,'ConfigProvider']]],

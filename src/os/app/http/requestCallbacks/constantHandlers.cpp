@@ -1,4 +1,6 @@
 #include <os/app/http/httpserver.hpp>
+#include "generated/GeneratedDigitalEventActions.hpp"
+#include "os/app/DigitalEvent/DigitalEventReceiver.hpp"
 #include "os/Logger.hpp"
 #include <Esp.h>
 
@@ -319,78 +321,22 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
 
   client.println("\
     <table class=\"table-graphite\" id=\"data-table\" aria-describedby=\"table-desc\">\
-    <thead><tr><th style=\"width:25%\">Event ID</th><th style=\"width:25%\">Affects</th><th style=\"width:25%\">Affected Item</th><th style=\"width:25%\">Action</th><th style=\"width:90px\">&nbsp;</th>\
+    <thead><tr><th style=\"width:15%\">Mapping ID</th><th style=\"width:25%\">Event ID</th><th style=\"width:30%\">Device</th><th style=\"width:30%\">Action</th><th style=\"width:90px\">&nbsp;</th>\
     </tr></thead><tbody>");
 
   for (auto &mapping : digitalEventsMapping)
   {
-    client.println("<tr><td><input type=\"text\" class=\"cell-id\" value=\"" + String((uint64_t)mapping.first) + "\" /></td>");
+    uint8_t deviceType = 255;
+    for (const auto &device : descriptionVector)
+    {
+      if (device.deviceId == mapping.second.deviceId) deviceType = device.deviceType;
+    }
+    const auto *action = GeneratedDigitalEventActions::find(deviceType, mapping.second.actionId);
 
-    if (mapping.second.affectedType == DigitalEvent::AffectedType::DEVICE)
-    {
-      client.println("<td>\
-          <select class=\"cell-type\">\
-            <option value=\"" +
-                     String((int)DigitalEvent::AffectedType::ROOM) + "\">Room</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::AffectedType::DEVICE) + "\" selected>Device</option>\
-          </select>\
-        </td>");
-    }
-    else
-    {
-      client.println("<td>\
-          <select class=\"cell-type\">\
-            <option value=\"" +
-                     String((int)DigitalEvent::AffectedType::ROOM) + "\" selected>Room</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::AffectedType::DEVICE) + "\">Device</option>\
-          </select>\
-        </td>");
-    }
-
-    client.println("<td><input type=\"text\" class=\"cell-target-id\" value=\"" + String((int)mapping.second.affectedId) + "\" /></td>");
-
-    if (mapping.second.actionType == DigitalEvent::ActionType::TOGGLE)
-    {
-      client.println("<td>\
-          <select class=\"cell-action\">\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::TOGGLE) + "\" selected>TOGGLE</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::ON) + "\" >ON</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
-          </select>\
-        </td>");
-    }
-    else if (mapping.second.actionType == DigitalEvent::ActionType::ON)
-    {
-      client.println("<td>\
-          <select class=\"cell-action\">\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::ON) + "\" selected>ON</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
-          </select>\
-        </td>");
-    }
-    else
-    {
-      client.println("<td>\
-          <select class=\"cell-action\">\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::ON) + "\" >ON</option>\
-            <option value=\"" +
-                     String((int)DigitalEvent::ActionType::OFF) + "\" selected>OFF</option>\
-          </select>\
-        </td>");
-    }
-
+    client.println("<tr><td><input type=\"text\" class=\"cell-mapping-id\" readonly value=\"" + String((int)mapping.second.mappingId) + "\" /></td>");
+    client.println("<td><input type=\"text\" class=\"cell-event-id\" value=\"" + String((uint64_t)mapping.first) + "\" /></td>");
+    client.println("<td><select class=\"cell-device\" data-selected=\"" + String((int)mapping.second.deviceId) + "\"></select></td>");
+    client.println("<td><button type=\"button\" class=\"button cell-action\" data-action-id=\"" + String((int)mapping.second.actionId) + "\">" + String(action ? action->label : "Choose action") + "</button></td>");
     client.println("<td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>");
   }
   client.println("</tbody></table>");
@@ -406,28 +352,17 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
   client.println("\
     <template id=\"row-template\">\
     <tr>\
-      <td><input type=\"text\" class=\"cell-id\" value=\"\" /></td>\
-      <td>\
-        <select class=\"cell-type\">\
-          <option value=\"" +
-                 String((int)DigitalEvent::AffectedType::ROOM) + "\">Room</option>\
-          <option value=\"" +
-                 String((int)DigitalEvent::AffectedType::DEVICE) + "\">Device</option>\
-        </select>\
-      </td>\
-      <td><input type=\"text\" class=\"cell-target-id\" value=\"0\" /></td>\
-      <td>\
-        <select class=\"cell-action\">\
-          <option value=\"" +
-                 String((int)DigitalEvent::ActionType::TOGGLE) + "\">TOGGLE</option>\
-          <option value=\"" +
-                 String((int)DigitalEvent::ActionType::ON) + "\">ON</option>\
-          <option value=\"" +
-                 String((int)DigitalEvent::ActionType::OFF) + "\">OFF</option>\
-        </select>\
-      </td>\
+      <td><input type=\"text\" class=\"cell-mapping-id\" readonly /></td>\
+      <td><input type=\"text\" class=\"cell-event-id\" /></td>\
+      <td><select class=\"cell-device\"></select></td>\
+      <td><button type=\"button\" class=\"button cell-action\" data-action-id=\"\">Choose action</button></td>\
       <td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>\
   </template>\
+  <div class=\"popup-overlay hidden-popup\" id=\"action-popup\">\
+    <div class=\"popup-content\"><div class=\"popup-header\">Choose device action</div>\
+      <div id=\"action-popup-options\"></div><button type=\"button\" class=\"button\" id=\"action-popup-close\">Cancel</button>\
+    </div>\
+  </div>\
     ");
 
   const char *skript = R"SCRIPT(
@@ -570,54 +505,154 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
 )SCRIPT2";
 
   client.println(skript);
-  const auto &roomsWithNames = roomNamesMapping;
-  const auto &roomsWithoutNames = deviceToRoomMappingList;
-  const auto &deviceDescriptions = descriptionVector;
-
-  client.println("const elementsByType = {\
-    \"Room\": [");
-  int iterator = 1;
-  for (auto &room : roomsWithNames)
+  client.println("const digitalEventDevices = [");
+  for (const auto &device : descriptionVector)
   {
-    client.println("{ value: \"" + String((int)room.first) + "\", label: \"" + room.second + "\"}");
-    // if(iterator != roomsWithNames.size()){
-    client.println(",");
-    // }
-    iterator++;
+    String label = device.deviceName;
+    label.replace("\\", "\\\\");
+    label.replace("\"", "\\\"");
+    client.println("{id:" + String((int)device.deviceId) + ",type:" + String((int)device.deviceType) + ",label:\"" + label + "\"},");
   }
-  iterator = 1;
-  for (auto &room : roomsWithoutNames)
+  client.println("]; const digitalEventActions = [");
+  for (const auto &action : GeneratedDigitalEventActions::kActions)
   {
-    client.println("{ value: \"" + String((int)room.first) + "\", label: \"" + String((int)room.first) + "\"}");
-    if (iterator != roomsWithoutNames.size())
-    {
-      client.println(",");
-    }
-    iterator++;
+    String label = action.label;
+    label.replace("\\", "\\\\");
+    label.replace("\"", "\\\"");
+    client.println("{type:" + String((int)action.deviceType) + ",id:" + String((int)action.id) + ",label:\"" + label + "\"},");
+  }
+  client.println("]; ");
+  client.println(R"SCRIPT3(
+  let activeActionRow = null;
+  const actionPopup = document.getElementById('action-popup');
+  const actionOptions = document.getElementById('action-popup-options');
+
+  function fillDeviceSelect(select) {
+    const selected = select.dataset.selected || select.value;
+    select.innerHTML = '';
+    digitalEventDevices.forEach(device => {
+      const option = document.createElement('option');
+      option.value = device.id;
+      option.textContent = device.label;
+      option.dataset.type = device.type;
+      option.selected = String(device.id) === String(selected);
+      select.appendChild(option);
+    });
   }
 
-  client.println("],\
-    \"Device\": [");
-  iterator = 1;
-  for (auto &device : deviceDescriptions)
-  {
-    String roomName = "";
-    if (roomNamesMapping.find(device.roomId) != roomNamesMapping.end())
-    {
-      roomName = roomNamesMapping.at(device.roomId);
-    }
-    else
-    {
-      roomName = "RoomID:" + String((int)device.roomId);
-    }
-
-    client.println("{ value: \"" + String((int)device.deviceId) + "\", label: \"" + device.deviceName + " (" + roomName + ")\"}");
-    if (iterator != deviceDescriptions.size())
-    {
-      client.println(",");
-    }
-    iterator++;
+  function openActionPopup(row) {
+    activeActionRow = row;
+    const device = digitalEventDevices.find(item => String(item.id) === row.querySelector('.cell-device').value);
+    actionOptions.innerHTML = '';
+    digitalEventActions.filter(action => device && action.type === device.type).forEach(action => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'button';
+      button.textContent = action.label;
+      button.onclick = () => {
+        const target = activeActionRow.querySelector('.cell-action');
+        target.dataset.actionId = action.id;
+        target.textContent = action.label;
+        actionPopup.classList.remove('visible-popup');
+        actionPopup.classList.add('hidden-popup');
+        actionPopup.querySelector('.popup-content').classList.remove('show');
+      };
+      actionOptions.appendChild(button);
+    });
+    if (!actionOptions.children.length) actionOptions.textContent = 'This device does not expose event-triggered actions.';
+    actionPopup.classList.remove('hidden-popup');
+    actionPopup.classList.add('visible-popup');
+    actionPopup.querySelector('.popup-content').classList.add('show');
   }
-  client.println("] };");
-  client.println(skript2);
+
+  function nextMappingId() {
+    const used = new Set(Array.from(tbody.querySelectorAll('.cell-mapping-id')).map(input => Number(input.value)));
+    for (let id = 1; id <= 255; id++) if (id !== 11 && id !== 12 && !used.has(id)) return id;
+    return 0;
+  }
+
+  Array.from(tbody.querySelectorAll('tr')).forEach(row => fillDeviceSelect(row.querySelector('.cell-device')));
+  addBtn.onclick = () => {
+    const row = template.content.firstElementChild.cloneNode(true);
+    row.querySelector('.cell-mapping-id').value = nextMappingId();
+    fillDeviceSelect(row.querySelector('.cell-device'));
+    tbody.appendChild(row);
+  };
+  tbody.onclick = event => {
+    const row = event.target.closest('tr');
+    if (event.target.classList.contains('error-button')) row.remove();
+    if (event.target.classList.contains('cell-action')) openActionPopup(row);
+  };
+  tbody.onchange = event => {
+    if (!event.target.classList.contains('cell-device')) return;
+    const row = event.target.closest('tr');
+    const action = row.querySelector('.cell-action');
+    action.dataset.actionId = '';
+    action.textContent = 'Choose action';
+    openActionPopup(row);
+  };
+  document.getElementById('action-popup-close').onclick = () => {
+    actionPopup.classList.remove('visible-popup');
+    actionPopup.classList.add('hidden-popup');
+    actionPopup.querySelector('.popup-content').classList.remove('show');
+  };
+  submitBtn.onclick = () => {
+    const data = Array.from(tbody.querySelectorAll('tr')).map(row => ({
+      mappingId: Number(row.querySelector('.cell-mapping-id').value),
+      eventId: String(row.querySelector('.cell-event-id').value),
+      deviceId: Number(row.querySelector('.cell-device').value),
+      actionId: Number(row.querySelector('.cell-action').dataset.actionId)
+    }));
+    if (data.some(item => !item.mappingId || !item.eventId || !item.deviceId || !item.actionId)) {
+      alert('Complete every mapping before saving.');
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.timeout = 10000;
+    xhr.open('POST', '/newDigEvntTab&' + JSON.stringify(data), true);
+    xhr.onreadystatechange = () => { if (xhr.readyState === 4) window.location.href = '/digBtn'; };
+    xhr.send();
+  };
+  })();
+  )SCRIPT3");
+  client.println("</script>");
+}
+
+void HomeLightHttpServer::constantHandler_unmappedEvents(WiFiClient &client)
+{
+  client.println("<div class=\"wrapper\"><div class=\"header\">Unmapped events</div>");
+  client.println("<table class=\"table-graphite\"><thead><tr><th>Source</th><th>Event ID</th><th>&nbsp;</th></tr></thead><tbody>");
+
+  const auto &events = DigitalEventReceiver::getUnmappedEvents();
+  if (events.empty())
+  {
+    client.println("<tr><td colspan=\"3\">No unmapped events have occurred during this power cycle.</td></tr>");
+  }
+  for (size_t index = 0; index < events.size(); ++index)
+  {
+    String source = events[index].source;
+    source.replace("&", "&amp;");
+    source.replace("<", "&lt;");
+    source.replace(">", "&gt;");
+    source.replace("\"", "&quot;");
+    String eventId = String((unsigned long long)events[index].eventId);
+    client.println("<tr><td>" + source + "</td><td><input id=\"unmapped-event-" + String(index) +
+                   "\" type=\"text\" readonly value=\"" + eventId +
+                   "\"></td><td><button type=\"button\" class=\"button\" onclick=\"copyEventId('unmapped-event-" +
+                   String(index) + "')\">Copy</button></td></tr>");
+  }
+
+  client.println("</tbody></table><a href=\"/digBtn\" class=\"button\">Event mappings</a>"
+                 "<a href=\"/config\" class=\"button\">BACK</a></div>");
+  client.println(R"SCRIPT(
+<script>
+function copyEventId(id) {
+  const input = document.getElementById(id);
+  input.select();
+  input.setSelectionRange(0, input.value.length);
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(input.value);
+  else document.execCommand('copy');
+}
+</script>
+)SCRIPT");
 }

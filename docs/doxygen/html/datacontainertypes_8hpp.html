@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('datacontainert
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="DeviceControlApi_8hpp_source.html">DeviceControlApi.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="RC__publicDataTypes_8hpp_source.html">os/app/remoteControl/RC_publicDataTypes.hpp</a>&quot;</code><br />
-<code>#include &quot;devices/Device.hpp&quot;</code><br />
+<code>#include &quot;<a class="el" href="device_8hpp_source.html">devices/device.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="NvmConfigSlotDefinition_8hpp_source.html">os/datacontainer/NvmConfigSlotDefinition.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="messageUDP_8hpp_source.html">os/tools/messageUDP.hpp</a>&quot;</code><br />
 <code>#include &lt;ArduinoJson.h&gt;</code><br />
@@ -154,13 +154,6 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:aa23c7a72a1fac5c90c90552dce62c170" id="r_aa23c7a72a1fac5c90c90552dce62c170"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170">DigitalEvent::ActionType</a> { <a class="el" href="namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a4c70268a9468353da108b11ffe135980">DigitalEvent::ON</a> = 21
-, <a class="el" href="namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a2b903c410ef8147354d4bc909fb85604">DigitalEvent::OFF</a>
-, <a class="el" href="namespaceDigitalEvent.html#aa23c7a72a1fac5c90c90552dce62c170a850d3cc071850f0910ea73abf5d95baa">DigitalEvent::TOGGLE</a>
- }</td></tr>
-<tr class="memitem:a0bb3a4156d3da60a8de188ad666797d0" id="r_a0bb3a4156d3da60a8de188ad666797d0"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0">DigitalEvent::AffectedType</a> { <a class="el" href="namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a62c49e46befbccd092c63cf31015113e">DigitalEvent::ROOM</a> = 11
-, <a class="el" href="namespaceDigitalEvent.html#a0bb3a4156d3da60a8de188ad666797d0a2a392ba76123bb1863423602d70d587b">DigitalEvent::DEVICE</a>
- }</td></tr>
 <tr class="memitem:a60fc2e93e5602be5d234f6150170eb48" id="r_a60fc2e93e5602be5d234f6150170eb48"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#a60fc2e93e5602be5d234f6150170eb48">PersistentDatablockID</a> { <br />
 &#160;&#160;<a class="el" href="#a60fc2e93e5602be5d234f6150170eb48a2bebec921baa90c0e3bad1179ce086e2">e_PERSISTENT_BLOCK_FIRST</a> = 0
 , <a class="el" href="#a60fc2e93e5602be5d234f6150170eb48a7742f5cb5202af03c75420a4dd404e4c">e_BLOCK_DEVICE_1</a> = e_PERSISTENT_BLOCK_FIRST
@@ -252,7 +245,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="datacontainertypes_8hpp_source.html#l00016">16</a> of file <a class="el" href="datacontainertypes_8hpp_source.html">datacontainertypes.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00221">DigitalEventReceiver::deinit()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00250">RemoteDevicesManager::deinit()</a>, <a class="el" href="RFManager_8cpp_source.html#l00230">RFManager::deinit()</a>, <a class="el" href="configprovider_8cpp_source.html#l00415">ConfigProvider::eraseDatablockMemory()</a>, <a class="el" href="httpserver_8cpp_source.html#l00156">HomeLightHttpServer::flushNvmData()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00086">PersistentDataBlock::getSize()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00020">DigitalEventReceiver::init()</a>, <a class="el" href="httpserver_8cpp_source.html#l00219">HomeLightHttpServer::init()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">RemoteDevicesManager::init()</a>, and <a class="el" href="RFManager_8cpp_source.html#l00022">RFManager::init()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00250">DigitalEventReceiver::deinit()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00250">RemoteDevicesManager::deinit()</a>, <a class="el" href="RFManager_8cpp_source.html#l00232">RFManager::deinit()</a>, <a class="el" href="configprovider_8cpp_source.html#l00415">ConfigProvider::eraseDatablockMemory()</a>, <a class="el" href="httpserver_8cpp_source.html#l00163">HomeLightHttpServer::flushNvmData()</a>, <a class="el" href="datacontainertypes_8hpp_source.html#l00086">PersistentDataBlock::getSize()</a>, <a class="el" href="DigitalEventReceiver_8cpp_source.html#l00043">DigitalEventReceiver::init()</a>, <a class="el" href="httpserver_8cpp_source.html#l00226">HomeLightHttpServer::init()</a>, <a class="el" href="RemoteDevicesManager_8cpp_source.html#l00023">RemoteDevicesManager::init()</a>, and <a class="el" href="RFManager_8cpp_source.html#l00022">RFManager::init()</a>.</p>
 
 </div>
 </div>

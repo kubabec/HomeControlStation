@@ -358,6 +358,20 @@ bool DeviceManager::extractDeviceInstanceBasedOnNvmData(
                     {
                         (*function)(eventId);
                     }
+                },
+                .getNodeMacAddress = []()
+                {
+                    std::any value = DataContainer::getSignalValue(SIG_MAC_ADDRESS);
+                    if (auto macAddress = std::any_cast<uint64_t>(&value)) return *macAddress;
+                    return uint64_t{0};
+                },
+                .fireDigitalEventWithSource = [](uint64_t eventId, const String &source)
+                {
+                    std::any callback = DataContainer::getSignalValue(CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE);
+                    if (auto function = std::any_cast<std::function<void(uint64_t, const String &)>>(&callback))
+                    {
+                        (*function)(eventId, source);
+                    }
                 }};
 
             std::unique_ptr<Device> device = GeneratedDeviceRegistry::create(nvmData.deviceType, nvmData, context);

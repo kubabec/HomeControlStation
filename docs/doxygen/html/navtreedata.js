@@ -39,9 +39,7 @@ var NAVTREE =
       [ "Namespace Members", "namespacemembers.html", [
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ],
-        [ "Variables", "namespacemembers_vars.html", null ],
-        [ "Enumerations", "namespacemembers_enum.html", null ],
-        [ "Enumerator", "namespacemembers_eval.html", null ]
+        [ "Variables", "namespacemembers_vars.html", null ]
       ] ]
     ] ],
     [ "Classes", "annotated.html", [
@@ -74,15 +72,15 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"AdvancedControlsLoader_8cpp.html",
-"SparkleInAnimation_8cpp.html",
-"classExtendedDataAllocator.html#a4eea864898f6f05ab0a87b6d90d82132",
-"classLedWS1228bDeviceType.html#aebd6bc5c04d856ec2896ac812a664a56",
-"classRemoteControlClient.html#a5f6a5729d293fd18b0211c06835b3c45",
-"classTestDeviceType.html",
-"dir_f29d85dd4a02f94d9087189ebca38efc.html",
-"parameterizedHandlers_8cpp.html",
-"structGeneratedDeviceConfigWidgets_1_1FieldSpec.html#a40cec81f9f4b5a310376bb6e4fd214bf"
+"AdvancedControlTemplates_8hpp.html",
+"SystemDefinition_8hpp.html#ae311a3eb60574cf3cf91deaea54d3962",
+"classFadeInAnimation.html#aa5e4f9f133637eaffe2abd1ab1177f6fa1b68161c0f941df080c890dfa5f96644",
+"classNetworkDriver.html#a8db312d13c899ca8135bec8cc006b884",
+"classRemoteDevicesManager.html#a1bda8615c4648b10d6832eec5e377e32",
+"datacontainertypes_8hpp.html#a60fc2e93e5602be5d234f6150170eb48a0416feb29fe831460e2ab0765839ef5d",
+"httpserver_8cpp.html#afc672aa5457a9e92544a596c32afeec8",
+"signals_8hpp.html#af01fe53890022ebf14996ce6824f829eabaede36f7ae5cd914e8f2a60e210b71d",
+"structRcResponseLong.html#a5f2f7e5310d3c0ffbfde599354f5e716"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

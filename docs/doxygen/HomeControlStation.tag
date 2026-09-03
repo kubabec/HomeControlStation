@@ -47,7 +47,7 @@
     <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
     <includes id="AdvancedControls_8hpp" name="AdvancedControls.hpp" local="yes" import="no" module="no" objc="no">AdvancedControls.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-    <includes id="GeneratedDeviceTypes_8hpp" name="GeneratedDeviceTypes.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceTypes.hpp</includes>
+    <includes id="DeviceTypes_8hpp" name="DeviceTypes.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceTypes.hpp</includes>
     <class kind="class">Device</class>
     <class kind="struct">DeviceDescription</class>
     <class kind="struct">RtcTime</class>
@@ -298,16 +298,72 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>DistanceSensor.hpp</name>
-    <path>include/devices/DistanceSensor/</path>
-    <filename>DistanceSensor_8hpp.html</filename>
-    <class kind="class">DistanceSensor</class>
+    <name>AdvancedControlTemplates.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>AdvancedControlTemplates_8hpp.html</filename>
+    <namespace>GeneratedAdvancedControlTemplates</namespace>
   </compound>
   <compound kind="file">
-    <name>HwButton.hpp</name>
-    <path>include/devices/HwButton/</path>
-    <filename>HwButton_8hpp.html</filename>
-    <class kind="class">HwButton</class>
+    <name>DeviceConfiguration.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceConfiguration_8hpp.html</filename>
+    <member kind="variable">
+      <type>const String</type>
+      <name>generatedDeviceConfigurationJs</name>
+      <anchorfile>DeviceConfiguration_8hpp.html</anchorfile>
+      <anchor>a4133e3bd6cde47162e9efc59dbe24468</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>DeviceConfigWidgets.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceConfigWidgets_8hpp.html</filename>
+    <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
+    <namespace>GeneratedDeviceConfigWidgets</namespace>
+  </compound>
+  <compound kind="file">
+    <name>DeviceRegistry.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceRegistry_8hpp.html</filename>
+    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
+    <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
+    <class kind="struct">GeneratedDeviceRegistry::Registration</class>
+    <class kind="struct">GeneratedDeviceRegistry::RuntimeContext</class>
+    <namespace>GeneratedDeviceRegistry</namespace>
+  </compound>
+  <compound kind="file">
+    <name>DeviceStateSerializer.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceStateSerializer_8hpp.html</filename>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
+    <namespace>GeneratedDeviceStateSerializer</namespace>
+  </compound>
+  <compound kind="file">
+    <name>DeviceTypes.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceTypes_8hpp.html</filename>
+    <namespace>GeneratedDeviceTypes</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>DevType</name>
+      <anchorfile>DeviceTypes_8hpp.html</anchorfile>
+      <anchor>af4988302c4a294490815e684de36255c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>DeviceWidgets.hpp</name>
+    <path>include/devices/fallback/</path>
+    <filename>DeviceWidgets_8hpp.html</filename>
+    <member kind="variable">
+      <type>const String</type>
+      <name>generatedDeviceWidgetsJs</name>
+      <anchorfile>DeviceWidgets_8hpp.html</anchorfile>
+      <anchor>aac1faee60c16e2d1b3fffd454085a1dd</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>BounceInAnimation.hpp</name>
@@ -338,20 +394,9 @@
     <class kind="class">ILedAnimation</class>
   </compound>
   <compound kind="file">
-    <name>ILiveAnimation.hpp</name>
-    <path>include/devices/LedStrip/Animations/</path>
-    <filename>ILiveAnimation_8hpp.html</filename>
-  </compound>
-  <compound kind="file">
-    <name>SingleWaveAnimation copy.hpp</name>
-    <path>include/devices/LedStrip/Animations/live/</path>
-    <filename>SingleWaveAnimation_01copy_8hpp.html</filename>
-  </compound>
-  <compound kind="file">
     <name>SingleWaveAnimation.hpp</name>
     <path>include/devices/LedStrip/Animations/live/</path>
     <filename>SingleWaveAnimation_8hpp.html</filename>
-    <includes id="ILiveAnimation_8hpp" name="ILiveAnimation.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/ILiveAnimation.hpp</includes>
     <class kind="class">ComplexSequenceAnimation::Burst</class>
     <class kind="class">ComplexSequenceAnimation</class>
     <class kind="class">Config</class>
@@ -399,6 +444,7 @@
     <path>include/devices/LedWS1228bDeviceType/</path>
     <filename>LedWS1228bDeviceType_8hpp.html</filename>
     <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
     <includes id="FadeIn_8hpp" name="FadeIn.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/FadeIn.hpp</includes>
     <includes id="FadeOut_8hpp" name="FadeOut.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/FadeOut.hpp</includes>
     <includes id="RollInAnimation_8hpp" name="RollInAnimation.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/RollInAnimation.hpp</includes>
@@ -425,28 +471,13 @@
     <class kind="class">OnOffDevice</class>
   </compound>
   <compound kind="file">
-    <name>SegLedWS1228bDeviceType.hpp</name>
-    <path>include/devices/SegLedWS1228bDeviceType/</path>
-    <filename>SegLedWS1228bDeviceType_8hpp.html</filename>
-    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
-    <includes id="FadeIn_8hpp" name="FadeIn.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/FadeIn.hpp</includes>
-    <includes id="FadeOut_8hpp" name="FadeOut.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/FadeOut.hpp</includes>
-    <class kind="class">SegLedWS1228bDeviceType</class>
-    <class kind="class">SegmentData</class>
-  </compound>
-  <compound kind="file">
     <name>TempSensorDHT11DeviceType.hpp</name>
     <path>include/devices/TempSensorDHT11DeviceType/</path>
     <filename>TempSensorDHT11DeviceType_8hpp.html</filename>
     <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
     <class kind="struct">TempSensorDHT11DeviceType::SensorReading</class>
     <class kind="class">TempSensorDHT11DeviceType</class>
-  </compound>
-  <compound kind="file">
-    <name>TestDeviceType.hpp</name>
-    <path>include/devices/TestDeviceType/</path>
-    <filename>TestDeviceType_8hpp.html</filename>
-    <class kind="class">TestDeviceType</class>
   </compound>
   <compound kind="file">
     <name>GeneratedAdvancedControlTemplates.hpp</name>
@@ -477,28 +508,16 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>GeneratedDeviceConfigWidgets.hpp</name>
-    <path>include/generated/</path>
-    <filename>GeneratedDeviceConfigWidgets_8hpp.html</filename>
-    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
-    <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
-    <class kind="struct">GeneratedDeviceConfigWidgets::DeviceTypeSpec</class>
-    <class kind="struct">GeneratedDeviceConfigWidgets::FieldSpec</class>
-    <namespace>GeneratedDeviceConfigWidgets</namespace>
-  </compound>
-  <compound kind="file">
     <name>GeneratedDeviceRegistry.hpp</name>
     <path>include/generated/</path>
     <filename>GeneratedDeviceRegistry_8hpp.html</filename>
     <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
     <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
     <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
+    <includes id="GeneratedDigitalEventTriggers_8hpp" name="GeneratedDigitalEventTriggers.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDigitalEventTriggers.hpp</includes>
     <includes id="OnOffDevice_8hpp" name="OnOffDevice.hpp" local="yes" import="no" module="no" objc="no">devices/OnOffDevice/OnOffDevice.hpp</includes>
     <includes id="LedWS1228bDeviceType_8hpp" name="LedWS1228bDeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp</includes>
     <includes id="TempSensorDHT11DeviceType_8hpp" name="TempSensorDHT11DeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp</includes>
-    <includes id="SegLedWS1228bDeviceType_8hpp" name="SegLedWS1228bDeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp</includes>
-    <includes id="DistanceSensor_8hpp" name="DistanceSensor.hpp" local="yes" import="no" module="no" objc="no">devices/DistanceSensor/DistanceSensor.hpp</includes>
-    <includes id="HwButton_8hpp" name="HwButton.hpp" local="yes" import="no" module="no" objc="no">devices/HwButton/HwButton.hpp</includes>
     <class kind="struct">GeneratedDeviceRegistry::Registration</class>
     <class kind="struct">GeneratedDeviceRegistry::RuntimeContext</class>
     <namespace>GeneratedDeviceRegistry</namespace>
@@ -542,24 +561,6 @@
       <anchor>af4988302c4a294490815e684de36255cae877adb07bf73f323b1ab3d522281262</anchor>
       <arglist></arglist>
     </member>
-    <member kind="enumvalue">
-      <name>type_LED_STRIP_SEGMENTED</name>
-      <anchorfile>GeneratedDeviceTypes_8hpp.html</anchorfile>
-      <anchor>af4988302c4a294490815e684de36255ca592bb49e84bfcedce4210f6575f033af</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>type_DISTANCE_SENSOR</name>
-      <anchorfile>GeneratedDeviceTypes_8hpp.html</anchorfile>
-      <anchor>af4988302c4a294490815e684de36255ca96174c5862b93157edd19f36be5790f8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>type_HARDWARE_BUTTON</name>
-      <anchorfile>GeneratedDeviceTypes_8hpp.html</anchorfile>
-      <anchor>af4988302c4a294490815e684de36255caeed38a5239ba6c989571d8f1e19c779a</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="file">
     <name>GeneratedDeviceWidgets.hpp</name>
@@ -569,7 +570,6 @@
     <includes id="GeneratedOnOffWidget_8hpp" name="GeneratedOnOffWidget.hpp" local="yes" import="no" module="no" objc="no">generated/widgets/GeneratedOnOffWidget.hpp</includes>
     <includes id="GeneratedLedStripWidget_8hpp" name="GeneratedLedStripWidget.hpp" local="yes" import="no" module="no" objc="no">generated/widgets/GeneratedLedStripWidget.hpp</includes>
     <includes id="GeneratedTempSensorWidget_8hpp" name="GeneratedTempSensorWidget.hpp" local="yes" import="no" module="no" objc="no">generated/widgets/GeneratedTempSensorWidget.hpp</includes>
-    <includes id="GeneratedDistanceSensorWidget_8hpp" name="GeneratedDistanceSensorWidget.hpp" local="yes" import="no" module="no" objc="no">generated/widgets/GeneratedDistanceSensorWidget.hpp</includes>
     <member kind="function">
       <type>String</type>
       <name>buildGeneratedDeviceWidgetsJs</name>
@@ -586,16 +586,20 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>GeneratedDistanceSensorWidget.hpp</name>
-    <path>include/generated/widgets/</path>
-    <filename>GeneratedDistanceSensorWidget_8hpp.html</filename>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>generatedDistanceSensorWidgetJs</name>
-      <anchorfile>GeneratedDistanceSensorWidget_8hpp.html</anchorfile>
-      <anchor>a056ef8a7fee1a6549c01325250a808de</anchor>
-      <arglist></arglist>
-    </member>
+    <name>GeneratedDigitalEventActions.hpp</name>
+    <path>include/generated/</path>
+    <filename>GeneratedDigitalEventActions_8hpp.html</filename>
+    <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="yes" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
+    <class kind="struct">GeneratedDigitalEventActions::Action</class>
+    <namespace>GeneratedDigitalEventActions</namespace>
+  </compound>
+  <compound kind="file">
+    <name>GeneratedDigitalEventTriggers.hpp</name>
+    <path>include/generated/</path>
+    <filename>GeneratedDigitalEventTriggers_8hpp.html</filename>
+    <class kind="struct">GeneratedDigitalEventTriggers::Trigger</class>
+    <namespace>GeneratedDigitalEventTriggers</namespace>
   </compound>
   <compound kind="file">
     <name>GeneratedLedStripWidget.hpp</name>
@@ -689,6 +693,7 @@
     <path>include/os/app/</path>
     <filename>devicemanager_8hpp.html</filename>
     <includes id="device_8hpp" name="device.hpp" local="no" import="no" module="no" objc="no">devices/device.hpp</includes>
+    <includes id="datacontainertypes_8hpp" name="datacontainertypes.hpp" local="no" import="no" module="no" objc="no">os/datacontainer/datacontainertypes.hpp</includes>
     <includes id="ExtendedDataAllocator_8hpp" name="ExtendedDataAllocator.hpp" local="no" import="no" module="no" objc="no">os/tools/ExtendedDataAllocator.hpp</includes>
     <class kind="class">DeviceManager</class>
   </compound>
@@ -703,6 +708,7 @@
     <name>DigitalEventDefinitions.hpp</name>
     <path>include/os/app/DigitalEvent/</path>
     <filename>DigitalEventDefinitions_8hpp.html</filename>
+    <class kind="struct">DigitalEventOccurrence</class>
     <member kind="define">
       <type>#define</type>
       <name>DIGITAL_EVENT_CONFIRMED_MSG_ID</name>
@@ -715,6 +721,20 @@
       <name>DIGITAL_EVENT_FIRED_MSG_ID</name>
       <anchorfile>DigitalEventDefinitions_8hpp.html</anchorfile>
       <anchor>a05b2eb9e46f3c3dd1cbf0ea089e97671</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID</name>
+      <anchorfile>DigitalEventDefinitions_8hpp.html</anchorfile>
+      <anchor>afbbfc0d7a267a3e3f98ffeb0f5e36cae</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>DIGITAL_EVENT_SOURCE_MAX_LENGTH</name>
+      <anchorfile>DigitalEventDefinitions_8hpp.html</anchorfile>
+      <anchor>ac4875cbc0d1564877a0eb2a2bf1af962</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -997,7 +1017,7 @@
     <name>javascript.h</name>
     <path>include/os/app/http/</path>
     <filename>javascript_8h.html</filename>
-    <includes id="GeneratedDeviceConfiguration_8hpp" name="GeneratedDeviceConfiguration.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceConfiguration.hpp</includes>
+    <includes id="DeviceConfiguration_8hpp" name="DeviceConfiguration.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceConfiguration.hpp</includes>
     <member kind="variable">
       <type>const String</type>
       <name>javascript</name>
@@ -1029,7 +1049,7 @@
     <name>renderRoomsJS.h</name>
     <path>include/os/app/http/</path>
     <filename>renderRoomsJS_8h.html</filename>
-    <includes id="GeneratedDeviceWidgets_8hpp" name="GeneratedDeviceWidgets.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceWidgets.hpp</includes>
+    <includes id="DeviceWidgets_8hpp" name="DeviceWidgets.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceWidgets.hpp</includes>
     <member kind="variable">
       <type>const String</type>
       <name>renderRoomsJS</name>
@@ -1079,6 +1099,7 @@
     <path>include/os/app/</path>
     <filename>NotificationHandler_8hpp.html</filename>
     <class kind="class">NotificationHandler</class>
+    <class kind="struct">NotificationHandler::PendingNotification</class>
     <member kind="define">
       <type>#define</type>
       <name>MAX_NUMBER_OF_NOTIFICATIONS</name>
@@ -1414,6 +1435,8 @@
     <name>datacontainer.hpp</name>
     <path>include/os/datacontainer/</path>
     <filename>datacontainer_8hpp.html</filename>
+    <includes id="datacontainertypes_8hpp" name="datacontainertypes.hpp" local="yes" import="no" module="no" objc="no">datacontainertypes.hpp</includes>
+    <includes id="signals_8hpp" name="signals.hpp" local="yes" import="no" module="no" objc="no">signals.hpp</includes>
     <class kind="class">DataContainer</class>
   </compound>
   <compound kind="file">
@@ -1422,6 +1445,7 @@
     <filename>datacontainertypes_8hpp.html</filename>
     <includes id="DeviceControlApi_8hpp" name="DeviceControlApi.hpp" local="yes" import="no" module="no" objc="no">DeviceControlApi.hpp</includes>
     <includes id="RC__publicDataTypes_8hpp" name="RC_publicDataTypes.hpp" local="yes" import="no" module="no" objc="no">os/app/remoteControl/RC_publicDataTypes.hpp</includes>
+    <includes id="device_8hpp" name="device.hpp" local="yes" import="no" module="no" objc="no">devices/device.hpp</includes>
     <includes id="NvmConfigSlotDefinition_8hpp" name="NvmConfigSlotDefinition.hpp" local="yes" import="no" module="no" objc="no">os/datacontainer/NvmConfigSlotDefinition.hpp</includes>
     <includes id="messageUDP_8hpp" name="messageUDP.hpp" local="yes" import="no" module="no" objc="no">os/tools/messageUDP.hpp</includes>
     <class kind="struct">ConfigSlotsDataType</class>
@@ -1712,7 +1736,7 @@
     <path>include/os/datacontainer/</path>
     <filename>NvmConfigSlotDefinition_8hpp.html</filename>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-    <includes id="GeneratedDeviceTypes_8hpp" name="GeneratedDeviceTypes.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceTypes.hpp</includes>
+    <includes id="DeviceTypes_8hpp" name="DeviceTypes.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceTypes.hpp</includes>
     <class kind="class">DeviceConfigSlotType</class>
   </compound>
   <compound kind="file">
@@ -2041,6 +2065,12 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
+      <name>CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE</name>
+      <anchorfile>signals_8hpp.html</anchorfile>
+      <anchor>af01fe53890022ebf14996ce6824f829ea57acb85a83e9e1597f1b99614e0a7724</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>SIG_DIGITAL_EVNT_MAPPING</name>
       <anchorfile>signals_8hpp.html</anchorfile>
       <anchor>af01fe53890022ebf14996ce6824f829ea5e2c1d9472ba0dbe5614e938888cbc7c</anchor>
@@ -2344,19 +2374,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>DistanceSensor.cpp</name>
-    <path>src/device/DistanceSensor/</path>
-    <filename>DistanceSensor_8cpp.html</filename>
-    <includes id="DistanceSensor_8hpp" name="DistanceSensor.hpp" local="yes" import="no" module="no" objc="no">devices/DistanceSensor/DistanceSensor.hpp</includes>
-  </compound>
-  <compound kind="file">
-    <name>HwButton.cpp</name>
-    <path>src/device/HwButton/</path>
-    <filename>HwButton_8cpp.html</filename>
-    <includes id="HwButton_8hpp" name="HwButton.hpp" local="yes" import="no" module="no" objc="no">devices/HwButton/HwButton.hpp</includes>
-    <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-  </compound>
-  <compound kind="file">
     <name>BounceInAnimation.cpp</name>
     <path>src/device/LedStrip/Animations/</path>
     <filename>BounceInAnimation_8cpp.html</filename>
@@ -2393,16 +2410,6 @@
     <path>src/device/LedStrip/Animations/</path>
     <filename>ILedAnimation_8cpp.html</filename>
     <includes id="ILedAnimation_8hpp" name="ILedAnimation.hpp" local="yes" import="no" module="no" objc="no">devices/LedStrip/Animations/ILedAnimation.hpp</includes>
-  </compound>
-  <compound kind="file">
-    <name>ILiveAnimation.cpp</name>
-    <path>src/device/LedStrip/Animations/</path>
-    <filename>ILiveAnimation_8cpp.html</filename>
-  </compound>
-  <compound kind="file">
-    <name>SingleWaveAnimation.cpp</name>
-    <path>src/device/LedStrip/Animations/live/</path>
-    <filename>SingleWaveAnimation_8cpp.html</filename>
   </compound>
   <compound kind="file">
     <name>RollInAnimation.cpp</name>
@@ -2463,37 +2470,11 @@
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
   </compound>
   <compound kind="file">
-    <name>SegLedWS1228bDeviceType.cpp</name>
-    <path>src/device/SegLedWS1228bDeviceType/</path>
-    <filename>SegLedWS1228bDeviceType_8cpp.html</filename>
-    <includes id="SegLedWS1228bDeviceType_8hpp" name="SegLedWS1228bDeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp</includes>
-    <member kind="function">
-      <type>bool</type>
-      <name>notBlack</name>
-      <anchorfile>SegLedWS1228bDeviceType_8cpp.html</anchorfile>
-      <anchor>ae9fb6df8ad536d6741da534d26bc11b2</anchor>
-      <arglist>(LedColor color)</arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint8_t</type>
-      <name>maxVirtualLeds</name>
-      <anchorfile>SegLedWS1228bDeviceType_8cpp.html</anchorfile>
-      <anchor>a4cc7b20a1d6df81fda4aae1caeee2347</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>TempSensorDHT11DeviceType.cpp</name>
     <path>src/device/TempSensorDHT11DeviceType/</path>
     <filename>TempSensorDHT11DeviceType_8cpp.html</filename>
     <includes id="TempSensorDHT11DeviceType_8hpp" name="TempSensorDHT11DeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-  </compound>
-  <compound kind="file">
-    <name>TestDeviceType.cpp</name>
-    <path>src/device/TestDeviceType/</path>
-    <filename>TestDeviceType_8cpp.html</filename>
-    <includes id="TestDeviceType_8hpp" name="TestDeviceType.hpp" local="yes" import="no" module="no" objc="no">devices/TestDeviceType/TestDeviceType.hpp</includes>
   </compound>
   <compound kind="file">
     <name>main.cpp</name>
@@ -2562,7 +2543,8 @@
     <path>src/os/app/</path>
     <filename>devicemanager_8cpp.html</filename>
     <includes id="Logger_8hpp" name="Logger.hpp" local="no" import="no" module="no" objc="no">os/Logger.hpp</includes>
-    <includes id="GeneratedDeviceRegistry_8hpp" name="GeneratedDeviceRegistry.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceRegistry.hpp</includes>
+    <includes id="DeviceRegistry_8hpp" name="DeviceRegistry.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceRegistry.hpp</includes>
+    <namespace>anonymous_namespace{devicemanager.cpp}</namespace>
     <member kind="function">
       <type>bool</type>
       <name>isNull</name>
@@ -2590,12 +2572,27 @@
     <filename>DigitalEventReceiver_8cpp.html</filename>
     <includes id="DigitalEventReceiver_8hpp" name="DigitalEventReceiver.hpp" local="no" import="no" module="no" objc="no">os/app/DigitalEvent/DigitalEventReceiver.hpp</includes>
     <includes id="networkdriver_8hpp" name="networkdriver.hpp" local="no" import="no" module="no" objc="no">os/drivers/networkdriver.hpp</includes>
+    <includes id="GeneratedDigitalEventActions_8hpp" name="GeneratedDigitalEventActions.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDigitalEventActions.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
+    <member kind="function" static="yes">
+      <type>static uint8_t</type>
+      <name>nextMappingId</name>
+      <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
+      <anchor>aa08776906880260f8aaef4ef28171a02</anchor>
+      <arglist>(const std::vector&lt; std::pair&lt; uint64_t, DigitalEvent::Event &gt; &gt; &amp;mappings)</arglist>
+    </member>
     <member kind="variable">
       <type>const uint8_t</type>
-      <name>deviceOrRoomIdIndex</name>
+      <name>LEGACY_DEVICE_TYPE</name>
       <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
-      <anchor>a295ea2d1010ab0abb3d243f6ca259155</anchor>
+      <anchor>a64dbc8a7c343c986a1bd38c114d31450</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const uint8_t</type>
+      <name>LEGACY_ROOM_TYPE</name>
+      <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
+      <anchor>af2e5d3d00311a1378fd7702e6f000303</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -2603,27 +2600,6 @@
       <name>NVM_VALID</name>
       <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
       <anchor>ac4659bb02dcb2db7ca4075eb64192741</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint8_t</type>
-      <name>serviceOverloadingIndex</name>
-      <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
-      <anchor>a6612832ff9f915545226a29da821e884</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint8_t</type>
-      <name>serviceTypeIndex</name>
-      <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
-      <anchor>a0cd17db166f3d8991e3f34c085b2107e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint8_t</type>
-      <name>valueIndex</name>
-      <anchorfile>DigitalEventReceiver_8cpp.html</anchorfile>
-      <anchor>a1f856fbfba41e80f197503fd6f2db9c7</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -2658,7 +2634,7 @@
     <path>src/os/app/http/</path>
     <filename>AdvancedControlsLoader_8cpp.html</filename>
     <includes id="AdvancedControlsLoader_8hpp" name="AdvancedControlsLoader.hpp" local="no" import="no" module="no" objc="no">os/app/http/AdvancedControlsLoader.hpp</includes>
-    <includes id="GeneratedAdvancedControlTemplates_8hpp" name="GeneratedAdvancedControlTemplates.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedAdvancedControlTemplates.hpp</includes>
+    <includes id="AdvancedControlTemplates_8hpp" name="AdvancedControlTemplates.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/AdvancedControlTemplates.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
     <includes id="SystemDefinition_8hpp" name="SystemDefinition.hpp" local="no" import="no" module="no" objc="no">SystemDefinition.hpp</includes>
   </compound>
@@ -2669,7 +2645,7 @@
     <includes id="HttpAsyncRequestHandler_8hpp" name="HttpAsyncRequestHandler.hpp" local="no" import="no" module="no" objc="no">os/app/http/HttpAsyncRequestHandler.hpp</includes>
     <includes id="AdvancedControlsLoader_8hpp" name="AdvancedControlsLoader.hpp" local="no" import="no" module="no" objc="no">os/app/http/AdvancedControlsLoader.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
-    <includes id="GeneratedDeviceStateSerializer_8hpp" name="GeneratedDeviceStateSerializer.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceStateSerializer.hpp</includes>
+    <includes id="DeviceStateSerializer_8hpp" name="DeviceStateSerializer.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceStateSerializer.hpp</includes>
     <member kind="function">
       <type>String</type>
       <name>getHexColor</name>
@@ -2685,7 +2661,8 @@
     <includes id="tempGaugeJS_8h" name="tempGaugeJS.h" local="yes" import="no" module="no" objc="no">os/app/http/tempGauge/tempGaugeJS.h</includes>
     <includes id="tempGaugeCSS_8h" name="tempGaugeCSS.h" local="yes" import="no" module="no" objc="no">os/app/http/tempGauge/tempGaugeCSS.h</includes>
     <includes id="renderRoomsJS_8h" name="renderRoomsJS.h" local="yes" import="no" module="no" objc="no">os/app/http/renderRoomsJS.h</includes>
-    <includes id="GeneratedDeviceConfigWidgets_8hpp" name="GeneratedDeviceConfigWidgets.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceConfigWidgets.hpp</includes>
+    <includes id="DeviceConfigWidgets_8hpp" name="DeviceConfigWidgets.hpp" local="yes" import="no" module="no" objc="no">devices/fallback/DeviceConfigWidgets.hpp</includes>
+    <includes id="GeneratedDeviceRegistry_8hpp" name="GeneratedDeviceRegistry.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDeviceRegistry.hpp</includes>
     <includes id="build__info_8h" name="build_info.h" local="yes" import="no" module="no" objc="no">build_info.h</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
     <member kind="variable">
@@ -2764,6 +2741,8 @@
     <path>src/os/app/http/requestCallbacks/</path>
     <filename>constantHandlers_8cpp.html</filename>
     <includes id="httpserver_8hpp" name="httpserver.hpp" local="no" import="no" module="no" objc="no">os/app/http/httpserver.hpp</includes>
+    <includes id="GeneratedDigitalEventActions_8hpp" name="GeneratedDigitalEventActions.hpp" local="yes" import="no" module="no" objc="no">generated/GeneratedDigitalEventActions.hpp</includes>
+    <includes id="DigitalEventReceiver_8hpp" name="DigitalEventReceiver.hpp" local="yes" import="no" module="no" objc="no">os/app/DigitalEvent/DigitalEventReceiver.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
   </compound>
   <compound kind="file">
@@ -3032,6 +3011,7 @@
     <name>messageUDP.cpp</name>
     <path>src/os/tools/</path>
     <filename>messageUDP_8cpp.html</filename>
+    <includes id="messageUDP_8hpp" name="messageUDP.hpp" local="no" import="no" module="no" objc="no">os/tools/messageUDP.hpp</includes>
     <includes id="Logger_8hpp" name="Logger.hpp" local="yes" import="no" module="no" objc="no">os/Logger.hpp</includes>
   </compound>
   <compound kind="file">
@@ -3071,6 +3051,52 @@
       <name>statusCheckInterval</name>
       <anchorfile>wifiAdapter_8cpp.html</anchorfile>
       <anchor>ae3c75c48bce94613d3cc20368ca0a48c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>GeneratedDigitalEventActions::Action</name>
+    <filename>structGeneratedDigitalEventActions_1_1Action.html</filename>
+    <member kind="variable">
+      <type>uint8_t</type>
+      <name>deviceType</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>a5912bcbc1e27232cfcb33b6411c944e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint8_t</type>
+      <name>id</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>ad446dbec8740c280acbff277f4a9cc2e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>label</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>afc0d948be00927c010a024123afb5960</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>ServiceParameters_set1</type>
+      <name>parameters</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>a35941c633d3f99bb46afd4d1b9461e26</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>DeviceServicesType</type>
+      <name>service</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>ab309d7b294483b52d90310f010f595b8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>toggleState</name>
+      <anchorfile>structGeneratedDigitalEventActions_1_1Action.html</anchorfile>
+      <anchor>a39c68a06dd59b7be3e47a8a6432f8ea0</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -4359,8 +4385,8 @@
       <type>static bool</type>
       <name>extractDeviceInstanceBasedOnNvmData</name>
       <anchorfile>classDeviceManager.html</anchorfile>
-      <anchor>acc7c90ea6c943f89203ffdda9520abb1</anchor>
-      <arglist>(DeviceConfigSlotType &amp;nvmData, uint8_t configSlotID)</arglist>
+      <anchor>a32f08818ad21b272e2ac62893e83f112</anchor>
+      <arglist>(DeviceConfigSlotType &amp;nvmData, uint8_t configSlotID, bool *claimedPins, size_t claimedPinCount)</arglist>
     </member>
     <member kind="function" protection="private" static="yes">
       <type>static void</type>
@@ -4632,41 +4658,20 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>GeneratedDeviceConfigWidgets::DeviceTypeSpec</name>
-    <filename>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</filename>
+    <name>DigitalEventOccurrence</name>
+    <filename>structDigitalEventOccurrence.html</filename>
     <member kind="variable">
-      <type>const char *</type>
-      <name>enumSymbol</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</anchorfile>
-      <anchor>a99c985ddcf39e6b3350386bedfbc57d1</anchor>
+      <type>uint64_t</type>
+      <name>eventId</name>
+      <anchorfile>structDigitalEventOccurrence.html</anchorfile>
+      <anchor>a2901f092765dbe51cdbb364e3a231b88</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint8_t</type>
-      <name>fieldCount</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</anchorfile>
-      <anchor>a187b072bcae85155c17aac963aa41b8f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>FieldSpec</type>
-      <name>fields</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</anchorfile>
-      <anchor>aa83bdd72344fc0679602d67973495406</anchor>
-      <arglist>[8]</arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>label</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</anchorfile>
-      <anchor>ae707d5e6c5b439cf9bfe6a9a8d7e4f3d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint8_t</type>
-      <name>typeId</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1DeviceTypeSpec.html</anchorfile>
-      <anchor>a0b8fde7dd90d51e1c51aaa3afe60aa86</anchor>
+      <type>String</type>
+      <name>source</name>
+      <anchorfile>structDigitalEventOccurrence.html</anchorfile>
+      <anchor>a20c04c4d982b2147453007f5c00d5638</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -4693,6 +4698,20 @@
       <anchorfile>classDigitalEventReceiver.html</anchorfile>
       <anchor>a003827f217ef9841d01bb5287c2db3bd</anchor>
       <arglist>(uint64_t eventId)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>fireEvent</name>
+      <anchorfile>classDigitalEventReceiver.html</anchorfile>
+      <anchor>a5ef01db6ae638290e167fb5750d96af3</anchor>
+      <arglist>(uint64_t eventId, const String &amp;source)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static const std::vector&lt; DigitalEventOccurrence &gt; &amp;</type>
+      <name>getUnmappedEvents</name>
+      <anchorfile>classDigitalEventReceiver.html</anchorfile>
+      <anchor>a86030a39fd8c1e37b3479932550b5b64</anchor>
+      <arglist>()</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -4736,13 +4755,6 @@
       <anchor>a9b8189f33b9d6b0ed50f7b0a3a4cab63</anchor>
       <arglist>()</arglist>
     </member>
-    <member kind="function" protection="private" static="yes">
-      <type>static void</type>
-      <name>roomAction</name>
-      <anchorfile>classDigitalEventReceiver.html</anchorfile>
-      <anchor>a9dca3356b18a70932b82ca152f7d9259</anchor>
-      <arglist>(DigitalEvent::Event &amp;action)</arglist>
-    </member>
     <member kind="variable" protection="private" static="yes">
       <type>static std::vector&lt; std::pair&lt; uint64_t, DigitalEvent::Event &gt; &gt;</type>
       <name>digitalEventsMapping</name>
@@ -4751,24 +4763,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" protection="private" static="yes">
-      <type>static std::queue&lt; uint64_t &gt;</type>
+      <type>static std::queue&lt; DigitalEventOccurrence &gt;</type>
       <name>eventsQueue</name>
       <anchorfile>classDigitalEventReceiver.html</anchorfile>
-      <anchor>a6ed82760865642ce91b33f01a48ba956</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private" static="yes">
-      <type>static long</type>
-      <name>lastEventOccurrenceTime</name>
-      <anchorfile>classDigitalEventReceiver.html</anchorfile>
-      <anchor>ad8575263c25023bdf736bd36a2573d71</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private" static="yes">
-      <type>static uint8_t</type>
-      <name>lastReceivedTransmissionId</name>
-      <anchorfile>classDigitalEventReceiver.html</anchorfile>
-      <anchor>add6211cccfb7c79cfcc6b3a777c5aa93</anchor>
+      <anchor>a6d0c612bd5c81e6f29f181e62719eb0a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" protection="private" static="yes">
@@ -4776,6 +4774,20 @@
       <name>pendingServiceCalls</name>
       <anchorfile>classDigitalEventReceiver.html</anchorfile>
       <anchor>a749d669f21708c8036d0aebae8f239fc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>static std::vector&lt; std::pair&lt; uint32_t, uint8_t &gt; &gt;</type>
+      <name>receivedTransmissionIds</name>
+      <anchorfile>classDigitalEventReceiver.html</anchorfile>
+      <anchor>a0040aae540a5ea3d4c863bf281affc78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>static std::vector&lt; DigitalEventOccurrence &gt;</type>
+      <name>unmappedEvents</name>
+      <anchorfile>classDigitalEventReceiver.html</anchorfile>
+      <anchor>a8929546b3f4df48e1fd069ddbd14d4a5</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -4805,6 +4817,13 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
+      <name>fireEvent</name>
+      <anchorfile>classDigitalEventTransmitter.html</anchorfile>
+      <anchor>ab7453257cdd9b26ab7cacce52f55ca54</anchor>
+      <arglist>(uint64_t eventId, const String &amp;source)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>init</name>
       <anchorfile>classDigitalEventTransmitter.html</anchorfile>
       <anchor>a1ac1b3e136cab8fc4279f9bd8364878c</anchor>
@@ -4822,6 +4841,13 @@
       <name>lastTransmittedId</name>
       <anchorfile>classDigitalEventTransmitter.html</anchorfile>
       <anchor>a8726955031b7fdd511b6c93f82b5bea4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="private" static="yes">
+      <type>static String</type>
+      <name>lastTransmittedSource</name>
+      <anchorfile>classDigitalEventTransmitter.html</anchorfile>
+      <anchor>ac89c2eb3996c6e18af10db95d7f0cfdc</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" protection="private" static="yes">
@@ -5002,123 +5028,6 @@
       <name>receptionUdpQueue</name>
       <anchorfile>classDisplayServer.html</anchorfile>
       <anchor>a11c451c2f2f17eefc84d4400d4d47159</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="class">
-    <name>DistanceSensor</name>
-    <filename>classDistanceSensor.html</filename>
-    <base>Device</base>
-    <member kind="function">
-      <type></type>
-      <name>DistanceSensor</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a96526b9f3be4b69e2b8e849c11a983d9</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>DistanceSensor</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>ae0c714ad650ffffe2320575576b5cf43</anchor>
-      <arglist>(DeviceConfigSlotType nvmData)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>cyclic</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a658ce0c15811ff87f83fd10d8280df93</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual DeviceDescription</type>
-      <name>getDeviceDescription</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a0bd79ad183a656cfff33e47067a668bb</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceIdentifier</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>ab09424fba5f5e9e1280297e777e54fa7</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceType</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a04e2ed765bc075ea1a500bdbf0ef2b8f</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint16_t</type>
-      <name>getExtendedMemoryLength</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>af6675707a0770f8443b607a1149c9cb5</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>init</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a0d5e4b8cf425987e78aef4e02b4afaf0</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a333d1d1d12318994e860ead8623eeb84</anchor>
-      <arglist>(DeviceServicesType serviceType)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a115d6981545287b3acab72bc466a9a90</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set1 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a533ab98f72d55b413cc3b316e398a456</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set2 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>aebe7a57d4f1613f9610f3d296007982e</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set3 param)</arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>deviceId</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>aff5c2005c894a0aaf1b107fb01a9f6a0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>String</type>
-      <name>deviceName</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>ac81ec54c67322d344deaa7ffd63f542f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>int</type>
-      <name>pinNumber</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a827d5879360be4e67a840059d27ad1d9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>roomId</name>
-      <anchorfile>classDistanceSensor.html</anchorfile>
-      <anchor>a7a82df494580dc43f7368740503758cd</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -5624,87 +5533,6 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="struct">
-    <name>GeneratedDeviceConfigWidgets::FieldSpec</name>
-    <filename>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</filename>
-    <member kind="variable">
-      <type>uint8_t</type>
-      <name>arrayLength</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a114f24b043a0c0b085419593209b1f33</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>htmlType</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a5e80ac7ee0097d216e9c85580d966c92</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>key</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a2ab279008ddd71af019980b8e7e8be5e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>label</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a8deb36b423fb625f186bbc25deccae8f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>maximum</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a862d6c2e3e840b4d50a95bb73d4899eb</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>minimum</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a40cec81f9f4b5a310376bb6e4fd214bf</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint8_t</type>
-      <name>offset</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a82901711bb96ba7b79fe3aa85c818aec</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint8_t</type>
-      <name>optionCount</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a6da6ad161abc0a38896059986fd64ead</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>optionLabels</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a649d9ec350f44d18dd3ffc3ffccabb95</anchor>
-      <arglist>[2]</arglist>
-    </member>
-    <member kind="variable">
-      <type>const char *</type>
-      <name>optionValues</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>a244bdd4e7e661b15e87bd19db31938cf</anchor>
-      <arglist>[2]</arglist>
-    </member>
-    <member kind="variable">
-      <type>uint8_t</type>
-      <name>size</name>
-      <anchorfile>structGeneratedDeviceConfigWidgets_1_1FieldSpec.html</anchorfile>
-      <anchor>aefd0a7c547b893ba5c2fe34551aa6d91</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
   <compound kind="class">
     <name>HomeLightHttpServer</name>
     <filename>classHomeLightHttpServer.html</filename>
@@ -5791,6 +5619,13 @@
       <name>constantHandler_systemDetails</name>
       <anchorfile>classHomeLightHttpServer.html</anchorfile>
       <anchor>a0558d0112a95f59e40cdcb56fe9947a4</anchor>
+      <arglist>(WiFiClient &amp;client)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>constantHandler_unmappedEvents</name>
+      <anchorfile>classHomeLightHttpServer.html</anchorfile>
+      <anchor>a1bfa3354c6e348bea8560889e5971997</anchor>
       <arglist>(WiFiClient &amp;client)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -6353,228 +6188,6 @@
       <name>restoredSuccessfully</name>
       <anchorfile>structHomeLightHttpServer_1_1HttpServerNvmMetadata.html</anchorfile>
       <anchor>a0d3d8b2a15f9940eb26b1b60bfd38814</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="class">
-    <name>HwButton</name>
-    <filename>classHwButton.html</filename>
-    <base>Device</base>
-    <member kind="function">
-      <type></type>
-      <name>HwButton</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a61fbed7dab683aceab082b67c59e484e</anchor>
-      <arglist>(DeviceConfigSlotType nvmData, std::function&lt; void(uint16_t)&gt; localToggleCbk, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>HwButton</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a4754855f6c44cd7258d12f0554265479</anchor>
-      <arglist>(DeviceConfigSlotType nvmData, std::function&lt; void(uint64_t)&gt; eventTriggerCbk)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>cyclic</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a7eddaa6028c55aee586f7628d06411b2</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual DeviceDescription</type>
-      <name>getDeviceDescription</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>af10db870b798982a6070d3d378f670bd</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceIdentifier</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a380eb8075842e185cf46dbf8f03c31dc</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceType</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a0152bd7760a46560d190f42f0f21e423</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint16_t</type>
-      <name>getExtendedMemoryLength</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>aedb9a36c3d77fa9ae1b0a101f1b5417b</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>init</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ac36372c6915dbcdfeaac3110d09c5edd</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ad37659889fb0c9409f4d2c036f3e9ed9</anchor>
-      <arglist>(DeviceServicesType serviceType)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a1b5ca395d085d8c9fdc6ed8440a48cd9</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set1 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ad8b84e520b7873edee737568d6aed66b</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set2 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a94d56c503b0ccd44e8dadc51cd1f9be9</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set3 param)</arglist>
-    </member>
-    <member kind="function" protection="private">
-      <type>void ICACHE_RAM_ATTR</type>
-      <name>buttonAction</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ae254f1df6c6d64ce30ad8d3fec02346d</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" protection="private">
-      <type>void</type>
-      <name>processButtonAction</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a9bb4dfb3448f96f26dc292c4ca9b8930</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" protection="private" static="yes">
-      <type>static void ICACHE_RAM_ATTR</type>
-      <name>interruptRouter</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a95fc4d01c321d0ea7d8757b3ed5a87c1</anchor>
-      <arglist>(void *arg)</arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>activeHigh</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a4da20016e89e6dac30f44a2bbd77ce5a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::queue&lt; std::pair&lt; uint8_t, long long &gt; &gt;</type>
-      <name>buttonActionsQueue</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>aad047176582386e3fd1d2654b4a50f1b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>deviceId</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a3fb0bee99faf3994a62b9b924a503e64</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>doubleClick</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ac0325d9c3bc17f4bfdbb818a5410a72e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint64_t</type>
-      <name>doubleClickEventId</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a634bac496ad18ab5d1a2b9c9c74ecd65</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>const unsigned</type>
-      <name>eventDurationTimeMs</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a671e0059eee6771da747c42bac6a2c74</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>long long</type>
-      <name>eventEndTime</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a427477686a78df20c2db89ac32d555f0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>eventForceFinished</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ae79dfc3ea8c3390de6fb0250bdfa9c8f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>eventStarted</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a39dabe5fe2477159ed11056882b86245</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>long long</type>
-      <name>eventStartTime</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a492b09ad144608c601e861775ab78867</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::function&lt; void(uint64_t)&gt;</type>
-      <name>eventTriggerFunction</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a88e49e3f08b5834d2471f38dba12df0e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint16_t</type>
-      <name>localDeviceIdToTrigger</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a95503556a8ff4d26299a63029518b259</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::function&lt; void(uint16_t)&gt;</type>
-      <name>localDeviceTriggerFunction</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ac552b38f2ce2e7c261015eb6d028be82</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint64_t</type>
-      <name>longPressEventId</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a5853f4e7ad00969ccfc82da79deb48a4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint64_t</type>
-      <name>optionalSinglePressEventId</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>a508db0f6495c13842a17eb9ebd222a87</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>pinNumber</name>
-      <anchorfile>classHwButton.html</anchorfile>
-      <anchor>ae8fa5fb64b5aae2c82d74d74c4639b67</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -7858,12 +7471,20 @@
   <compound kind="class">
     <name>NotificationHandler</name>
     <filename>classNotificationHandler.html</filename>
+    <class kind="struct">NotificationHandler::PendingNotification</class>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>createNotification</name>
       <anchorfile>classNotificationHandler.html</anchorfile>
       <anchor>a984bd3f242981982d53079668b02a737</anchor>
       <arglist>(UserInterfaceNotification &amp;newNotification)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>createNotification</name>
+      <anchorfile>classNotificationHandler.html</anchorfile>
+      <anchor>a5658bc485e1986643806471adb4e7f67</anchor>
+      <arglist>(UserInterfaceNotification &amp;newNotification, uint32_t timeoutMs)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -7900,11 +7521,25 @@
       <anchor>a04e05e51af10e7d0d067f6bfdd0cb5ff</anchor>
       <arglist>()</arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static constexpr uint32_t</type>
+      <name>DEFAULT_NOTIFICATION_TIMEOUT_MS</name>
+      <anchorfile>classNotificationHandler.html</anchorfile>
+      <anchor>a612416bfa17020ec54422a8532b2222c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" protection="private" static="yes">
+      <type>static void</type>
+      <name>removeExpiredNotifications</name>
+      <anchorfile>classNotificationHandler.html</anchorfile>
+      <anchor>aae173be7fee0635ff8c3197e06dc6bb1</anchor>
+      <arglist>()</arglist>
+    </member>
     <member kind="variable" protection="private" static="yes">
-      <type>static std::queue&lt; UserInterfaceNotification &gt;</type>
+      <type>static std::deque&lt; PendingNotification &gt;</type>
       <name>notifications</name>
       <anchorfile>classNotificationHandler.html</anchorfile>
-      <anchor>a8d4b4114d9d2958dd1c59b3438f2300a</anchor>
+      <anchor>a763bbb3344e7e31efc4a41df7c56ee5a</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8496,6 +8131,31 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>NotificationHandler::PendingNotification</name>
+    <filename>structNotificationHandler_1_1PendingNotification.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>createdAtMs</name>
+      <anchorfile>structNotificationHandler_1_1PendingNotification.html</anchorfile>
+      <anchor>a6b4161f7b5ff423027e7f1a38b3c96ba</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>UserInterfaceNotification</type>
+      <name>notification</name>
+      <anchorfile>structNotificationHandler_1_1PendingNotification.html</anchorfile>
+      <anchor>a9dd5fe07440828d219e44b0543cd8bf5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>timeoutMs</name>
+      <anchorfile>structNotificationHandler_1_1PendingNotification.html</anchorfile>
+      <anchor>a3e7fdcf645271a08dcba9e28551bb2a1</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>PersistentDataBlock</name>
     <filename>structPersistentDataBlock.html</filename>
     <member kind="function" static="yes">
@@ -9051,7 +8711,7 @@
       <type>const char *</type>
       <name>name</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1Registration.html</anchorfile>
-      <anchor>a6a71def2bfa1d0a78b5a909668ede689</anchor>
+      <anchor>a13dd070e99fbdaa787995fa5b15547a1</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -10281,28 +9941,42 @@
       <type>std::function&lt; void(uint64_t)&gt;</type>
       <name>fireDigitalEvent</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
-      <anchor>a2cbd395fbb2f23bf35e553805a3d7fb1</anchor>
+      <anchor>a9ccebd04e061ebbe27711c9a6313789a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::function&lt; void(uint64_t, const String &amp;)&gt;</type>
+      <name>fireDigitalEventWithSource</name>
+      <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
+      <anchor>a485220e93e71f5133700cd95cf67da52</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::function&lt; uint64_t()&gt;</type>
+      <name>getNodeMacAddress</name>
+      <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
+      <anchor>ad1272d8c8b81a9a51fb2925d57904f56</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>std::function&lt; RtcTime()&gt;</type>
       <name>getRtcTime</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
-      <anchor>aecb88e3fc34125d16cd308563608b825</anchor>
+      <anchor>ac73ac43d1fe419030e9e1ac0897c89b3</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>std::function&lt; void()&gt;</type>
       <name>persistentDataChanged</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
-      <anchor>a41ccd5a3a315b125b7c1ce84e5d1e778</anchor>
+      <anchor>aafe15bb9150d8fca9a1980e4bcec1389</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>std::function&lt; void(uint16_t)&gt;</type>
       <name>toggleLocalDevice</name>
       <anchorfile>structGeneratedDeviceRegistry_1_1RuntimeContext.html</anchorfile>
-      <anchor>ac355e3bbb9941ab063b9bb0e58149411</anchor>
+      <anchor>acaf4cd810c10d2002f2e3e334420d227</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10366,406 +10040,6 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="class">
-    <name>SegLedWS1228bDeviceType</name>
-    <filename>classSegLedWS1228bDeviceType.html</filename>
-    <base>Device</base>
-    <member kind="function">
-      <type></type>
-      <name>SegLedWS1228bDeviceType</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a31411c41823c4c6c6387ddcd1c1fb89e</anchor>
-      <arglist>(DeviceConfigSlotType nvmData, std::function&lt; void(void)&gt; reportNvmDataChangedCbk)</arglist>
-    </member>
-    <member kind="function">
-      <type>ServiceRequestErrorCode</type>
-      <name>applyContent</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a2a6058aaec51a4004a0ee1500f92153f</anchor>
-      <arglist>(LedStripContentIndex contentIndex)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>cyclic</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>af67e7fdf4cb747eb714dc210cdb9d565</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>getDetailedColors</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>adaac33c3b90cba1ed22bd6fe4b90fa9a</anchor>
-      <arglist>(LedColor *memoryBuffer, uint16_t count)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual DeviceDescription</type>
-      <name>getDeviceDescription</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a0666c69fe1ac6d67318e95051a3495d2</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceIdentifier</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a271d0942774fc9342a09f684bb064299</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceType</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a88718c2775dffaad9a0890bf97535ee2</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint16_t</type>
-      <name>getExtendedMemoryLength</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a3a916e75c3d30b34e2ae9de19cc58c8a</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>init</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a5489a201aa8ad39a627275d5badd65de</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>isStripInitialized</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>af7e0335ff4333a2a73ebae374bacd47e</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>ServiceRequestErrorCode</type>
-      <name>saveContentAs</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a96b903a9f5d91a17574ba90ba2e1999d</anchor>
-      <arglist>(LedStripContentIndex contentIndex)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a8c6d993bb2a02a53f9b1df5326ce8cee</anchor>
-      <arglist>(DeviceServicesType serviceType)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a548855170fa09f96d08a01a949e21e1e</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set1 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a9c705e625bb66a79db46c31e0418674c</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set2 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a891396e28ecba42dee124154ffe9d1e6</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set3 param)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>setColors</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a9d0a90545c87f6a56fa47afe90536dce</anchor>
-      <arglist>(LedColor *ledsArray, uint16_t count)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>stripOff</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a410d44f1796a29f6d3df7107ab3858f4</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>stripOn</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a7e11182d4304cfe11efff6e3a61c1a7b</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>ServiceRequestErrorCode</type>
-      <name>updateExtendedMemoryPtr</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a74531121852f7abc1a09377c347dccef</anchor>
-      <arglist>(uint8_t *ptr, uint16_t size)</arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eACTIVE_CURRENT_CONTENT</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a8325bb80798d3029f9faabde5f0d2416</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eDIFFERENT_CONTENTS_COUNT</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2ac79d87f40755ba67e0ac301af736727b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eSAVED_CONTENT_SLOT1</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a8e80dbc23a941bd9976c8293437bd5ca</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eSAVED_CONTENT_SLOT2</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a6cbd35ea8b983be067e66368ba5ef726</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumeration" protection="private">
-      <type></type>
-      <name>LedStripContentIndex</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eACTIVE_CURRENT_CONTENT</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a8325bb80798d3029f9faabde5f0d2416</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eSAVED_CONTENT_SLOT1</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a8e80dbc23a941bd9976c8293437bd5ca</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eSAVED_CONTENT_SLOT2</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2a6cbd35ea8b983be067e66368ba5ef726</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue" protection="private">
-      <name>eDIFFERENT_CONTENTS_COUNT</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aa83e18eb8514afbb82226c64b64e59a2ac79d87f40755ba67e0ac301af736727b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function" protection="private">
-      <type>void</type>
-      <name>applyVirtualToRealDiodes</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a7b932478184e6d784c753c6057244d23</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" protection="private">
-      <type>void</type>
-      <name>setHwLedStripColor</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a63a25dafeb60eb00933d5e57c27b4e1d</anchor>
-      <arglist>(uint8_t virtualLedIndex, uint8_t r, uint8_t g, uint8_t b)</arglist>
-    </member>
-    <member kind="function" protection="private">
-      <type>void</type>
-      <name>setSegmentState</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a1f5987ae0de9fe5c3c8123d8fe1bb4b6</anchor>
-      <arglist>(uint8_t segmentIndex, uint8_t state)</arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>Adafruit_NeoPixel *</type>
-      <name>adafruit_ws2812b</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>af8eea0281528f29bf552255dbb264a08</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>LedColor</type>
-      <name>averagedColors</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aae55f8343f2004718977a92e25d2f39d</anchor>
-      <arglist>[eDIFFERENT_CONTENTS_COUNT]</arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>brightness</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>ab4c8ad71d60a672faad5488d38596788</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>deviceId</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>ae2bc0a516d396793b710ba92f68a432c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>String</type>
-      <name>deviceName</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a41ded484d0e219e127743e726c26d902</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint16_t</type>
-      <name>diodesCount</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>addc19353c87b3e7680a59238e1afbcd3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t *</type>
-      <name>extendedMemoryPointer</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>ae9934ed1afb7875519c006e7b429568f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>isContentInitialized</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a000c8df1e5c3855e58347cc2419507a3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>isInversedOrder</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a9e84a2bb8ae88eecb7d7458eba6da5f1</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>bool</type>
-      <name>isOn</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a81b51f63e668c3d76ea527da7e0306c9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::function&lt; void(void)&gt;</type>
-      <name>m_reportNvmDataChangedCbk</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>aeaceb0c649cfa8812f622ac2bd964ea4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>ILedAnimation *</type>
-      <name>ongoingAnimation</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a64f51db9742c3a8bb3154f97c516013a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>physicalLedsPerVirtualLed</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>abe8a837a045b8bb288862def00ace572</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>int</type>
-      <name>pinNumber</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a364273b6a3dfc74a0ddd0505296bd4a8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>roomId</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a50c52491140becf640e493aa97a5cf34</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::vector&lt; LedColor &gt;</type>
-      <name>segmentColors</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a965d85f2a998c9bd042b3f1dc322063a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::vector&lt; uint8_t &gt;</type>
-      <name>segmentFlips</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a2c28cedffd7551d082ef50f443e0821c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::vector&lt; uint8_t &gt;</type>
-      <name>segmentLedCount</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>ae155475659e9b41b25f7d3e70dead60c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::vector&lt; uint8_t &gt;</type>
-      <name>segmentStatus</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>adef58f112195afa7de7677f78bdf0c84</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>std::vector&lt; SegmentData &gt;</type>
-      <name>stripContents</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>ade3b2b6a0e94812d11f9f6bbb9c1c929</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>ILedAnimation *</type>
-      <name>switchOffAnimation</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a435f9d3038809633c793a4c7187406e7</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>int</type>
-      <name>totalLedsCount</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>a964f458e7f05cc4b20ca982e58e61a63</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" protection="private">
-      <type>uint8_t</type>
-      <name>virtualDiodesCount</name>
-      <anchorfile>classSegLedWS1228bDeviceType.html</anchorfile>
-      <anchor>acdbdf6ecc0b6863cff57d332c958d684</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="class">
-    <name>SegmentData</name>
-    <filename>structSegmentData.html</filename>
-    <member kind="variable">
-      <type>LedColor *</type>
-      <name>current</name>
-      <anchorfile>structSegmentData.html</anchorfile>
-      <anchor>a0682e84989ef6f0c8d23f3976f7910f0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>LedColor *</type>
-      <name>savedSlot1</name>
-      <anchorfile>structSegmentData.html</anchorfile>
-      <anchor>a29f8d1d4abc202abf57b8e239f75980d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>LedColor *</type>
-      <name>savedSlot2</name>
-      <anchorfile>structSegmentData.html</anchorfile>
-      <anchor>ab9235eb424805baddfd7374334a1d15a</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
   <compound kind="struct">
     <name>TempSensorDHT11DeviceType::SensorReading</name>
     <filename>structTempSensorDHT11DeviceType_1_1SensorReading.html</filename>
@@ -10796,9 +10070,9 @@
     <filename>structServiceCallData.html</filename>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>deviceOrRoomId</name>
+      <name>deviceId</name>
       <anchorfile>structServiceCallData.html</anchorfile>
-      <anchor>ae952fb48741c88bf031145a4ce919e33</anchor>
+      <anchor>a1cf91f5555509df568f310f43c81d22e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11612,81 +10886,6 @@
     </member>
   </compound>
   <compound kind="class">
-    <name>TestDeviceType</name>
-    <filename>classTestDeviceType.html</filename>
-    <base>Device</base>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>cyclic</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>a666849b40b7cf080527b221a0510c800</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual DeviceDescription</type>
-      <name>getDeviceDescription</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>ac84831b86617f683410046896fb5e3ea</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceIdentifier</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>a96030d5918a400614493f30e7ab1324f</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint8_t</type>
-      <name>getDeviceType</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>aae0f46e18084f502ce40476491f01929</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual uint16_t</type>
-      <name>getExtendedMemoryLength</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>a7f35176b4c2d5dda4b3c5bc2c972f4b4</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual void</type>
-      <name>init</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>a608bed92471180489d146301e7556139</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>abfd2aa3d25ca5939eac4ef7059b38a28</anchor>
-      <arglist>(DeviceServicesType serviceType)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>a32be708ba08c5e369deeaeb1d4e6dabb</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set1 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>af04a2d9579006d78344b330eaec937e3</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set2 param)</arglist>
-    </member>
-    <member kind="function" virtualness="virtual">
-      <type>virtual ServiceRequestErrorCode</type>
-      <name>service</name>
-      <anchorfile>classTestDeviceType.html</anchorfile>
-      <anchor>ae85a0051d9f8a96525c7b618db94cb60</anchor>
-      <arglist>(DeviceServicesType serviceType, ServiceParameters_set3 param)</arglist>
-    </member>
-  </compound>
-  <compound kind="class">
     <name>TimeMaster</name>
     <filename>classTimeMaster.html</filename>
     <member kind="function" static="yes">
@@ -11831,6 +11030,31 @@
       <name>response</name>
       <anchorfile>structTransaction.html</anchorfile>
       <anchor>aabade81845a6c9d17340370c22523416</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>GeneratedDigitalEventTriggers::Trigger</name>
+    <filename>structGeneratedDigitalEventTriggers_1_1Trigger.html</filename>
+    <member kind="variable">
+      <type>uint8_t</type>
+      <name>deviceType</name>
+      <anchorfile>structGeneratedDigitalEventTriggers_1_1Trigger.html</anchorfile>
+      <anchor>a55ec35dbe51a0545c1350edef40bd98a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint8_t</type>
+      <name>id</name>
+      <anchorfile>structGeneratedDigitalEventTriggers_1_1Trigger.html</anchorfile>
+      <anchor>ab25feb6ac7c1abee74ca8f3326ea3169</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const char *</type>
+      <name>label</name>
+      <anchorfile>structGeneratedDigitalEventTriggers_1_1Trigger.html</anchorfile>
+      <anchor>a5daea5c931290bc0502a92d2ddb61163</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12005,6 +11229,13 @@
       <name>createNotification</name>
       <anchorfile>structUINotificationsControlAPI.html</anchorfile>
       <anchor>a0198b464c85f32e3307cc773cb54d1e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::function&lt; bool(UserInterfaceNotification &amp;, uint32_t)&gt;</type>
+      <name>createNotificationWithTimeout</name>
+      <anchorfile>structUINotificationsControlAPI.html</anchorfile>
+      <anchor>af3d5127022ee3b3a72adc2d53b59d8ae</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12352,52 +11583,26 @@
     </member>
   </compound>
   <compound kind="namespace">
+    <name>anonymous_namespace{devicemanager.cpp}</name>
+    <filename>namespaceanonymous__namespace_02devicemanager_8cpp_03.html</filename>
+    <member kind="function">
+      <type>bool</type>
+      <name>validateConfigurationSet</name>
+      <anchorfile>namespaceanonymous__namespace_02devicemanager_8cpp_03.html</anchorfile>
+      <anchor>af053c8e8dc4b729bf23f33da7837aa6d</anchor>
+      <arglist>(const ConfigSlotsDataType &amp;configuration)</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr size_t</type>
+      <name>CONFIGURABLE_GPIO_COUNT</name>
+      <anchorfile>namespaceanonymous__namespace_02devicemanager_8cpp_03.html</anchorfile>
+      <anchor>a346f30bb42382ce91ac26dac2cc56f38</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
     <name>DigitalEvent</name>
     <filename>namespaceDigitalEvent.html</filename>
-    <member kind="enumeration">
-      <type></type>
-      <name>ActionType</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>aa23c7a72a1fac5c90c90552dce62c170</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>ON</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>aa23c7a72a1fac5c90c90552dce62c170a4c70268a9468353da108b11ffe135980</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>OFF</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>aa23c7a72a1fac5c90c90552dce62c170a2b903c410ef8147354d4bc909fb85604</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>TOGGLE</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>aa23c7a72a1fac5c90c90552dce62c170a850d3cc071850f0910ea73abf5d95baa</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumeration">
-      <type></type>
-      <name>AffectedType</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>a0bb3a4156d3da60a8de188ad666797d0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>ROOM</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>a0bb3a4156d3da60a8de188ad666797d0a62c49e46befbccd092c63cf31015113e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>DEVICE</name>
-      <anchorfile>namespaceDigitalEvent.html</anchorfile>
-      <anchor>a0bb3a4156d3da60a8de188ad666797d0a2a392ba76123bb1863423602d70d587b</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function">
       <type>struct</type>
       <name>__attribute__</name>
@@ -12545,6 +11750,20 @@
     </member>
     <member kind="function">
       <type></type>
+      <name>generate_digital_event_actions</name>
+      <anchorfile>namespacegenerate__device__registry.html</anchorfile>
+      <anchor>aa9ea5333909da427a33306ea53a64239</anchor>
+      <arglist>(descriptions)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>generate_digital_event_triggers</name>
+      <anchorfile>namespacegenerate__device__registry.html</anchorfile>
+      <anchor>a20a0538b4e56cb5c1307a506b711bbef</anchor>
+      <arglist>(descriptions)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
       <name>generate_registry</name>
       <anchorfile>namespacegenerate__device__registry.html</anchorfile>
       <anchor>ad50f4ae932682fb5a8228aed65e21d3f</anchor>
@@ -12621,6 +11840,13 @@
       <arglist>(path, content)</arglist>
     </member>
     <member kind="variable">
+      <type>dict</type>
+      <name>AREA_BYTE_CAPACITIES</name>
+      <anchorfile>namespacegenerate__device__registry.html</anchorfile>
+      <anchor>a98ae96bee02a35d91346171d3c1d5b16</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
       <type>str</type>
       <name>DEVICES_DIR</name>
       <anchorfile>namespacegenerate__device__registry.html</anchorfile>
@@ -12691,56 +11917,19 @@
   <compound kind="namespace">
     <name>GeneratedDeviceConfigWidgets</name>
     <filename>namespaceGeneratedDeviceConfigWidgets.html</filename>
-    <class kind="struct">GeneratedDeviceConfigWidgets::DeviceTypeSpec</class>
-    <class kind="struct">GeneratedDeviceConfigWidgets::FieldSpec</class>
-    <member kind="function">
-      <type>void</type>
-      <name>emitField</name>
-      <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>a5c8f89e348366c46bd865b590f4f76d8</anchor>
-      <arglist>(uint8_t slotNumber, const DeviceConfigSlotType &amp;slot, const FieldSpec &amp;field, WiFiClient &amp;client)</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
       <name>emitGeneratedCustomFields</name>
       <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>aea9439c0e30b43df08bd6ed263834e29</anchor>
-      <arglist>(uint8_t slotNumber, uint8_t deviceType, const DeviceConfigSlotType &amp;slot, WiFiClient &amp;client)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>emitGpioSelect</name>
-      <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>a33a2d06089dad56b0e58d1145ec48623</anchor>
-      <arglist>(uint8_t slotNumber, const FieldSpec &amp;field, uint16_t value, WiFiClient &amp;client)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>emitSelect</name>
-      <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>a5539175b1da3f38319d270c43d161e69</anchor>
-      <arglist>(uint8_t slotNumber, const FieldSpec &amp;field, uint16_t value, WiFiClient &amp;client)</arglist>
+      <anchor>abe63878571fb3c93e4dd5715fa37cfb4</anchor>
+      <arglist>(uint8_t, uint8_t, const DeviceConfigSlotType &amp;, WiFiClient &amp;)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>emitTypeSelector</name>
       <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>a155ba5858bb4965f0da16881bf98fae9</anchor>
-      <arglist>(uint8_t slotNumber, uint8_t selectedType, WiFiClient &amp;client)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint16_t</type>
-      <name>readValue</name>
-      <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>a7b447cffff7f09a27009c5fe3a289d32</anchor>
-      <arglist>(const DeviceConfigSlotType &amp;slot, const FieldSpec &amp;field)</arglist>
-    </member>
-    <member kind="variable">
-      <type>const DeviceTypeSpec</type>
-      <name>kKnownDeviceTypeWidgetSpecs</name>
-      <anchorfile>namespaceGeneratedDeviceConfigWidgets.html</anchorfile>
-      <anchor>aadef3fdd300127cee47eba72069c8fb6</anchor>
-      <arglist>[]</arglist>
+      <anchor>a6410010a3c7dae6f018c98161d252686</anchor>
+      <arglist>(uint8_t slotNumber, uint8_t, WiFiClient &amp;client)</arglist>
     </member>
   </compound>
   <compound kind="namespace">
@@ -12748,6 +11937,13 @@
     <filename>namespaceGeneratedDeviceRegistry.html</filename>
     <class kind="struct">GeneratedDeviceRegistry::Registration</class>
     <class kind="struct">GeneratedDeviceRegistry::RuntimeContext</class>
+    <member kind="function">
+      <type>bool</type>
+      <name>claimPin</name>
+      <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
+      <anchor>a2bdf25adac6e394bb6bdf9967dd3a2b6</anchor>
+      <arglist>(uint8_t pin, bool optional, bool *claimedPins, size_t claimedPinCount)</arglist>
+    </member>
     <member kind="function">
       <type>std::unique_ptr&lt; Device &gt;</type>
       <name>create</name>
@@ -12762,11 +11958,39 @@
       <anchor>a006e6c663ecdfa3c5a8cf0a24c4b8622</anchor>
       <arglist>(uint8_t typeId)</arglist>
     </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isConfigurableGpio</name>
+      <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
+      <anchor>a5e6cd6fc85976b205df5c8c1dc7c9bae</anchor>
+      <arglist>(uint8_t pin)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isWifiSafeAdcPin</name>
+      <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
+      <anchor>abbc990dcf2a345ef094be2ae9790baae</anchor>
+      <arglist>(uint8_t pin)</arglist>
+    </member>
+    <member kind="function">
+      <type>uint16_t</type>
+      <name>readU16</name>
+      <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
+      <anchor>a19801dd6a00b4ff1e8581f73af5f7ad3</anchor>
+      <arglist>(const uint8_t *bytes, size_t offset)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>validateConfiguration</name>
+      <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
+      <anchor>a539d7aead0475efcbd7b4a3b14409ec4</anchor>
+      <arglist>(const DeviceConfigSlotType &amp;config, bool *claimedPins, size_t claimedPinCount)</arglist>
+    </member>
     <member kind="variable">
       <type>constexpr Registration</type>
       <name>kEnabledTypes</name>
       <anchorfile>namespaceGeneratedDeviceRegistry.html</anchorfile>
-      <anchor>a5f6fa40eb7bff9df61f69bab3f5366c3</anchor>
+      <anchor>abd519e3dd0e03cc5af93e6759983bd84</anchor>
       <arglist>[]</arglist>
     </member>
   </compound>
@@ -12828,6 +12052,58 @@
       <arglist>[]</arglist>
     </member>
   </compound>
+  <compound kind="namespace">
+    <name>GeneratedDigitalEventActions</name>
+    <filename>namespaceGeneratedDigitalEventActions.html</filename>
+    <class kind="struct">GeneratedDigitalEventActions::Action</class>
+    <member kind="function">
+      <type>const Action *</type>
+      <name>find</name>
+      <anchorfile>namespaceGeneratedDigitalEventActions.html</anchorfile>
+      <anchor>af59d2c5d60af1b1725a06febe3f4b51b</anchor>
+      <arglist>(uint8_t deviceType, uint8_t actionId)</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr Action</type>
+      <name>kActions</name>
+      <anchorfile>namespaceGeneratedDigitalEventActions.html</anchorfile>
+      <anchor>a54e59631834415c1e6fb6169422a56a2</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>GeneratedDigitalEventTriggers</name>
+    <filename>namespaceGeneratedDigitalEventTriggers.html</filename>
+    <class kind="struct">GeneratedDigitalEventTriggers::Trigger</class>
+    <member kind="function">
+      <type>std::function&lt; void(uint8_t)&gt;</type>
+      <name>bind</name>
+      <anchorfile>namespaceGeneratedDigitalEventTriggers.html</anchorfile>
+      <anchor>aaae2025274e8f5b85ee9fd58c72aeae5</anchor>
+      <arglist>(uint8_t deviceType, uint8_t deviceId, const String &amp;deviceName, const std::function&lt; uint64_t()&gt; &amp;getNodeMac, const std::function&lt; void(uint64_t, const String &amp;)&gt; &amp;fireEvent)</arglist>
+    </member>
+    <member kind="function">
+      <type>const Trigger *</type>
+      <name>find</name>
+      <anchorfile>namespaceGeneratedDigitalEventTriggers.html</anchorfile>
+      <anchor>a79afc7b2601ac9b0ddf8332fbebceb39</anchor>
+      <arglist>(uint8_t deviceType, uint8_t triggerId)</arglist>
+    </member>
+    <member kind="function">
+      <type>uint64_t</type>
+      <name>makeEventId</name>
+      <anchorfile>namespaceGeneratedDigitalEventTriggers.html</anchorfile>
+      <anchor>abf31fbf8df831f8e5f72fbb4aa4f7c81</anchor>
+      <arglist>(uint64_t nodeMac, uint8_t deviceType, uint8_t deviceId, uint8_t triggerId)</arglist>
+    </member>
+    <member kind="variable">
+      <type>constexpr Trigger</type>
+      <name>kTriggers</name>
+      <anchorfile>namespaceGeneratedDigitalEventTriggers.html</anchorfile>
+      <anchor>ad35d4994c39df677398a0901532627db</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
   <compound kind="dir">
     <name>include/devices/LedStrip/Animations</name>
     <path>include/devices/LedStrip/Animations/</path>
@@ -12837,7 +12113,6 @@
     <file>FadeIn.hpp</file>
     <file>FadeOut.hpp</file>
     <file>ILedAnimation.hpp</file>
-    <file>ILiveAnimation.hpp</file>
     <file>RollInAnimation.hpp</file>
     <file>RollOutAnimation.hpp</file>
     <file>SparkleInAnimation.hpp</file>
@@ -12848,12 +12123,10 @@
     <name>src/device/LedStrip/Animations</name>
     <path>src/device/LedStrip/Animations/</path>
     <filename>dir_de9527c8bc0a1d603f929a4ef88d515f.html</filename>
-    <dir>src/device/LedStrip/Animations/live</dir>
     <file>BounceInAnimation.cpp</file>
     <file>FadeIn.cpp</file>
     <file>FadeOut.cpp</file>
     <file>ILedAnimation.cpp</file>
-    <file>ILiveAnimation.cpp</file>
     <file>RollInAnimation.cpp</file>
     <file>RollOutAnimation.cpp</file>
     <file>SparkleInAnimation.cpp</file>
@@ -12930,27 +12203,20 @@
     <name>src/device</name>
     <path>src/device/</path>
     <filename>dir_16dc92632bab467dc50b01bd02b3341a.html</filename>
-    <dir>src/device/DistanceSensor</dir>
-    <dir>src/device/HwButton</dir>
     <dir>src/device/LedStrip</dir>
     <dir>src/device/LedWS1228bDeviceType</dir>
     <dir>src/device/OnOffDevice</dir>
-    <dir>src/device/SegLedWS1228bDeviceType</dir>
     <dir>src/device/TempSensorDHT11DeviceType</dir>
-    <dir>src/device/TestDeviceType</dir>
   </compound>
   <compound kind="dir">
     <name>include/devices</name>
     <path>include/devices/</path>
     <filename>dir_0ae5fd04a9b991f2c376fafa197d3147.html</filename>
-    <dir>include/devices/DistanceSensor</dir>
-    <dir>include/devices/HwButton</dir>
+    <dir>include/devices/fallback</dir>
     <dir>include/devices/LedStrip</dir>
     <dir>include/devices/LedWS1228bDeviceType</dir>
     <dir>include/devices/OnOffDevice</dir>
-    <dir>include/devices/SegLedWS1228bDeviceType</dir>
     <dir>include/devices/TempSensorDHT11DeviceType</dir>
-    <dir>include/devices/TestDeviceType</dir>
     <file>AdvancedControls.hpp</file>
     <file>device.hpp</file>
   </compound>
@@ -12987,18 +12253,6 @@
     <file>DisplayServer.cpp</file>
   </compound>
   <compound kind="dir">
-    <name>include/devices/DistanceSensor</name>
-    <path>include/devices/DistanceSensor/</path>
-    <filename>dir_2d7c9316752db01fef283e270fcd74e3.html</filename>
-    <file>DistanceSensor.hpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>src/device/DistanceSensor</name>
-    <path>src/device/DistanceSensor/</path>
-    <filename>dir_cd073fa873ac58b1c2d2951e95460e03.html</filename>
-    <file>DistanceSensor.cpp</file>
-  </compound>
-  <compound kind="dir">
     <name>docs</name>
     <path>docs/</path>
     <filename>dir_49e56c817e5e54854c35e136979f97ca.html</filename>
@@ -13026,17 +12280,30 @@
     <file>generate_device_registry.py</file>
   </compound>
   <compound kind="dir">
+    <name>include/devices/fallback</name>
+    <path>include/devices/fallback/</path>
+    <filename>dir_d7b0bb8d50bb7d5fe58ea11e36026da9.html</filename>
+    <file>AdvancedControlTemplates.hpp</file>
+    <file>DeviceConfiguration.hpp</file>
+    <file>DeviceConfigWidgets.hpp</file>
+    <file>DeviceRegistry.hpp</file>
+    <file>DeviceStateSerializer.hpp</file>
+    <file>DeviceTypes.hpp</file>
+    <file>DeviceWidgets.hpp</file>
+  </compound>
+  <compound kind="dir">
     <name>include/generated</name>
     <path>include/generated/</path>
     <filename>dir_4d1ed909a21131f86fc8e803e1892b06.html</filename>
     <dir>include/generated/widgets</dir>
     <file>GeneratedAdvancedControlTemplates.hpp</file>
     <file>GeneratedDeviceConfiguration.hpp</file>
-    <file>GeneratedDeviceConfigWidgets.hpp</file>
     <file>GeneratedDeviceRegistry.hpp</file>
     <file>GeneratedDeviceStateSerializer.hpp</file>
     <file>GeneratedDeviceTypes.hpp</file>
     <file>GeneratedDeviceWidgets.hpp</file>
+    <file>GeneratedDigitalEventActions.hpp</file>
+    <file>GeneratedDigitalEventTriggers.hpp</file>
   </compound>
   <compound kind="dir">
     <name>include/os/app/http</name>
@@ -13060,18 +12327,6 @@
     <file>AdvancedControlsLoader.cpp</file>
     <file>HttpAsyncRequestHandler.cpp</file>
     <file>httpserver.cpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>include/devices/HwButton</name>
-    <path>include/devices/HwButton/</path>
-    <filename>dir_70df1429056311cbbcaf89398b7e7cad.html</filename>
-    <file>HwButton.hpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>src/device/HwButton</name>
-    <path>src/device/HwButton/</path>
-    <filename>dir_60059c87330ba75333cf9482805763fe.html</filename>
-    <file>HwButton.cpp</file>
   </compound>
   <compound kind="dir">
     <name>include/os/HwDependency</name>
@@ -13122,14 +12377,7 @@
     <name>include/devices/LedStrip/Animations/live</name>
     <path>include/devices/LedStrip/Animations/live/</path>
     <filename>dir_5657a69ee96261376c85258213edad3e.html</filename>
-    <file>SingleWaveAnimation copy.hpp</file>
     <file>SingleWaveAnimation.hpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>src/device/LedStrip/Animations/live</name>
-    <path>src/device/LedStrip/Animations/live/</path>
-    <filename>dir_b55b21b3b65f0e65e355c1b0fa40bce0.html</filename>
-    <file>SingleWaveAnimation.cpp</file>
   </compound>
   <compound kind="dir">
     <name>include/devices/OnOffDevice</name>
@@ -13199,18 +12447,6 @@
     <file>parameterizedHandlers.cpp</file>
   </compound>
   <compound kind="dir">
-    <name>include/devices/SegLedWS1228bDeviceType</name>
-    <path>include/devices/SegLedWS1228bDeviceType/</path>
-    <filename>dir_7f11096c364e6f509edf4b3efc2b9e22.html</filename>
-    <file>SegLedWS1228bDeviceType.hpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>src/device/SegLedWS1228bDeviceType</name>
-    <path>src/device/SegLedWS1228bDeviceType/</path>
-    <filename>dir_dee04ef62718e145d3a767c72ced47b2.html</filename>
-    <file>SegLedWS1228bDeviceType.cpp</file>
-  </compound>
-  <compound kind="dir">
     <name>src</name>
     <path>src/</path>
     <filename>dir_68267d1309a1af8e8297ef4c3efbcdba.html</filename>
@@ -13239,18 +12475,6 @@
     <file>TempSensorDHT11DeviceType.cpp</file>
   </compound>
   <compound kind="dir">
-    <name>include/devices/TestDeviceType</name>
-    <path>include/devices/TestDeviceType/</path>
-    <filename>dir_4ee8b2ca64dc63cbef6fa19e2287ebfc.html</filename>
-    <file>TestDeviceType.hpp</file>
-  </compound>
-  <compound kind="dir">
-    <name>src/device/TestDeviceType</name>
-    <path>src/device/TestDeviceType/</path>
-    <filename>dir_ed9187efad6823f3cc863409b2a348c7.html</filename>
-    <file>TestDeviceType.cpp</file>
-  </compound>
-  <compound kind="dir">
     <name>include/os/tools</name>
     <path>include/os/tools/</path>
     <filename>dir_893dc215ea1423cb30b4e3506d7a249c.html</filename>
@@ -13273,7 +12497,6 @@
     <name>include/generated/widgets</name>
     <path>include/generated/widgets/</path>
     <filename>dir_324370849da6f4e3cd53d17fad5020e9.html</filename>
-    <file>GeneratedDistanceSensorWidget.hpp</file>
     <file>GeneratedLedStripWidget.hpp</file>
     <file>GeneratedOnOffWidget.hpp</file>
     <file>GeneratedTempSensorWidget.hpp</file>

@@ -43,6 +43,7 @@ var signals_8hpp =
       [ "CBK_START_NVM_SAVE_TIMER", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829eab6dd2f7e838cc0169968ed557cc5213a", null ],
       [ "SIG_STARTUP_TIME", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea17476a9c5723bfb2c89fbd0b861c1adb", null ],
       [ "CBK_FIRE_DIGITAL_EVENT", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea20a1946b6b1ceceddac02ab6b6a80e7d", null ],
+      [ "CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea57acb85a83e9e1597f1b99614e0a7724", null ],
       [ "SIG_DIGITAL_EVNT_MAPPING", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea5e2c1d9472ba0dbe5614e938888cbc7c", null ],
       [ "CBK_UPDATE_DIG_EVNT_TABLE", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829eadc891e1c64c69f16b2502c87dabce26f", null ],
       [ "SIG_RF_BUTTONS_CTRL_API", "signals_8hpp.html#af01fe53890022ebf14996ce6824f829ea6724c839196527c8bdfe45d65472b16d", null ],

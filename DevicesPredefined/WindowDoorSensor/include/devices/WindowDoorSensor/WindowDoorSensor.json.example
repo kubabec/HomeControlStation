@@ -4,7 +4,7 @@
   "deviceType": { "name": "WindowDoorSensor", "className": "WindowDoorSensor", "enumSymbol": "type_WINDOW_DOOR_SENSOR", "enumValue": 50 },
   "implementation": {
     "header": "include/devices/WindowDoorSensor/WindowDoorSensor.hpp", "source": "src/device/WindowDoorSensor/WindowDoorSensor.cpp", "buildGuard": null,
-    "dependencies": ["Arduino GPIO", "reed switch or dry contact"], "factory": { "arguments": ["config"] },
+    "dependencies": ["Arduino GPIO", "reed switch or dry contact"], "factory": { "arguments": ["config", "fireDeviceEvent"] },
     "manager": { "registered": true, "collection": "DeviceManager::devices", "includedInDeviceCollection": true }
   },
   "lifecycle": { "init": { "actions": ["configure contact input", "capture initial state"] }, "update": { "entryPoint": "cyclic", "schedule": { "mode": "every_manager_cycle" } } },
@@ -20,11 +20,15 @@
     ]
   },
   "services": [],
+  "digitalEventTriggers": [
+    { "id": 1, "label": "Opened" },
+    { "id": 2, "label": "Closed" }
+  ],
   "state": {
     "enabledSemantics": "always-on read-only sensor", "descriptionCustomBytes": [{ "name": "closed", "type": "boolean", "offset": 0, "size": 1 }, { "name": "rawClosed", "type": "boolean", "offset": 1, "size": 1 }],
     "httpFields": [{ "name": "closed", "type": "boolean", "source": "customBytes[0]" }]
   },
   "ui": { "roomWidget": "generateWindowDoorSensorWidget", "controls": [], "readouts": [{ "name": "contact", "widget": "status-label", "source": "closed", "label": "Contact", "trueLabel": "Closed", "falseLabel": "Open", "trueTone": "success", "falseTone": "warning" }] },
   "extendedMemory": { "required": false, "size": 0 },
-  "limitations": ["This is a polling input and does not generate automation events by itself.", "External wiring must protect the 3.3 V GPIO from ESD and overvoltage."]
+  "limitations": ["External wiring must protect the 3.3 V GPIO from ESD and overvoltage."]
 }

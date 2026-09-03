@@ -7,15 +7,15 @@
 #include <queue>
 /**
  * @struct ServiceCallData
- * @brief Captures a device or room action that should be triggered when a digital event is received.
+ * @brief Captures a device action that should be triggered when a digital event is received.
  */
 
 struct ServiceCallData
 {
     /**
-     * Target device or room identifier that should receive the service call.
+    * Target device identifier that should receive the service call.
      */
-    uint32_t deviceOrRoomId = 0;
+    uint32_t deviceId = 0;
 
     /**
      * Service to invoke on the target entity.
@@ -42,22 +42,18 @@ class DigitalEventReceiver
     /**
      * Queue of event IDs waiting to be processed.
      */
-    static std::queue<uint64_t> eventsQueue;
+    static std::queue<DigitalEventOccurrence> eventsQueue;
+
+    /** Last ten unmapped event occurrences from the current power cycle. */
+    static std::vector<DigitalEventOccurrence> unmappedEvents;
 
     /**
      * Queue of executable service calls produced by the processed events.
      */
     static std::queue<ServiceCallData> pendingServiceCalls;
 
-    /**
-     * Identifier of the latest received transmission.
-     */
-    static uint8_t lastReceivedTransmissionId;
-
-    /**
-     * Timestamp of the last digital event occurrence.
-     */
-    static long lastEventOccurrenceTime;
+    /** Latest transmission byte observed for each remote IPv4 sender. */
+    static std::vector<std::pair<uint32_t, uint8_t>> receivedTransmissionIds;
 
 public:
     /**
@@ -93,6 +89,16 @@ public:
      */
     static void fireEvent(uint64_t eventId);
 
+    /**
+     * Fires a locally known event with diagnostic source information.
+     * @param eventId Event ID to execute.
+     * @param source Human-readable application, device, or abstraction name.
+     */
+    static void fireEvent(uint64_t eventId, const String &source);
+
+    /** @return Read-only snapshot of recent unmapped events in newest-first order. */
+    static const std::vector<DigitalEventOccurrence> &getUnmappedEvents();
+
 private:
     /**
      * Executes the action payload described by a digital event.
@@ -105,12 +111,6 @@ private:
      * @param action Event action to execute.
      */
     static void deviceAction(DigitalEvent::Event &action);
-
-    /**
-     * Executes an action targeting a room-level event or group.
-     * @param action Event action to execute.
-     */
-    static void roomAction(DigitalEvent::Event &action);
 
     /**
      * Drains the pending event queue and dispatches the resulting actions.

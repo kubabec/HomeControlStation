@@ -15,7 +15,6 @@ var searchData=
   ['discoverdisplays_12',['discoverDisplays',['../classDisplayServer.html#a0be1666223383fc9beec01a87aaa016f',1,'DisplayServer']]],
   ['display_13',['Display',['../classDisplay.html#a60fec3eb6f87e7c1e89b9df7d7c75bc0',1,'Display']]],
   ['displayramusage_14',['displayRamUsage',['../classOperatingSystem.html#a124f9cc14eaa5911296c777d87363022',1,'OperatingSystem']]],
-  ['distancesensor_15',['DistanceSensor',['../classDistanceSensor.html#a96526b9f3be4b69e2b8e849c11a983d9',1,'DistanceSensor::DistanceSensor()'],['../classDistanceSensor.html#ae0c714ad650ffffe2320575576b5cf43',1,'DistanceSensor::DistanceSensor(DeviceConfigSlotType nvmData)']]],
-  ['downloadadvancedcontrols_16',['downloadAdvancedControls',['../classHTTPAsyncRequestHandler.html#a9d1e1821b9db4df178725603627947bc',1,'HTTPAsyncRequestHandler']]],
-  ['dummytoberemoved_17',['dummyTobeRemoved',['../networkdriver_8cpp.html#aacd29f8e611a26a8cc2396b5792192a9',1,'networkdriver.cpp']]]
+  ['downloadadvancedcontrols_15',['downloadAdvancedControls',['../classHTTPAsyncRequestHandler.html#a9d1e1821b9db4df178725603627947bc',1,'HTTPAsyncRequestHandler']]],
+  ['dummytoberemoved_16',['dummyTobeRemoved',['../networkdriver_8cpp.html#aacd29f8e611a26a8cc2396b5792192a9',1,'networkdriver.cpp']]]
 ];

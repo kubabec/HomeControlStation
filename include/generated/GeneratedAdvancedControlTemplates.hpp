@@ -61,96 +61,137 @@ context.root.querySelector('[data-action="save"]').addEventListener('click', asy
 });
 </script>
 )HCSADV";
-inline const char advancedControlsTemplate_type_WINDOW_BLINDER[] = R"HCSADV(<div class="advanced-controls-form" data-role="window-blinder-controls">
-  <div class="advanced-status-card">
-    <div class="advanced-status-item"><span class="advanced-status-label">Motion</span><span class="advanced-status-value" data-field="motion">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Position</span><span class="advanced-status-value" data-field="position">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Upper limit</span><span class="advanced-status-value" data-field="upper">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Lower limit</span><span class="advanced-status-value" data-field="lower">—</span></div>
-    <div class="advanced-status-item wide"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault">—</span></div>
+#ifdef LED_STRIP_SUPPORTED
+inline const char advancedControlsTemplate_type_LED_STRIP[] = R"HCSADV(<style>
+  .advanced-led-controls .advanced-led-actions,
+  .advanced-led-controls .advanced-led-presets { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .advanced-led-controls .advanced-led-preset { display:flex; align-items:center; gap:4px; }
+  .advanced-led-controls .advanced-led-presets[hidden] { display:none; }
+</style>
+<div class="advanced-led-controls">
+  <div class="led-strip" data-role="led-strip"></div>
+  <label>Color <input class="color-input" data-field="color" type="color" value="#0010af"></label>
+  <label>Enable animation
+    <select data-field="enableAnimation">
+      <option value="0">Roll (left)</option><option value="1">Roll (right)</option>
+      <option value="2">Fade</option><option value="3">Bounce</option>
+    </select>
+  </label>
+  <label>Disable animation
+    <select data-field="disableAnimation">
+      <option value="0">Fade out</option><option value="1">Roll out (right)</option>
+      <option value="2">Roll out (left)</option>
+    </select>
+  </label>
+  <label>Animation speed
+    <select data-field="animationSpeed">
+      <option value="0">Normal</option><option value="1">Fast</option><option value="2">Slow</option>
+    </select>
+  </label>
+  <div class="advanced-led-presets" data-role="presets" hidden></div>
+  <div class="button-container advanced-led-actions">
+    <button class="icon-btn presets" data-action="toggle-presets" title="Saved compositions"></button>
+    <button class="icon-btn ok" data-action="save" title="Apply"></button>
   </div>
-  <div class="advanced-actions"><button class="advanced-action primary" data-action="open">Open blind</button><button class="advanced-action danger" data-action="stop">Stop</button><button class="advanced-action" data-action="close">Close blind</button></div>
 </div>
 <script type="application/x-hcs-advanced-controls">
-if (context.payload.length !== 6) { context.showError('Invalid WindowBlinder payload.'); return; }
-const labels = ['Stopped', 'Opening', 'Closing'];
-const position = context.payload[2] === 255 ? 'unknown' : `${context.payload[2]}%`;
-const faultLabels = ['Ready', 'Travel timeout', 'Limit conflict'];
-const motionValue = context.root.querySelector('[data-field="motion"]');
-const faultValue = context.root.querySelector('[data-field="fault"]');
-motionValue.textContent = labels[context.payload[1]] || 'Invalid'; motionValue.classList.add(context.payload[1] ? 'warn' : 'good');
-context.root.querySelector('[data-field="position"]').textContent = position;
-context.root.querySelector('[data-field="upper"]').textContent = context.payload[3] ? 'Reached' : 'Clear';
-context.root.querySelector('[data-field="lower"]').textContent = context.payload[4] ? 'Reached' : 'Clear';
-faultValue.textContent = faultLabels[context.payload[5]] || `Code ${context.payload[5]}`; faultValue.classList.add(context.payload[5] ? 'danger' : 'good');
-async function command(value) {
-  const next = new Uint8Array(context.payload); next[0] = value;
-  if (await context.save(next)) context.close();
+const payload = context.payload;
+if (payload.length < 5 || (payload.length - 5) % 3 !== 0) {
+  context.showError('Invalid LED-strip advanced-controls payload.');
+  return;
 }
-context.root.querySelector('[data-action="stop"]').onclick = () => command(0);
-context.root.querySelector('[data-action="open"]').onclick = () => command(1);
-context.root.querySelector('[data-action="close"]').onclick = () => command(2);
-</script>)HCSADV";
-inline const char advancedControlsTemplate_type_GATE[] = R"HCSADV(<div class="advanced-controls-form" data-role="gate-controls">
-  <div class="advanced-status-card">
-    <div class="advanced-status-item"><span class="advanced-status-label">Motion</span><span class="advanced-status-value" data-field="motion">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Open limit</span><span class="advanced-status-value" data-field="opened">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Closed limit</span><span class="advanced-status-value" data-field="closed">—</span></div>
-  </div>
-  <div class="advanced-actions"><button class="advanced-action primary" data-action="open">Open gate</button><button class="advanced-action danger" data-action="stop">Stop</button><button class="advanced-action" data-action="close">Close gate</button></div>
-</div>
-<script type="application/x-hcs-advanced-controls">
-if (context.payload.length !== 5) { context.showError('Invalid Gate payload.'); return; }
-const motion = ['Stopped', 'Opening', 'Closing'][context.payload[1]] || 'Invalid';
-const faultLabels = ['Ready', 'Travel timeout', 'Limit conflict'];
-const motionValue = context.root.querySelector('[data-field="motion"]');
-const faultValue = context.root.querySelector('[data-field="fault"]');
-motionValue.textContent = motion; motionValue.classList.add(context.payload[1] ? 'warn' : 'good');
-faultValue.textContent = faultLabels[context.payload[4]] || `Code ${context.payload[4]}`; faultValue.classList.add(context.payload[4] ? 'danger' : 'good');
-context.root.querySelector('[data-field="opened"]').textContent = context.payload[2] ? 'Reached' : 'Clear';
-context.root.querySelector('[data-field="closed"]').textContent = context.payload[3] ? 'Reached' : 'Clear';
-async function command(value) { const next = new Uint8Array(context.payload); next[0] = value; if (await context.save(next)) context.close(); }
-context.root.querySelector('[data-action="stop"]').onclick = () => command(0);
-context.root.querySelector('[data-action="open"]').onclick = () => command(1);
-context.root.querySelector('[data-action="close"]').onclick = () => command(2);
-</script>)HCSADV";
-inline const char advancedControlsTemplate_type_AQUARIUM_CONTROLLER[] = R"HCSADV(<div class="advanced-controls-form" data-role="aquarium-controls">
-  <div class="advanced-status-card">
-    <div class="advanced-status-item"><span class="advanced-status-label">Water</span><span class="advanced-status-value" data-field="temperature">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Heater</span><span class="advanced-status-value" data-field="heater-state">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Water level</span><span class="advanced-status-value" data-field="water-state">—</span></div>
-    <div class="advanced-status-item"><span class="advanced-status-label">Safety</span><span class="advanced-status-value" data-field="fault-state">—</span></div>
-  </div>
-  <label class="advanced-field"><span>Heater mode</span><select data-field="heater"><option value="0">Off</option><option value="1">Automatic thermostat</option><option value="2">Forced on (cutoffs active)</option></select></label>
-  <label class="advanced-switch"><span>Lighting</span><input data-field="light" type="checkbox"></label>
-  <label class="advanced-switch"><span>Filter pump</span><input data-field="filter" type="checkbox"></label>
-  <button class="advanced-primary" data-action="save">Apply changes</button>
-</div>
-<script type="application/x-hcs-advanced-controls">
-if (context.payload.length !== 10) { context.showError('Invalid AquariumController payload.'); return; }
-const rawTemperature = context.payload[6] | (context.payload[7] << 8);
-const signedTemperature = rawTemperature & 0x8000 ? rawTemperature - 0x10000 : rawTemperature;
-const temperatureState = context.root.querySelector('[data-field="temperature"]');
-const heaterState = context.root.querySelector('[data-field="heater-state"]');
-const waterState = context.root.querySelector('[data-field="water-state"]');
-const faultState = context.root.querySelector('[data-field="fault-state"]');
-temperatureState.textContent = context.payload[4] ? `${signedTemperature / 10} °C` : 'Sensor error';
-temperatureState.classList.add(context.payload[4] ? 'good' : 'danger');
-heaterState.textContent = context.payload[3] ? 'Heating' : 'Idle';
-heaterState.classList.add(context.payload[3] ? 'warn' : 'good');
-waterState.textContent = context.payload[5] ? 'Low' : 'Normal';
-waterState.classList.add(context.payload[5] ? 'danger' : 'good');
-const faultLabels = ['Ready', 'Probe error', 'Low water', 'Probe + water', 'Over temperature', 'Probe + over temp', 'Water + over temp', 'Multiple faults'];
-faultState.textContent = faultLabels[context.payload[8]] || `Code ${context.payload[8]}`;
-faultState.classList.add(context.payload[8] ? 'danger' : 'good');
-const heater = context.root.querySelector('[data-field="heater"]'); const light = context.root.querySelector('[data-field="light"]'); const filter = context.root.querySelector('[data-field="filter"]');
-heater.value = String(context.payload[0]); light.checked = context.payload[1] !== 0; filter.checked = context.payload[2] !== 0;
-context.root.querySelector('[data-action="save"]').onclick = async () => {
-  const next = new Uint8Array(context.payload); next[0] = Number(heater.value); next[1] = light.checked ? 1 : 0; next[2] = filter.checked ? 1 : 0;
-  if (await context.save(next)) context.close();
+const ledCount = (payload.length - 5) / 3;
+const colors = Array.from({length: ledCount}, (_, index) => [payload[5 + index * 3], payload[6 + index * 3], payload[7 + index * 3]]);
+const selected = new Set();
+const strip = context.root.querySelector('[data-role="led-strip"]');
+const colorInput = context.root.querySelector('[data-field="color"]');
+const enableAnimation = context.root.querySelector('[data-field="enableAnimation"]');
+const disableAnimation = context.root.querySelector('[data-field="disableAnimation"]');
+const animationSpeed = context.root.querySelector('[data-field="animationSpeed"]');
+enableAnimation.value = String(payload[0]);
+disableAnimation.value = String(payload[1]);
+animationSpeed.value = String(payload[2]);
+let dragMode = 0;
+const renderLed = index => {
+  const element = strip.children[index];
+  const color = colors[index];
+  element.firstElementChild.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  element.firstElementChild.style.boxShadow = color.some(value => value !== 0) ? '0 0 6px 8px rgba(0,205,0,.08)' : 'none';
+  element.classList.toggle('marked', selected.has(index));
 };
-</script>)HCSADV";
+const markLed = index => {
+  if (dragMode === 1) selected.add(index);
+  if (dragMode === 2) selected.delete(index);
+  renderLed(index);
+};
+colors.forEach((color, index) => {
+  const container = document.createElement('div');
+  container.className = 'ledContainer';
+  container.dataset.index = String(index);
+  const led = document.createElement('div');
+  led.className = 'led';
+  led.style.borderRadius = '3px';
+  container.appendChild(led);
+  const begin = event => {
+    event.preventDefault();
+    dragMode = selected.has(index) ? 2 : 1;
+    markLed(index);
+  };
+  container.addEventListener('mousedown', begin);
+  container.addEventListener('mouseenter', () => { if (dragMode) markLed(index); });
+  container.addEventListener('touchstart', begin, {passive:false});
+  strip.appendChild(container);
+  renderLed(index);
+});
+const finishDrag = () => { dragMode = 0; };
+document.addEventListener('mouseup', finishDrag, {once:false});
+document.addEventListener('touchend', finishDrag, {once:false});
+context.onCleanup(() => {
+  document.removeEventListener('mouseup', finishDrag);
+  document.removeEventListener('touchend', finishDrag);
+});
+strip.addEventListener('touchmove', event => {
+  event.preventDefault();
+  const touch = event.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.ledContainer');
+  if (target && strip.contains(target) && dragMode) markLed(Number(target.dataset.index));
+}, {passive:false});
+colorInput.addEventListener('input', () => {
+  const rgb = [1, 3, 5].map(offset => parseInt(colorInput.value.slice(offset, offset + 2), 16));
+  const targets = selected.size ? Array.from(selected) : colors.map((_, index) => index);
+  targets.forEach(index => { colors[index] = rgb.slice(); renderLed(index); });
+  selected.clear();
+  colors.forEach((_, index) => renderLed(index));
+});
+const presets = context.root.querySelector('[data-role="presets"]');
+for (let slot = 1; slot <= 3; ++slot) {
+  const row = document.createElement('div');
+  row.className = 'advanced-led-preset';
+  const swatch = document.createElement('div');
+  swatch.className = 'color-display';
+  const offset = 2 + slot * 3;
+  swatch.style.backgroundColor = `rgb(${context.descriptionBytes[offset]}, ${context.descriptionBytes[offset + 1]}, ${context.descriptionBytes[offset + 2]})`;
+  const save = document.createElement('button');
+  save.className = 'icon-btn save';
+  save.title = `Save composition ${slot}`;
+  save.addEventListener('click', async () => { if (await context.action(slot)) context.close(); });
+  const load = document.createElement('button');
+  load.className = 'icon-btn play';
+  load.title = `Load composition ${slot}`;
+  load.addEventListener('click', async () => { if (await context.action(slot + 3)) context.close(); });
+  row.append(swatch, save, load);
+  presets.appendChild(row);
+}
+context.root.querySelector('[data-action="toggle-presets"]').addEventListener('click', () => { presets.hidden = !presets.hidden; });
+context.root.querySelector('[data-action="save"]').addEventListener('click', async () => {
+  const nextPayload = new Uint8Array(payload.length);
+  nextPayload.set([Number(enableAnimation.value), Number(disableAnimation.value), Number(animationSpeed.value), payload[3], payload[4]]);
+  colors.forEach((color, index) => nextPayload.set(color, 5 + index * 3));
+  if (await context.save(nextPayload)) context.close();
+});
+</script>
+)HCSADV";
+#endif
 
 /** @brief Returns the device-provided advanced-controls template, or nullptr. */
 inline const char* find(uint8_t typeId)
@@ -158,9 +199,9 @@ inline const char* find(uint8_t typeId)
     switch (typeId)
     {
     case type_ONOFFDEVICE: return advancedControlsTemplate_type_ONOFFDEVICE;
-    case type_WINDOW_BLINDER: return advancedControlsTemplate_type_WINDOW_BLINDER;
-    case type_GATE: return advancedControlsTemplate_type_GATE;
-    case type_AQUARIUM_CONTROLLER: return advancedControlsTemplate_type_AQUARIUM_CONTROLLER;
+    #ifdef LED_STRIP_SUPPORTED
+    case type_LED_STRIP: return advancedControlsTemplate_type_LED_STRIP;
+    #endif
     default:
         return nullptr;
     }

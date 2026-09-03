@@ -373,6 +373,53 @@ The JSON `parameters` array documents how named values map to the C++ payload. F
 
 Only advertise `implemented` services to a generated control. The generator does not prove that the corresponding C++ `switch` branch exists.
 
+### 4.3 Event-triggered actions
+
+To expose a service in the `/digBtn` DigitalEvent action popup, add `digitalEventActions` at the JSON root. Every entry is a complete invocation preset with a stable ID that is unique within the device type:
+
+```json
+"digitalEventActions": [
+  {
+    "id": 21,
+    "label": "Turn on",
+    "service": "DEVSERVICE_STATE_SWITCH",
+    "parameters": { "a": 1 }
+  },
+  {
+    "id": 23,
+    "label": "Toggle",
+    "service": "DEVSERVICE_STATE_SWITCH",
+    "toggleState": true
+  }
+]
+```
+
+Action IDs are stored as one byte in NVM. Preserve an ID's meaning after release; mappings refer to the number, not the label. IDs `11` and `12` are reserved for legacy NVM migration. IDs `21`, `22`, and `23` retain the former ON, OFF, and TOGGLE meanings where those actions are supported.
+
+Only an implemented `serviceCall_1` service may be used. Fixed `parameters.a` through `parameters.e` are optional byte values and default to `255`. `toggleState` is valid only with `DEVSERVICE_STATE_SWITCH` and computes parameter `a` from the current state. For a richer operation such as changing an LED strip color, expose compact device presets, for example separate actions that invoke `DEVSERVICE_LED_STRIP_SWITCH_CONTENT` with saved slot values `1`, `2`, and `3`. Do not bind pointer, read, or variable-payload services directly.
+
+The generated `GeneratedDigitalEventActions.hpp` lookup is used by both the UI and runtime dispatcher, so the popup and executable service call stay derived from the same declaration.
+
+### 4.4 Device-generated events
+
+A device type may optionally declare events it can produce. IDs are stable one-byte identifiers within that type:
+
+```json
+"implementation": {
+  "factory": { "arguments": ["config", "fireDeviceEvent"] }
+},
+"digitalEventTriggers": [
+  { "id": 1, "label": "Opened" },
+  { "id": 2, "label": "Closed" }
+]
+```
+
+The constructor receives `std::function<void(uint8_t)>`. Invoke it only when the corresponding state transition is confirmed, for example `fireDeviceEvent(1)`. The generator rejects duplicate IDs, missing labels, triggers without the factory callback, and callbacks without declared triggers.
+
+The callback converts the trigger ID into a stable 64-bit event ID using FNV-1a over the node MAC address, device type, configured device ID, and trigger ID. This makes two sensor instances on one node, and equivalent sensors on different nodes, produce different IDs. The configured device name is transmitted as the human-readable Source. Keep the device type, device ID, and trigger ID stable to preserve existing mappings.
+
+Do not construct the 64-bit ID in device code and do not call networking directly. The predefined `WindowDoorSensor` package is the reference implementation.
+
 ## 5. Write the JSON description
 
 ### 5.1 Complete starter description
@@ -533,6 +580,7 @@ Allowed factory arguments and exact C++ types:
 | `getRtcTime` | current RTC value | `std::function<RtcTime()>` |
 | `toggleLocalDevice` | toggle a device ID | `std::function<void(uint16_t)>` |
 | `fireDigitalEvent` | fire an event ID | `std::function<void(uint64_t)>` |
+| `fireDeviceEvent` | fire a declared trigger; the registry derives its ID and source | `std::function<void(uint8_t)>` |
 
 The order in JSON is the constructor order. For example, `["config", "getRtcTime"]` requires a constructor compatible with `MyDevice(DeviceConfigSlotType, std::function<RtcTime()>)`.
 

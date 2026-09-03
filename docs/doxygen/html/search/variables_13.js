@@ -6,5 +6,6 @@ var searchData=
   ['uiblocktime_3',['uiBlockTime',['../HomeStation__os_8cpp.html#aeb21be3bebaaca6d9ef124751c216ad4',1,'HomeStation_os.cpp']]],
   ['uniquedeviceidtonormaldeviceidmap_4',['uniqueDeviceIdToNormalDeviceIdMap',['../classDeviceProvider.html#aad63f9b3c3a466b4dc477561ffc51519',1,'DeviceProvider']]],
   ['uniquelifecycleid_5',['uniqueLifecycleId',['../classOperatingSystem.html#a305323894415ae18fea504297ef9df13',1,'OperatingSystem']]],
-  ['updateinterval_6',['updateInterval',['../classTimeMaster.html#a4305daeb89d344b710ad77b5ade9ce63',1,'TimeMaster']]]
+  ['unmappedevents_6',['unmappedEvents',['../classDigitalEventReceiver.html#a8929546b3f4df48e1fd069ddbd14d4a5',1,'DigitalEventReceiver']]],
+  ['updateinterval_7',['updateInterval',['../classTimeMaster.html#a4305daeb89d344b710ad77b5ade9ce63',1,'TimeMaster']]]
 ];

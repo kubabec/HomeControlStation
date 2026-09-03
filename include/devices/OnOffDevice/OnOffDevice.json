@@ -92,6 +92,15 @@
       ]
     }
   ],
+  "digitalEventActions": [
+    { "id": 21, "label": "Turn on", "service": "DEVSERVICE_STATE_SWITCH", "parameters": { "a": 1 } },
+    { "id": 22, "label": "Turn off", "service": "DEVSERVICE_STATE_SWITCH", "parameters": { "a": 0 } },
+    { "id": 23, "label": "Toggle", "service": "DEVSERVICE_STATE_SWITCH", "toggleState": true },
+    { "id": 30, "label": "Brightness 25%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 25 } },
+    { "id": 31, "label": "Brightness 50%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 50 } },
+    { "id": 32, "label": "Brightness 75%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 75 } },
+    { "id": 33, "label": "Brightness 100%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 100 } }
+  ],
   "state": {
     "enabledSemantics": "isOn",
     "descriptionCustomBytes": [

@@ -121,12 +121,10 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('GeneratedDevic
 <code>#include &quot;<a class="el" href="SystemDefinition_8hpp_source.html">SystemDefinition.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="device_8hpp_source.html">devices/device.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="NvmConfigSlotDefinition_8hpp_source.html">os/datacontainer/NvmConfigSlotDefinition.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeneratedDigitalEventTriggers_8hpp_source.html">generated/GeneratedDigitalEventTriggers.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="OnOffDevice_8hpp_source.html">devices/OnOffDevice/OnOffDevice.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="LedWS1228bDeviceType_8hpp_source.html">devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="TempSensorDHT11DeviceType_8hpp_source.html">devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="SegLedWS1228bDeviceType_8hpp_source.html">devices/SegLedWS1228bDeviceType/SegLedWS1228bDeviceType.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="DistanceSensor_8hpp_source.html">devices/DistanceSensor/DistanceSensor.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="HwButton_8hpp_source.html">devices/HwButton/HwButton.hpp</a>&quot;</code><br />
 </div>
 <p><a href="GeneratedDeviceRegistry_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -143,14 +141,20 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a2bdf25adac6e394bb6bdf9967dd3a2b6" id="r_a2bdf25adac6e394bb6bdf9967dd3a2b6"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a2bdf25adac6e394bb6bdf9967dd3a2b6">GeneratedDeviceRegistry::claimPin</a> (uint8_t pin, bool optional, bool *claimedPins, size_t claimedPinCount)</td></tr>
+<tr class="memdesc:a2bdf25adac6e394bb6bdf9967dd3a2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Claims one configured GPIO and rejects invalid or duplicate assignments.  <br /></td></tr>
 <tr class="memitem:a71edd8169324ace706b65b9d4f0d48a5" id="r_a71edd8169324ace706b65b9d4f0d48a5"><td class="memItemLeft">std::unique_ptr&lt; <a class="el" href="classDevice.html">Device</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a71edd8169324ace706b65b9d4f0d48a5">GeneratedDeviceRegistry::create</a> (uint8_t typeId, <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> config, const <a class="el" href="structGeneratedDeviceRegistry_1_1RuntimeContext.html">RuntimeContext</a> &amp;context)</td></tr>
 <tr class="memdesc:a71edd8169324ace706b65b9d4f0d48a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a concrete device through schema-declared factory arguments.  <br /></td></tr>
 <tr class="memitem:a006e6c663ecdfa3c5a8cf0a24c4b8622" id="r_a006e6c663ecdfa3c5a8cf0a24c4b8622"><td class="memItemLeft">const <a class="el" href="structGeneratedDeviceRegistry_1_1Registration.html">Registration</a> *&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a006e6c663ecdfa3c5a8cf0a24c4b8622">GeneratedDeviceRegistry::find</a> (uint8_t typeId)</td></tr>
 <tr class="memdesc:a006e6c663ecdfa3c5a8cf0a24c4b8622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an implementation enabled in the current firmware build.  <br /></td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a5f6fa40eb7bff9df61f69bab3f5366c3" id="r_a5f6fa40eb7bff9df61f69bab3f5366c3"><td class="memItemLeft">constexpr <a class="el" href="structGeneratedDeviceRegistry_1_1Registration.html">Registration</a>&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a5f6fa40eb7bff9df61f69bab3f5366c3">GeneratedDeviceRegistry::kEnabledTypes</a> []</td></tr>
+<tr class="memitem:a5e6cd6fc85976b205df5c8c1dc7c9bae" id="r_a5e6cd6fc85976b205df5c8c1dc7c9bae"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a5e6cd6fc85976b205df5c8c1dc7c9bae">GeneratedDeviceRegistry::isConfigurableGpio</a> (uint8_t pin)</td></tr>
+<tr class="memdesc:a5e6cd6fc85976b205df5c8c1dc7c9bae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports whether a GPIO can be assigned to a configurable device on this board.  <br /></td></tr>
+<tr class="memitem:abbc990dcf2a345ef094be2ae9790baae" id="r_abbc990dcf2a345ef094be2ae9790baae"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#abbc990dcf2a345ef094be2ae9790baae">GeneratedDeviceRegistry::isWifiSafeAdcPin</a> (uint8_t pin)</td></tr>
+<tr class="memdesc:abbc990dcf2a345ef094be2ae9790baae"><td class="mdescLeft">&#160;</td><td class="mdescRight">ADC1 pins remain available while the station's Wi-Fi stack is active.  <br /></td></tr>
+<tr class="memitem:a19801dd6a00b4ff1e8581f73af5f7ad3" id="r_a19801dd6a00b4ff1e8581f73af5f7ad3"><td class="memItemLeft">uint16_t&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a19801dd6a00b4ff1e8581f73af5f7ad3">GeneratedDeviceRegistry::readU16</a> (const uint8_t *bytes, size_t offset)</td></tr>
+<tr class="memdesc:a19801dd6a00b4ff1e8581f73af5f7ad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a little-endian uint16 value from configuration custom bytes.  <br /></td></tr>
+<tr class="memitem:a539d7aead0475efcbd7b4a3b14409ec4" id="r_a539d7aead0475efcbd7b4a3b14409ec4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespaceGeneratedDeviceRegistry.html#a539d7aead0475efcbd7b4a3b14409ec4">GeneratedDeviceRegistry::validateConfiguration</a> (const <a class="el" href="structDeviceConfigSlotType.html">DeviceConfigSlotType</a> &amp;config, bool *claimedPins, size_t claimedPinCount)</td></tr>
+<tr class="memdesc:a539d7aead0475efcbd7b4a3b14409ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validates all GPIO assignments declared by one active device schema.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Build-profile-specific device factories and runtime participation metadata. </p>

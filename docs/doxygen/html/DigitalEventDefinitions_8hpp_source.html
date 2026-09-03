@@ -118,14 +118,29 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('DigitalEventDe
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="DigitalEventDefinitions_8hpp.html#a05b2eb9e46f3c3dd1cbf0ea089e97671">    4</a></span><span class="preprocessor">#define DIGITAL_EVENT_FIRED_MSG_ID 100</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno"><a class="line" href="DigitalEventDefinitions_8hpp.html#a2d28fcacc9f8a979ba4cc21fc5d58611">    5</a></span><span class="preprocessor">#define DIGITAL_EVENT_CONFIRMED_MSG_ID 101</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"></span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * @file include/os/app/DigitalEvent/DigitalEventDefinitions.hpp</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * @brief Digital event definitions and handlers for the Home Control Station.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="DigitalEventDefinitions_8hpp.html#afbbfc0d7a267a3e3f98ffeb0f5e36cae">    6</a></span><span class="preprocessor">#define DIGITAL_EVENT_FIRED_WITH_SOURCE_MSG_ID 102</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="DigitalEventDefinitions_8hpp.html#ac4875cbc0d1564877a0eb2a2bf1af962">    7</a></span><span class="preprocessor">#define DIGITAL_EVENT_SOURCE_MAX_LENGTH 31</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"></span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * @file include/os/app/DigitalEvent/DigitalEventDefinitions.hpp</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * @brief Digital event definitions and handlers for the Home Control Station.</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"></span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">/** @brief One source-aware event occurrence used by runtime queues and diagnostics. */</span></div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structDigitalEventOccurrence.html">   17</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structDigitalEventOccurrence.html">DigitalEventOccurrence</a></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>{</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structDigitalEventOccurrence.html#a2901f092765dbe51cdbb364e3a231b88">   19</a></span>    uint64_t <a class="code hl_variable" href="structDigitalEventOccurrence.html#a2901f092765dbe51cdbb364e3a231b88">eventId</a> = 0;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structDigitalEventOccurrence.html#a20c04c4d982b2147453007f5c00d5638">   20</a></span>    String <a class="code hl_variable" href="structDigitalEventOccurrence.html#a20c04c4d982b2147453007f5c00d5638">source</a> = <span class="stringliteral">&quot;Legacy&quot;</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>};</div>
+</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="astructDigitalEventOccurrence_html"><div class="ttname"><a href="structDigitalEventOccurrence.html">DigitalEventOccurrence</a></div><div class="ttdoc">One source-aware event occurrence used by runtime queues and diagnostics.</div><div class="ttdef"><b>Definition</b> <a href="#l00017">DigitalEventDefinitions.hpp:18</a></div></div>
+<div class="ttc" id="astructDigitalEventOccurrence_html_a20c04c4d982b2147453007f5c00d5638"><div class="ttname"><a href="structDigitalEventOccurrence.html#a20c04c4d982b2147453007f5c00d5638">DigitalEventOccurrence::source</a></div><div class="ttdeci">String source</div><div class="ttdef"><b>Definition</b> <a href="#l00020">DigitalEventDefinitions.hpp:20</a></div></div>
+<div class="ttc" id="astructDigitalEventOccurrence_html_a2901f092765dbe51cdbb364e3a231b88"><div class="ttname"><a href="structDigitalEventOccurrence.html#a2901f092765dbe51cdbb364e3a231b88">DigitalEventOccurrence::eventId</a></div><div class="ttdeci">uint64_t eventId</div><div class="ttdef"><b>Definition</b> <a href="#l00019">DigitalEventDefinitions.hpp:19</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->
