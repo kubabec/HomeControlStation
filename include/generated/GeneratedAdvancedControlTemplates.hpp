@@ -17,10 +17,14 @@ inline const char advancedControlsTemplate_type_LED_STRIP[] = R"HCSADV(<style>
   .advanced-led-controls .advanced-led-presets { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
   .advanced-led-controls .advanced-led-preset { display:flex; align-items:center; gap:4px; }
   .advanced-led-controls .advanced-led-presets[hidden] { display:none; }
+  .advanced-led-controls .led-strip { display:grid; gap:0; width:100%; min-width:0; overflow:visible; }
+  .advanced-led-controls .ledContainer { min-width:0; width:auto; padding:5px 0; cursor:pointer; }
+  .advanced-led-controls .ledContainer.marked { background-color:rgba(93, 190, 255, 0.9); }
+  .advanced-led-controls .ledContainer .led { width:100%; height:8px; }
 </style>
 <div class="advanced-led-controls">
-  <div class="led-strip" data-role="led-strip"></div>
   <label>Color <input class="color-input" data-field="color" type="color" value="#0010af"></label>
+  <div class="led-strip" data-role="led-strip"></div>
   <label>Enable animation
     <select data-field="enableAnimation">
       <option value="0">Roll (left)</option><option value="1">Roll (right)</option>
@@ -52,7 +56,6 @@ if (payload.length < 5 || (payload.length - 5) % 3 !== 0) {
 }
 const ledCount = (payload.length - 5) / 3;
 const colors = Array.from({length: ledCount}, (_, index) => [payload[5 + index * 3], payload[6 + index * 3], payload[7 + index * 3]]);
-const selected = new Set();
 const strip = context.root.querySelector('[data-role="led-strip"]');
 const colorInput = context.root.querySelector('[data-field="color"]');
 const enableAnimation = context.root.querySelector('[data-field="enableAnimation"]');
@@ -61,12 +64,14 @@ const animationSpeed = context.root.querySelector('[data-field="animationSpeed"]
 enableAnimation.value = String(payload[0]);
 disableAnimation.value = String(payload[1]);
 animationSpeed.value = String(payload[2]);
+const selected = new Set();
 let dragMode = 0;
 const renderLed = index => {
   const element = strip.children[index];
   const color = colors[index];
-  element.firstElementChild.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-  element.firstElementChild.style.boxShadow = color.some(value => value !== 0) ? '0 0 6px 8px rgba(0,205,0,.08)' : 'none';
+  const led = element.querySelector('.led');
+  led.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  led.style.boxShadow = color.some(value => value !== 0) ? '0 0 6px 8px rgba(0,205,0,.08)' : 'none';
   element.classList.toggle('marked', selected.has(index));
 };
 const markLed = index => {
@@ -81,17 +86,26 @@ colors.forEach((color, index) => {
   const led = document.createElement('div');
   led.className = 'led';
   led.style.borderRadius = '3px';
-  container.appendChild(led);
-  const begin = event => {
+  const beginSelection = event => {
+    if (event.target === colorInput) return;
     event.preventDefault();
     dragMode = selected.has(index) ? 2 : 1;
     markLed(index);
   };
-  container.addEventListener('mousedown', begin);
+  container.addEventListener('mousedown', beginSelection);
   container.addEventListener('mouseenter', () => { if (dragMode) markLed(index); });
-  container.addEventListener('touchstart', begin, {passive:false});
+  container.addEventListener('touchstart', beginSelection, {passive:false});
+  container.appendChild(led);
   strip.appendChild(container);
   renderLed(index);
+});
+strip.style.gridTemplateColumns = `repeat(${ledCount}, minmax(0, 1fr))`;
+colorInput.addEventListener('input', () => {
+  const rgb = [1, 3, 5].map(offset => parseInt(colorInput.value.slice(offset, offset + 2), 16));
+  const targets = selected.size ? Array.from(selected) : colors.map((_, index) => index);
+  targets.forEach(index => { colors[index] = rgb.slice(); renderLed(index); });
+  selected.clear();
+  colors.forEach((_, index) => renderLed(index));
 });
 const finishDrag = () => { dragMode = 0; };
 document.addEventListener('mouseup', finishDrag, {once:false});
@@ -106,13 +120,6 @@ strip.addEventListener('touchmove', event => {
   const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.ledContainer');
   if (target && strip.contains(target) && dragMode) markLed(Number(target.dataset.index));
 }, {passive:false});
-colorInput.addEventListener('input', () => {
-  const rgb = [1, 3, 5].map(offset => parseInt(colorInput.value.slice(offset, offset + 2), 16));
-  const targets = selected.size ? Array.from(selected) : colors.map((_, index) => index);
-  targets.forEach(index => { colors[index] = rgb.slice(); renderLed(index); });
-  selected.clear();
-  colors.forEach((_, index) => renderLed(index));
-});
 const presets = context.root.querySelector('[data-role="presets"]');
 for (let slot = 1; slot <= 3; ++slot) {
   const row = document.createElement('div');
