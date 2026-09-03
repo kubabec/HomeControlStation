@@ -2,6 +2,7 @@
 #include "os/Logger.hpp"
 
 #include <os/app/config/PersistentMemoryAccess.hpp>
+#include <os/app/config/ExtendedMemoryManager.hpp>
 #include <ArduinoJson.h>
 #include "os/datacontainer/datacontainertypes.hpp"
 #include <Regexp.h>
@@ -18,13 +19,14 @@ ConfigData ConfigProvider::configRamMirror = {255, 1, 1, 255, "\0", "\0", "\0"};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
+uint8_t ConfigProvider::restoredPersistentBlockCount = e_NUMBER_OF_PERSISTENT_BLOCKS;
 
 void ConfigProvider::init()
 {
     Logger::log("ConfigProvider init ...");
     totalNvmSize = configRamMirror.getSize() + PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize();
 
-    PersistentMemoryAccess::init(totalNvmSize);
+    PersistentMemoryAccess::init(totalNvmSize, MAX_EXT_MEMORY_SIZE_TOTAL);
 
 
     if(readRamMirrorFromNvm())
@@ -305,15 +307,22 @@ bool ConfigProvider::saveRamMirrorToNvm()
         memcpy(mergedBuffer, &configRamMirror, configRamMirror.getSize());
 
         /* Copy datablocks to the buffer */
-        memcpy(
-            mergedBuffer + configRamMirror.getSize(),
-            dataBlocksRamMirror->data,
-            PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize()
-        );
+        for (uint8_t block = 0; block < PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS; ++block)
+        {
+            memcpy(mergedBuffer + configRamMirror.getSize() + block * PersistentDataBlock::getSize(),
+                   dataBlocksRamMirror[block].data, PersistentDataBlock::getSize());
+        }
 
         /* Try to save entire mergedBuffer into persistent memory */
-        if(PersistentMemoryAccess::saveData(mergedBuffer, mergedBufferSize))
+        const uint16_t restoredDataSize = configRamMirror.getSize() +
+                        restoredPersistentBlockCount * PersistentDataBlock::getSize();
+        const bool saved = restoredPersistentBlockCount < e_NUMBER_OF_PERSISTENT_BLOCKS
+            ? PersistentMemoryAccess::saveDataMigratingExtendedMemory(
+                  mergedBuffer, mergedBufferSize, restoredDataSize, MAX_EXT_MEMORY_SIZE_TOTAL)
+            : PersistentMemoryAccess::saveData(mergedBuffer, mergedBufferSize);
+        if(saved)
         {
+            restoredPersistentBlockCount = e_NUMBER_OF_PERSISTENT_BLOCKS;
             /* Update data container signals */
             updateNodeConfigurationSignal();
             retVal = true;
@@ -352,17 +361,55 @@ bool ConfigProvider::readRamMirrorFromNvm()
             memcpy(&configRamMirror, mergedBuffer, configRamMirror.getSize());
 
             /* Copy datablocks to ram mirror */
-            memcpy(
-                dataBlocksRamMirror->data,
-                mergedBuffer + configRamMirror.getSize(),
-                PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS * PersistentDataBlock::getSize()
-            );
+            for (uint8_t block = 0; block < PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS; ++block)
+            {
+                memcpy(dataBlocksRamMirror[block].data,
+                       mergedBuffer + configRamMirror.getSize() + block * PersistentDataBlock::getSize(),
+                       PersistentDataBlock::getSize());
+            }
 
             updateNodeConfigurationSignal();
         }
         else 
         {
-            nvmDataAvailable = false;
+            constexpr uint8_t historicalBlockCounts[] = {
+                CONDITION_LAYOUT_BLOCK_COUNT,
+                LEGACY_PERSISTENT_BLOCK_COUNT
+            };
+            for (const uint8_t historicalBlockCount : historicalBlockCounts)
+            {
+                const uint16_t historicalBufferSize = configRamMirror.getSize() +
+                                                      historicalBlockCount * PersistentDataBlock::getSize();
+                uint8_t *historicalBuffer = static_cast<uint8_t *>(malloc(historicalBufferSize));
+                if (historicalBuffer != nullptr &&
+                    PersistentMemoryAccess::readData(historicalBuffer, historicalBufferSize))
+                {
+                    memcpy(&configRamMirror, historicalBuffer, configRamMirror.getSize());
+                    for (uint8_t block = 0; block < historicalBlockCount; ++block)
+                    {
+                        memcpy(dataBlocksRamMirror[block].data,
+                               historicalBuffer + configRamMirror.getSize() + block * PersistentDataBlock::getSize(),
+                               PersistentDataBlock::getSize());
+                    }
+                    for (uint8_t block = historicalBlockCount;
+                         block < PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS; ++block)
+                    {
+                        memset(dataBlocksRamMirror[block].data, 0, PersistentDataBlock::getSize());
+                    }
+                    nvmDataAvailable = true;
+                    restoredPersistentBlockCount = historicalBlockCount;
+                    retVal = true;
+                    updateNodeConfigurationSignal();
+                    Logger::log("ConfigProvider:// Migrating persistent layout with " +
+                                String((int)historicalBlockCount) + " blocks");
+                }
+                free(historicalBuffer);
+                if (retVal)
+                {
+                    break;
+                }
+            }
+            if (!retVal) nvmDataAvailable = false;
         }
 
         /* Release resources */
@@ -431,9 +478,9 @@ void ConfigProvider::eraseDatablockMemory()
     Logger::log("Datablock erase done.");
 }
 
-void ConfigProvider::flushNvmData()
+bool ConfigProvider::flushNvmData()
 {
-    saveRamMirrorToNvm();
+    return saveRamMirrorToNvm();
 }
 
 

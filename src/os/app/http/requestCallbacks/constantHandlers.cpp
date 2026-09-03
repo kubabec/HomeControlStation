@@ -1,6 +1,8 @@
 #include <os/app/http/httpserver.hpp>
 #include "generated/GeneratedDigitalEventActions.hpp"
+#include "generated/GeneratedEnablingConditions.hpp"
 #include "os/app/DigitalEvent/DigitalEventReceiver.hpp"
+#include "os/app/timeMaster.hpp"
 #include "os/Logger.hpp"
 #include <Esp.h>
 
@@ -318,10 +320,11 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
 
   std::vector<std::pair<uint64_t, DigitalEvent::Event>> digitalEventsMapping =
       std::any_cast<std::vector<std::pair<uint64_t, DigitalEvent::Event>>>(DataContainer::getSignalValue(SIG_DIGITAL_EVNT_MAPPING));
+  const auto &mappingConditions = DigitalEventReceiver::getMappingConditions();
 
   client.println("\
     <table class=\"table-graphite\" id=\"data-table\" aria-describedby=\"table-desc\">\
-    <thead><tr><th style=\"width:15%\">Mapping ID</th><th style=\"width:25%\">Event ID</th><th style=\"width:30%\">Device</th><th style=\"width:30%\">Action</th><th style=\"width:90px\">&nbsp;</th>\
+    <thead><tr><th>Mapping ID</th><th>Event ID</th><th>Device</th><th>Action</th><th>Enabling conditions (AND)</th><th style=\"width:90px\">&nbsp;</th>\
     </tr></thead><tbody>");
 
   for (auto &mapping : digitalEventsMapping)
@@ -332,11 +335,21 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
       if (device.deviceId == mapping.second.deviceId) deviceType = device.deviceType;
     }
     const auto *action = GeneratedDigitalEventActions::find(deviceType, mapping.second.actionId);
+    String selectedConditions;
+    auto assignment = std::find_if(mappingConditions.begin(), mappingConditions.end(), [&mapping](const auto &item) { return item.mappingId == mapping.second.mappingId; });
+    if (assignment != mappingConditions.end())
+    {
+      for (uint8_t conditionId : assignment->conditionIds)
+      {
+        if (conditionId != 0) selectedConditions += (selectedConditions.length() ? "," : "") + String((int)conditionId);
+      }
+    }
 
     client.println("<tr><td><input type=\"text\" class=\"cell-mapping-id\" readonly value=\"" + String((int)mapping.second.mappingId) + "\" /></td>");
     client.println("<td><input type=\"text\" class=\"cell-event-id\" value=\"" + String((uint64_t)mapping.first) + "\" /></td>");
     client.println("<td><select class=\"cell-device\" data-selected=\"" + String((int)mapping.second.deviceId) + "\"></select></td>");
     client.println("<td><button type=\"button\" class=\"button cell-action\" data-action-id=\"" + String((int)mapping.second.actionId) + "\">" + String(action ? action->label : "Choose action") + "</button></td>");
+    client.println("<td><div class=\"cell-conditions\" data-selected=\"" + selectedConditions + "\"></div></td>");
     client.println("<td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>");
   }
   client.println("</tbody></table>");
@@ -356,6 +369,7 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
       <td><input type=\"text\" class=\"cell-event-id\" /></td>\
       <td><select class=\"cell-device\"></select></td>\
       <td><button type=\"button\" class=\"button cell-action\" data-action-id=\"\">Choose action</button></td>\
+      <td><div class=\"cell-conditions\"></div></td>\
       <td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>\
   </template>\
   <div class=\"popup-overlay hidden-popup\" id=\"action-popup\">\
@@ -521,6 +535,18 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
     label.replace("\"", "\\\"");
     client.println("{type:" + String((int)action.deviceType) + ",id:" + String((int)action.id) + ",label:\"" + label + "\"},");
   }
+  client.println("]; const configuredConditions = [");
+  for (const auto &condition : DigitalEventReceiver::getEnablingConditions())
+  {
+    auto device = std::find_if(descriptionVector.begin(), descriptionVector.end(), [&condition](const auto &item) { return item.deviceId == condition.deviceId; });
+    if (device == descriptionVector.end()) continue;
+    const auto *predicate = GeneratedEnablingConditions::find(device->deviceType, condition.predicateId);
+    if (predicate == nullptr) continue;
+    String label = String((int)condition.conditionId) + ": " + device->deviceName + " / " + predicate->label;
+    label.replace("\\", "\\\\");
+    label.replace("\"", "\\\"");
+    client.println("{id:" + String((int)condition.conditionId) + ",label:\"" + label + "\"},");
+  }
   client.println("]; ");
   client.println(R"SCRIPT3(
   let activeActionRow = null;
@@ -538,6 +564,22 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
       option.selected = String(device.id) === String(selected);
       select.appendChild(option);
     });
+  }
+
+  function fillConditionSelects(row) {
+    const container = row.querySelector('.cell-conditions');
+    const selected = (container.dataset.selected || '').split(',').filter(Boolean);
+    container.innerHTML = '';
+    for (let index = 0; index < 3; index++) {
+      const select = document.createElement('select');
+      select.className = 'cell-condition';
+      const none = document.createElement('option'); none.value = ''; none.textContent = index === 0 ? 'No condition' : 'No additional condition'; select.appendChild(none);
+      configuredConditions.forEach(condition => {
+        const option = document.createElement('option'); option.value = condition.id; option.textContent = condition.label;
+        option.selected = String(condition.id) === String(selected[index]); select.appendChild(option);
+      });
+      container.appendChild(select);
+    }
   }
 
   function openActionPopup(row) {
@@ -571,11 +613,12 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
     return 0;
   }
 
-  Array.from(tbody.querySelectorAll('tr')).forEach(row => fillDeviceSelect(row.querySelector('.cell-device')));
+  Array.from(tbody.querySelectorAll('tr')).forEach(row => { fillDeviceSelect(row.querySelector('.cell-device')); fillConditionSelects(row); });
   addBtn.onclick = () => {
     const row = template.content.firstElementChild.cloneNode(true);
     row.querySelector('.cell-mapping-id').value = nextMappingId();
     fillDeviceSelect(row.querySelector('.cell-device'));
+    fillConditionSelects(row);
     tbody.appendChild(row);
   };
   tbody.onclick = event => {
@@ -601,7 +644,8 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
       mappingId: Number(row.querySelector('.cell-mapping-id').value),
       eventId: String(row.querySelector('.cell-event-id').value),
       deviceId: Number(row.querySelector('.cell-device').value),
-      actionId: Number(row.querySelector('.cell-action').dataset.actionId)
+      actionId: Number(row.querySelector('.cell-action').dataset.actionId),
+      conditionIds: Array.from(row.querySelectorAll('.cell-condition')).map(select => Number(select.value)).filter(Boolean)
     }));
     if (data.some(item => !item.mappingId || !item.eventId || !item.deviceId || !item.actionId)) {
       alert('Complete every mapping before saving.');
@@ -615,6 +659,75 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
   };
   })();
   )SCRIPT3");
+  client.println("</script>");
+}
+
+void HomeLightHttpServer::constantHandler_enablingConditions(WiFiClient &client)
+{
+  const auto &conditions = DigitalEventReceiver::getEnablingConditions();
+  client.println("<div class=\"header\">Enabling Conditions</div>");
+  client.println("<table class=\"table-graphite\" id=\"condition-table\"><thead><tr><th>Condition ID</th><th>Device</th><th>Condition</th><th>&nbsp;</th></tr></thead><tbody>");
+  for (const auto &condition : conditions)
+  {
+    client.println("<tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"255\" value=\"" + String((int)condition.conditionId) + "\"></td>");
+    client.println("<td><select class=\"condition-device\" data-selected=\"" + String((int)condition.deviceId) + "\"></select></td>");
+    client.println("<td><select class=\"condition-predicate\" data-selected=\"" + String((int)condition.predicateId) + "\"></select></td>");
+    client.println("<td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>");
+  }
+  client.println("</tbody></table><div class=\"controls\"><button type=\"button\" id=\"add-condition\" class=\"button\">(+) New condition</button><button type=\"button\" id=\"save-conditions\" class=\"button\">Save table</button></div><a href=\"/config\" class=\"button\">BACK</a>");
+  client.println("<template id=\"condition-row-template\"><tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"255\"></td><td><select class=\"condition-device\"></select></td><td><select class=\"condition-predicate\"></select></td><td><button type=\"button\" class=\"error-button\">Remove</button></td></tr></template>");
+
+  client.println("<script>const conditionDevices=[");
+  for (const auto &device : descriptionVector)
+  {
+    String label = device.deviceName;
+    label.replace("\\", "\\\\");
+    label.replace("\"", "\\\"");
+    client.println("{id:" + String((int)device.deviceId) + ",type:" + String((int)device.deviceType) + ",label:\"" + label + "\"},");
+  }
+  client.println("];const devicePredicates=[");
+  for (const auto &predicate : GeneratedEnablingConditions::kPredicates)
+  {
+    String label = predicate.label;
+    label.replace("\\", "\\\\");
+    label.replace("\"", "\\\"");
+    client.println("{type:" + String((int)predicate.deviceType) + ",id:" + String((int)predicate.id) + ",label:\"" + label + "\"},");
+  }
+  client.println(R"SCRIPT(];
+(function(){
+const tbody=document.querySelector('#condition-table tbody');
+const template=document.getElementById('condition-row-template');
+function fillPredicates(row){
+  const device=conditionDevices.find(item=>String(item.id)===row.querySelector('.condition-device').value);
+  const select=row.querySelector('.condition-predicate');
+  const selected=select.dataset.selected||select.value;
+  select.innerHTML='';
+  devicePredicates.filter(item=>device&&item.type===device.type).forEach(item=>{
+    const option=document.createElement('option');option.value=item.id;option.textContent=item.label;
+    option.selected=String(item.id)===String(selected);select.appendChild(option);
+  });
+}
+function initialize(row){
+  const select=row.querySelector('.condition-device');const selected=select.dataset.selected||select.value;
+  select.innerHTML='';conditionDevices.forEach(item=>{const option=document.createElement('option');option.value=item.id;option.textContent=item.label;option.selected=String(item.id)===String(selected);select.appendChild(option);});
+  fillPredicates(row);
+}
+Array.from(tbody.children).forEach(initialize);
+tbody.onclick=event=>{if(event.target.classList.contains('error-button'))event.target.closest('tr').remove();};
+tbody.onchange=event=>{if(event.target.classList.contains('condition-device'))fillPredicates(event.target.closest('tr'));};
+document.getElementById('add-condition').onclick=()=>{
+  if(tbody.children.length>=20){alert('A maximum of 20 enabling conditions is supported.');return;}
+  const row=template.content.firstElementChild.cloneNode(true);const used=new Set(Array.from(tbody.querySelectorAll('.condition-id')).map(input=>Number(input.value)));
+  for(let id=1;id<=255;id++){if(!used.has(id)){row.querySelector('.condition-id').value=id;break;}}
+  initialize(row);tbody.appendChild(row);
+};
+document.getElementById('save-conditions').onclick=()=>{
+  const data=Array.from(tbody.children).map(row=>({conditionId:Number(row.querySelector('.condition-id').value),deviceId:Number(row.querySelector('.condition-device').value),predicateId:Number(row.querySelector('.condition-predicate').value)}));
+  const ids=data.map(item=>item.conditionId);if(data.some(item=>!item.conditionId||!item.deviceId||!item.predicateId)||new Set(ids).size!==ids.length){alert('Use unique condition IDs and complete every row.');return;}
+  const xhr=new XMLHttpRequest();xhr.open('POST','/saveEnablingConditions&'+JSON.stringify(data),true);xhr.onreadystatechange=()=>{if(xhr.readyState===4)window.location.href='/enablingConditions';};xhr.send();
+};
+})();
+)SCRIPT");
   client.println("</script>");
 }
 
@@ -655,4 +768,73 @@ function copyEventId(id) {
 }
 </script>
 )SCRIPT");
+}
+
+void HomeLightHttpServer::constantHandler_rtcEvents(WiFiClient &client)
+{
+  client.println("<div class=\"header\">RTC Events</div>");
+  client.println("<table class=\"table-graphite\" id=\"rtc-event-table\"><thead><tr><th>Event ID</th><th>Repeats</th><th>Schedule</th><th>&nbsp;</th></tr></thead><tbody></tbody></table>");
+  client.println("<div class=\"controls\"><button type=\"button\" id=\"add-rtc-event\" class=\"button\">(+) New RTC event</button><button type=\"button\" id=\"save-rtc-events\" class=\"button\">Save table</button></div><a href=\"/config\" class=\"button\">BACK</a>");
+  client.println("<script>const initialRtcEvents=[");
+  for (const auto &event : TimeMaster::getRtcEvents())
+  {
+    client.println("{eventId:'" + String((unsigned long long)event.eventId) + "',anchorEpoch:" +
+                   String((unsigned long)event.anchorEpoch) + ",intervalHours:" +
+                   String((int)event.intervalHours) + ",recurrence:" +
+                   String((int)event.recurrence) + ",weekdayMask:" +
+                   String((int)event.weekdayMask) + "},");
+  }
+  client.println(R"SCRIPT(];
+(function(){
+const tbody=document.querySelector('#rtc-event-table tbody');
+const modes=[['0','One shot'],['1','Every N hours'],['2','Every day'],['3','Selected weekdays']];
+const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const epochToDateTime=epoch=>new Date(epoch*1000).toISOString().slice(0,16);
+const epochToTime=epoch=>new Date(epoch*1000).toISOString().slice(11,16);
+function wallEpoch(value){
+  const match=value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  return match?Math.floor(Date.UTC(+match[1],+match[2]-1,+match[3],+match[4],+match[5])/1000):0;
+}
+function addRow(data={eventId:'',anchorEpoch:0,intervalHours:1,recurrence:0,weekdayMask:0}){
+  const row=document.createElement('tr');
+  row.innerHTML='<td><input class="rtc-event-id" type="text" inputmode="numeric" pattern="[0-9]+" value="'+data.eventId+'"></td>'+
+    '<td><select class="rtc-mode">'+modes.map(mode=>'<option value="'+mode[0]+'"'+(+mode[0]===+data.recurrence?' selected':'')+'>'+mode[1]+'</option>').join('')+'</select></td>'+
+    '<td><div class="rtc-once"><input class="rtc-date-time" type="datetime-local"></div>'+
+    '<div class="rtc-interval"><label>Start <input class="rtc-interval-start" type="datetime-local"></label><label>Every <input class="rtc-hours" type="number" min="1" max="168" value="'+(data.intervalHours||1)+'"> hours</label></div>'+
+    '<div class="rtc-daily"><input class="rtc-time" type="time"></div>'+
+    '<div class="rtc-weekly"><input class="rtc-weekly-time" type="time"><div class="rtc-days">'+dayNames.map((name,index)=>'<label><input type="checkbox" value="'+index+'" '+((data.weekdayMask&(1<<index))?'checked':'')+'>'+name+'</label>').join('')+'</div></div></td>'+
+    '<td><button type="button" class="error-button rtc-remove">Remove</button></td>';
+  const dateTime=data.anchorEpoch?epochToDateTime(data.anchorEpoch):'';
+  const time=data.anchorEpoch?epochToTime(data.anchorEpoch):'12:00';
+  row.querySelector('.rtc-date-time').value=dateTime;
+  row.querySelector('.rtc-interval-start').value=dateTime;
+  row.querySelector('.rtc-time').value=time;
+  row.querySelector('.rtc-weekly-time').value=time;
+  tbody.appendChild(row);updateVisibleFields(row);
+}
+function updateVisibleFields(row){
+  const mode=+row.querySelector('.rtc-mode').value;
+  ['rtc-once','rtc-interval','rtc-daily','rtc-weekly'].forEach((name,index)=>row.querySelector('.'+name).style.display=mode===index?'block':'none');
+}
+initialRtcEvents.forEach(addRow);
+tbody.onchange=event=>{if(event.target.classList.contains('rtc-mode'))updateVisibleFields(event.target.closest('tr'));};
+tbody.onclick=event=>{if(event.target.classList.contains('rtc-remove'))event.target.closest('tr').remove();};
+document.getElementById('add-rtc-event').onclick=()=>{if(tbody.children.length>=10){alert('A maximum of 10 RTC events is supported.');return;}addRow();};
+document.getElementById('save-rtc-events').onclick=()=>{
+  const records=Array.from(tbody.children).map(row=>{
+    const recurrence=+row.querySelector('.rtc-mode').value;
+    let dateTime='';let weekdayMask=0;
+    if(recurrence===0)dateTime=row.querySelector('.rtc-date-time').value;
+    if(recurrence===1)dateTime=row.querySelector('.rtc-interval-start').value;
+    if(recurrence===2)dateTime='2000-01-02T'+row.querySelector('.rtc-time').value;
+    if(recurrence===3){dateTime='2000-01-02T'+row.querySelector('.rtc-weekly-time').value;row.querySelectorAll('.rtc-days input:checked').forEach(day=>weekdayMask|=1<<+day.value);}
+    return {eventId:row.querySelector('.rtc-event-id').value.trim(),recurrence,anchorEpoch:wallEpoch(dateTime),intervalHours:recurrence===1?+row.querySelector('.rtc-hours').value:0,weekdayMask};
+  });
+  const ids=records.map(record=>record.eventId);
+  if(records.some(record=>!/^[0-9]+$/.test(record.eventId)||record.eventId==='0'||!record.anchorEpoch||(record.recurrence===1&&(record.intervalHours<1||record.intervalHours>168))||(record.recurrence===3&&!record.weekdayMask))||new Set(ids).size!==ids.length){alert('Complete every schedule and use unique, non-zero event IDs.');return;}
+  const xhr=new XMLHttpRequest();xhr.open('POST','/saveRtcEvents&'+JSON.stringify(records),true);xhr.onreadystatechange=()=>{if(xhr.readyState===4)window.location.href='/rtcEvents';};xhr.send();
+};
+})();
+)SCRIPT");
+  client.println("</script>");
 }

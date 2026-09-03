@@ -5,6 +5,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <ctime>  // Do konwersji czasu Unix na datę
+#include <vector>
 #include <os/datacontainer/datacontainertypes.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 /**
@@ -49,6 +50,12 @@ public:
      * @return Current time expressed as RtcTime.
      */
     static RtcTime getRtcTime();
+
+    /** Returns the RTC schedules currently configured by the user. */
+    static const std::vector<RtcEvent::Schedule>& getRtcEvents();
+
+    /** Replaces RTC schedules from a validated JSON array. */
+    static bool updateRtcEventsViaJson(String& json);
 
 private:
     /**
@@ -110,6 +117,13 @@ private:
      * Counter tracking time sync failures so the system can back off or retry deliberately.
      */
     static uint8_t timeSyncFailureCount;
+
+    static std::vector<RtcEvent::Schedule> rtcEvents;
+    static uint32_t lastEvaluatedMinute;
+
+    static void restoreRtcEvents();
+    static bool saveRtcEvents();
+    static void evaluateRtcEvents();
 };
 
 #endif // MASTERTIMER_HPP

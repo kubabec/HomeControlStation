@@ -1,4 +1,5 @@
 #include <devices/OnOffDevice/OnOffDevice.hpp>
+#include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 
 static_assert(sizeof(AdvancedControlsOnOff) == 4, "OnOff advanced-controls JSON payload size is out of sync");
@@ -308,6 +309,9 @@ ServiceRequestErrorCode OnOffDevice::service(DeviceServicesType serviceType, Ser
 {
     switch (serviceType)
     {
+    case DEVSERVICE_CHECK_ENABLING_CONDITION:
+        return GeneratedEnablingConditions::evaluateService(getDeviceDescription(), param);
+
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
         Logger::log("<"+deviceName+"> Service: DEVSERVICE_GET_ADVANCED_CONTROLS");
         if (param.size != sizeof(AdvancedControlsOnOff) || param.buff == nullptr ||

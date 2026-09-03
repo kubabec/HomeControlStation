@@ -24,6 +24,10 @@
     { "id": 1, "label": "Opened" },
     { "id": 2, "label": "Closed" }
   ],
+  "enablingConditions": [
+    { "id": 1, "label": "Closed", "source": "customBytes[0]", "type": "boolean", "comparator": "equals", "value": true },
+    { "id": 2, "label": "Opened", "source": "customBytes[0]", "type": "boolean", "comparator": "equals", "value": false }
+  ],
   "state": {
     "enabledSemantics": "always-on read-only sensor", "descriptionCustomBytes": [{ "name": "closed", "type": "boolean", "offset": 0, "size": 1 }, { "name": "rawClosed", "type": "boolean", "offset": 1, "size": 1 }],
     "httpFields": [{ "name": "closed", "type": "boolean", "source": "customBytes[0]" }]

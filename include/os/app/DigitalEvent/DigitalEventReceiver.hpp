@@ -27,6 +27,17 @@ struct ServiceCallData
      */
     ServiceParameters_set1 parameters;
 };
+
+struct PendingConditionalAction
+{
+    DigitalEvent::Event action{};
+    uint8_t conditionIds[DigitalEvent::MAX_CONDITIONS_PER_MAPPING] = {0};
+    uint8_t conditionIndex = 0;
+    uint8_t result = 0;
+    uint32_t activeDeviceId = 0;
+    uint8_t activePredicateId = 0;
+    bool requestPending = false;
+};
 /**
  * @class DigitalEventReceiver
  * @brief Receives digital-event packets, maps them to actions, and dispatches the matching service calls.
@@ -38,6 +49,12 @@ class DigitalEventReceiver
      * Mapping between event IDs and their associated digital-action payloads.
      */
     static std::vector<std::pair<uint64_t, DigitalEvent::Event>> digitalEventsMapping;
+
+    /** Reusable device-backed conditions configured by the user. */
+    static std::vector<DigitalEvent::EnablingCondition> enablingConditions;
+
+    /** Up to three condition IDs assigned to each mapping ID. */
+    static std::vector<DigitalEvent::MappingConditions> mappingConditions;
 
     /**
      * Queue of event IDs waiting to be processed.
@@ -51,6 +68,9 @@ class DigitalEventReceiver
      * Queue of executable service calls produced by the processed events.
      */
     static std::queue<ServiceCallData> pendingServiceCalls;
+
+    /** Mapped actions waiting for live condition-service responses. */
+    static std::queue<PendingConditionalAction> pendingConditionalActions;
 
     /** Latest transmission byte observed for each remote IPv4 sender. */
     static std::vector<std::pair<uint32_t, uint8_t>> receivedTransmissionIds;
@@ -99,6 +119,15 @@ public:
     /** @return Read-only snapshot of recent unmapped events in newest-first order. */
     static const std::vector<DigitalEventOccurrence> &getUnmappedEvents();
 
+    /** @return Configured reusable enabling conditions. */
+    static const std::vector<DigitalEvent::EnablingCondition> &getEnablingConditions();
+
+    /** @return Persisted condition assignments for event mappings. */
+    static const std::vector<DigitalEvent::MappingConditions> &getMappingConditions();
+
+    /** Replaces the enabling-condition table from a JSON array. */
+    static void updateEnablingConditionsViaJson(String &json);
+
 private:
     /**
      * Executes the action payload described by a digital event.
@@ -116,6 +145,9 @@ private:
      * Drains the pending event queue and dispatches the resulting actions.
      */
     static void processEvents();
+
+    /** Requests and combines live device condition results before dispatching an action. */
+    static void processPendingConditions();
 };
 
 #endif

@@ -45,6 +45,11 @@
     "customBytes": []
   },
   "services": [],
+  "enablingConditions": [
+    { "id": 1, "label": "Cold (below 18 C)", "source": "customBytes[3..6]", "type": "float32", "comparator": "lessThan", "value": 18 },
+    { "id": 2, "label": "Normal (18-24 C)", "source": "customBytes[3..6]", "type": "float32", "comparator": "between", "minimum": 18, "maximum": 24 },
+    { "id": 3, "label": "Warm (above 24 C)", "source": "customBytes[3..6]", "type": "float32", "comparator": "greaterThan", "value": 24 }
+  ],
   "state": {
     "enabledSemantics": "alwaysOn; does not participate in room power state",
     "descriptionCustomBytes": [

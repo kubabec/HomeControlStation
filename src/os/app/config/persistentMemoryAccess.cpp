@@ -13,9 +13,10 @@ const uint8_t START_OF_DATA = 0b10101010;
 const uint8_t END_OF_DATA = 0b01010101;
 
 uint16_t PersistentMemoryAccess::standardDataEepromSize = 0;
+uint16_t PersistentMemoryAccess::extendedDataEepromSize = 0;
 bool PersistentMemoryAccess::eepromInitializedSuccessfully = false;
 
-void PersistentMemoryAccess::init(uint16_t eepromSize)
+void PersistentMemoryAccess::init(uint16_t eepromSize, uint16_t extendedMemorySize)
 {
     const uint16_t finalSize = 
         sizeof(START_OF_DATA) + 
@@ -23,9 +24,15 @@ void PersistentMemoryAccess::init(uint16_t eepromSize)
         eepromSize +
         sizeof(int);
 
-    eepromInitializedSuccessfully = EEPROM.begin(finalSize + 1750);
+    eepromInitializedSuccessfully = EEPROM.begin(finalSize + extendedMemorySize);
     if(eepromInitializedSuccessfully){
         standardDataEepromSize = finalSize;
+        extendedDataEepromSize = extendedMemorySize;
+        Logger::log("EEPROM initialized: standard=" + String((int)standardDataEepromSize) +
+                    " extended=" + String((int)extendedDataEepromSize) +
+                    " total=" + String((int)(standardDataEepromSize + extendedDataEepromSize)));
+    }else{
+        Logger::log("EEPROM initialization failed for " + String((int)(finalSize + extendedMemorySize)) + " bytes");
     }
 }
 
@@ -79,6 +86,39 @@ bool PersistentMemoryAccess::saveData(uint8_t* data, uint16_t size)
         Logger::log("EEPROM not initialized successfully!");
         return false;
     }
+}
+
+bool PersistentMemoryAccess::saveDataMigratingExtendedMemory(uint8_t* data, uint16_t size,
+                                                              uint16_t legacyDataSize, uint16_t extendedMemorySize)
+{
+    if (!eepromInitializedSuccessfully || data == nullptr || extendedMemorySize > extendedDataEepromSize)
+        return false;
+    const uint16_t legacyExtendedBase = sizeof(START_OF_DATA) + legacyDataSize + sizeof(END_OF_DATA) + sizeof(int);
+    uint8_t *extendedData = static_cast<uint8_t *>(malloc(extendedMemorySize));
+    if (extendedData == nullptr) return false;
+    for (uint16_t index = 0; index < extendedMemorySize; ++index)
+    {
+        extendedData[index] = EEPROM.read(legacyExtendedBase + index);
+    }
+
+    uint16_t currentAddress = 0;
+    int checkSum = START_OF_DATA + END_OF_DATA;
+    EEPROM.write(currentAddress++, START_OF_DATA);
+    for (uint16_t index = 0; index < size; ++index)
+    {
+        EEPROM.write(currentAddress++, data[index]);
+        checkSum += data[index];
+    }
+    EEPROM.write(currentAddress++, END_OF_DATA);
+    EEPROM.put(currentAddress, checkSum);
+    for (uint16_t index = 0; index < extendedMemorySize; ++index)
+    {
+        EEPROM.write(standardDataEepromSize + index, extendedData[index]);
+    }
+    const bool saved = EEPROM.commit();
+    Logger::log(saved ? "NVM layout migration committed atomically" : "NVM layout migration commit failed");
+    free(extendedData);
+    return saved;
 }
 
 bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
@@ -140,7 +180,7 @@ bool PersistentMemoryAccess::readData(uint8_t* buffer, uint16_t size)
 
 void PersistentMemoryAccess::massErase(uint16_t eepromSize)
 {
-    uint16_t eepromSize2 = standardDataEepromSize + 1750;
+    uint16_t eepromSize2 = standardDataEepromSize + extendedDataEepromSize;
     Logger::log("NVM :: ERASING " + String((int)eepromSize2) + " BYTES FROM FLASH MEMORY ... ");
     for(uint16_t i = 0; i < eepromSize2; i ++){
         EEPROM.write(i, 0);

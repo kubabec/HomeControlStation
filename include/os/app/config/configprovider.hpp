@@ -115,6 +115,8 @@ typedef struct
         }
     }
 }ConfigData;
+
+static_assert(sizeof(ConfigData) == 244, "ConfigData NVM layout must remain backwards compatible");
 /**
  * @class ConfigProvider
  * @brief Manages the persisted configuration mirror and exposes it to the rest of the OS.
@@ -128,6 +130,7 @@ class ConfigProvider
     static uint16_t totalNvmSize;
 
     static bool nvmDataAvailable;
+    static uint8_t restoredPersistentBlockCount;
 
     static void updateNodeConfigurationSignal();
     static bool saveRamMirrorToNvm();
@@ -136,7 +139,7 @@ public:
     static void init();
     static void deinit();
     static void cyclic();
-    static void flushNvmData();
+    static bool flushNvmData();
 
     static bool loadConfigFromFile(JsonDocument& doc);
     static bool setConfigViaString(String& configString);

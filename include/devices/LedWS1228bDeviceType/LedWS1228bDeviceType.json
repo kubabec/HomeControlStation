@@ -132,6 +132,10 @@
     { "id": 43, "label": "Start live animation", "service": "DEVSERVICE_LIVE_ANIMATION", "parameters": { "a": 1 } },
     { "id": 44, "label": "Stop live animation", "service": "DEVSERVICE_LIVE_ANIMATION", "parameters": { "a": 0 } }
   ],
+  "enablingConditions": [
+    { "id": 1, "label": "Enabled", "source": "isEnabled", "type": "boolean", "comparator": "equals", "value": true },
+    { "id": 2, "label": "Disabled", "source": "isEnabled", "type": "boolean", "comparator": "equals", "value": false }
+  ],
   "state": {
     "enabledSemantics": "isOn",
     "descriptionCustomBytes": [

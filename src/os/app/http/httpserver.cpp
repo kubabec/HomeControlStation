@@ -14,6 +14,7 @@
 #include "devices/fallback/DeviceConfigWidgets.hpp"
 #endif
 #include "generated/GeneratedDeviceRegistry.hpp"
+#include "os/app/config/ExtendedMemoryManager.hpp"
 #include "build_info.h"
 #include "os/Logger.hpp"
 
@@ -57,7 +58,9 @@ std::vector<String> constantRequests = {
   "networkInspection",
   "sysDetails",
   "digBtn",
-  "unmappedEvents"
+  "unmappedEvents",
+  "enablingConditions",
+  "rtcEvents"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -65,7 +68,10 @@ std::vector<String> parameterizedRequests = {
   "roomMappingApply",
   "passwordApply",
   "ledStripColor",
-  "ledColor"
+  "ledColor",
+  "newDigEvntTab",
+  "saveEnablingConditions",
+  "saveRtcEvents"
 };
 
 std::vector<String> parameterizedAsyncRequests = {
@@ -82,8 +88,7 @@ std::vector<String> parameterizedAsyncRequests = {
   "segSwtch",
   "ledsLiveSwtch",
   "getHash",
-  "roomToggle",
-  "newDigEvntTab"
+  "roomToggle"
 };
 
 
@@ -98,7 +103,9 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_unmappedEvents, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::constantHandler_unmappedEvents, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_enablingConditions, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -107,6 +114,9 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_passwordApply, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledStripColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE},
+  {HomeLightHttpServer::parameterizedHandler_newDigEvntTab, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_enablingConditions, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
@@ -123,8 +133,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_segmentStateSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_getHash, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE},
-  {HomeLightHttpServer::parameterizedHandler_newDigEvntTab, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::parameterizedHandler_roomToggle, e_ACCESS_LEVEL_NONE}
 };
 
 void HomeLightHttpServer::escapeSpecialCharsInJson(String& json)
@@ -766,6 +775,14 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       var url = `/unmappedEvents`;\
       window.location.href = url;\
     }\
+    function enablingConditions(){\
+      var url = `/enablingConditions`;\
+      window.location.href = url;\
+    }\
+    function rtcEvents(){\
+      var url = `/rtcEvents`;\
+      window.location.href = url;\
+    }\
     function resetDevice(){\
         var url = `/resetDevice`;\
         window.location.href = url;\
@@ -887,7 +904,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   // client.println(String((int)extMemoryFunctions.getCurrentMemoryUsage()) + " / 2 500 bytes");
   // client.println("\" type=\"text\" \"></label>");
 
-  int memoryUsagePercent = (int)((float)extMemoryFunctions.getCurrentMemoryUsage() / 2000.f * 100.f);
+  int memoryUsagePercent = (int)((float)extMemoryFunctions.getCurrentMemoryUsage() / MAX_EXT_MEMORY_SIZE_TOTAL * 100.f);
 
   client.println("<label>Memory usage: <div class=\"memory-bar\" id=\"memoryBar\">");
   client.println("<div class=\"memory-bar-fill\" id=\"memoryBarFill\"></div>");
@@ -928,7 +945,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   if(currentConfig.isRcServer){
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
     client.println("<div class=\"button-link\" onclick=\"digitalBtn()\">Digital Events</div>");
+    client.println("<div class=\"button-link\" onclick=\"enablingConditions()\">Enabling Conditions</div>");
     client.println("<div class=\"button-link\" onclick=\"unmappedEvents()\">Unmapped events</div>");
+    client.println("<div class=\"button-link\" onclick=\"rtcEvents()\">RTC Events</div>");
   }
     
   /* Devices setup button */

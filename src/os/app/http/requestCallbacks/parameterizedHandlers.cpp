@@ -1,4 +1,7 @@
 #include <os/app/http/httpserver.hpp>
+#include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
+#include <os/app/config/ConfigProvider.hpp>
+#include <os/app/timeMaster.hpp>
 #include "os/Logger.hpp"
 
 /**
@@ -98,10 +101,48 @@ void HomeLightHttpServer::parameterizedHandler_newDigEvntTab(String &request, Wi
     if (auto p = std::any_cast<std::function<void(String &)>>(&localAny))
     {
       (*p)(request);
+      DigitalEventReceiver::deinit();
+      if (!ConfigProvider::flushNvmData())
+      {
+        Logger::log("Digital event mapping NVM commit failed");
+      }
+      client.println("<meta http-equiv='refresh' content='0; url=/digBtn'>");
     }
     else
     {
     }
+  }
+}
+
+void HomeLightHttpServer::parameterizedHandler_enablingConditions(String &request, WiFiClient &client)
+{
+  SecurityAccessLevelType currentAccessLevel =
+      std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
+  if (currentAccessLevel == e_ACCESS_LEVEL_SERVICE_MODE)
+  {
+    escapeSpecialCharsInJson(request);
+    request.replace("/saveEnablingConditions&", "");
+    DigitalEventReceiver::updateEnablingConditionsViaJson(request);
+    DigitalEventReceiver::deinit();
+    if (!ConfigProvider::flushNvmData())
+    {
+      Logger::log("Enabling conditions NVM commit failed");
+    }
+    client.println("<meta http-equiv='refresh' content='0; url=/enablingConditions'>");
+  }
+}
+
+void HomeLightHttpServer::parameterizedHandler_rtcEvents(String &request, WiFiClient &client)
+{
+  SecurityAccessLevelType currentAccessLevel =
+      std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
+  if (currentAccessLevel == e_ACCESS_LEVEL_SERVICE_MODE)
+  {
+    escapeSpecialCharsInJson(request);
+    request.replace("/saveRtcEvents&", "");
+    if (!TimeMaster::updateRtcEventsViaJson(request))
+      Logger::log("RTC event table validation or NVM commit failed");
+    client.println("<meta http-equiv='refresh' content='0; url=/rtcEvents'>");
   }
 }
 

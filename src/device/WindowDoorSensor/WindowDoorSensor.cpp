@@ -1,4 +1,5 @@
 #include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
+#include "generated/GeneratedEnablingConditions.hpp"
 
 WindowDoorSensor::WindowDoorSensor(DeviceConfigSlotType config, std::function<void(uint8_t)> fireDeviceEventCallback)
     : sensorPin(config.pinNumber), deviceId(config.deviceId), roomId(config.roomId), deviceName(config.deviceName),
@@ -52,4 +53,10 @@ uint16_t WindowDoorSensor::getExtendedMemoryLength() { return 0; }
 ServiceRequestErrorCode WindowDoorSensor::service(DeviceServicesType) { return SERV_NOT_SUPPORTED; }
 ServiceRequestErrorCode WindowDoorSensor::service(DeviceServicesType, ServiceParameters_set1) { return SERV_NOT_SUPPORTED; }
 ServiceRequestErrorCode WindowDoorSensor::service(DeviceServicesType, ServiceParameters_set2) { return SERV_NOT_SUPPORTED; }
-ServiceRequestErrorCode WindowDoorSensor::service(DeviceServicesType, ServiceParameters_set3) { return SERV_NOT_SUPPORTED; }
+ServiceRequestErrorCode WindowDoorSensor::service(DeviceServicesType serviceType, ServiceParameters_set3 param)
+{
+    if (serviceType != DEVSERVICE_CHECK_ENABLING_CONDITION) return SERV_NOT_SUPPORTED;
+    DeviceDescription description = getDeviceDescription();
+    description.customBytes[0] = readClosed();
+    return GeneratedEnablingConditions::evaluateService(description, param);
+}

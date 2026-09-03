@@ -69,9 +69,26 @@ typedef enum
     e_BLOCK_DIGITAL_EVENT_6,
     e_BLOCK_RFMANAGER_1,
     e_BLOCK_RFMANAGER_2,
-    e_PERSISTENT_BLOCK_LAST = e_BLOCK_RFMANAGER_2,
+    e_BLOCK_ENABLING_CONDITIONS_1,
+    e_BLOCK_ENABLING_CONDITIONS_2,
+    e_BLOCK_ENABLING_CONDITIONS_3,
+    e_BLOCK_DIGITAL_EVENT_CONDITIONS_1,
+    e_BLOCK_DIGITAL_EVENT_CONDITIONS_2,
+    e_BLOCK_DIGITAL_EVENT_CONDITIONS_3,
+    e_PERSISTENT_BLOCK_LAST = e_BLOCK_DIGITAL_EVENT_CONDITIONS_3,
     e_NUMBER_OF_PERSISTENT_BLOCKS = (e_PERSISTENT_BLOCK_LAST + 1)
 }PersistentDatablockID;
+
+inline constexpr uint8_t LEGACY_PERSISTENT_BLOCK_COUNT = 28;
+inline constexpr uint8_t CONDITION_LAYOUT_BLOCK_COUNT = 34;
+static_assert(e_BLOCK_RFMANAGER_2 + 1 == LEGACY_PERSISTENT_BLOCK_COUNT,
+              "Legacy NVM block IDs must remain unchanged");
+static_assert(e_BLOCK_ENABLING_CONDITIONS_1 == LEGACY_PERSISTENT_BLOCK_COUNT,
+              "New NVM blocks must be appended after the legacy layout");
+static_assert(e_BLOCK_DIGITAL_EVENT_CONDITIONS_3 + 1 == CONDITION_LAYOUT_BLOCK_COUNT,
+              "Condition-layout NVM block IDs must remain unchanged");
+static_assert(e_NUMBER_OF_PERSISTENT_BLOCKS == CONDITION_LAYOUT_BLOCK_COUNT,
+              "Persistent block count does not match the deployed condition layout");
 
 /* Array of available configuration slots wrapper */
 typedef struct {
@@ -87,6 +104,9 @@ typedef struct
         return PERSISTENT_DATABLOCK_SIZE;
     }
 }PersistentDataBlock;
+
+static_assert(sizeof(PersistentDataBlock) == PERSISTENT_DATABLOCK_SIZE,
+              "Persistent block wrapper must not contain padding");
 
 typedef struct
 {
@@ -203,6 +223,52 @@ namespace DigitalEvent{
     static_assert(sizeof(Event) == 6, "DigitalEvent NVM record size must remain backwards compatible");
     static_assert(offsetof(Event, mappingId) == 0 && offsetof(Event, deviceId) == 1 && offsetof(Event, actionId) == 5,
                   "DigitalEvent NVM field offsets must not change");
+
+    inline constexpr uint8_t MAX_ENABLING_CONDITIONS = 20;
+    inline constexpr uint8_t MAX_CONDITIONS_PER_MAPPING = 3;
+    inline constexpr uint8_t MAX_EVENT_MAPPINGS =
+        ((e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE - 2) /
+        (sizeof(uint64_t) + sizeof(Event));
+
+    struct __attribute__((packed)) EnablingCondition
+    {
+        uint8_t conditionId = 0;
+        uint32_t deviceId = 0;
+        uint8_t predicateId = 0;
+    };
+
+    struct __attribute__((packed)) MappingConditions
+    {
+        uint8_t mappingId = 0;
+        uint8_t conditionIds[MAX_CONDITIONS_PER_MAPPING] = {0, 0, 0};
+    };
+
+    static_assert(sizeof(EnablingCondition) == 6, "Enabling-condition NVM record must remain compact");
+    static_assert(sizeof(MappingConditions) == 4, "Mapping-condition NVM record must remain compact");
+}
+
+namespace RtcEvent
+{
+    inline constexpr uint8_t MAX_EVENTS = 10;
+
+    enum class Recurrence : uint8_t
+    {
+        ONCE = 0,
+        INTERVAL_HOURS = 1,
+        DAILY = 2,
+        WEEKLY = 3
+    };
+
+    struct __attribute__((packed)) Schedule
+    {
+        uint64_t eventId = 0;
+        uint32_t anchorEpoch = 0;
+        uint16_t intervalHours = 0;
+        Recurrence recurrence = Recurrence::ONCE;
+        uint8_t weekdayMask = 0;
+    };
+
+    static_assert(sizeof(Schedule) == 16, "RTC event NVM record size must remain stable");
 }
 
 #endif 

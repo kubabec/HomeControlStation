@@ -269,6 +269,9 @@ void OperatingSystem::saveNvmData()
 
 void OperatingSystem::performReset()
 {
+    // Record that this reset is intentional before any component teardown can fail.
+    ConfigProvider::deinit();
+
     DeviceProvider::deinit();
 
     if (isRCServerRunning)

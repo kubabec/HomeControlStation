@@ -101,6 +101,10 @@
     { "id": 32, "label": "Brightness 75%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 75 } },
     { "id": 33, "label": "Brightness 100%", "service": "DEVSERVICE_BRIGHTNESS_CHANGE", "parameters": { "a": 100 } }
   ],
+  "enablingConditions": [
+    { "id": 1, "label": "Enabled", "source": "isEnabled", "type": "boolean", "comparator": "equals", "value": true },
+    { "id": 2, "label": "Disabled", "source": "isEnabled", "type": "boolean", "comparator": "equals", "value": false }
+  ],
   "state": {
     "enabledSemantics": "isOn",
     "descriptionCustomBytes": [

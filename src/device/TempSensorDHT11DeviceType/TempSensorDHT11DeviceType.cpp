@@ -1,4 +1,5 @@
 #include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
+#include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 
 #ifdef TEMP_SENSOR_SUPPORTED
@@ -199,6 +200,10 @@ ServiceRequestErrorCode TempSensorDHT11DeviceType::service(DeviceServicesType se
 {
     switch (serviceType)
     {
+    case DEVSERVICE_CHECK_ENABLING_CONDITION:
+        temHumReading();
+        if (temHumSensError) return SERV_EXECUTION_FAILURE;
+        return GeneratedEnablingConditions::evaluateService(getDeviceDescription(), param);
     default:
         return SERV_NOT_SUPPORTED;
     };

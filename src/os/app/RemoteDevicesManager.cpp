@@ -401,13 +401,21 @@ bool RemoteDevicesManager::receiveResponse(RcResponse &response)
     {
         Logger::log("Invalid request received, returning GENERAL_FAILURE");
 
-        UserInterfaceNotification notif;
-        notif.title = "Problem occured";
-        notif.body = "No response from remote device. Please try again.";
-        notif.type = UserInterfaceNotification::WARNING;
-        std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
-
-        requestProcessingState = RDM_REQUEST_FAILED;
+        if (currentRequestFingerprint.serviceName == DEVSERVICE_CHECK_ENABLING_CONDITION)
+        {
+            currentRequestRespErrorCode = SERV_NOT_SUPPORTED;
+            requestProcessingState = RDM_REQUEST_COMPLETED;
+            Logger::log("RDM : //// Remote node does not support live enabling conditions");
+        }
+        else
+        {
+            UserInterfaceNotification notif;
+            notif.title = "Problem occured";
+            notif.body = "No response from remote device. Please try again.";
+            notif.type = UserInterfaceNotification::WARNING;
+            std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+            requestProcessingState = RDM_REQUEST_FAILED;
+        }
     }
 
     return true;

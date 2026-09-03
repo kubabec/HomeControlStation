@@ -1,4 +1,5 @@
 #include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
+#include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 #ifdef LED_STRIP_SUPPORTED
 static_assert(sizeof(LedStripAnimationProperties) == 5, "LED advanced-controls overhead size is out of sync");
@@ -502,6 +503,11 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set3 param)
 {
+    if (serviceType == DEVSERVICE_CHECK_ENABLING_CONDITION)
+    {
+        return GeneratedEnablingConditions::evaluateService(getDeviceDescription(), param);
+    }
+
     if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
     {
         Logger::log("Ongoing animation in progress, service request cannot be processed");

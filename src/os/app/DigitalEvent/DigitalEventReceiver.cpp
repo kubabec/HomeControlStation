@@ -1,6 +1,7 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/drivers/networkdriver.hpp>
 #include "generated/GeneratedDigitalEventActions.hpp"
+#include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 #include <algorithm>
 
@@ -11,15 +12,69 @@
 
 
 std::vector<std::pair<uint64_t, DigitalEvent::Event>> DigitalEventReceiver::digitalEventsMapping;
+std::vector<DigitalEvent::EnablingCondition> DigitalEventReceiver::enablingConditions;
+std::vector<DigitalEvent::MappingConditions> DigitalEventReceiver::mappingConditions;
 std::queue<DigitalEventOccurrence> DigitalEventReceiver::eventsQueue;
 std::vector<DigitalEventOccurrence> DigitalEventReceiver::unmappedEvents;
 std::queue<ServiceCallData> DigitalEventReceiver::pendingServiceCalls;
+std::queue<PendingConditionalAction> DigitalEventReceiver::pendingConditionalActions;
 
 std::vector<std::pair<uint32_t, uint8_t>> DigitalEventReceiver::receivedTransmissionIds;
 
 const uint8_t NVM_VALID = 0xCD;
 const uint8_t LEGACY_ROOM_TYPE = 11;
 const uint8_t LEGACY_DEVICE_TYPE = 12;
+
+template <typename Record>
+static void restoreFixedTable(PersistentDatablockID firstBlock, PersistentDatablockID lastBlock,
+                              uint8_t maximumRecords, std::vector<Record> &records)
+{
+    const uint16_t size = (lastBlock - firstBlock + 1) * PERSISTENT_DATABLOCK_SIZE;
+    const uint8_t physicalCapacity = (size - 2) / sizeof(Record);
+    std::vector<uint8_t> data(size, 0);
+    uint16_t offset = 0;
+    for (uint8_t block = firstBlock; block <= lastBlock; ++block, offset += PERSISTENT_DATABLOCK_SIZE)
+    {
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_GET_NVM_DATABLOCK))(
+            static_cast<PersistentDatablockID>(block), &data[offset]);
+    }
+    if (data[0] != NVM_VALID) return;
+    const uint8_t count = std::min(data[1], std::min(maximumRecords, physicalCapacity));
+    for (uint8_t index = 0; index < count; ++index)
+    {
+        Record record{};
+        memcpy(&record, &data[2 + index * sizeof(Record)], sizeof(Record));
+        records.push_back(record);
+    }
+    Logger::log("DigitalEventReceiver:// Restored " + String((int)count) +
+                " records from NVM blocks " + String((int)firstBlock) + "-" + String((int)lastBlock));
+}
+
+template <typename Record>
+static void saveFixedTable(PersistentDatablockID firstBlock, PersistentDatablockID lastBlock,
+                           const std::vector<Record> &records)
+{
+    const uint16_t size = (lastBlock - firstBlock + 1) * PERSISTENT_DATABLOCK_SIZE;
+    const size_t physicalCapacity = (size - 2) / sizeof(Record);
+    const size_t count = std::min(records.size(), physicalCapacity);
+    std::vector<uint8_t> data(size, 0);
+    data[0] = NVM_VALID;
+    data[1] = static_cast<uint8_t>(count);
+    for (size_t index = 0; index < count; ++index)
+    {
+        memcpy(&data[2 + index * sizeof(Record)], &records[index], sizeof(Record));
+    }
+    uint16_t offset = 0;
+    for (uint8_t block = firstBlock; block <= lastBlock; ++block, offset += PERSISTENT_DATABLOCK_SIZE)
+    {
+        std::any_cast<std::function<bool(PersistentDatablockID, uint8_t *)>>(
+            DataContainer::getSignalValue(CBK_SET_NVM_DATABLOCK))(
+            static_cast<PersistentDatablockID>(block), &data[offset]);
+    }
+    Logger::log("DigitalEventReceiver:// Saved " + String((int)count) +
+                " records to NVM blocks " + String((int)firstBlock) + "-" + String((int)lastBlock));
+}
 
 static uint8_t nextMappingId(const std::vector<std::pair<uint64_t, DigitalEvent::Event>> &mappings)
 {
@@ -43,6 +98,12 @@ static uint8_t nextMappingId(const std::vector<std::pair<uint64_t, DigitalEvent:
 void DigitalEventReceiver::init()
 {
     Logger::log("DigitalEventReceiver init ...");
+    digitalEventsMapping.clear();
+    enablingConditions.clear();
+    mappingConditions.clear();
+    eventsQueue = {};
+    pendingServiceCalls = {};
+    pendingConditionalActions = {};
 
     /* Read NVM data for DigitalEventReceiver application */
     uint16_t sizeOfNvm = (e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
@@ -66,7 +127,8 @@ void DigitalEventReceiver::init()
         // check if FIRST byte of NVM contains validity flag
         if (nvmData[0] == NVM_VALID)
         {
-            uint8_t numberOfElementsInNvm = nvmData[1];
+            const uint8_t numberOfElementsInNvm =
+                std::min(nvmData[1], DigitalEvent::MAX_EVENT_MAPPINGS);
 
             // Are there any Event events saved in nvm?
             if (numberOfElementsInNvm > 0)
@@ -104,6 +166,11 @@ void DigitalEventReceiver::init()
         free(nvmData);
     }
 
+    restoreFixedTable(e_BLOCK_ENABLING_CONDITIONS_1, e_BLOCK_ENABLING_CONDITIONS_3,
+                      DigitalEvent::MAX_ENABLING_CONDITIONS, enablingConditions);
+    restoreFixedTable(e_BLOCK_DIGITAL_EVENT_CONDITIONS_1, e_BLOCK_DIGITAL_EVENT_CONDITIONS_3,
+                      DigitalEvent::MAX_EVENT_MAPPINGS, mappingConditions);
+
     DataContainer::setSignalValue(SIG_DIGITAL_EVNT_MAPPING, digitalEventsMapping);
     DataContainer::setSignalValue(CBK_UPDATE_DIG_EVNT_TABLE, std::function<void(String &)>(updateDigitalEventMappingViaJson));
 
@@ -129,6 +196,7 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
     if (success == DeserializationError::Code::Ok)
     {
         digitalEventsMapping.clear();
+        mappingConditions.clear();
         // oczekujemy tablicy na rootzie
         JsonArray arr = doc.as<JsonArray>();
 
@@ -141,7 +209,7 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 continue;
             }
 
-            if (digitalEventsMapping.size() < 25)
+            if (digitalEventsMapping.size() < DigitalEvent::MAX_EVENT_MAPPINGS)
             {
                 uint64_t eventId = obj["eventId"].as<uint64_t>();
                 uint32_t deviceId = obj["deviceId"].as<uint32_t>();
@@ -181,10 +249,25 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 DigitalEvent::Event event{mappingId, deviceId, actionId};
                 Logger::log("DigitalEventReceiver:// Adding mapping ID: " + String((int)mappingId) + " device ID: " + String((int)deviceId) + " action ID: " + String((int)actionId));
                 digitalEventsMapping.push_back({eventId, event});
+
+                DigitalEvent::MappingConditions assignment{};
+                assignment.mappingId = mappingId;
+                JsonArray conditionIds = obj["conditionIds"].as<JsonArray>();
+                uint8_t conditionIndex = 0;
+                for (JsonVariant conditionValue : conditionIds)
+                {
+                    if (conditionIndex >= DigitalEvent::MAX_CONDITIONS_PER_MAPPING) break;
+                    const uint8_t conditionId = conditionValue.as<uint8_t>();
+                    const bool exists = std::any_of(enablingConditions.begin(), enablingConditions.end(),
+                                                    [conditionId](const auto &condition) { return condition.conditionId == conditionId; });
+                    const bool duplicate = std::find(std::begin(assignment.conditionIds), std::end(assignment.conditionIds), conditionId) != std::end(assignment.conditionIds);
+                    if (conditionId != 0 && exists && !duplicate) assignment.conditionIds[conditionIndex++] = conditionId;
+                }
+                mappingConditions.push_back(assignment);
             }else {
                 UserInterfaceNotification notif;
                 notif.title = "Problem occured";
-                notif.body = "Too many digital event mappings, maximum is 25. Some mappings have been skipped.";
+                notif.body = "Too many digital event mappings. Some mappings have been skipped.";
                 notif.type = UserInterfaceNotification::ERROR;
                 std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
             }
@@ -215,6 +298,7 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
 void DigitalEventReceiver::cyclic()
 {
     processEvents();
+    processPendingConditions();
 
     if (pendingServiceCalls.size() > 0)
     {
@@ -256,22 +340,76 @@ const std::vector<DigitalEventOccurrence> &DigitalEventReceiver::getUnmappedEven
     return unmappedEvents;
 }
 
+const std::vector<DigitalEvent::EnablingCondition> &DigitalEventReceiver::getEnablingConditions()
+{
+    return enablingConditions;
+}
+
+const std::vector<DigitalEvent::MappingConditions> &DigitalEventReceiver::getMappingConditions()
+{
+    return mappingConditions;
+}
+
+void DigitalEventReceiver::updateEnablingConditionsViaJson(String &json)
+{
+    JsonDocument doc;
+    if (deserializeJson(doc, json) != DeserializationError::Ok || !doc.is<JsonArray>())
+    {
+        Logger::log("DigitalEventReceiver:// Invalid enabling conditions JSON");
+        return;
+    }
+
+    std::vector<DigitalEvent::EnablingCondition> updated;
+    const auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+    for (JsonObject object : doc.as<JsonArray>())
+    {
+        if (updated.size() >= DigitalEvent::MAX_ENABLING_CONDITIONS) break;
+        const uint8_t conditionId = object["conditionId"].as<uint8_t>();
+        const uint32_t deviceId = object["deviceId"].as<uint32_t>();
+        const uint8_t predicateId = object["predicateId"].as<uint8_t>();
+        if (conditionId == 0 || deviceId == 0 || predicateId == 0) continue;
+        const bool duplicate = std::any_of(updated.begin(), updated.end(), [conditionId](const auto &condition)
+                                           { return condition.conditionId == conditionId; });
+        auto device = std::find_if(devices.begin(), devices.end(), [deviceId](const auto &item)
+                                   { return item.deviceId == deviceId; });
+        if (duplicate || device == devices.end() || GeneratedEnablingConditions::find(device->deviceType, predicateId) == nullptr)
+        {
+            Logger::log("DigitalEventReceiver:// Invalid or duplicate enabling condition, skipping");
+            continue;
+        }
+        updated.push_back({conditionId, deviceId, predicateId});
+    }
+    enablingConditions = std::move(updated);
+    for (auto &assignment : mappingConditions)
+    {
+        for (uint8_t &conditionId : assignment.conditionIds)
+        {
+            const bool exists = std::any_of(enablingConditions.begin(), enablingConditions.end(),
+                                            [conditionId](const auto &condition) { return condition.conditionId == conditionId; });
+            if (!exists) conditionId = 0;
+        }
+    }
+    std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+}
+
 void DigitalEventReceiver::deinit()
 {
     // We only have NVM data if we handshaked at least 1 slave node
     /* Write NVM data for DigitalEventReceiver application */
     uint16_t sizeOfNvm = (e_BLOCK_DIGITAL_EVENT_6 - e_BLOCK_DIGITAL_EVENT_1 + 1) * PERSISTENT_DATABLOCK_SIZE;
     /* Allocate memory for NVM data */
-    uint8_t *nvmData = (uint8_t *)malloc(sizeOfNvm);
+    uint8_t *nvmData = static_cast<uint8_t *>(calloc(sizeOfNvm, sizeof(uint8_t)));
+    if (nvmData == nullptr) return;
 
     // Data validity indicator
     nvmData[0] = NVM_VALID;
     // Number of mappings present in the system
-    nvmData[1] = digitalEventsMapping.size();
+    const size_t mappingCount = std::min(digitalEventsMapping.size(), static_cast<size_t>(DigitalEvent::MAX_EVENT_MAPPINGS));
+    nvmData[1] = mappingCount;
 
     uint8_t i = 0;
     // Serialize map to nvmData raw memory
-    for (auto it = digitalEventsMapping.begin(); it != digitalEventsMapping.end(); ++it, ++i)
+    for (auto it = digitalEventsMapping.begin(); it != digitalEventsMapping.begin() + mappingCount; ++it, ++i)
     {
         memcpy(&(nvmData[2 + i * (sizeof(uint64_t) + sizeof(DigitalEvent::Event))]), &(it->first), sizeof(uint64_t));
         memcpy(&(nvmData[2 + (i * (sizeof(uint64_t) + sizeof(DigitalEvent::Event)) + sizeof(uint64_t))]), &(it->second), sizeof(DigitalEvent::Event));
@@ -294,6 +432,9 @@ void DigitalEventReceiver::deinit()
 
     /* release heap buffer */
     free(nvmData);
+
+    saveFixedTable(e_BLOCK_ENABLING_CONDITIONS_1, e_BLOCK_ENABLING_CONDITIONS_3, enablingConditions);
+    saveFixedTable(e_BLOCK_DIGITAL_EVENT_CONDITIONS_1, e_BLOCK_DIGITAL_EVENT_CONDITIONS_3, mappingConditions);
 }
 
 void DigitalEventReceiver::receiveUDP(MessageUDP &msg)
@@ -365,7 +506,20 @@ void DigitalEventReceiver::processEvents()
         {
             if (mapping.first == occurrence.eventId)
             {
-                executeAction(mapping.second);
+                auto assignment = std::find_if(mappingConditions.begin(), mappingConditions.end(), [&mapping](const auto &item)
+                                               { return item.mappingId == mapping.second.mappingId; });
+                if (assignment == mappingConditions.end() ||
+                    std::all_of(std::begin(assignment->conditionIds), std::end(assignment->conditionIds), [](uint8_t id) { return id == 0; }))
+                {
+                    executeAction(mapping.second);
+                }
+                else
+                {
+                    PendingConditionalAction pending{};
+                    pending.action = mapping.second;
+                    std::copy(std::begin(assignment->conditionIds), std::end(assignment->conditionIds), pending.conditionIds);
+                    pendingConditionalActions.push(pending);
+                }
                 found = true;
             }
         }
@@ -377,6 +531,76 @@ void DigitalEventReceiver::processEvents()
 
         eventsQueue.pop();
     }
+}
+
+void DigitalEventReceiver::processPendingConditions()
+{
+    if (pendingConditionalActions.empty()) return;
+
+    PendingConditionalAction &pending = pendingConditionalActions.front();
+    while (pending.conditionIndex < DigitalEvent::MAX_CONDITIONS_PER_MAPPING &&
+           pending.conditionIds[pending.conditionIndex] == 0)
+    {
+        ++pending.conditionIndex;
+    }
+    if (pending.conditionIndex >= DigitalEvent::MAX_CONDITIONS_PER_MAPPING)
+    {
+        executeAction(pending.action);
+        pendingConditionalActions.pop();
+        return;
+    }
+
+    const uint8_t conditionId = pending.conditionIds[pending.conditionIndex];
+    if (pending.activeDeviceId == 0)
+    {
+        auto condition = std::find_if(enablingConditions.begin(), enablingConditions.end(), [conditionId](const auto &item)
+                                      { return item.conditionId == conditionId; });
+        if (condition == enablingConditions.end())
+        {
+            Logger::log("DigitalEventReceiver:// Mapping blocked by missing enabling condition");
+            pendingConditionalActions.pop();
+            return;
+        }
+        pending.activeDeviceId = condition->deviceId;
+        pending.activePredicateId = condition->predicateId;
+    }
+
+    if (!pending.requestPending) pending.result = 0;
+    ServiceParameters_set3 parameters;
+    parameters.buff = &pending.result;
+    parameters.size = 1;
+    parameters.additionalParam = pending.activePredicateId;
+    parameters.direction = e_OUT_from_DEVICE;
+    const ServiceRequestErrorCode result =
+        std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES))
+            .serviceCall_set3(pending.activeDeviceId, DEVSERVICE_CHECK_ENABLING_CONDITION, parameters);
+
+    if (result == SERV_BUSY) return;
+    if (result == SERV_PENDING)
+    {
+        pending.requestPending = true;
+        return;
+    }
+    if (result == SERV_NOT_SUPPORTED)
+    {
+        const auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+        auto device = std::find_if(devices.begin(), devices.end(), [&pending](const auto &item)
+                                   { return item.deviceId == pending.activeDeviceId; });
+        pending.result = device != devices.end() &&
+                         GeneratedEnablingConditions::evaluate(*device, pending.activePredicateId);
+        Logger::log("DigitalEventReceiver:// Using advertised-state fallback for a legacy condition device");
+    }
+    if ((result != SERV_SUCCESS && result != SERV_NOT_SUPPORTED) || pending.result == 0)
+    {
+        Logger::log("DigitalEventReceiver:// Mapping " + String((int)pending.action.mappingId) + " blocked by enabling condition " + String((int)conditionId));
+        pendingConditionalActions.pop();
+        return;
+    }
+
+    pending.requestPending = false;
+    pending.activeDeviceId = 0;
+    pending.activePredicateId = 0;
+    ++pending.conditionIndex;
 }
 
 void DigitalEventReceiver::executeAction(DigitalEvent::Event &action)

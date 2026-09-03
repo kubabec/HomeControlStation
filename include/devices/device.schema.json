@@ -16,6 +16,7 @@
     "limitations"
   ],
   "properties": {
+    "$schema": { "type": "string" },
     "schemaVersion": {
       "const": 1
     },
@@ -164,6 +165,10 @@
       "type": "array",
       "items": { "$ref": "#/$defs/digitalEventTrigger" }
     },
+    "enablingConditions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/enablingCondition" }
+    },
     "state": {
       "type": "object",
       "required": ["descriptionCustomBytes", "httpFields"],
@@ -239,6 +244,21 @@
     }
   },
   "$defs": {
+    "enablingCondition": {
+      "type": "object",
+      "required": ["id", "label", "source", "type", "comparator"],
+      "properties": {
+        "id": { "type": "integer", "minimum": 1, "maximum": 255 },
+        "label": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "pattern": "^(isEnabled|customBytes\\[[0-9]+(\\.\\.[0-9]+)?\\])$" },
+        "type": { "enum": ["boolean", "uint8", "float32"] },
+        "comparator": { "enum": ["equals", "lessThan", "greaterThan", "between"] },
+        "value": { "type": ["number", "boolean"] },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
     "digitalEventTrigger": {
       "type": "object",
       "required": ["id", "label"],
@@ -280,7 +300,7 @@
         "fieldId": { "type": "string" },
         "htmlType": { "type": "string" },
         "offset": { "type": "integer", "minimum": 0 },
-        "size": { "type": "integer", "minimum": 1 },
+        "size": { "type": ["integer", "string"], "minimum": 1 },
         "source": { "type": "string" },
         "unit": { "type": "string" },
         "minimum": { "type": "number" },

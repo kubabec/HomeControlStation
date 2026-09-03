@@ -420,6 +420,21 @@ The callback converts the trigger ID into a stable 64-bit event ID using FNV-1a 
 
 Do not construct the 64-bit ID in device code and do not call networking directly. The predefined `WindowDoorSensor` package is the reference implementation.
 
+### 4.5 Enabling conditions
+
+A device may expose boolean predicates that users can instantiate once and reuse across DigitalEvent mappings:
+
+```json
+"enablingConditions": [
+  { "id": 1, "label": "Enabled", "source": "isEnabled", "type": "boolean", "comparator": "equals", "value": true },
+  { "id": 2, "label": "Warm", "source": "customBytes[3..6]", "type": "float32", "comparator": "greaterThan", "value": 24 }
+]
+```
+
+Predicate IDs are stable one-byte identifiers within a device type. Preserve their meaning after release because persisted condition instances refer to the number. Sources may be `isEnabled`, `customBytes[N]`, or a custom-byte span for `float32`. Supported comparators are `equals`, `lessThan`, `greaterThan`, and inclusive `between`, which uses `minimum` and `maximum`.
+
+The generated `GeneratedEnablingConditions.hpp` helper evaluates these predicates and writes the boolean service result. A device that declares conditions must handle `DEVSERVICE_CHECK_ENABLING_CONDITION` in its `serviceCall_3` overload, capture current state, and call `GeneratedEnablingConditions::evaluateService(...)`. Sensors should take a fresh hardware reading there when required. The DigitalEvent receiver requests this service through the normal local/remote device API and waits asynchronously for its result. Keep `state.descriptionCustomBytes`, the C++ `getDeviceDescription()` implementation, and predicate offsets synchronized. Settings permits 20 reusable instances, and each mapping may select up to three; all selected conditions must be true.
+
 ## 5. Write the JSON description
 
 ### 5.1 Complete starter description
@@ -538,6 +553,7 @@ The schema requires:
 - `lifecycle`
 - `configuration`
 - `services`
+- `enablingConditions` when the device offers DigitalEvent gating predicates
 - `state`
 - `ui`
 - `extendedMemory`

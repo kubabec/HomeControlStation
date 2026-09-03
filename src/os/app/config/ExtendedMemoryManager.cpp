@@ -107,20 +107,27 @@ void ExtendedMemoryManager::restoreExtMemoryFromNvm()
     for(uint8_t deviceId = 0 ; deviceId < SLOTS_FOR_EXT_MEMORY_BUFFERS; deviceId++){
         /* Are there any data for this device? */
         if(extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId] > 0){
+            const uint16_t requestedLength = extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId];
+            if (requestedLength > MAX_EXT_MEMORY_SIZE_TOTAL - offsetInNvm)
+            {
+                Logger::log("ExtendedMemoryManager//ERROR: Persisted extended memory exceeds current 1200-byte capacity");
+                extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId] = 0;
+                continue;
+            }
             /* try to allocate RAM buffer for data */
-            uint8_t* data = (uint8_t*)malloc(extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId]);
+            uint8_t* data = (uint8_t*)malloc(requestedLength);
             if(data != nullptr){
                 /* Read data from NVM to buffer under 'data' pointer */
                 PersistentMemoryAccess::readExtendedMemoryWithOffset(
                     offsetInNvm,
                     data,
-                    extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId]
+                    requestedLength
                 );
 
                 /* Create new ExtMemory entry */
                 ExtMemoryData entry {
                     .ownerDeviceId = deviceId + 1,
-                    .length = extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId],
+                    .length = requestedLength,
                     .dataPtr = data
                 };
 

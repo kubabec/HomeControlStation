@@ -11,11 +11,13 @@ class PersistentMemoryAccess
 {
     static bool eepromInitializedSuccessfully;
     static uint16_t standardDataEepromSize;
+    static uint16_t extendedDataEepromSize;
 
 public:
-    static void init(uint16_t eepromSize);
+    static void init(uint16_t eepromSize, uint16_t extendedMemorySize);
 
     static bool saveData(uint8_t* data, uint16_t size);
+    static bool saveDataMigratingExtendedMemory(uint8_t* data, uint16_t size, uint16_t legacyDataSize, uint16_t extendedMemorySize);
     static bool readData(uint8_t* buffer, uint16_t size);
     static void massErase(uint16_t eepromSize);
 

@@ -67,6 +67,8 @@ typedef enum
     DEVSERVICE_LIVE_ANIMATION,
     /** Common opaque payload write used by every generated advanced-controls widget. */
     DEVSERVICE_SET_ADVANCED_CONTROLS,
+    /** Evaluates a device-owned enabling predicate and returns one boolean byte. */
+    DEVSERVICE_CHECK_ENABLING_CONDITION,
     DEVSERVICE_INVALID
 } DeviceServicesType;
 

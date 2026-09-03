@@ -313,6 +313,12 @@ public:
      */
     static void constantHandler_unmappedEvents(WiFiClient& client);
 
+    /** Renders the reusable digital-event enabling-condition table. */
+    static void constantHandler_enablingConditions(WiFiClient& client);
+
+    /** Renders user-configurable RTC DigitalEvent schedules. */
+    static void constantHandler_rtcEvents(WiFiClient& client);
+
     /**
      * Handles a fallback pending response route.
      * @param client HTTP client receiving the response.
@@ -444,6 +450,12 @@ public:
      * @param client HTTP client receiving the response.
      */
     static void parameterizedHandler_newDigEvntTab(String& request, WiFiClient& client);
+
+    /** Applies the reusable enabling-condition table submitted by the UI. */
+    static void parameterizedHandler_enablingConditions(String& request, WiFiClient& client);
+
+    /** Applies the RTC DigitalEvent schedule table submitted by the UI. */
+    static void parameterizedHandler_rtcEvents(String& request, WiFiClient& client);
     
 };
 

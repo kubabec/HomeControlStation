@@ -423,6 +423,35 @@ The generator accepts only implemented `serviceCall_1` services because a mappin
 
 The NVM contract is fixed. Blocks `e_BLOCK_DIGITAL_EVENT_1` through `e_BLOCK_DIGITAL_EVENT_6` and the packed six-byte record must not move or grow. Its byte layout is `mappingId`, `uint32_t deviceId`, `actionId`. Legacy byte-zero values `11` (room) and `12` (device) are reserved: room mappings are ignored, while legacy device mappings are assigned a new mapping ID in RAM and retain action IDs `21`/`22`/`23`. New mapping IDs therefore never use `11` or `12`.
 
+### Enabling conditions
+
+Settings exposes `/enablingConditions`, where up to 20 reusable conditions can be assigned a stable condition ID, a device, and one device-owned predicate. A DigitalEvent mapping may reference up to three condition IDs. Before its action is queued, the receiver requests `DEVSERVICE_CHECK_ENABLING_CONDITION` from each selected device and waits asynchronously for the one-byte boolean response. The same service route supports local and remote devices. The relationship is logical AND; a false result, failed service, unknown condition, missing device, or unsupported predicate fails closed and abandons that mapping execution. A mapping without conditions remains unconditional.
+
+Device predicates are declared under `enablingConditions` in the device JSON and generated into `GeneratedEnablingConditions.hpp`. Supported state sources are `isEnabled`, a single `customBytes[N]`, or a byte span containing a native `float32`; comparisons are equality, less-than, greater-than, and inclusive range. Each supporting device handles the common condition service and supplies state captured at request time. Sensor implementations may perform an immediate hardware sample before invoking the generated predicate evaluator. Remote responses use the existing `serviceCall_3` output-buffer transport, so the event task remains non-blocking while it waits.
+
+Remote nodes running firmware from before the condition-service protocol reject this request. For those nodes only, the master evaluates the same JSON predicate against the node's last advertised `DeviceDescription` and suppresses the expected unsupported-service warning. This preserves existing installations while upgraded nodes use live service evaluation.
+
+The persistent layout retains legacy blocks 0-27 unchanged and appends condition definitions in blocks 28-30 and mapping assignments in blocks 31-33. Compile-time assertions guard the block count, append boundaries, record sizes, and configuration size.
+
+The original DigitalEvent blocks remain unchanged. Three appended `e_BLOCK_ENABLING_CONDITIONS_*` blocks persist 20 six-byte definitions, and three appended `e_BLOCK_DIGITAL_EVENT_CONDITIONS_*` blocks persist up to 21 four-byte mapping assignments. Extended device memory is capped at 1200 bytes to reserve NVS capacity for reliable atomic updates and fixed platform tables.
+
+### RTC events
+
+Settings exposes `/rtcEvents`, where up to ten user-defined schedules generate ordinary source-aware DigitalEvents with source `TimeMaster`. Event IDs are entered as decimal strings so the browser never converts 64-bit values through JavaScript's limited integer representation. A generated RTC event follows the same mapping, enabling-condition, local/remote action, and Unmapped Events paths as RF and device-generated events.
+
+TimeMaster supports four recurrence modes:
+
+- **One shot** fires at or after its selected local date and minute, then removes itself from RAM and commits the shortened table immediately.
+- **Every N hours** repeats every 1-168 hours from a selected local date and time.
+- **Every day** fires at a selected local time.
+- **Selected weekdays** fires at a selected local time on any selected Sunday-Saturday day.
+
+Evaluation begins only after the node has synchronized with NTP at least once. TimeMaster evaluates at most once per epoch minute, preventing its 10 ms application cycle from generating duplicates. Recurring events are not replayed for minutes missed while powered off; an overdue one-shot fires once after valid time becomes available.
+
+Each schedule is a compile-time-checked 16-byte record containing the 64-bit event ID, wall-clock anchor, hour interval, recurrence mode, and weekday mask. TimeMaster stores ten records in its own versioned, checksummed 170-byte NVS blob under the `rtc_events` namespace. Saving an RTC table and removing a fired one-shot update only this small blob; neither operation rewrites or moves ConfigProvider's standard image or device extended memory.
+
+The ConfigProvider layout remains the deployed 34-block condition layout. With the 244-byte `ConfigData`, its standard EEPROM image remains 1950 bytes including framing and checksum. The 1200-byte extended region starts at byte 1950, producing a 3150-byte EEPROM blob. Original 28-block images retain their existing atomic migration path from extended base 1650. Keeping RTC persistence separate and limiting extended memory leave enough headroom in the 16 KB NVS partition for old and new blob generations during atomic updates.
+
 ### Event occurrence and compatibility
 
 An event occurrence consists of a 64-bit event ID and a human-readable Source. Platform producers use the source-aware callback `CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE`; the original `CBK_FIRE_DIGITAL_EVENT` callback remains available and assigns a legacy source.
@@ -473,6 +502,7 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Public local/remote device routing | `src/os/app/deviceProvider.cpp` |
 | Digital-event action registry | `include/generated/GeneratedDigitalEventActions.hpp` |
 | Device event trigger registry and ID derivation | `include/generated/GeneratedDigitalEventTriggers.hpp` |
+| Device enabling-condition registry and evaluator | `include/generated/GeneratedEnablingConditions.hpp` |
 | Digital-event mapping and NVM compatibility | `src/os/app/DigitalEvent/DigitalEventReceiver.cpp` |
 | Wi-Fi, UDP dispatch and OTA | `src/os/drivers/networkdriver.cpp` |
 | Master discovery and RC transport | `src/os/app/remoteControl/remotecontrolserver.cpp` |
@@ -500,6 +530,9 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Reserved unknown device type | 255 |
 | Device description custom bytes | 50 |
 | Generic advanced-control payload | Maximum 391 bytes |
+| Reusable enabling conditions | 20 |
+| Conditions per DigitalEvent mapping | 3, combined with logical AND |
+| Extended device memory | 1500 bytes total |
 
 ---
 
