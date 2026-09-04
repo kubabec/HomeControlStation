@@ -5,7 +5,11 @@
 static_assert(sizeof(LedStripAnimationProperties) == 5, "LED advanced-controls overhead size is out of sync");
 static_assert(sizeof(LedColor) == 3, "LED advanced-controls element size is out of sync");
 
+#ifdef SUPERMINI
+const uint8_t maxVirtualLeds = 50;
+#else
 const uint8_t maxVirtualLeds = 100;
+#endif
 
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
 {

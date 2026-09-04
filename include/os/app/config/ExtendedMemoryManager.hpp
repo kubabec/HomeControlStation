@@ -6,7 +6,11 @@
 #include <vector>
 #include "os/Logger.hpp"
 
+#ifdef SUPERMINI
+#define MAX_EXT_MEMORY_SIZE_TOTAL 600 /* bytes */
+#else
 #define MAX_EXT_MEMORY_SIZE_TOTAL 1200 /* bytes */
+#endif
 #define SLOTS_FOR_EXT_MEMORY_BUFFERS 10 /* number of slots for independent data pointers */
 
 /**
