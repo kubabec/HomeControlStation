@@ -875,7 +875,7 @@ def generate_widget_javascript(description):
         rows.append(
             "const readings=document.createElement('div');"
             f"if(device.{error_source}==0){{readings.className='temperature-container';"
-            "readings.innerHTML=`<div id=\"gauge${device.id}\" class=\"temperature-widget\"><canvas style=\"max-width:100px;\"></canvas><div class=\"temperature-value\">20°C</div></div><div id=\"humidity${device.id}\" class=\"humidity-widget\"><canvas></canvas><div class=\"value-display humidity-value\">50%</div></div>`;"
+            "readings.innerHTML=`<div id=\"gauge${device.id}\" class=\"temperature-widget\"><div class=\"meter-heading\"><span class=\"meter-label\">Temp.</span><span class=\"temperature-value\">--</span></div><div class=\"temperature-meter\"><div class=\"temperature-fill\"></div><span class=\"temperature-marker\"></span></div><div class=\"meter-scale\"><span>-10°</span><span>15°</span><span>40°</span></div></div><div id=\"humidity${device.id}\" class=\"humidity-widget\"><div class=\"meter-heading\"><span class=\"meter-label\">Humidity</span><span class=\"value-display humidity-value\">--</span></div><div class=\"humidity-meter\"><div class=\"humidity-fill\"></div></div><div class=\"meter-scale\"><span>0%</span><span>50%</span><span>100%</span></div></div>`;"
             f"listOfTempWidgets.push(`gauge${{device.id}}`);listOfTempValues.push(device.{temp_source});"
             f"listOfHumidWidgets.push(`humidity${{device.id}}`);listOfHumidValues.push(device.{humidity_source});"
             "}else{readings.className='sensor-error';readings.innerHTML='SENSOR ERROR';}deviceContainer.appendChild(readings);"

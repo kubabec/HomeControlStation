@@ -1,8 +1,9 @@
 <style>
-  .advanced-led-controls .advanced-led-actions,
-  .advanced-led-controls .advanced-led-presets { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
-  .advanced-led-controls .advanced-led-preset { display:flex; align-items:center; gap:4px; }
-  .advanced-led-controls .advanced-led-presets[hidden] { display:none; }
+  .advanced-led-controls .advanced-led-actions { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .advanced-led-controls .advanced-led-presets { display:grid; grid-template-columns:minmax(0, 1fr); gap:8px; width:100%; margin-top:6px; }
+  .advanced-led-controls .advanced-led-preset { display:grid; grid-template-columns:minmax(0, 1fr) 36px 36px; align-items:center; gap:8px; min-width:0; padding:6px 8px; border:1px solid rgba(110, 130, 153, 0.55); border-radius:6px; background:rgba(19, 25, 32, 0.45); }
+  .advanced-led-controls .advanced-led-preset .color-display { width:100%; min-width:0; height:28px; border:1px solid rgba(220, 230, 240, 0.45); border-radius:3px; }
+  .advanced-led-controls .advanced-led-preset .icon-btn { min-width:0; width:36px; height:36px; min-height:36px; margin:0; padding:0; flex:0 0 36px; border-radius:6px; font-size:1.2rem; }
   .advanced-led-controls .led-strip { display:grid; gap:0; width:100%; min-width:0; overflow:visible; }
   .advanced-led-controls .ledContainer { min-width:0; width:auto; padding:5px 0; cursor:pointer; }
   .advanced-led-controls .ledContainer.marked { background-color:rgba(93, 190, 255, 0.9); }
@@ -28,9 +29,8 @@
       <option value="0">Normal</option><option value="1">Fast</option><option value="2">Slow</option>
     </select>
   </label>
-  <div class="advanced-led-presets" data-role="presets" hidden></div>
+  <div class="advanced-led-presets" data-role="presets"></div>
   <div class="button-container advanced-led-actions">
-    <button class="icon-btn presets" data-action="toggle-presets" title="Saved compositions"></button>
     <button class="icon-btn ok" data-action="save" title="Apply"></button>
   </div>
 </div>
@@ -125,7 +125,6 @@ for (let slot = 1; slot <= 3; ++slot) {
   row.append(swatch, save, load);
   presets.appendChild(row);
 }
-context.root.querySelector('[data-action="toggle-presets"]').addEventListener('click', () => { presets.hidden = !presets.hidden; });
 context.root.querySelector('[data-action="save"]').addEventListener('click', async () => {
   const nextPayload = new Uint8Array(payload.length);
   nextPayload.set([Number(enableAnimation.value), Number(disableAnimation.value), Number(animationSpeed.value), payload[3], payload[4]]);
