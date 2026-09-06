@@ -1,0 +1,776 @@
+{
+  "$schema": "../device.schema.json",
+
+  "schemaVersion": 1,
+
+  "deviceType": {
+    "name": "Garden Irrigation",
+    "className": "GardenIrrigationDevice",
+    "enumSymbol": "type_GARDEN_IRRIGATION",
+    "enumValue": 60,
+
+    "httpConfig": {
+      "displayName": "Garden irrigation controller",
+      "configurable": true
+    }
+  },
+
+  "implementation": {
+    "header": "include/devices/GardenIrrigationDevice/GardenIrrigationDevice.hpp",
+
+    "source": "src/device/folder bez nazwy/GardenIrrigationDevice.cpp",
+
+    "buildGuard": null,
+
+    "dependencies": [
+      "Arduino GPIO",
+      "DHT sensor library"
+    ],
+
+    "factory": {
+      "arguments": [
+        "config"
+      ]
+    },
+
+    "manager": {
+      "registered": true,
+      "collection": "DeviceManager::devices",
+      "includedInDeviceCollection": true
+    }
+  },
+
+  "lifecycle": {
+
+    "init": {
+      "actions": [
+        "Initialize DHT22",
+        "Configure irrigation nozzle GPIO outputs",
+        "Ensure irrigation outputs are OFF"
+      ]
+    },
+
+    "update": {
+
+      "entryPoint": "cyclic",
+
+      "schedule": {
+
+        "mode": "fixed_interval",
+
+        "intervalMs": 2500
+      }
+    }
+  },
+
+  "configuration": {
+
+    "commonFields": [
+
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "source": "isActive",
+        "widget": "checkbox"
+      },
+
+      {
+        "name": "name",
+        "type": "string",
+        "source": "deviceName",
+        "maximumLength": 24,
+        "widget": "text"
+      },
+
+      {
+        "name": "sensorPin",
+        "type": "uint8",
+        "source": "pinNumber",
+        "widget": "gpio-select"
+      },
+
+      {
+        "name": "id",
+        "type": "uint8",
+        "source": "deviceId",
+        "widget": "device-slot"
+      },
+
+      {
+        "name": "room",
+        "type": "uint8",
+        "source": "roomId",
+        "widget": "room-select"
+      }
+    ],
+
+
+    "customBytes": [
+
+      {
+        "name": "nozzle1Pin",
+
+        "type": "uint8",
+
+        "label": "Nozzle 1 GPIO",
+
+        "fieldId": "nozzle1Pin",
+
+        "htmlType": "gpio-select",
+
+        "hardwareRole": "gpio",
+
+        "offset": 0,
+
+        "size": 1,
+
+        "minimum": 0,
+
+        "maximum": 48,
+
+        "widget": "gpio-select"
+      },
+
+
+      {
+        "name": "nozzle2Pin",
+
+        "type": "uint8",
+
+        "label": "Nozzle 2 GPIO",
+
+        "fieldId": "nozzle2Pin",
+
+        "htmlType": "gpio-select",
+
+        "hardwareRole": "gpio",
+
+        "offset": 1,
+
+        "size": 1,
+
+        "minimum": 0,
+
+        "maximum": 48,
+
+        "widget": "gpio-select"
+      },
+
+
+      {
+        "name": "outputsActiveHigh",
+
+        "type": "boolean",
+
+        "label": "Relay polarity",
+
+        "fieldId": "outputsActiveHigh",
+
+        "htmlType": "select",
+
+        "offset": 2,
+
+        "size": 1,
+
+        "widget": "select",
+
+        "options": [
+          {
+            "value": 1,
+            "label": "Active HIGH"
+          },
+          {
+            "value": 0,
+            "label": "Active LOW"
+          }
+        ]
+      },
+
+
+      {
+        "name": "sensorEnabled",
+
+        "type": "boolean",
+
+        "label": "DHT22 sensor connected",
+
+        "fieldId": "sensorEnabled",
+
+        "htmlType": "checkbox",
+
+        "offset": 7,
+
+        "size": 1,
+
+        "default": false,
+
+        "widget": "checkbox"
+      },
+
+
+      {
+        "name": "wateringDurationSeconds",
+
+        "type": "uint16",
+
+        "label": "Default watering duration [s]",
+
+        "fieldId": "wateringDurationSeconds",
+
+        "htmlType": "number",
+
+        "offset": 3,
+
+        "size": 2,
+
+        "minimum": 1,
+
+        "maximum": 3600,
+
+        "widget": "number"
+      },
+
+
+      {
+        "name": "dryThreshold",
+
+        "type": "uint8",
+
+        "label": "Dry threshold [%]",
+
+        "fieldId": "dryThreshold",
+
+        "htmlType": "number",
+
+        "offset": 5,
+
+        "size": 1,
+
+        "minimum": 0,
+
+        "maximum": 100,
+
+        "widget": "number"
+      },
+
+
+      {
+        "name": "wetThreshold",
+
+        "type": "uint8",
+
+        "label": "Wet threshold [%]",
+
+        "fieldId": "wetThreshold",
+
+        "htmlType": "number",
+
+        "offset": 6,
+
+        "size": 1,
+
+        "minimum": 0,
+
+        "maximum": 100,
+
+        "widget": "number"
+      }
+    ]
+  },
+
+
+  "services": [
+
+    {
+      "name": "DEVSERVICE_STATE_SWITCH",
+
+      "overload": "serviceCall_1",
+
+      "status": "implemented",
+
+      "parameters": [
+
+        {
+          "name": "state",
+
+          "type": "boolean",
+
+          "source": "ServiceParameters_set1.a",
+
+          "minimum": 0,
+
+          "maximum": 1
+        }
+      ]
+    },
+
+
+    {
+      "name": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+
+      "overload": "serviceCall_3",
+
+      "status": "implemented",
+
+      "parameters": [
+
+        {
+          "name": "controls",
+
+          "type": "byte[]",
+
+          "source": "ServiceParameters_set3.buff",
+
+          "direction": "out",
+
+          "size": "4"
+        }
+      ]
+    },
+
+
+    {
+      "name": "DEVSERVICE_SET_ADVANCED_CONTROLS",
+
+      "overload": "serviceCall_3",
+
+      "status": "implemented",
+
+      "parameters": [
+
+        {
+          "name": "controls",
+
+          "type": "byte[]",
+
+          "source": "ServiceParameters_set3.buff",
+
+          "direction": "in",
+
+          "size": "4"
+        }
+      ]
+    },
+
+
+    {
+      "name": "DEVSERVICE_CHECK_ENABLING_CONDITION",
+
+      "overload": "serviceCall_3",
+
+      "status": "implemented",
+
+      "parameters": [
+
+        {
+          "name": "condition",
+
+          "type": "byte[]",
+
+          "source": "ServiceParameters_set3.buff",
+
+          "direction": "out"
+        }
+      ]
+    }
+  ],
+
+
+  "digitalEventActions": [
+
+    {
+      "id": 21,
+
+      "label": "Start irrigation",
+
+      "service": "DEVSERVICE_STATE_SWITCH",
+
+      "parameters": {
+        "a": 1
+      }
+    },
+
+
+    {
+      "id": 22,
+
+      "label": "Stop irrigation",
+
+      "service": "DEVSERVICE_STATE_SWITCH",
+
+      "parameters": {
+        "a": 0
+      }
+    },
+
+
+    {
+      "id": 23,
+
+      "label": "Toggle irrigation",
+
+      "service": "DEVSERVICE_STATE_SWITCH",
+
+      "toggleState": true
+    }
+  ],
+
+
+  "enablingConditions": [
+
+    {
+      "id": 1,
+
+      "label": "Dry",
+
+      "source": "customBytes[11]",
+
+      "type": "boolean",
+
+      "comparator": "equals",
+
+      "value": true
+    },
+
+
+    {
+      "id": 2,
+
+      "label": "Wet",
+
+      "source": "customBytes[12]",
+
+      "type": "boolean",
+
+      "comparator": "equals",
+
+      "value": true
+    }
+  ],
+
+
+  "state": {
+
+    "enabledSemantics": "irrigation controller available",
+
+    "descriptionCustomBytes": [
+
+      {
+        "name": "sensorError",
+
+        "type": "boolean",
+
+        "offset": 0,
+
+        "size": 1
+      },
+
+
+      {
+        "name": "temperature",
+
+        "type": "float32",
+
+        "offset": 1,
+
+        "size": 4,
+
+        "unit": "degrees Celsius"
+      },
+
+
+      {
+        "name": "humidity",
+
+        "type": "float32",
+
+        "offset": 5,
+
+        "size": 4,
+
+        "unit": "percent"
+      },
+
+
+      {
+        "name": "nozzle1",
+
+        "type": "boolean",
+
+        "offset": 9,
+
+        "size": 1
+      },
+
+
+      {
+        "name": "nozzle2",
+
+        "type": "boolean",
+
+        "offset": 10,
+
+        "size": 1
+      },
+
+
+      {
+        "name": "dry",
+
+        "type": "boolean",
+
+        "offset": 11,
+
+        "size": 1
+      },
+
+
+      {
+        "name": "wet",
+
+        "type": "boolean",
+
+        "offset": 12,
+
+        "size": 1
+      }
+    ],
+
+
+    "httpFields": [
+
+      {
+        "name": "sensorError",
+
+        "type": "boolean",
+
+        "source": "customBytes[0]"
+      },
+
+
+      {
+        "name": "temperature",
+
+        "type": "float32",
+
+        "source": "customBytes[1..4]"
+      },
+
+
+      {
+        "name": "humidity",
+
+        "type": "float32",
+
+        "source": "customBytes[5..8]"
+      },
+
+
+      {
+        "name": "nozzle1",
+
+        "type": "boolean",
+
+        "source": "customBytes[9]"
+      },
+
+
+      {
+        "name": "nozzle2",
+
+        "type": "boolean",
+
+        "source": "customBytes[10]"
+      },
+
+
+      {
+        "name": "dry",
+
+        "type": "boolean",
+
+        "source": "customBytes[11]"
+      },
+
+
+      {
+        "name": "wet",
+
+        "type": "boolean",
+
+        "source": "customBytes[12]"
+      }
+    ]
+  },
+
+
+  "ui": {
+
+    "roomWidget": "generateGardenIrrigationWidget",
+
+
+    "advancedControls": {
+
+      "template": "include/devices/GardenIrrigationDevice/AdvancedControls.html",
+
+      "payloadSize": {
+        "fixedBytes": 4
+      }
+    },
+
+
+    "controls": [
+
+      {
+        "name": "irrigation",
+
+        "widget": "toggle-button",
+
+        "service": "DEVSERVICE_STATE_SWITCH",
+
+        "overload": "serviceCall_1",
+
+        "parameter": "state",
+
+        "displayOrder": 0
+      },
+
+      {
+        "name": "settings",
+
+        "widget": "settings-button",
+
+        "service": "DEVSERVICE_GET_ADVANCED_CONTROLS",
+
+        "overload": "serviceCall_3",
+
+        "displayOrder": 1
+      }
+    ],
+
+
+    "readouts": [
+
+      {
+        "name": "temperature",
+
+        "widget": "numeric-label",
+
+        "source": "temperature",
+
+        "label": "Temperature",
+
+        "unit": "°C"
+      },
+
+
+      {
+        "name": "humidity",
+
+        "widget": "numeric-label",
+
+        "source": "humidity",
+
+        "label": "Humidity",
+
+        "unit": "%"
+      },
+
+
+      {
+        "name": "dry",
+
+        "widget": "status-label",
+
+        "source": "dry",
+
+        "label": "Soil state",
+
+        "trueLabel": "DRY",
+
+        "falseLabel": "NOT DRY",
+
+        "trueTone": "warning",
+
+        "falseTone": "neutral"
+      },
+
+
+      {
+        "name": "wet",
+
+        "widget": "status-label",
+
+        "source": "wet",
+
+        "label": "Humidity state",
+
+        "trueLabel": "WET",
+
+        "falseLabel": "NOT WET",
+
+        "trueTone": "success",
+
+        "falseTone": "neutral"
+      },
+
+
+      {
+        "name": "nozzle1",
+
+        "widget": "status-label",
+
+        "source": "nozzle1",
+
+        "label": "Nozzle 1",
+
+        "trueLabel": "ON",
+
+        "falseLabel": "OFF",
+
+        "trueTone": "success",
+
+        "falseTone": "neutral"
+      },
+
+
+      {
+        "name": "nozzle2",
+
+        "widget": "status-label",
+
+        "source": "nozzle2",
+
+        "label": "Nozzle 2",
+
+        "trueLabel": "ON",
+
+        "falseLabel": "OFF",
+
+        "trueTone": "success",
+
+        "falseTone": "neutral"
+      }
+    ]
+  },
+
+
+  "extendedMemory": {
+
+    "required": false,
+
+    "size": 0
+  },
+
+
+  "limitations": [
+
+    "DHT22 measures air humidity, not soil moisture.",
+
+    "Advanced controls are runtime-only unless persistent storage support is explicitly added.",
+
+    "Dry threshold must be lower than wet threshold.",
+
+    "Nozzle outputs are automatically switched off after the configured watering duration."
+  ]
+}

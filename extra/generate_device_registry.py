@@ -760,7 +760,7 @@ def state_field_code(field, index):
         return f'''{prefix}
         float value{index} = 0.0f;
         memcpy(&value{index}, &description.customBytes[{start}], sizeof(value{index}));
-        result += String(value{index});'''
+        result += isfinite(value{index}) ? String(value{index}) : "null";'''
     if field_type == "hex-color":
         return f'''{prefix}
         result += "\\\"#" + rgbHex(description.customBytes[{start}], description.customBytes[{start + 1}], description.customBytes[{start + 2}]) + "\\\"";'''
@@ -806,6 +806,7 @@ def generate_state_serializer(descriptions):
 #define GENERATED_DEVICE_STATE_SERIALIZER_HPP
 
 #include <cstring>
+#include <math.h>
 #include "SystemDefinition.hpp"
 #include "devices/device.hpp"
 
@@ -919,7 +920,9 @@ def generate_widget_javascript(description):
                     f"{value_variable}.textContent=Number(device.{source})==={json.dumps(unknown_value)}?{json.dumps(unknown_label)}:`${{device.{source}}}{(' ' + unit) if unit else ''}`;"
                 )
             else:
-                rows.append(f"{value_variable}.textContent=`${{device.{source}}}{(' ' + unit) if unit else ''}`;")
+                rows.append(
+                    f"{value_variable}.textContent=device.{source}==null?\"N/A\":`${{device.{source}}}{(' ' + unit) if unit else ''}`;"
+                )
         rows.append(
             f"{variable}.appendChild({label_variable});{variable}.appendChild({value_variable});readoutGrid.appendChild({variable});"
         )

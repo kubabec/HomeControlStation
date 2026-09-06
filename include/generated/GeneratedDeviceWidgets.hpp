@@ -15,6 +15,7 @@
 #include "generated/widgets/GeneratedTempSensorWidget.hpp"
 #endif
 #include "generated/widgets/GeneratedWindowDoorSensorWidget.hpp"
+#include "generated/widgets/GeneratedGarden_IrrigationWidget.hpp"
 
 /** @brief Builds the JavaScript widget bundle and generated type dispatcher. */
 inline String buildGeneratedDeviceWidgetsJs()
@@ -28,6 +29,7 @@ widgets += generatedLedStripWidgetJs;
 widgets += generatedTempSensorWidgetJs;
 #endif
 widgets += generatedWindowDoorSensorWidgetJs;
+widgets += generatedGarden_IrrigationWidgetJs;
     widgets += "function renderGeneratedDeviceWidget(deviceContainer,device){switch(Number(device.devType)){";
     widgets += "case 43: generateOnOffWidget(deviceContainer,device); return true;";
     #ifdef LED_STRIP_SUPPORTED
@@ -37,6 +39,7 @@ widgets += "case 44: generateLedStripWidget(deviceContainer,device); return true
 widgets += "case 45: generateTempWidget(deviceContainer,device); return true;";
 #endif
     widgets += "case 50: generateWindowDoorSensorWidget(deviceContainer,device); return true;";
+    widgets += "case 60: generateGardenIrrigationWidget(deviceContainer,device); return true;";
     widgets += "default:return false;}}";
     return widgets;
 }

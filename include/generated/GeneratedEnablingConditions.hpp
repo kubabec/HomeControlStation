@@ -48,6 +48,8 @@ inline constexpr Predicate kPredicates[] = {
     #endif
     {50, 1, "Closed", ValueType::BOOLEAN, Comparator::EQUALS, 0, 1.0f, 1.0f },
     {50, 2, "Opened", ValueType::BOOLEAN, Comparator::EQUALS, 0, 0.0f, 0.0f },
+    {60, 1, "Dry", ValueType::BOOLEAN, Comparator::EQUALS, 11, 1.0f, 1.0f },
+    {60, 2, "Wet", ValueType::BOOLEAN, Comparator::EQUALS, 12, 1.0f, 1.0f },
 };
 
 inline const Predicate* find(uint8_t deviceType, uint8_t predicateId)

@@ -5,3 +5,4 @@ case type_LED_STRIP: return (currentlyRequestedDeviceDescription.customBytes[0] 
 #ifdef TEMP_SENSOR_SUPPORTED
 case type_TEMP_SENSOR: return 376;
 #endif
+case type_GARDEN_IRRIGATION: return 4;

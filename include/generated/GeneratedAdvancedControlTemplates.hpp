@@ -272,6 +272,198 @@ if (days.length > 1) {
 }
 </script>)HCSADV";
 #endif
+inline const char advancedControlsTemplate_type_GARDEN_IRRIGATION[] = R"HCSADV(<div
+    class="advanced-controls-form"
+    data-role="garden-irrigation-controls"
+>
+
+    <label>
+        Watering duration [seconds]
+
+        <input
+            data-field="wateringDuration"
+            type="number"
+            min="1"
+            max="3600"
+        >
+    </label>
+
+
+    <label>
+        Dry threshold [%]
+
+        <input
+            data-field="dryThreshold"
+            type="number"
+            min="0"
+            max="100"
+        >
+    </label>
+
+
+    <label>
+        Wet threshold [%]
+
+        <input
+            data-field="wetThreshold"
+            type="number"
+            min="0"
+            max="100"
+        >
+    </label>
+
+
+    <button
+        class="popup-button"
+        data-action="save"
+    >
+        Save
+    </button>
+
+</div>
+
+
+<script type="application/x-hcs-advanced-controls">
+
+const payload = context.payload;
+
+
+// ================================================================
+// PAYLOAD VALIDATION
+// ================================================================
+
+if (payload.length !== 4)
+{
+    context.showError(
+        'Invalid Garden Irrigation configuration payload.'
+    );
+
+    return;
+}
+
+
+// ================================================================
+// UI ELEMENTS
+// ================================================================
+
+const wateringDuration =
+    context.root.querySelector(
+        '[data-field="wateringDuration"]'
+    );
+
+const dryThreshold =
+    context.root.querySelector(
+        '[data-field="dryThreshold"]'
+    );
+
+const wetThreshold =
+    context.root.querySelector(
+        '[data-field="wetThreshold"]'
+    );
+
+
+// ================================================================
+// DECODE PAYLOAD
+// ================================================================
+
+const duration =
+    payload[0] |
+    (payload[1] << 8);
+
+
+wateringDuration.value =
+    String(duration);
+
+
+dryThreshold.value =
+    String(payload[2]);
+
+
+wetThreshold.value =
+    String(payload[3]);
+
+
+// ================================================================
+// SAVE
+// ================================================================
+
+context.root
+    .querySelector('[data-action="save"]')
+    .addEventListener(
+        'click',
+
+        async () =>
+        {
+            const durationValue =
+                Math.max(
+                    1,
+                    Math.min(
+                        3600,
+                        Math.round(Number(wateringDuration.value) || 60)
+                    )
+                );
+
+
+            const dryValue =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        Math.round(Number(dryThreshold.value) || 0)
+                    )
+                );
+
+
+            const wetValue =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        Math.round(Number(wetThreshold.value) || 100)
+                    )
+                );
+
+
+            if (dryValue >= wetValue)
+            {
+                context.showError(
+                    'Dry threshold must be lower than wet threshold.'
+                );
+
+                return;
+            }
+
+
+            const next =
+                new Uint8Array(4);
+
+
+            // Watering duration uint16 little-endian.
+            next[0] =
+                durationValue & 0xFF;
+
+            next[1] =
+                (durationValue >> 8) & 0xFF;
+
+
+            // Humidity thresholds.
+            next[2] =
+                dryValue;
+
+            next[3] =
+                wetValue;
+
+
+            if (
+                await context.save(next)
+            )
+            {
+                context.close();
+            }
+        }
+    );
+
+</script>)HCSADV";
 
 /** @brief Returns the device-provided advanced-controls template, or nullptr. */
 inline const char* find(uint8_t typeId)
@@ -284,6 +476,7 @@ inline const char* find(uint8_t typeId)
     #ifdef TEMP_SENSOR_SUPPORTED
     case type_TEMP_SENSOR: return advancedControlsTemplate_type_TEMP_SENSOR;
     #endif
+    case type_GARDEN_IRRIGATION: return advancedControlsTemplate_type_GARDEN_IRRIGATION;
     default:
         return nullptr;
     }

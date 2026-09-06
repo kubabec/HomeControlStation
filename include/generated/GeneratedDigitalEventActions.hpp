@@ -54,6 +54,9 @@ inline constexpr Action kActions[] = {
     #ifdef LED_STRIP_SUPPORTED
     {44, 44, "Stop live animation", DEVSERVICE_LIVE_ANIMATION, {0, 255, 255, 255, 255}, false},
     #endif
+    {60, 21, "Start irrigation", DEVSERVICE_STATE_SWITCH, {1, 255, 255, 255, 255}, false},
+    {60, 22, "Stop irrigation", DEVSERVICE_STATE_SWITCH, {0, 255, 255, 255, 255}, false},
+    {60, 23, "Toggle irrigation", DEVSERVICE_STATE_SWITCH, {255, 255, 255, 255, 255}, true},
 };
 
 inline const Action* find(uint8_t deviceType, uint8_t actionId)

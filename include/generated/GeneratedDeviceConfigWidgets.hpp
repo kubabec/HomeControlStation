@@ -111,6 +111,14 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
 }
 
 inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
+    {60, "Garden irrigation controller", "type_GARDEN_IRRIGATION", {{"nozzle1Pin", "Nozzle 1 GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"nozzle2Pin", "Nozzle 2 GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"outputsActiveHigh", "Relay polarity", "select", 2, 1, 0, 255, {"1", "0"}, {"Active HIGH", "Active LOW"}, 2, 0, 1.0, 0},
+        {"sensorEnabled", "DHT22 sensor connected", "checkbox", 7, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"wateringDurationSeconds", "Default watering duration [s]", "number", 3, 2, 1, 3600, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"dryThreshold", "Dry threshold [%]", "number", 5, 1, 0, 100, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"wetThreshold", "Wet threshold [%]", "number", 6, 1, 0, 100, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 7},
     #ifdef LED_STRIP_SUPPORTED
     {44, "LedStrip", "type_LED_STRIP", {{"ledsCount", "LEDs num.", "number", 0, 2, 1, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
         {"ledsSideFlip", "Sides flip", "select", 2, 1, 0, 255, {"0", "1"}, {"Not inversed", "Inversed"}, 2, 0, 1.0, 0},

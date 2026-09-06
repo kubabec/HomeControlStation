@@ -20,6 +20,7 @@
 #include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
 #endif
 #include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
+#include "devices/GardenIrrigationDevice/GardenIrrigationDevice.hpp"
 
 namespace GeneratedDeviceRegistry
 {
@@ -53,6 +54,7 @@ inline constexpr Registration kEnabledTypes[] = {
     {45, "TempSensor", true, 60000u},
     #endif
     {50, "WindowDoorSensor", true, 0u},
+    {60, "Garden Irrigation", true, 2500u},
 };
 
 /** @brief Finds an implementation enabled in the current firmware build. */
@@ -129,6 +131,17 @@ inline bool validateConfiguration(const DeviceConfigSlotType& config, bool* clai
             if (config.customBytes[1] != 0 && config.customBytes[1] != 1) return false;
             if (readU16(config.customBytes, 2) < 10 || readU16(config.customBytes, 2) > 5000) return false;
             break;
+    case type_GARDEN_IRRIGATION:
+            if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
+            if (config.customBytes[0] < 0 || config.customBytes[0] > 48) return false;
+            if (!claimPin(config.customBytes[0], false, candidatePins, claimedPinCount)) return false;
+            if (config.customBytes[1] < 0 || config.customBytes[1] > 48) return false;
+            if (!claimPin(config.customBytes[1], false, candidatePins, claimedPinCount)) return false;
+            if (config.customBytes[2] != 1 && config.customBytes[2] != 0) return false;
+            if (readU16(config.customBytes, 3) < 1 || readU16(config.customBytes, 3) > 3600) return false;
+            if (config.customBytes[5] < 0 || config.customBytes[5] > 100) return false;
+            if (config.customBytes[6] < 0 || config.customBytes[6] > 100) return false;
+            break;
     default:
         return false;
     }
@@ -156,6 +169,8 @@ inline std::unique_ptr<Device> create(
     #endif
     case type_WINDOW_DOOR_SENSOR:
             return std::unique_ptr<Device>(new WindowDoorSensor(config, GeneratedDigitalEventTriggers::bind(config.deviceType, config.deviceId, config.deviceName, context.getNodeMacAddress, context.fireDigitalEventWithSource)));
+    case type_GARDEN_IRRIGATION:
+            return std::unique_ptr<Device>(new GardenIrrigationDevice(config));
     default:
         return nullptr;
     }

@@ -7,6 +7,7 @@
 #define GENERATED_DEVICE_STATE_SERIALIZER_HPP
 
 #include <cstring>
+#include <math.h>
 #include "SystemDefinition.hpp"
 #include "devices/device.hpp"
 
@@ -50,7 +51,7 @@ inline String serialize(const DeviceDescription& description)
             result += ",\"temp\":";
             float value0 = 0.0f;
             memcpy(&value0, &description.customBytes[3], sizeof(value0));
-            result += String(value0);
+            result += isfinite(value0) ? String(value0) : "null";
             result += ",\"humid\":";
             result += String((int)description.customBytes[2]);
             result += ",\"Err\":";
@@ -62,6 +63,28 @@ inline String serialize(const DeviceDescription& description)
         {
             result += ",\"closed\":";
             result += String((int)description.customBytes[0]);
+            break;
+        }
+    case type_GARDEN_IRRIGATION:
+        {
+            result += ",\"sensorError\":";
+            result += String((int)description.customBytes[0]);
+            result += ",\"temperature\":";
+            float value1 = 0.0f;
+            memcpy(&value1, &description.customBytes[1], sizeof(value1));
+            result += isfinite(value1) ? String(value1) : "null";
+            result += ",\"humidity\":";
+            float value2 = 0.0f;
+            memcpy(&value2, &description.customBytes[5], sizeof(value2));
+            result += isfinite(value2) ? String(value2) : "null";
+            result += ",\"nozzle1\":";
+            result += String((int)description.customBytes[9]);
+            result += ",\"nozzle2\":";
+            result += String((int)description.customBytes[10]);
+            result += ",\"dry\":";
+            result += String((int)description.customBytes[11]);
+            result += ",\"wet\":";
+            result += String((int)description.customBytes[12]);
             break;
         }
     default:
