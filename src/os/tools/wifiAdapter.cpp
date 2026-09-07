@@ -1,4 +1,4 @@
-#include <os/tools/WifiAdapter.hpp>
+#include <os/tools/wifiAdapter.hpp>
 #include <os/datacontainer/DataContainer.hpp>
 #include <ESPmDNS.h>
 #include "os/Logger.hpp"

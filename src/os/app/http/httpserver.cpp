@@ -17,6 +17,7 @@
 #include "os/app/config/ExtendedMemoryManager.hpp"
 #include "build_info.h"
 #include "os/Logger.hpp"
+#include "os/app/display/DisplayServer.hpp"
 
 /**
  * @file src/os/app/http/httpserver.cpp
@@ -56,6 +57,7 @@ std::vector<String> constantRequests = {
   "masseraseviahttp",
   "asyncRequestTest",
   "networkInspection",
+  "displayDevices",
   "sysDetails",
   "digBtn",
   "unmappedEvents",
@@ -101,6 +103,7 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_massErase, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_asyncTest, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::constantHandler_networkInspecion, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_displayDevices, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_systemDetails, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_unmappedEvents, e_ACCESS_LEVEL_SERVICE_MODE},
@@ -270,6 +273,7 @@ void HomeLightHttpServer::init()
   }
 
   restoreNvmData(nvmData, sizeOfNvm);
+  DataContainer::setSignalValue(SIG_ROOM_NAMES_MAPPING, RoomNamesMapping(roomNamesMapping));
 
   /* release heap buffer */
   free(nvmData);
@@ -408,6 +412,8 @@ bool HomeLightHttpServer::loadConfigFromFile(JsonDocument& doc){
       break;
     }
   }
+
+  DataContainer::setSignalValue(SIG_ROOM_NAMES_MAPPING, RoomNamesMapping(roomNamesMapping));
 
   /* no error */
   return false;
@@ -759,6 +765,10 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
         var url = `/networkInspection`;\
         window.location.href = url;\
     }\
+    function goToDisplayDevices(){\
+      var url = `/displayDevices`;\
+      window.location.href = url;\
+    }\
     function sysPropert() {\
         var url = `/sysDetails`;\
         window.location.href = url;\
@@ -940,6 +950,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   if(currentConfig.isRcServer){
     client.println("<div class=\"settings-menu-section\"><div class=\"settings-menu-title\">Network</div>");
     client.println("<div class=\"button-link\" onclick=\"goToNetIns()\">Network inspection</div>");
+    client.println("<div class=\"button-link\" onclick=\"goToDisplayDevices()\">Display terminals</div>");
     client.println("</div>");
   }
 

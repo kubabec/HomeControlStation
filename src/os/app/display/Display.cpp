@@ -25,3 +25,14 @@ uint16_t Display::getDisplayDataHash()
 {
     return displayDataHash;
 }
+
+const DisplayInfo& Display::getInfo() const
+{
+    return info;
+}
+
+void Display::updateInfo(const DisplayInfo& newInfo)
+{
+    info = newInfo;
+    lastDataUpdateTime = millis();
+}

@@ -38,6 +38,7 @@ public:
      * @param msg Packet produced by a display or control application.
      */
     static void receiveUDP(MessageUDP &msg);
+    static const std::vector<Display>& getKnownDisplays();
 
 private:
     /**
@@ -49,6 +50,17 @@ private:
      * UDP packets waiting to be processed by the display server.
      */
     static std::queue<MessageUDP> receptionUdpQueue;
+
+    struct PendingAction
+    {
+        bool active = false;
+        MessageUDP request;
+        DisplayActionRequest action;
+        ServiceParameters_set1 parameters;
+        DeviceServicesType service = DEVSERVICE_STATE_SWITCH;
+    };
+
+    static PendingAction pendingAction;
 
     /**
      * Timestamp of the last display-discovery sweep.
@@ -65,6 +77,12 @@ private:
      * @param msg Packet containing the new display announcement.
      */
     static void handleNewDisplay(MessageUDP &msg);
+    static void handleMessage(MessageUDP &msg);
+    static void processPendingAction();
+    static void sendDeviceList(const Display& display);
+    static void sendRoomNames(const Display& display);
+    static void sendActionResponse(const MessageUDP& request, uint16_t sequence, uint8_t status, uint8_t deviceId);
+    static void broadcastDeviceState(uint8_t deviceId);
 
     /**
      * Sends discovery requests to discover currently reachable displays on the LAN.

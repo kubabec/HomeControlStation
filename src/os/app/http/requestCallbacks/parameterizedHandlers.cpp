@@ -71,6 +71,8 @@ void HomeLightHttpServer::parameterizedHandler_roomNameMappingApply(String &requ
       }
       client.println("<meta http-equiv='refresh' content='0; url=http://" + ipAddressString + "/roomAssignment'>");
 
+      DataContainer::setSignalValue(SIG_ROOM_NAMES_MAPPING, RoomNamesMapping(roomNamesMapping));
+
       /* Trigger NVM save to have persistant room name values */
       std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
     }

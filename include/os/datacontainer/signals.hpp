@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 48
+#define NUMBER_OF_SIGNALS 49
 
 /**
  * @file include/os/datacontainer/signals.hpp
@@ -114,6 +114,9 @@ enum Signal
 
     SIG_LAST_KNOWN_MASTER_IP_ADDR,
 
-    CBK_RECONNECT_WIFI
+    CBK_RECONNECT_WIFI,
+
+    /* Type: RoomNamesMapping - configured room ID-to-name mapping */
+    SIG_ROOM_NAMES_MAPPING
 };
 #endif

@@ -350,3 +350,8 @@ MessageUDP::IPAddr& MessageUDP::getIPAddress()
 {
     return ipAddress;
 }
+
+const MessageUDP::IPAddr& MessageUDP::getIPAddress() const
+{
+    return ipAddress;
+}

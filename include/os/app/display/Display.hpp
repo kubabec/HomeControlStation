@@ -35,6 +35,9 @@ public:
      */
     uint16_t getDisplayDataHash();
 
+    const DisplayInfo& getInfo() const;
+    void updateInfo(const DisplayInfo& newInfo);
+
 private:
     /**
      * Time of the most recent payload update received from the display.

@@ -46,7 +46,7 @@ public:
          * @param rhv Right-hand value to compare.
          * @return true when all octets match.
          */
-        bool operator==(const IPAddr &rhv)
+        bool operator==(const IPAddr &rhv) const
         {
             if (this->octet1 == rhv.octet1 &&
                 this->octet2 == rhv.octet2 &&
@@ -63,7 +63,7 @@ public:
          * Formats the IP address as a dotted-decimal string.
          * @return IPv4 string suitable for logs or UI output.
          */
-        String toString()
+        String toString() const
         {
             static char buffer[16];
             sprintf(buffer, "%d.%d.%d.%d", octet1, octet2, octet3, octet4);
@@ -271,6 +271,7 @@ public:
      * @return Reference to the stored IP address.
      */
     MessageUDP::IPAddr &getIPAddress();
+    const MessageUDP::IPAddr &getIPAddress() const;
 };
 
 #endif

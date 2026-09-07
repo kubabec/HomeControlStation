@@ -14,7 +14,7 @@
 // in orded to do not overload the UDP packet with the data. When DisplayServer updates the DeviceDescription vector on the concrete Display,
 // data will be send in chunks of 5 devices, and this class will be responsible for spliting the data into correct chunks and sending them one by one to the DisplayServer.
 // On the client side, this class will be responsible for merge of received chunks of DeviceDescription into one vector and update the global signal with the merged data.
-// Class provides static methods for both server and client side, so it can be used in both DisplayServer and DisplayClient.
+// Class provides protocol packing helpers without depending on endpoint-specific implementations.
 /**
  * @class DeviceDescriptionPacker
  * @brief Splits and merges device-description vectors across UDP chunk boundaries.

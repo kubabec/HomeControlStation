@@ -154,7 +154,10 @@ void OperatingSystem::task10ms()
 
 void OperatingSystem::task20ms()
 {
-    CyclicProfiler::call("DisplayServer", DisplayServer::cyclic);
+    if (isRCServerRunning)
+    {
+        CyclicProfiler::call("DisplayServer", DisplayServer::cyclic);
+    }
 }
 
 void OperatingSystem::task50ms()

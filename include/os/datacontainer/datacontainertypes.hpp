@@ -12,9 +12,12 @@
 #include "os/datacontainer/NvmConfigSlotDefinition.hpp"
 #include "os/tools/messageUDP.hpp"
 #include <ArduinoJson.h>
+#include <map>
 
 #define PERSISTENT_DATABLOCK_SIZE 50
 #define NUMBER_OF_CONFIG_SLOTS 6
+
+using RoomNamesMapping = std::map<uint8_t, String>;
 
 // aktualny stan przerabianego requesta
 /* State of request processing */

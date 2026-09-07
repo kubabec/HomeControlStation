@@ -275,6 +275,8 @@ public:
      */
     static void constantHandler_networkInspecion(WiFiClient& client);
 
+    static void constantHandler_displayDevices(WiFiClient& client);
+
     /**
      * Provides the system-details page.
      * @param client HTTP client receiving the response.

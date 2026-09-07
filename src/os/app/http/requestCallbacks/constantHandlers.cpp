@@ -4,6 +4,7 @@
 #include "os/app/DigitalEvent/DigitalEventReceiver.hpp"
 #include "os/app/timeMaster.hpp"
 #include "os/Logger.hpp"
+#include "os/app/display/DisplayServer.hpp"
 #include <Esp.h>
 
 /**
@@ -229,6 +230,25 @@ void HomeLightHttpServer::constantHandler_massErase(WiFiClient &client)
 void HomeLightHttpServer::constantHandler_asyncTest(WiFiClient &client)
 {
   Logger::log("Asysnc request received!");
+}
+
+void HomeLightHttpServer::constantHandler_displayDevices(WiFiClient &client)
+{
+  client.println("<div class=\"wrapper\"><div class=\"header\">Display terminals</div>");
+  client.println("<p>Displays discovered on the local network.</p>");
+  client.println("<table><tr><th>Display</th><th>IP address</th><th>Resolution</th></tr>");
+  const auto& displays = DisplayServer::getKnownDisplays();
+  if (displays.empty()) {
+    client.println("<tr><td colspan=\"3\">No display terminals discovered yet.</td></tr>");
+  } else {
+    uint8_t index = 0;
+    for (const auto& display : displays) {
+      const auto& info = display.getInfo();
+      client.println("<tr><td>Display " + String(index++) + "</td><td>" + info.ip.toString() +
+                     "</td><td>" + String(info.resWidth) + " x " + String(info.resHeight) + "</td></tr>");
+    }
+  }
+  client.println("</table><br><a href=\"/config\" class=\"button\">Settings</a></div>");
 }
 
 void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)
