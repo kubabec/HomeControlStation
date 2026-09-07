@@ -28,11 +28,12 @@ typedef struct{
      * Per-device allocation target reserved for the current slot configuration.
      */
     uint16_t memoryPerDeviceSlotNeeded[SLOTS_FOR_EXT_MEMORY_BUFFERS];
+    uint8_t ownerDeviceIds[SLOTS_FOR_EXT_MEMORY_BUFFERS];
 
     /**
      * Reserved buffer to allow future metadata growth without changing the NVM layout.
      */
-    uint8_t reserved[PERSISTENT_DATABLOCK_SIZE - (SLOTS_FOR_EXT_MEMORY_BUFFERS * sizeof(uint16_t))];
+    uint8_t reserved[PERSISTENT_DATABLOCK_SIZE - (SLOTS_FOR_EXT_MEMORY_BUFFERS * (sizeof(uint16_t) + sizeof(uint8_t)))];
 
 }ExtMemoryMetadataType;
 

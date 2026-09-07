@@ -20,6 +20,7 @@ void ExtendedMemoryManager::init(){
     for(uint8_t i = 0 ; i < SLOTS_FOR_EXT_MEMORY_BUFFERS; i ++)
     {
         extMemoryMetadata.memoryPerDeviceSlotNeeded[i] = 0x00;
+        extMemoryMetadata.ownerDeviceIds[i] = 0x00;
     }
 
 
@@ -104,14 +105,14 @@ void ExtendedMemoryManager::deinit(){
 void ExtendedMemoryManager::restoreExtMemoryFromNvm()
 {
     uint16_t offsetInNvm = 0;
-    for(uint8_t deviceId = 0 ; deviceId < SLOTS_FOR_EXT_MEMORY_BUFFERS; deviceId++){
+    for(uint8_t slot = 0 ; slot < SLOTS_FOR_EXT_MEMORY_BUFFERS; slot++){
         /* Are there any data for this device? */
-        if(extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId] > 0){
-            const uint16_t requestedLength = extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId];
+        if(extMemoryMetadata.memoryPerDeviceSlotNeeded[slot] > 0){
+            const uint16_t requestedLength = extMemoryMetadata.memoryPerDeviceSlotNeeded[slot];
             if (requestedLength > MAX_EXT_MEMORY_SIZE_TOTAL - offsetInNvm)
             {
                 Logger::log("ExtendedMemoryManager//ERROR: Persisted extended memory exceeds current 1200-byte capacity");
-                extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId] = 0;
+                extMemoryMetadata.memoryPerDeviceSlotNeeded[slot] = 0;
                 continue;
             }
             /* try to allocate RAM buffer for data */
@@ -126,7 +127,7 @@ void ExtendedMemoryManager::restoreExtMemoryFromNvm()
 
                 /* Create new ExtMemory entry */
                 ExtMemoryData entry {
-                    .ownerDeviceId = deviceId + 1,
+                    .ownerDeviceId = extMemoryMetadata.ownerDeviceIds[slot] != 0 ? extMemoryMetadata.ownerDeviceIds[slot] : slot + 1,
                     .length = requestedLength,
                     .dataPtr = data
                 };
@@ -137,10 +138,10 @@ void ExtendedMemoryManager::restoreExtMemoryFromNvm()
                 extMemoryContainer.push_back(entry);
 
                 /* Move offset to next ExtMemory section in NVM */
-                offsetInNvm += extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId];
+                offsetInNvm += extMemoryMetadata.memoryPerDeviceSlotNeeded[slot];
             }else 
             {
-                Logger::log("ExtendedMemoryManager//ERROR : Cannot allocate RAM mirror with length :" + String((int)extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId]));
+                Logger::log("ExtendedMemoryManager//ERROR : Cannot allocate RAM mirror with length :" + String((int)extMemoryMetadata.memoryPerDeviceSlotNeeded[slot]));
                 return;
             }
         }
@@ -150,32 +151,53 @@ void ExtendedMemoryManager::restoreExtMemoryFromNvm()
 
 bool ExtendedMemoryManager::requestNewExtendedMemorySpace(uint8_t deviceId, uint16_t spaceSize)
 {
-    bool success = false;
-    if(deviceId > 0 && deviceId < 10){
-        const uint16_t previousSpaceSize = extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId - 1];
-        const uint16_t spaceWithRequestedNeeds = extMemoryInUse - previousSpaceSize + spaceSize;
-        if(spaceWithRequestedNeeds <= MAX_EXT_MEMORY_SIZE_TOTAL){
-            extMemoryInUse -= previousSpaceSize;
-            extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId-1] = spaceSize;
-            extMemoryInUse += spaceSize;
-            success = true;
-        }else {
-            Logger::log("ExtendedMemoryManager//ERROR: Cannot allocate space length: "+String((int)spaceSize)+", already in use: "+String((int)extMemoryInUse));
-        }
-
-    }else {
-        Logger::log("ExtendedMemoryManager//ERROR: Invalid device ID to allocate ext memory: "+String((int)deviceId));
+    if(deviceId == 0 || spaceSize == 0){
+        Logger::log("ExtendedMemoryManager//ERROR: Invalid extended memory request");
+        return false;
     }
 
-    return success;
+    uint8_t slot = SLOTS_FOR_EXT_MEMORY_BUFFERS;
+    for(uint8_t index = 0; index < SLOTS_FOR_EXT_MEMORY_BUFFERS; ++index){
+        if(extMemoryMetadata.ownerDeviceIds[index] == deviceId ||
+           (extMemoryMetadata.ownerDeviceIds[index] == 0 && index + 1 == deviceId)){
+            slot = index;
+            break;
+        }
+        if(slot == SLOTS_FOR_EXT_MEMORY_BUFFERS && extMemoryMetadata.memoryPerDeviceSlotNeeded[index] == 0){
+            slot = index;
+        }
+    }
+
+    if(slot == SLOTS_FOR_EXT_MEMORY_BUFFERS){
+        Logger::log("ExtendedMemoryManager//ERROR: No metadata slot for device ID: "+String((int)deviceId));
+        return false;
+    }
+
+    const uint16_t previousSpaceSize = extMemoryMetadata.memoryPerDeviceSlotNeeded[slot];
+    const uint16_t spaceWithRequestedNeeds = extMemoryInUse - previousSpaceSize + spaceSize;
+    if(spaceWithRequestedNeeds > MAX_EXT_MEMORY_SIZE_TOTAL){
+        Logger::log("ExtendedMemoryManager//ERROR: Cannot allocate space length: "+String((int)spaceSize)+", already in use: "+String((int)extMemoryInUse));
+        return false;
+    }
+
+    extMemoryInUse -= previousSpaceSize;
+    extMemoryMetadata.memoryPerDeviceSlotNeeded[slot] = spaceSize;
+    extMemoryMetadata.ownerDeviceIds[slot] = deviceId;
+    extMemoryInUse += spaceSize;
+    return true;
 }
 
 void ExtendedMemoryManager::releaseExtendedMemorySpace(uint8_t deviceId){
-    if(deviceId > 0 && deviceId < 10){
-        extMemoryMetadata.memoryPerDeviceSlotNeeded[deviceId-1] = 0;
-    }else {
-        Logger::log("ExtendedMemoryManager//ERROR: Invalid device ID to release ext memory: "+String((int)deviceId));
+    for(uint8_t slot = 0; slot < SLOTS_FOR_EXT_MEMORY_BUFFERS; ++slot){
+        if(extMemoryMetadata.ownerDeviceIds[slot] == deviceId ||
+           (extMemoryMetadata.ownerDeviceIds[slot] == 0 && slot + 1 == deviceId)){
+            extMemoryInUse -= extMemoryMetadata.memoryPerDeviceSlotNeeded[slot];
+            extMemoryMetadata.memoryPerDeviceSlotNeeded[slot] = 0;
+            extMemoryMetadata.ownerDeviceIds[slot] = 0;
+            return;
+        }
     }
+    Logger::log("ExtendedMemoryManager//ERROR: Invalid device ID to release ext memory: "+String((int)deviceId));
 }
 
 uint8_t* ExtendedMemoryManager::getExtMemoryPtrByDeviceId(uint8_t deviceId, uint16_t* extMemoryLengthPtr){

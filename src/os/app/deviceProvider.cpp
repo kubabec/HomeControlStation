@@ -283,15 +283,18 @@ ServiceRequestErrorCode DeviceProvider::handelService3Request(RcRequest &request
             return SERV_GENERAL_FAILURE;
         }
 
-        param.buff = (uint8_t *)malloc(param.size);
-        if (param.buff == nullptr)
+        param.buff = param.size > 0 ? (uint8_t *)malloc(param.size) : nullptr;
+        if (param.size > 0 && param.buff == nullptr)
         {
             Logger::log("Unable to allocate memory for set3");
             response.setResponseType((uint8_t)INVALID_REQ_RESP);
             sendResponse(response);
             return SERV_GENERAL_FAILURE;
         }
-        memcpy(param.buff, &request.getData().at(2 + sizeof(ServiceParameters_set3)), param.size);
+        if (param.size > 0)
+        {
+            memcpy(param.buff, &request.getData().at(2 + sizeof(ServiceParameters_set3)), param.size);
+        }
         /* call the service */
         result = (std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES))).serviceCall_set3(devicedetails.originalID, (DeviceServicesType)request.getData().at(SERVICE_NAME_INDEX), /* TODO negative response*/
                                                                                                                                param);

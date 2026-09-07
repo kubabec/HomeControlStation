@@ -152,6 +152,9 @@ uint8_t RemoteDevicesManager::getMappingOffsetForNode(uint64_t &nodeMAC)
             /* save node */
             mappingSlotsForExternalNodes.at(i).mac = nodeMAC;
 
+            std::any_cast<std::function<void()>>(
+                DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
+
             /* new slot found at offset 'i' */
             // Logger::log("RemoteDevicesManager:// New mapping created for node with MAC: " + String(macStr) + ", at slot: " + String((int)i));
             return i;

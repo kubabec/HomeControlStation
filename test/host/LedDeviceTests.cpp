@@ -134,3 +134,28 @@ TEST_CASE("LED strip reports busy during animation and then returns its payload"
     EXPECT_TRUE(std::memcmp(payload.data(), output.data(), payload.size()) == 0);
     EXPECT_EQ(strip.service(DEVSERVICE_GET_ADVANCED_CONTROLS, ledParams(output.data(), 10, e_OUT_from_DEVICE)), SERV_EXECUTION_FAILURE);
 }
+
+TEST_CASE("LED strip handles empty-payload slot actions and live toggles")
+{
+    ArduinoFake::reset(); LedWS1228bDeviceType strip(ledConfig(2), [] {});
+    std::array<LedColor, 8> memory; for (auto& color : memory) color = LedColor(10, 20, 30);
+    EXPECT_EQ(strip.service(DEVSERVICE_SET_EXT_MEMORY_PTR,
+                           ledParams(reinterpret_cast<uint8_t*>(memory.data()), 24, e_IN_to_DEVICE)), SERV_SUCCESS);
+
+    ServiceParameters_set3 save = ledParams(nullptr, 0, e_IN_to_DEVICE);
+    save.additionalParam = 1;
+    EXPECT_EQ(strip.service(DEVSERVICE_SET_ADVANCED_CONTROLS, save), SERV_SUCCESS);
+
+    std::array<uint8_t, 11> payload = {0, 0, 1, 0, 0, 40, 50, 60, 70, 80, 90};
+    EXPECT_EQ(strip.service(DEVSERVICE_SET_ADVANCED_CONTROLS,
+                           ledParams(payload.data(), payload.size(), e_IN_to_DEVICE)), SERV_SUCCESS);
+
+    ServiceParameters_set3 load = ledParams(nullptr, 0, e_IN_to_DEVICE);
+    load.additionalParam = 4;
+    EXPECT_EQ(strip.service(DEVSERVICE_SET_ADVANCED_CONTROLS, load), SERV_SUCCESS);
+
+    EXPECT_EQ(strip.service(DEVSERVICE_STATE_SWITCH, ServiceParameters_set1{.a = 2}), SERV_SUCCESS);
+    EXPECT_TRUE(strip.getDeviceDescription().isEnabled);
+    EXPECT_EQ(strip.service(DEVSERVICE_STATE_SWITCH, ServiceParameters_set1{.a = 2}), SERV_SUCCESS);
+    EXPECT_FALSE(strip.getDeviceDescription().isEnabled);
+}

@@ -393,9 +393,16 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
         }
     }
 
-    avgRed = (int)((float)avgRed / (float)(virtualDiodesCount - skipped));
-    avgGreen = (int)((float)avgGreen / (float)(virtualDiodesCount - skipped));
-    avgBlue = (int)((float)avgBlue / (float)(virtualDiodesCount - skipped));
+    const uint16_t activeColorCount = virtualDiodesCount - skipped;
+    if (activeColorCount == 0)
+    {
+        averagedColors[content] = {0, 0, 0};
+        return;
+    }
+
+    avgRed = (int)((float)avgRed / (float)activeColorCount);
+    avgGreen = (int)((float)avgGreen / (float)activeColorCount);
+    avgBlue = (int)((float)avgBlue / (float)activeColorCount);
 
     averagedColors[content].r = (uint8_t)avgRed;
     averagedColors[content].g = (uint8_t)avgGreen;
@@ -426,16 +433,15 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param)
 {
-    if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
-    {
-        Logger::log("Ongoing animation in progress, service request cannot be processed");
-        return SERV_BUSY;
-    }
-
     switch (serviceType)
     {
     case DEVSERVICE_STATE_SWITCH:
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_STATE_SWITCH, param.a: " + String((int)param.a));
+        if (param.a == 2)
+        {
+            param.a = isOn ? 0 : 1;
+        }
+
         if (param.a == 1)
         {
             if (!isOn)
@@ -472,6 +478,12 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_LED_STRIP_SWITCH_CONTENT, param.a: " + String((int)param.a));
         return applyContent((LedStripContentIndex)param.a);
     case DEVSERVICE_LIVE_ANIMATION:
+        if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+        {
+            Logger::log("Ongoing animation in progress, service request cannot be processed");
+            return SERV_BUSY;
+        }
+
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_LIVE_ANIMATION, param.a: " + String((int)param.a));
         if (param.a == 1 && liveAnimation == nullptr) // start animation
         {
@@ -512,12 +524,6 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         return GeneratedEnablingConditions::evaluateService(getDeviceDescription(), param);
     }
 
-    if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
-    {
-        Logger::log("Ongoing animation in progress, service request cannot be processed");
-        return SERV_BUSY;
-    }
-
     switch (serviceType)
     {
     case DEVSERVICE_GET_ADVANCED_CONTROLS:
@@ -546,7 +552,22 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         }
         if (param.additionalParam >= 4 && param.additionalParam <= 6)
         {
+            if (ongoingAnimation != nullptr)
+            {
+                delete ongoingAnimation;
+                ongoingAnimation = nullptr;
+            }
+            if (switchOffAnimation != nullptr)
+            {
+                delete switchOffAnimation;
+                switchOffAnimation = nullptr;
+            }
             return applyContent((LedStripContentIndex)(param.additionalParam - 3));
+        }
+        if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+        {
+            Logger::log("Ongoing animation in progress, service request cannot be processed");
+            return SERV_BUSY;
         }
         [[fallthrough]];
     case DEVSERVICE_SET_DETAILED_COLORS:

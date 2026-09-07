@@ -261,6 +261,10 @@ void OperatingSystem::saveNvmData()
         HomeLightHttpServer::flushNvmData();
     }
     ExtendedMemoryManager::flushNvmData();
+    if (isRCServerRunning)
+    {
+        RemoteDevicesManager::deinit();
+    }
     ConfigProvider::flushNvmData();
 
     DigitalEventReceiver::deinit();

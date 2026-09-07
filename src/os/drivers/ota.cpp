@@ -18,8 +18,7 @@ void OTA::init(const String hostname, const String password)
     // Port defaults to 3232
     // ArduinoOTA.setPort(3232);
 
-    // Hostname defaults to esp3232-[MAC]
-    // ArduinoOTA.setHostname(hostname.c_str());
+    ArduinoOTA.setHostname(hostname.c_str());
 
     // No authentication by default
     ArduinoOTA.setPassword(password.c_str());
@@ -39,7 +38,7 @@ void OTA::init(const String hostname, const String password)
     ArduinoOTA.onEnd([]() {
         Logger::log("\nEnd");
 
-        std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))();
+        std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(1000);
 
     });
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
