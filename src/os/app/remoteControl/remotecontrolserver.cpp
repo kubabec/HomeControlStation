@@ -36,29 +36,6 @@ void RemoteControlServer::deinit()
 
 void RemoteControlServer::init()
 {
-    /* Stub test code START */
-    // DeviceDescription fakeDescription;
-    // fakeDescription.deviceType = type_LED_STRIP;
-    // fakeDescription.macAddress = 765432;
-    // fakeDescription.deviceId = 1;
-    // fakeDescription.roomId = 2;
-    // fakeDescription.isEnabled = true;
-    // fakeDescription.deviceName = "FakeDevice";
-    // fakeDescription.customBytes[0] = 50; // Leds count
-    // fakeDescription.customBytes[2] = 43; // average color R
-    // fakeDescription.customBytes[3] = 150; // average color G
-    // fakeDescription.customBytes[4] = 180; // average color B
-
-    // RemoteNodeInformation fakeNode;
-    // fakeNode.numberOfDevices = 1;
-    // fakeNode.devicesCollection.push_back(fakeDescription);
-    // fakeNode.isDeviceCollectionCompleted = true;
-    // fakeNode.lastKeepAliveReceivedTime = millis();
-    // fakeNode.lastKnownNodeHash = 1000;
-
-    // remoteNodes.insert({765432, fakeNode});
-
-    /* Stub test code END */
 
     Logger::log("RemoteControlServer init ...");
     DataContainer::setSignalValue(
@@ -78,7 +55,6 @@ void RemoteControlServer::init()
     requestDetailedDataTimer = millis();
     requestKeepAliveTimer = millis();
     initialDataExitTimer = millis();
-
     updateNetworkNodesInformationSignal();
 
     Logger::log("... done");

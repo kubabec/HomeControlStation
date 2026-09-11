@@ -83,6 +83,8 @@ private:
 
     /** Persists NVM values when the periodic save timer expires. */
     static void handleNvmSaveMech();
+
+    static void sendStartupReport();
     
 public:
     /**

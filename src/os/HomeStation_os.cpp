@@ -2,12 +2,15 @@
 #include <DHT.h>
 #include <os/Logger.hpp>
 #include "esp_adc_cal.h"
+#include "build_info.h"
+
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 /**
  * @file src/os/HomeStation_os.cpp
  * @brief Main OS loop, scheduler and lifecycle management for the Home Control Station.
  */
-
 
 DHT tempSensor(21, DHT11);
 
@@ -20,6 +23,11 @@ uint16_t OperatingSystem::uniqueLifecycleId = 0;
 
 bool OperatingSystem::isNvmSaveTimerActive = false;
 long long OperatingSystem::nvmSaveTimerValue = 0;
+
+bool serverDailyStatisticsUploaded = false;
+const unsigned long statisticsUploadDelay = 45000;       // after startup delay
+const unsigned long statisticsUploadInterval = 86400000; // 24h
+unsigned long lastStatisticsUploadTime = 0;
 
 long long OperatingSystem::accessLevelGrantedTimeSnapshot = 0;
 SecurityAccessLevelType OperatingSystem::currentAccessLevel = e_ACCESS_LEVEL_NONE;
@@ -142,12 +150,10 @@ void OperatingSystem::task10ms()
     {
         CyclicProfiler::call("RemoteControlServer", RemoteControlServer::cyclic);
         CyclicProfiler::call("RemoteDevicesManager", RemoteDevicesManager::cyclic);
-        
     }
     else
     {
         CyclicProfiler::call("RemoteControlClient", RemoteControlClient::cyclic);
-        
     }
     CyclicProfiler::call("DeviceManager", DeviceManager::cyclic);
 }
@@ -187,10 +193,12 @@ void OperatingSystem::task100ms()
         CyclicProfiler::call("HomeLightHttpServer", HomeLightHttpServer::cyclic);
     }
 
-    if(isRCServerRunning)
+    if (isRCServerRunning)
     {
         CyclicProfiler::call("DigitalEventReceiver", DigitalEventReceiver::cyclic);
-    }else {
+    }
+    else
+    {
         CyclicProfiler::call("DigitalEventTransmitter", DigitalEventTransmitter::cyclic);
     }
 }
@@ -238,12 +246,20 @@ void OperatingSystem::task1s()
     detectHwMassEraseRequest();
     handleNvmSaveMech();
 
-    static long long lastCheck = 0;
-
-    if (millis() - lastCheck > 3000)
+    // Upload statistics right after startup, or every 24 hours
+    if (isRCServerRunning)
     {
-        // displayRamUsage();
-        lastCheck = millis();
+        // First upload after startup
+        if (!serverDailyStatisticsUploaded && (millis() > statisticsUploadDelay))
+        {
+            sendStartupReport();
+        }
+        // Every 24h upload
+        else if (millis() - lastStatisticsUploadTime > statisticsUploadInterval)
+        {
+            sendStartupReport();
+            lastStatisticsUploadTime = millis();
+        }
     }
 }
 
@@ -450,6 +466,59 @@ void OperatingSystem::changeSecurityAccessLevel(SecurityAccessLevelType newAcces
         Logger::log("INVALID");
         break;
     }
+}
+
+void OperatingSystem::sendStartupReport()
+{
+    if (WiFi.status() != WL_CONNECTED)
+        return;
+
+    constexpr const char *SERVER_URL = "https://www.homecontrolstation.pl/hcsOnlineStatistics.php";
+    constexpr const char *API_KEY = "H0M3C0N7R0IIS7A7IoN0nLinEStat";
+
+    HTTPClient http;
+    http.begin(SERVER_URL);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("X-API-Key", API_KEY);
+
+    // // Prepare statistics content from DataContainer
+    int localDevices = 0;
+    int remoteDevices = 0;
+    std::any localAny{DataContainer::getSignalValue(SIG_LOCAL_COLLECTION)};
+    if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
+    {
+        localDevices = p->size();
+    }
+
+    std::any localAnyRemote{DataContainer::getSignalValue(SIG_REMOTE_COLLECTION)};
+    if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAnyRemote))
+    {
+        remoteDevices = p->size();
+    }
+
+    JsonDocument doc;
+    doc["mac"] = WiFi.macAddress();
+    doc["local_devices"] = localDevices;
+    doc["remote_devices"] = remoteDevices;
+    doc["build_timestamp"] = BUILD_TIMESTAMP;
+
+    String jsonPayload;
+    serializeJson(doc, jsonPayload);
+
+    int httpCode = http.POST(jsonPayload);
+
+    if (httpCode > 0)
+    {
+        Logger::log("Server daily statistics uploaded successfully.");
+        lastStatisticsUploadTime = millis();
+    }
+    else
+    {
+        Logger::log("Failed to upload server daily statistics.");
+    }
+    serverDailyStatisticsUploaded = true;
+
+    http.end();
 }
 
 void OperatingSystem::detectHwMassEraseRequest()
