@@ -1,5 +1,7 @@
 <div align="center">
-
+<p align="right">
+  <img src="https://flagcdn.com/w40/pl.png" width="16" alt="Polska">
+</p>
   <!-- PLACEHOLDER: Insert your logo image here -->
   <img src="docs/logo2.png" alt="HomeControlStation Logo" width="200"/>
 
