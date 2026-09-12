@@ -484,6 +484,7 @@ void OperatingSystem::sendStartupReport()
     // // Prepare statistics content from DataContainer
     int localDevices = 0;
     int remoteDevices = 0;
+    int nodesCount = 0;
     std::any localAny{DataContainer::getSignalValue(SIG_LOCAL_COLLECTION)};
     if (auto p = std::any_cast<std::vector<DeviceDescription>>(&localAny))
     {
@@ -496,10 +497,17 @@ void OperatingSystem::sendStartupReport()
         remoteDevices = p->size();
     }
 
+    std::any localAnyNodesCnt = DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO);
+    if (auto p = std::any_cast<std::vector<NetworkNodeInfo>>(&localAnyNodesCnt))
+    {
+        std::vector<NetworkNodeInfo> networkNodes = *p;
+        nodesCount = networkNodes.size();
+    }
+
     JsonDocument doc;
     doc["mac"] = WiFi.macAddress();
-    doc["local_devices"] = localDevices;
-    doc["remote_devices"] = remoteDevices;
+    doc["devices"] = localDevices + remoteDevices;
+    doc["network_nodes"] = nodesCount;
     doc["build_timestamp"] = BUILD_TIMESTAMP;
 
     String jsonPayload;

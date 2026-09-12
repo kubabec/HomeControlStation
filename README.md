@@ -1,11 +1,67 @@
-<img src="https://github.com/kubabec/HomeControlStation/blob/main/demo/img1.jpeg" width=50% height=50%>
+<div align="center">
+
+  <!-- PLACEHOLDER: Insert your logo image here -->
+  <img src="docs/logo2.png" alt="HomeControlStation Logo" width="200"/>
 
 
-<img src="https://github.com/kubabec/HomeControlStation/blob/main/demo/img2.jpeg" width=50% height=50%>
+  **Decentralized, Serverless Smart Home Network Powered Exclusively by ESP32**
 
-***Project under development . . . *
-**
-### Description
+  [![PlatformIO](https://img.shields.io/badge/Platform-PlatformIO-orange.svg?style=for-the-badge&logo=platformio)](#)
+  [![ESP32 Network](https://img.shields.io/badge/Hardware-ESP32-blue.svg?style=for-the-badge&logo=espressif)](#)
+  [![No Central Hub](https://img.shields.io/badge/Architecture-Decentralized-success.svg?style=for-the-badge)](#)
+  [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](#)
+
+  *No Raspberry Pi. No Home Assistant. Just standalone ESP32 microcontrollers communicating directly with each other.*
+
+  [www.homecontrolstation.pl](http://www.homecontrolstation.pl)
+</div>
+
+<br><br>
+
+## 🌟 Welcome to True Edge of Home Controls
+
+**HomeControlStation** completely flips the traditional smart home model upside down. Instead of relying on a dedicated server, hub, or central PC, this system operates entirely as a **decentralized, distributed ESP32 node network**. 
+
+Built for **PlatformIO** and **Arduino IDE**, every single ESP32 runs standalone firmware equipped with its own web stack, hardware state manager, and local network control routines.
+
+* ESP32-S3 required for Master node
+
+<br><br>
+
+## ✨ System Architecture & Highlights
+
+* **🚫 Serverless & Decentralized:** No host PC / RPI required
+* **👑 Master / Slave Topology:** One node acts as the primary gateway while lightweight slave nodes seamlessly join the HCS network.
+* **🌐 Embedded Web Interface:** Configured nodes serve a local, high-speed interface via `home.local` accessible across your local network using web browser on any device.
+* **🛠 Dynamic Pin Mapping:** Define relay switches, sensors, or dimmers directly on pinouts via software without rewriting code for every hardware variant.
+<br><br>
+
+## ⚡ Quick Setup & User Experience Flow
+
+1. **Flash Firmware:** Flash the **HomeControlStation** firmware onto your ESP32 device using PlatformIO or Arduino IDE.
+2. **Wi-Fi & Master Configuration:** Connect to the temporary Access Point network broadcasted by the ESP32, configure the node as **Master**, and enter your home Wi-Fi credentials.
+3. **GPIO Pin Assignment:** Navigate to **`http://home.local`** within your home network and configure the GPIO pins to run the end device in your desired hardware type (e.g., relay, sensor, switch).
+4. **Local Network Control:** Use the device remotely across your home network directly from the main page.
+5. **Add a Slave Device:** Take another ESP32 device, follow the initial configuration steps, and assign it as a **Slave** within your HomeControlStation network.
+6. **Slave Hardware Setup:** Configure the Slave's GPIO pins to run another end device in another location or room.
+7. **Distributed Automation:** Enjoy using the powerful distributed architecture of HomeControlStation with zero external server dependencies!
+
+<br><br>
+
+## 📸 Media, Demos & Showcase
+
+#### System demo
+[![HomeControlStation usage](https://img.youtube.com/vi/fdsndvb5hg0/maxresdefault.jpg)](https://www.youtube.com/watch?v=fdsndvb5hg0)
+
+
+
+#### Setup video guide
+[![HomeControlStation guide](https://img.youtube.com/vi/TAbCHl1-19U/maxresdefault.jpg)](https://www.youtube.com/watch?v=TAbCHl1-19U)
+
+
+<br><br>
+
+## Check also
 
 > **New to the project?** Start with the [architecture and end-to-end flow guide](ARCHITECTURE.md) for the Platform/Devices boundary, build-time generation, runtime lifecycle, and ESP32 UDP network diagrams.
 
@@ -13,54 +69,10 @@
 
 > **Building a device preset?** The concrete devices compiled into a firmware image are the package directories currently present under `include/devices/` and `src/device/`. Use the additive activation helper documented in [DevicesPredefined](DevicesPredefined) to copy complete opt-in packages, then run `platformio run`.
 
-**HomeControlStation** is an open source project developed in order to simplify usage of cheap ESP32 board to control popular home automation usecases, e.g.:
-- Light switching
-- Color LED strip with customization
-- Temperature check
-- Window and door contact monitoring
-- Roller blind and shutter control
-- Gate controller integration
-- Aquarium temperature, heater, light, and filter control
-- RC via customizable IrDA controler
 
-![System overview](https://github.com/kubabec/HomeControlStation/blob/main/ArchitectureOverview.png "System overview")
+---
 
-Future plans:
-- Integration with Zigbee controls
-- Integration with 3rd party temperature sensors
-- Integration with MQTT server
-- Creation of touch panel communicating with the system
-
-## Goal
-
-**HomeControlStation** enables user to connect multiple ESP32 chips within local WiFi network with all the periperals needed. Each device provides user friendly UI to control its previously configured GPIOs, but additionally there is one node acting as a master in the communication, which collects all the neccessary data from slaves and presents all the devices together in one common user interface divided into room categories. 
-
-
-## Demo
-
-
-![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.06.34.png?raw=false "Main page")
-![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.07.55.png?raw=false "Pinout configuration")
-![Main page](https://github.com/kubabec/HomeControlStation/blob/main/demo/Zrzut%20ekranu%202025-05-31%20o%2017.08.20.png?raw=false "Multi-node inspection")
-
-
-## Usage
-
-Activate the required predefined device packages before building. For example:
-
-```sh
-sh DevicesPredefined/activate-examples.sh OnOffDevice WindowDoorSensor WindowBlinder
-platformio run
-```
-
-Activation copies package files; it does not remove other active types or link them to the predefined catalog. See [DevicesPredefined/README.md](DevicesPredefined/README.md) for the complete package table, dependencies, removal process, GPIO validation rules, and configuration workflow.
-
-GPIO pin must be connected either to PWM controlled external switch module (e.g. to control cheap LED chain) or directly to relay switch pin to control On/Off device with possible brigthness adjustment via PWM.  
-
-GPIO can also be connected to control line of WS28B LED strip to control the leds via user interface. 
-
-
-
-```
-
-###End
+<div align="center">
+  <b>Built for Builders. Powered by ESP32. Fully Local.</b> <br>
+  <i>Found this project helpful? Give it a ⭐ on GitHub!</i>
+</div>
