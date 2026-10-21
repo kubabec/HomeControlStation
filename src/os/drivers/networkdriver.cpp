@@ -12,6 +12,7 @@
 #include <esp_mac.h>
 #endif
 #include <os/drivers/ota.hpp>
+#include <os/drivers/softwareupdater.hpp>
 #include "os/Logger.hpp"
 
 /**
@@ -38,6 +39,7 @@ void NetworkDriver::deinit()
 void NetworkDriver::init()
 {
     Logger::log("NetworkDriver init ...");
+    SoftwareUpdater::init();
 
     WiFiAdapter::init();
 
@@ -195,6 +197,8 @@ void NetworkDriver::cyclic()
             }
         }
     }
+
+    SoftwareUpdater::cyclic();
 
     // Update OTA task to be able to process OTA requests
     OTA::cyclic();

@@ -18,6 +18,7 @@
 #include "build_info.h"
 #include "os/Logger.hpp"
 #include "os/app/display/DisplayServer.hpp"
+#include "os/drivers/softwareupdater.hpp"
 
 /**
  * @file src/os/app/http/httpserver.cpp
@@ -62,7 +63,11 @@ std::vector<String> constantRequests = {
   "digBtn",
   "unmappedEvents",
   "enablingConditions",
-  "rtcEvents"
+  "rtcEvents",
+  "softwareUpdate",
+  "softwareUpdateVersions",
+  "softwareUpdateStatus",
+  "softwareUpdateRestart"
 };
 
 std::vector<String> parameterizedRequests = {
@@ -73,7 +78,8 @@ std::vector<String> parameterizedRequests = {
   "ledColor",
   "newDigEvntTab",
   "saveEnablingConditions",
-  "saveRtcEvents"
+  "saveRtcEvents",
+  "softwareUpdateInstall"
 };
 
 std::vector<String> parameterizedAsyncRequests = {
@@ -108,7 +114,11 @@ std::vector<std::pair<std::function<void(WiFiClient&)>, SecurityAccessLevelType>
   {HomeLightHttpServer::constantHandler_digitalEvents, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_unmappedEvents, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::constantHandler_enablingConditions, e_ACCESS_LEVEL_SERVICE_MODE},
-  {HomeLightHttpServer::constantHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE}
+  {HomeLightHttpServer::constantHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_softwareUpdatePage, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_softwareUpdateVersions, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_softwareUpdateStatus, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::constantHandler_softwareUpdateRestart, e_ACCESS_LEVEL_SERVICE_MODE}
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedRequestHandlers = {
@@ -120,6 +130,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_newDigEvntTab, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_enablingConditions, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_softwareUpdateInstall, e_ACCESS_LEVEL_SERVICE_MODE},
 };
 
 std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessLevelType>> parameterizedAsyncRequestHandlers = {
@@ -542,6 +553,46 @@ bool HomeLightHttpServer::processParameterizedAsyncRequests(String& request, WiF
   return retVal;
 }
 
+bool HomeLightHttpServer::processSoftwareUpdateApiRequest(WiFiClient& client)
+{
+  const String linkRequest = header.substring(
+      String("GET /").length(),
+      header.length() - (String(" HTTP/1.1").length() + 2));
+
+  const bool isInstallRequest = linkRequest.startsWith("softwareUpdateInstall&");
+  const bool isApiRequest =
+      linkRequest == "softwareUpdateVersions" ||
+      linkRequest == "softwareUpdateStatus" ||
+      linkRequest == "softwareUpdateRestart" ||
+      isInstallRequest;
+  if (!isApiRequest)
+    return false;
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: application/json; charset=UTF-8");
+  client.println("Cache-Control: no-store");
+  client.println();
+
+  if (secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE)
+  {
+    client.println("{\"ok\":false,\"error\":\"Service access required.\"}");
+    return true;
+  }
+
+  if (linkRequest == "softwareUpdateVersions")
+    constantHandler_softwareUpdateVersions(client);
+  else if (linkRequest == "softwareUpdateStatus")
+    constantHandler_softwareUpdateStatus(client);
+  else if (linkRequest == "softwareUpdateRestart")
+    constantHandler_softwareUpdateRestart(client);
+  else
+  {
+    String request = linkRequest;
+    parameterizedHandler_softwareUpdateInstall(request, client);
+  }
+  return true;
+}
+
 
 void HomeLightHttpServer::handleClientRequest()
 {
@@ -569,7 +620,14 @@ void HomeLightHttpServer::handleClientRequest()
                 return;
               }
 
-              // // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
+              if (processSoftwareUpdateApiRequest(client))
+              {
+                header = "";
+                client.stop();
+                return;
+              }
+
+                // // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
               // // and a content-type so the client knows what's coming, then a blank line:
               client.println("HTTP/1.1 200 OK");
               client.println("Content-Type: text/html; charset=UTF-8\r\n");
@@ -793,6 +851,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       var url = `/rtcEvents`;\
       window.location.href = url;\
     }\
+    function softwareUpdate(){\
+      window.location.href = `/softwareUpdate`;\
+    }\
     function resetDevice(){\
         var url = `/resetDevice`;\
         window.location.href = url;\
@@ -975,6 +1036,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   
     /* Clear all settings */
   client.println("<div class=\"maintenance-button danger\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
+  client.println("<div class=\"maintenance-button update-button\" onclick=\"softwareUpdate()\">Software Update</div>");
   }
 
   /* Common HTML tags closure */

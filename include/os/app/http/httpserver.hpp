@@ -170,6 +170,8 @@ class HomeLightHttpServer
      */
     static bool processParameterizedAsyncRequests(String& request, WiFiClient& client);
 
+    static bool processSoftwareUpdateApiRequest(WiFiClient& client);
+
     /**
      * Restores server metadata from the persistent NVM block.
      * @param nvmData Stored data block to decode.
@@ -321,6 +323,11 @@ public:
     /** Renders user-configurable RTC DigitalEvent schedules. */
     static void constantHandler_rtcEvents(WiFiClient& client);
 
+    static void constantHandler_softwareUpdatePage(WiFiClient& client);
+    static void constantHandler_softwareUpdateVersions(WiFiClient& client);
+    static void constantHandler_softwareUpdateStatus(WiFiClient& client);
+    static void constantHandler_softwareUpdateRestart(WiFiClient& client);
+
     /**
      * Handles a fallback pending response route.
      * @param client HTTP client receiving the response.
@@ -458,6 +465,8 @@ public:
 
     /** Applies the RTC DigitalEvent schedule table submitted by the UI. */
     static void parameterizedHandler_rtcEvents(String& request, WiFiClient& client);
+
+    static void parameterizedHandler_softwareUpdateInstall(String& request, WiFiClient& client);
     
 };
 

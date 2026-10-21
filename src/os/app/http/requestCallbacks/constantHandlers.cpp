@@ -6,6 +6,7 @@
 #include "os/Logger.hpp"
 #include "os/app/display/DisplayServer.hpp"
 #include <Esp.h>
+#include "os/drivers/softwareupdater.hpp"
 
 /**
  * @file src/os/app/http/requestCallbacks/constantHandlers.cpp
@@ -109,6 +110,98 @@ void HomeLightHttpServer::constantHandler_configPage(WiFiClient &client)
   client.println("<script>getNotifications();</script>");
   // Print config page if it is requested
   printConfigPage(client);
+}
+
+void HomeLightHttpServer::constantHandler_softwareUpdatePage(WiFiClient &client)
+{
+  client.println("<div class=\"wrapper\"><div class=\"header\">Software Update</div>");
+  client.println("<div id=\"software-update-message\">Loading available software versions...</div>");
+  client.println("<div id=\"software-update-list\"></div>");
+  client.println("<div id=\"software-update-installing\" style=\"display:none\">");
+  client.println("<div id=\"software-update-selected\" class=\"software-update-selected\"></div>");
+  client.println("<div class=\"software-update-progress\"><div id=\"software-update-progress-fill\" class=\"software-update-progress-fill\"></div></div>");
+  client.println("<div class=\"software-update-progress-value\"><span id=\"software-update-progress-value\">0</span>%</div></div>");
+  client.println("<br><a href=\"/config\" class=\"button\">Back</a></div>");
+  client.println("<script>\
+    const updateMessage = document.getElementById('software-update-message');\
+    const updateList = document.getElementById('software-update-list');\
+    const updateInstalling = document.getElementById('software-update-installing');\
+    const updateSelected = document.getElementById('software-update-selected');\
+    const updateProgressFill = document.getElementById('software-update-progress-fill');\
+    const updateProgressValue = document.getElementById('software-update-progress-value');\
+    let updatePolling = null;\
+    function showInstallation(version, progress) {\
+      updateList.style.display = 'none';\
+      updateInstalling.style.display = 'block';\
+      updateSelected.textContent = 'Installing version ' + version;\
+      updateProgressFill.style.width = progress + '%';\
+      updateProgressValue.textContent = progress;\
+    }\
+    function renderVersions(data) {\
+      if (!data.ok) { updateMessage.textContent = data.error || 'Could not load software versions.'; return; }\
+      updateMessage.textContent = 'Device type: ' + data.target + '. Current version: ' + data.currentVersion;\
+      updateList.innerHTML = '';\
+      (data.releases || []).forEach(release => {\
+        const row = document.createElement('div');\
+        row.className = 'container';\
+        row.innerHTML = '<b>Version ' + release.version + '</b><br>' +\
+          (release.releaseNotes || '') + '<br><button class=\"button\">Install</button>';\
+        row.querySelector('button').onclick = () => startUpdate(release.version);\
+        updateList.appendChild(row);\
+      });\
+      if (!data.releases || data.releases.length === 0) updateMessage.textContent += ' No releases available.';\
+    }\
+    async function loadVersions() {\
+      try { renderVersions(await (await fetch('/softwareUpdateVersions')).json()); }\
+      catch (error) { updateMessage.textContent = 'Could not load software versions.'; }\
+    }\
+    async function pollUpdate() {\
+      try {\
+        const status = await (await fetch('/softwareUpdateStatus')).json();\
+        updateMessage.textContent = status.message;\
+        if (status.state === 'downloading') {\
+          showInstallation(status.version, status.progress);\
+        } else if (status.state === 'ready') {\
+          clearInterval(updatePolling);\
+          showInstallation(status.version, 100);\
+          if (confirm('Software was installed successfully. Restart the device now?')) {\
+            await fetch('/softwareUpdateRestart');\
+            updateMessage.textContent = 'Device is restarting. Wait for it to come back online.';\
+          }\
+        } else if (status.state === 'failed') {\
+          clearInterval(updatePolling);\
+          updateInstalling.style.display = 'none';\
+          updateList.style.display = 'block';\
+        }\
+      } catch (error) { updateMessage.textContent = 'Waiting for device update status...'; }\
+    }\
+    async function startUpdate(version) {\
+      if (!confirm('Install software version ' + version + '? The device will restart afterwards.')) return;\
+      const response = await fetch('/softwareUpdateInstall&' + encodeURIComponent(version));\
+      if (!response.ok) { updateMessage.textContent = 'Could not start software update.'; return; }\
+      updateMessage.textContent = 'Starting software update...';\
+      showInstallation(version, 0);\
+      if (updatePolling) clearInterval(updatePolling);\
+      updatePolling = setInterval(pollUpdate, 1000);\
+      pollUpdate();\
+    }\
+    loadVersions();\
+  </script>");
+}
+
+void HomeLightHttpServer::constantHandler_softwareUpdateVersions(WiFiClient &client)
+{
+  client.println(SoftwareUpdater::getVersionsJson());
+}
+
+void HomeLightHttpServer::constantHandler_softwareUpdateStatus(WiFiClient &client)
+{
+  client.println(SoftwareUpdater::getStatusJson());
+}
+
+void HomeLightHttpServer::constantHandler_softwareUpdateRestart(WiFiClient &client)
+{
+  client.println(SoftwareUpdater::requestRestart() ? "{\"ok\":true}" : "{\"ok\":false}");
 }
 
 void HomeLightHttpServer::constantHandler_resetDevice(WiFiClient &client)

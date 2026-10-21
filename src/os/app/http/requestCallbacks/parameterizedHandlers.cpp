@@ -2,6 +2,7 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/app/config/ConfigProvider.hpp>
 #include <os/app/timeMaster.hpp>
+#include "os/drivers/softwareupdater.hpp"
 #include "os/Logger.hpp"
 
 /**
@@ -159,11 +160,19 @@ void HomeLightHttpServer::parameterizedHandler_passwordApply(String &request, Wi
     /* Request Security access level change in OS via received password */
     (*p)(request);
   }
+
   else
   {
   }
 
   client.println("<meta http-equiv='refresh' content='1; url=http://" + ipAddressString + "/config'>");
+}
+
+void HomeLightHttpServer::parameterizedHandler_softwareUpdateInstall(String &request, WiFiClient &client)
+{
+  const String prefix = "softwareUpdateInstall&";
+  const String version = request.substring(prefix.length());
+  client.println(SoftwareUpdater::start(version) ? "{\"ok\":true}" : "{\"ok\":false}");
 }
 
 void HomeLightHttpServer::parameterizedHandler_ledStripColor(String &request, WiFiClient &client)

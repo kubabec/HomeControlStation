@@ -1,6 +1,7 @@
 #include "os/drivers/ota.hpp"
 #include "os/datacontainer/DataContainer.hpp"
 #include "os/Logger.hpp"
+#include "os/drivers/softwareupdater.hpp"
 
 #ifdef SUPERMINI
 #include <WiFi.h>
@@ -65,6 +66,7 @@ void OTA::init(const String hostname, const String password)
 
 void OTA::cyclic()
 {
+    if (SoftwareUpdater::isBusy())
+        return;
     ArduinoOTA.handle();
 }
-

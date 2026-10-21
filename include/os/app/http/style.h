@@ -1070,6 +1070,12 @@ body .advanced-action.danger { background:#783E45;border-color:#D7787D;color:#FF
 .maintenance-button:hover { background:#465464;border-color:#7A8B9F; }\
 .maintenance-button.danger { border-color:#9E555D;background:#713E45;color:#FFE9EA; }\
 .maintenance-button.danger:hover { background:#874951; }\
+.maintenance-button.update-button { border-color:#C68238;background:#8A5927;color:#FFF2DF; }\
+.maintenance-button.update-button:hover { background:#A5682D;border-color:#E0A252; }\
+.software-update-selected { margin:0 0 12px;padding:12px 14px;border:1px solid #C68238;border-radius:6px;background:#4A3826;color:#FFF2DF;font-weight:650;text-align:center; }\
+.software-update-progress { width:100%;height:18px;overflow:hidden;border:1px solid var(--steel);border-radius:9px;background:var(--surface-0); }\
+.software-update-progress-fill { width:0%;height:100%;background:#D98B35;transition:width .25s ease; }\
+.software-update-progress-value { margin-top:8px;color:var(--text-strong);font-weight:650;text-align:center; }\
 .device-container .slot-header { flex:0 0 auto;width:100%;min-height:36px;margin:0;gap:10px;color:var(--text);white-space:nowrap; }\
 .device-container .slot-header .status-text { margin-left:auto;color:var(--text-muted); }\
 .device-container.disabled { min-height:58px;max-height:58px;padding:10px 16px; }\
