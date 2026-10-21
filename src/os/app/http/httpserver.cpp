@@ -598,7 +598,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2026 Home Control Station · Jakub Becmer · version 2.0</p></footer>");
+              client.println("<footer><p>&copy; 2026 Home Control Station · " DEVELOPER " · version " BUILD_VERSION "</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            
@@ -938,7 +938,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("\" type=\"text\" disabled></label>");
 
   client.println("<label>Build info:<input value=\"");
-  client.println("Time: [" BUILD_TIMESTAMP "], Git: [" BUILD_GITHASH "], Author: [" DEVELOPER "]");
+  client.println("Time: [" BUILD_TIMESTAMP "], Git: [" BUILD_GITHASH "], Version: [" BUILD_VERSION "], Author: [" DEVELOPER "]");
   client.println("\" type=\"text\" disabled></label>");
 
   client.println("<hr class=\"custom-hr\">");

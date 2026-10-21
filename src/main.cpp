@@ -14,12 +14,22 @@
 
 #include "esp_task_wdt.h"
 
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+#include <os/app/display/DisplayRuntime.hpp>
+#endif
+
 void setup()
 {
   esp_task_wdt_init(15, true);
   esp_task_wdt_add(NULL);
   Serial.begin(115200);
   randomSeed(analogRead(0));
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+  if (!DisplayRuntime::init())
+  {
+    Serial.println("Display runtime initialization failed");
+  }
+#endif
   OperatingSystem::init();
 }
 
@@ -27,6 +37,9 @@ void loop()
 {
 
   esp_task_wdt_reset();
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+  DisplayRuntime::cyclic();
+#endif
   static unsigned long next2ms = 0;
   static unsigned long next10ms = 0;
   static unsigned long next20ms = 0;

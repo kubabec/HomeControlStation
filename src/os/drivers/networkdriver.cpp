@@ -4,6 +4,9 @@
 #include <os/app/DigitalEvent/DigitalEventReceiver.hpp>
 #include <os/app/DigitalEvent/DigitalEventTransmitter.hpp>
 #include <os/app/display/DisplayServer.hpp>
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+#include <os/app/display/DisplayClient.hpp>
+#endif
 #include <esp_wifi.h>
 #ifdef SUPERMINI
 #include <esp_mac.h>
@@ -101,11 +104,16 @@ void NetworkDriver::init()
         packetReceivers.push_back(DigitalEventTransmitter::receiveUdp);
     }
 
+ #if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+    packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
+    packetReceivers.push_back(DisplayClient::receiveUDP);
+ #else
     if (isRcServer)
     {
         packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
         packetReceivers.push_back(DisplayServer::receiveUDP);
     }
+ #endif
 
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);
     packetReceivers.push_back(dummyTobeRemoved);

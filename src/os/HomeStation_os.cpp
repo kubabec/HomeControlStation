@@ -12,7 +12,18 @@
  * @brief Main OS loop, scheduler and lifecycle management for the Home Control Station.
  */
 
-DHT tempSensor(21, DHT11);
+/* GPIO0 is the Guition LCD red MSB and GPIO21 is the LCD pixel clock. */
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+#define HCS_BOOT_BUTTON_PIN (-1)
+#define HCS_ONBOARD_TEMP_SENSOR_PIN (-1)
+#else
+#define HCS_BOOT_BUTTON_PIN 0
+#define HCS_ONBOARD_TEMP_SENSOR_PIN 21
+#endif
+
+#if HCS_ONBOARD_TEMP_SENSOR_PIN >= 0
+DHT tempSensor(HCS_ONBOARD_TEMP_SENSOR_PIN, DHT11);
+#endif
 
 bool OperatingSystem::isHttpServerRunning = false;
 bool OperatingSystem::isRCServerRunning = false;
@@ -40,11 +51,13 @@ ServiceInformation OperatingSystem::displayRamUsage()
     accessLevelGrantedTimeSnapshot = millis();
 
     float T = 0.f;
+#if HCS_ONBOARD_TEMP_SENSOR_PIN >= 0
     float t = tempSensor.readTemperature();
     if (!isnan(t))
     {
         T = t;
     }
+#endif
 
     ServiceInformation info;
     info.ramTotal = esp_get_free_heap_size();
@@ -58,7 +71,9 @@ ServiceInformation OperatingSystem::displayRamUsage()
 
 void OperatingSystem::init()
 {
-    pinMode(0, INPUT_PULLUP);
+#if HCS_BOOT_BUTTON_PIN >= 0
+    pinMode(HCS_BOOT_BUTTON_PIN, INPUT_PULLUP);
+#endif
 
     uniqueLifecycleId = (uint16_t)random(10, 10000);
     DataContainer::setSignalValue(CBK_DISPLAY_RAM_USAGE, static_cast<std::function<ServiceInformation()>>(OperatingSystem::displayRamUsage));
@@ -104,7 +119,9 @@ void OperatingSystem::init()
         RemoteControlServer::init();
         RemoteDevicesManager::init();
         DigitalEventReceiver::init();
+#if !defined(HCS_TARGET_DISPLAY_S3_4INCH)
         DisplayServer::init();
+#endif
     }
     else
     {
@@ -160,10 +177,14 @@ void OperatingSystem::task10ms()
 
 void OperatingSystem::task20ms()
 {
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+    CyclicProfiler::call("DisplayClient", DisplayClient::cyclic);
+#else
     if (isRCServerRunning)
     {
         CyclicProfiler::call("DisplayServer", DisplayServer::cyclic);
     }
+#endif
 }
 
 void OperatingSystem::task50ms()
@@ -302,13 +323,19 @@ void OperatingSystem::performReset()
         RemoteDevicesManager::deinit();
         RemoteControlServer::deinit();
         DigitalEventReceiver::deinit();
+#if !defined(HCS_TARGET_DISPLAY_S3_4INCH)
         DisplayServer::deinit();
+#endif
     }
     else
     {
         RemoteControlClient::deinit();
         DigitalEventTransmitter::deinit();
     }
+
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+    DisplayClient::deinit();
+#endif
 
     DeviceManager::deinit();
 

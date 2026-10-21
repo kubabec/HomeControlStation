@@ -26,6 +26,9 @@
 #include <os/app/SafeResetManager.hpp>
 #include <os/app/timeMaster.hpp>
 #include <os/app/display/DisplayServer.hpp>
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+#include <os/app/display/DisplayClient.hpp>
+#endif
 
 #include <os/HwDependency/RFManager.hpp>
 

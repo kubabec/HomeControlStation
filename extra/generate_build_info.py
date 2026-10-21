@@ -11,6 +11,12 @@ def get_build_flag_value(flag_name):
     defines = {k: v for (k, v) in flags_with_value_list}
     return defines.get(flag_name)
 
+def require_build_flag_value(flag_name):
+    value = get_build_flag_value(flag_name)
+    if value is None or value == "":
+        raise RuntimeError("Missing required build flag: {}".format(flag_name))
+    return value
+
 def write_build_info(project_dir):
     out_dir = os.path.join(project_dir, "src")
     try:
@@ -38,7 +44,8 @@ def write_build_info(project_dir):
     content.append('#ifndef BUILD_INFO_H')
     content.append('#define BUILD_INFO_H')
     content.append('')
-    content.append('#define DEVELOPER "{}"'.format(get_build_flag_value("DEVELOPER")))
+    content.append('#define DEVELOPER "{}"'.format(require_build_flag_value("DEVELOPER")))
+    content.append('#define BUILD_VERSION "{}"'.format(require_build_flag_value("HCS_VERSION")))
     content.append('#define BUILD_TIMESTAMP "{}"'.format(timestamp))
     if git_hash:
         content.append('#define BUILD_GITHASH "{}"'.format(git_hash))

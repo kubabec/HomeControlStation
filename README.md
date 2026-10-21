@@ -71,6 +71,26 @@ Built for **PlatformIO** and **Arduino IDE**, every single ESP32 runs standalone
 
 > **Building a device preset?** The concrete devices compiled into a firmware image are the package directories currently present under `include/devices/` and `src/device/`. Use the additive activation helper documented in [DevicesPredefined](DevicesPredefined) to copy complete opt-in packages, then run `platformio run`.
 
+## Guition 4-inch display target
+
+The ESP32-S3 480x480 Guition terminal is integrated as the optional
+`DisplayS34inch` PlatformIO environment:
+
+```sh
+pio run -e DisplayS34inch
+```
+
+The target uses the same HomeControlStation operating system, device manager,
+configuration, remote-control, and master/slave networking infrastructure as
+the other environments. It adds the Guition panel/touch driver and runs the
+display client application. Display-free targets do not compile or link the
+LVGL, Arduino GFX, GT911, or display-client implementation.
+
+The display is a UI role, not a restricted network role. Its HCS configuration
+can therefore still host local devices and select master or slave operation.
+The display role only determines that the local display endpoint uses
+`DisplayClient` instead of `DisplayServer`.
+
 
 ---
 
