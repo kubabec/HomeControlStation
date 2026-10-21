@@ -137,7 +137,7 @@ void OperatingSystem::init()
     /* handle security access level grant to SERVICE MODE if there is no valid config loaded */
     NodeConfiguration currentConfig =
         std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
-    if (currentConfig.nodeType == 255 ||           /* invalid node type  */
+    if (!currentConfig.configurationInitialized ||
         !currentConfig.networkCredentialsAvailable /* no network credentials */
     )
     {

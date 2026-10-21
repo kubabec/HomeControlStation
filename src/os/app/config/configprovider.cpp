@@ -15,7 +15,7 @@
 
 
 
-ConfigData ConfigProvider::configRamMirror = {255, 1, 1, 255, "\0", "\0", "\0"};
+ConfigData ConfigProvider::configRamMirror = {};
 PersistentDataBlock ConfigProvider::dataBlocksRamMirror[PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS] = {'\0'};
 uint16_t ConfigProvider::totalNvmSize = 0;
 bool ConfigProvider::nvmDataAvailable = false;
@@ -64,7 +64,7 @@ void ConfigProvider::init()
         emptyConfiguration.isHttpServer = true;
         emptyConfiguration.isRcServer = true;
         emptyConfiguration.networkCredentialsAvailable = false;
-        emptyConfiguration.nodeType = 255;
+        emptyConfiguration.nodeType = compiledHardwareNodeType();
 
         emptyConfiguration.panelPassword = "admin";
         
@@ -123,6 +123,7 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.networkSSID = String(configRamMirror.networkSSID);
     validConfiguration.networkPassword = String(configRamMirror.networkPassword);
     validConfiguration.nodeType = configRamMirror.nodeType;
+    validConfiguration.configurationInitialized = isConfigurationInitialized();
     validConfiguration.panelPassword = String(configRamMirror.panelPassword);
 
     if(validConfiguration.networkSSID.length() > 0){
@@ -140,6 +141,11 @@ void ConfigProvider::updateNodeConfigurationSignal()
     DataContainer::setSignalValue(SIG_DEVICE_CONFIGURATION, validConfiguration);
 
     Logger::log("NVM configuration restored successfully.");
+}
+
+bool ConfigProvider::isConfigurationInitialized()
+{
+    return configRamMirror.configurationState == CONFIGURATION_INITIALIZED_MARKER;
 }
 
 void ConfigProvider::cyclic()
@@ -186,7 +192,6 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     
     String isHttpServerActive       = String(doc["NodeConfig"][0]["isHttpActive"]);
     String isRcServerActive         = String(doc["NodeConfig"][0]["isRcServer"]);
-    String nodeType                 = String(doc["NodeConfig"][0]["nodeType"]);
     String networkSSID              = String(doc["NodeConfig"][0]["ssid"]);
     String networkPassword          = String(doc["NodeConfig"][0]["wifiPass"]);
     String panelPassword            = String(doc["NodeConfig"][0]["usrPass"]);
@@ -201,9 +206,7 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
         configRamMirror.isRcServer = isRcServerActive == "true" ? 1 : 0;
     }
     
-    if(isNotNull(nodeType)){
-        configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
-    }
+    configRamMirror.nodeType = compiledHardwareNodeType();
     if(isNotNull(networkSSID)){
         configRamMirror.setSSID(networkSSID);
     }
@@ -212,6 +215,11 @@ bool ConfigProvider::loadConfigFromFile(JsonDocument& doc)
     }
     if(isNotNull(panelPassword)){
         configRamMirror.setPanelPassword(panelPassword);
+    }
+    if (isNotNull(networkSSID) && networkSSID.length() > 0 &&
+        isNotNull(panelPassword) && panelPassword.length() > 0)
+    {
+        configRamMirror.configurationState = CONFIGURATION_INITIALIZED_MARKER;
     }
 
     /* no failure */
@@ -240,27 +248,25 @@ bool ConfigProvider::setConfigViaString(String& configString)
         JsonDocument doc;
         DeserializationError success = deserializeJson(doc, configString.c_str());
         if(success == DeserializationError::Code::Ok){
-            String oldWiFiSSID = String(configRamMirror.networkSSID); /* IP detection workaround need */
-
             String isHttpServerActive       = String("yes" /*doc["httpActive"]*/);
             String isRcServerActive         = String(doc["rcServerActive"]);
-            String nodeType                 = String(doc["type"]);
             String networkSSID              = String(doc["network"]);
             String networkPassword          = String(doc["netPwd"]);
             String panelPassword            = String(doc["cfgPwd"]);
 
             if(isHttpServerActive.length() > 0 && isRcServerActive.length() > 0 &&
-               nodeType.length() > 0 && networkSSID.length() > 0 && panelPassword.length() > 0 ) {
+               networkSSID.length() > 0 && panelPassword.length() > 0 ) {
                 /* Some of configs are only allowed to be changed in Service mode */
                 if(currentAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE)   {
                     configRamMirror.isHttpServer = isHttpServerActive == "yes" ? 1 : 0;
                     configRamMirror.isRcServer = isRcServerActive == "yes" ? 1 : 0;
-                    configRamMirror.nodeType = nodeType.toInt() < 10 ? nodeType.toInt() : 255;
+                    configRamMirror.nodeType = compiledHardwareNodeType();
                 }
 
                 configRamMirror.setSSID(networkSSID);
                 configRamMirror.setPassword(networkPassword);
                 configRamMirror.setPanelPassword(panelPassword);
+                configRamMirror.configurationState = CONFIGURATION_INITIALIZED_MARKER;
 
                 Logger::log("Applying following configuration :");
                 configRamMirror.serialPrint();
@@ -360,6 +366,23 @@ bool ConfigProvider::readRamMirrorFromNvm()
             /* Copy device configuration */
             memcpy(&configRamMirror, mergedBuffer, configRamMirror.getSize());
 
+            const bool legacyConfigurationExists =
+                (!isHardwareNodeType(configRamMirror.nodeType) &&
+                 configRamMirror.nodeType != UNDEFINED_HARDWARE_NODE_TYPE) ||
+                configRamMirror.networkSSID[0] != '\0' ||
+                configRamMirror.panelPassword[0] != '\0';
+            const bool requiresMigration =
+                configRamMirror.nodeType != compiledHardwareNodeType() ||
+                (!isConfigurationInitialized() && legacyConfigurationExists);
+            if (requiresMigration)
+            {
+                configRamMirror.nodeType = compiledHardwareNodeType();
+                if (legacyConfigurationExists)
+                {
+                    configRamMirror.configurationState = CONFIGURATION_INITIALIZED_MARKER;
+                }
+            }
+
             /* Copy datablocks to ram mirror */
             for (uint8_t block = 0; block < PersistentDatablockID::e_NUMBER_OF_PERSISTENT_BLOCKS; ++block)
             {
@@ -385,6 +408,16 @@ bool ConfigProvider::readRamMirrorFromNvm()
                     PersistentMemoryAccess::readData(historicalBuffer, historicalBufferSize))
                 {
                     memcpy(&configRamMirror, historicalBuffer, configRamMirror.getSize());
+                    const bool legacyConfigurationExists =
+                        (!isHardwareNodeType(configRamMirror.nodeType) &&
+                         configRamMirror.nodeType != UNDEFINED_HARDWARE_NODE_TYPE) ||
+                        configRamMirror.networkSSID[0] != '\0' ||
+                        configRamMirror.panelPassword[0] != '\0';
+                    configRamMirror.nodeType = compiledHardwareNodeType();
+                    if (legacyConfigurationExists)
+                    {
+                        configRamMirror.configurationState = CONFIGURATION_INITIALIZED_MARKER;
+                    }
                     for (uint8_t block = 0; block < historicalBlockCount; ++block)
                     {
                         memcpy(dataBlocksRamMirror[block].data,
@@ -495,6 +528,3 @@ void ConfigProvider::massErase()
 {
     PersistentMemoryAccess::massErase(totalNvmSize);
 }
-
-
-

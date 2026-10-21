@@ -21,11 +21,12 @@ typedef struct
     uint8_t safeShutdownFlag = 255;
     uint8_t isHttpServer = 0;
     uint8_t isRcServer = 0;
-    uint8_t nodeType = 255;
+    uint8_t nodeType = compiledHardwareNodeType();
     char networkSSID[SSID_LENGTH] = {'\0'};
     char networkPassword[PASSWORD_LENGTH] = {'\0'};
     char panelPassword[PASSWORD_LENGTH] = {'\0'};
-    uint8_t reserved[150]; // Future usecase reservation
+    uint8_t reserved[149]; // Future usecase reservation
+    uint8_t configurationState = 0;
 
     uint16_t getSize()
     {
@@ -36,7 +37,8 @@ typedef struct
             SSID_LENGTH + // networkSSID
             PASSWORD_LENGTH + // Password
             PASSWORD_LENGTH + // user password
-            sizeof(reserved); // reserved
+            sizeof(reserved) + // reserved
+            sizeof(configurationState); // configuration state
     }
     /**
      * Prints the configuration to the logger for debugging.
@@ -132,6 +134,7 @@ class ConfigProvider
     static bool nvmDataAvailable;
     static uint8_t restoredPersistentBlockCount;
 
+    static bool isConfigurationInitialized();
     static void updateNodeConfigurationSignal();
     static bool saveRamMirrorToNvm();
     static bool readRamMirrorFromNvm();

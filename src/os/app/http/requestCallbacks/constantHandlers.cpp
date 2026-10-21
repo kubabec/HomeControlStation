@@ -46,9 +46,10 @@ void HomeLightHttpServer::constantHandler_mainPage(WiFiClient &client)
   // printTestLedStrip(client);
 
   /* Display configuration button */
-  uint8_t nodeType =
-      std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION)).nodeType;
-  const String configPageButtonText = nodeType != 255 ? "Settings" : "Configure";
+  const NodeConfiguration currentConfig =
+      std::any_cast<NodeConfiguration>(DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION));
+  const bool configurationInitialized = currentConfig.configurationInitialized;
+  const String configPageButtonText = configurationInitialized ? "Settings" : "Configure";
 
   if (secAccessLevel == e_ACCESS_LEVEL_NONE)
   {

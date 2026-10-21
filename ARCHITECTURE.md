@@ -452,6 +452,8 @@ Each schedule is a compile-time-checked 16-byte record containing the 64-bit eve
 
 The ConfigProvider layout remains the deployed 34-block condition layout. With the 244-byte `ConfigData`, its standard EEPROM image remains 1950 bytes including framing and checksum. The 1200-byte extended region starts at byte 1950, producing a 3150-byte EEPROM blob. Original 28-block images retain their existing atomic migration path from extended base 1650. Keeping RTC persistence separate and limiting extended memory leave enough headroom in the 16 KB NVS partition for old and new blob generations during atomic updates.
 
+Hardware target identity is assigned by the PlatformIO build target, not by the user. `ESP32-S3-c1`, `ESP32-S3-SuperMini`, and `ESP32-S3-4InchDisplay` use stable persisted type values, while a separate initialization marker distinguishes a virgin device from a configured device. Firmware updates migrate legacy type values and preserve Wi-Fi, Master/Slave, device-slot, and extended-memory configuration without requiring a new setup.
+
 ### Event occurrence and compatibility
 
 An event occurrence consists of a 64-bit event ID and a human-readable Source. Platform producers use the source-aware callback `CBK_FIRE_DIGITAL_EVENT_WITH_SOURCE`; the original `CBK_FIRE_DIGITAL_EVENT` callback remains available and assigns a legacy source.

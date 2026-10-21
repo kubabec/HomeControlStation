@@ -59,7 +59,6 @@ let isNotificationPollingActive = 1;\
     function applySettings() {\
         var isHTTPServer = 'yes';\
         var isRCServer = document.querySelector('select[name=\"isRCServer\"]').value;\
-        var nodeType = document.querySelector('select[name=\"nodetype\"]').value;\
         var SSID = document.querySelector('input[name=\"SSID\"]').value;\
         var Password = document.querySelector('input[name=\"Password\"]').value;\
         var PanelPassword = document.querySelector('input[name=\"UserPassword\"]').value;\
@@ -67,7 +66,6 @@ let isNotificationPollingActive = 1;\
         let finalJson = {\
         httpActive:isHTTPServer,\
         rcServerActive:isRCServer,\
-        type:nodeType,\
         network:SSID,\
         netPwd:Password,\
         cfgPwd:PanelPassword\

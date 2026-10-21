@@ -27,12 +27,59 @@ enum RequestProcessingState {
     eREQUEST_COMPLETED
 };
 
+enum class HardwareNodeType : uint8_t
+{
+    Esp32S3C1 = 10,
+    Esp32S3SuperMini = 11,
+    Esp32S34InchDisplay = 12
+};
+
+constexpr uint8_t UNDEFINED_HARDWARE_NODE_TYPE = 255;
+constexpr uint8_t CONFIGURATION_INITIALIZED_MARKER = 0xA5;
+
+#if defined(HCS_TARGET_ESP32_S3_C1)
+constexpr HardwareNodeType COMPILED_HARDWARE_NODE_TYPE = HardwareNodeType::Esp32S3C1;
+#elif defined(SUPERMINI)
+constexpr HardwareNodeType COMPILED_HARDWARE_NODE_TYPE = HardwareNodeType::Esp32S3SuperMini;
+#elif defined(HCS_TARGET_DISPLAY_S3_4INCH)
+constexpr HardwareNodeType COMPILED_HARDWARE_NODE_TYPE = HardwareNodeType::Esp32S34InchDisplay;
+#else
+#error "No HomeControlStation hardware target was selected"
+#endif
+
+constexpr uint8_t compiledHardwareNodeType()
+{
+    return static_cast<uint8_t>(COMPILED_HARDWARE_NODE_TYPE);
+}
+
+constexpr bool isHardwareNodeType(uint8_t nodeType)
+{
+    return nodeType >= static_cast<uint8_t>(HardwareNodeType::Esp32S3C1) &&
+           nodeType <= static_cast<uint8_t>(HardwareNodeType::Esp32S34InchDisplay);
+}
+
+inline const char* hardwareNodeTypeName(uint8_t nodeType)
+{
+    switch (static_cast<HardwareNodeType>(nodeType))
+    {
+    case HardwareNodeType::Esp32S3C1:
+        return "ESP32-S3-c1";
+    case HardwareNodeType::Esp32S3SuperMini:
+        return "ESP32-S3-SuperMini";
+    case HardwareNodeType::Esp32S34InchDisplay:
+        return "ESP32-S3-4InchDisplay";
+    default:
+        return "UNDEFINED";
+    }
+}
+
 /* Basic node (ESP32) configuration data */
 typedef struct {
     bool isHttpServer = 1;
     bool isRcServer = 1;
     bool networkCredentialsAvailable = false;
-    uint8_t nodeType = 0;
+    bool configurationInitialized = false;
+    uint8_t nodeType = compiledHardwareNodeType();
     String networkSSID = "";
     String networkPassword = "";
     String panelPassword = "";

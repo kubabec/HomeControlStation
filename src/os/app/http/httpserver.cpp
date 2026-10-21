@@ -867,21 +867,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     client.println("</select></label>");  
 
     /* Device type  */
-    const std::map<uint8_t, String> typeToNameMappings = {
-      {9, "HomeControlStation v1 (StirTech)"},
-      {1, "ESP32 devkit v1"},
-      {2, "ESP32 S3"},
-      {255, "UNDEFINED"}
-    };
-    client.println("<label>Type:<select name=\"nodetype\">");
-    for(auto& type : typeToNameMappings){
-      if(currentConfig.nodeType == type.first){
-        client.println("<option selected value=\""+String((int)type.first)+"\">"+type.second+"</option>");
-      }else {
-        client.println("<option value=\""+String((int)type.first)+"\">"+type.second+"</option>");
-      }
-    }
-    client.println("</select></label>");
+      client.println("<label>Type:<input type=\"text\" value=\"" +
+                     String(hardwareNodeTypeName(currentConfig.nodeType)) +
+                     "\" readonly></label>");
 
   if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("</div>");
