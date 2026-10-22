@@ -594,6 +594,54 @@ bool HomeLightHttpServer::processSoftwareUpdateApiRequest(WiFiClient& client)
 }
 
 
+/* Reads remaining headers and the body of a POST request, then rewrites the request line to
+   'GET /<path><body> HTTP/1.1' so the existing handlers receive the same string as before */
+static void convertPostToGetRequest(String& requestLine, WiFiClient& client)
+{
+  if (!requestLine.startsWith("POST /"))
+    return;
+
+  const unsigned long start = millis();
+  const unsigned long timeoutMs = 2000;
+  const size_t maxBodySize = 2048;
+  size_t contentLength = 0;
+  String line = "";
+
+  /* Read headers until the blank line, looking for Content-Length */
+  while (client.connected() && millis() - start < timeoutMs)
+  {
+    if (!client.available())
+      continue;
+    char c = client.read();
+    if (c != '\n')
+    {
+      line += c;
+      continue;
+    }
+    line.trim();
+    if (line.length() == 0)
+      break;
+    line.toLowerCase();
+    if (line.startsWith("content-length:"))
+      contentLength = line.substring(String("content-length:").length()).toInt();
+    line = "";
+  }
+
+  if (contentLength > maxBodySize)
+    contentLength = maxBodySize;
+
+  String body = "";
+  while (body.length() < contentLength && client.connected() && millis() - start < timeoutMs)
+  {
+    if (client.available())
+      body += (char)client.read();
+  }
+
+  /* Strip "POST /" prefix and " HTTP/1.1\r\n" suffix */
+  String path = requestLine.substring(String("POST /").length(), requestLine.length() - (String(" HTTP/1.1").length() + 2));
+  requestLine = "GET /" + path + body + " HTTP/1.1\r\n";
+}
+
 void HomeLightHttpServer::handleClientRequest()
 {
   client = server.available(); 
@@ -613,6 +661,7 @@ void HomeLightHttpServer::handleClientRequest()
             // if the current line is blank, you got two newline characters in a row.
             // that's the end of the client HTTP request, so send a response:
             if (currentLine.length() == 0) {
+              convertPostToGetRequest(header, client);
               if(processLinkAsyncRequest(client)){
                 /* Received async request, further processing of this function must be dropped */
                 header = "";

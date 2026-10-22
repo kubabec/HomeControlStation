@@ -73,8 +73,9 @@ let isNotificationPollingActive = 1;\
 \
         let jsonString = JSON.stringify(finalJson);\
         console.log(\"Wygenerowany Config:\", jsonString);\
-        var url = '/newCfgApply&' + jsonString;\
-        window.location.href = url;\
+        fetch('/newCfgApply&', {method: 'POST', body: jsonString}).finally(function() {\
+            window.location.href = '/';\
+        });\
     }\
     function onRangeTimChanged(value) {\
         value = parseInt(value);\
@@ -239,8 +240,9 @@ let isNotificationPollingActive = 1;\
         function submitPassword() {\
             const passwordValue = document.getElementById('password-input').value;\
             hidePopup('password-popup-overlay', 'password-popup-content');\
-            url = '/passwordApply' + passwordValue;\
-            window.location.href = url;\
+            fetch('/passwordApply', {method: 'POST', body: passwordValue}).finally(function() {\
+                setTimeout(function() { window.location.href = '/config'; }, 1000);\
+            });\
         }\
         function hexToRgb(hex) {\
             const match = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);\
