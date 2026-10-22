@@ -12,6 +12,8 @@
 #include "os/datacontainer/DataContainer.hpp"
 #include "os/app/display/DisplayClient.hpp"
 
+extern "C" const lv_img_dsc_t logo_hcs_footer;
+
 namespace
 {
     float readFloat(const uint8_t *bytes, size_t offset)
@@ -41,7 +43,7 @@ namespace
 #define FONT_BODY (&lv_font_montserrat_14)
 
     constexpr lv_coord_t kAppBarHeight = 52;
-    constexpr lv_coord_t kFooterHeight = 30;
+    constexpr lv_coord_t kFooterHeight = 40;
     constexpr lv_coord_t kNavButtonWidth = 34;
     constexpr lv_coord_t kRoomCardPad = 8;
     constexpr lv_coord_t kGridGap = 6;
@@ -309,10 +311,8 @@ void HomeControlApp::buildUi()
     lv_obj_set_flex_flow(footer_, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(footer_, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    lv_obj_t *footerLabel = lv_label_create(footer_);
-    lv_label_set_text(footerLabel, LV_SYMBOL_HOME " HomeControlStation");
-    lv_obj_set_style_text_color(footerLabel, lv_color_hex(kTextMuted), 0);
-    lv_obj_set_style_text_font(footerLabel, FONT_BODY, 0);
+    lv_obj_t *footerLogo = lv_img_create(footer_);
+    lv_img_set_src(footerLogo, &logo_hcs_footer);
 
     overlay_ = lv_obj_create(lv_layer_top());
     lv_obj_set_size(overlay_, lv_pct(100), lv_pct(100));

@@ -175,7 +175,7 @@ private:
     lv_obj_t* leftNavButton_ = nullptr;
     lv_obj_t* content_ = nullptr;  // Content area for devices (grid with vertical scroll)
     lv_obj_t* rightNavButton_ = nullptr;
-    lv_obj_t* footer_ = nullptr;  // Footer with HomeControlStation text
+    lv_obj_t* footer_ = nullptr;  // Footer with HomeControlStation logo
 
     lv_obj_t* overlay_ = nullptr;
     lv_obj_t* overlayCard_ = nullptr;

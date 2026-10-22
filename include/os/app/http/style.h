@@ -1039,7 +1039,7 @@ background:var(--surface-1);border:1px solid var(--steel-soft);border-radius:8px
 .rtc-days label { display:inline-flex;align-items:center;justify-content:flex-start;gap:5px;min-width:52px;padding:6px 8px;background:var(--surface-2);border:1px solid var(--steel-soft);border-radius:4px;color:var(--text-strong);white-space:nowrap; }\
 .rtc-days input[type=\"checkbox\"] { display:block;visibility:visible;opacity:1;width:20px;height:20px;margin:0; }\
 .sensor-error { min-height:64px;height:auto;background:var(--surface-1);border:1px solid #8F434A;border-radius:6px;box-shadow:none; }\
-footer { color:#647283;padding:18px 0 6px; }\
+footer { color:#647283;padding:2px 0 6px; }\
 footer a { color:#8195AD; }\
 body input[type=\"number\"] { width:min(220px,60%);min-height:44px;margin:0;padding:9px 12px;border:1px solid var(--steel);border-radius:6px;background:var(--surface-1);color:var(--text-strong); }\
 body input[type=\"number\"]:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,145,242,.18); }\

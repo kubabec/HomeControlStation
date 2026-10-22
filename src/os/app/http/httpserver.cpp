@@ -642,6 +642,9 @@ static void convertPostToGetRequest(String& requestLine, WiFiClient& client)
   requestLine = "GET /" + path + body + " HTTP/1.1\r\n";
 }
 
+extern const uint8_t logo_hcs_png_start[] asm("_binary_res_logo_hcs_png_start");
+extern const uint8_t logo_hcs_png_end[] asm("_binary_res_logo_hcs_png_end");
+
 void HomeLightHttpServer::handleClientRequest()
 {
   client = server.available(); 
@@ -662,6 +665,22 @@ void HomeLightHttpServer::handleClientRequest()
             // that's the end of the client HTTP request, so send a response:
             if (currentLine.length() == 0) {
               convertPostToGetRequest(header, client);
+              if (header.startsWith("GET /logo_hcs.png"))
+              {
+                const size_t logoSize = logo_hcs_png_end - logo_hcs_png_start;
+                client.println("HTTP/1.1 200 OK");
+                client.println("Content-Type: image/png");
+                client.println("Cache-Control: public, max-age=86400");
+                client.print("Content-Length: ");
+                client.println(logoSize);
+                client.println("Connection: close");
+                client.println();
+                client.write(logo_hcs_png_start, logoSize);
+                header = "";
+                client.stop();
+                return;
+              }
+
               if(processLinkAsyncRequest(client)){
                 /* Received async request, further processing of this function must be dropped */
                 header = "";
@@ -705,7 +724,7 @@ void HomeLightHttpServer::handleClientRequest()
               //   setInterval(getNotifications, 9325);\
               // </script>");
 
-              client.println("<footer><p>&copy; 2026 Home Control Station · " DEVELOPER " · version " BUILD_VERSION "</p></footer>");
+              client.println("<footer><img src=\"/logo_hcs.png\" alt=\"Home Control Station\" style=\"display:block;margin:0 auto 8px;width:140px;height:auto;opacity:.85\"><p>&copy; 2026 " DEVELOPER " · version " BUILD_VERSION "</p></footer>");
 
               client.println("</div>");
               client.println("</body></html>");            
