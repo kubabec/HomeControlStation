@@ -627,6 +627,11 @@ static void convertPostToGetRequest(String& requestLine, WiFiClient& client)
     line = "";
   }
 
+  /* Body-less POST (payload still in the URL) keeps the original "POST /..." line, which handlers like
+     getExtendedControls/saveRtcEvents rely on (leading '/' preserved by the 5-char substring) */
+  if (contentLength == 0)
+    return;
+
   if (contentLength > maxBodySize)
     contentLength = maxBodySize;
 
