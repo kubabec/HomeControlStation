@@ -118,6 +118,7 @@ inline bool validateConfiguration(const DeviceConfigSlotType& config, bool* clai
             if (readU16(config.customBytes, 0) < 1 || readU16(config.customBytes, 0) > 65535) return false;
             if (config.customBytes[2] != 0 && config.customBytes[2] != 1) return false;
             if (config.customBytes[3] < 15 || config.customBytes[3] > 254) return false;
+            if (config.customBytes[4] != 0 && config.customBytes[4] != 1 && config.customBytes[4] != 2 && config.customBytes[4] != 3 && config.customBytes[4] != 4 && config.customBytes[4] != 5) return false;
             break;
     #endif
     #ifdef TEMP_SENSOR_SUPPORTED

@@ -16,6 +16,7 @@ except NameError:
     PROJECT_DIR = Path(__file__).resolve().parent.parent
 DEVICES_DIR = PROJECT_DIR / "include" / "devices"
 OUTPUT_FILE = PROJECT_DIR / "include" / "generated" / "GeneratedDeviceConfigWidgets.hpp"
+MAX_SELECT_OPTIONS = 6
 
 
 def cpp_string(value):
@@ -56,13 +57,13 @@ def validate_field(path, field):
 def field_initializer(field):
     validate_field("device description", field)
     options = field.get("options", [])
-    if len(options) > 2:
-        raise ValueError(f"{field['name']}: the generated renderer supports at most two select options")
+    if len(options) > MAX_SELECT_OPTIONS:
+        raise ValueError(f"{field['name']}: the generated renderer supports at most {MAX_SELECT_OPTIONS} select options")
 
     option_values = [str(option["value"]) for option in options]
     option_labels = [option["label"] for option in options]
-    option_values.extend([""] * (2 - len(option_values)))
-    option_labels.extend([""] * (2 - len(option_labels)))
+    option_values.extend([""] * (MAX_SELECT_OPTIONS - len(option_values)))
+    option_labels.extend([""] * (MAX_SELECT_OPTIONS - len(option_labels)))
     return "{{{key}, {label}, {html_type}, {offset}, {size}, {minimum}, {maximum}, {{{option_values}}}, {{{option_labels}}}, {option_count}, {array_length}, {display_scale}, {default_value}}}".format(
         key=cpp_string(field["fieldId"]),
         label=cpp_string(field["label"]),
@@ -87,7 +88,7 @@ def device_initializer(description):
         raise ValueError(f"{device_type['name']}: a generated device type supports at most eight configuration fields")
 
     fields.extend([None] * (8 - len(fields)))
-    field_rows = [field_initializer(field) if field else '{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}' for field in fields]
+    field_rows = [field_initializer(field) if field else '{"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}' for field in fields]
     http_config = device_type.get("httpConfig", {})
     display_name = http_config.get("displayName", device_type["name"])
     initializer = "{{{type_id}, {name}, {enum_symbol}, {{{fields}}}, {field_count}}}".format(
@@ -130,8 +131,8 @@ struct FieldSpec
     uint8_t size;
     int minimum;
     int maximum;
-    const char* optionValues[2];
-    const char* optionLabels[2];
+    const char* optionValues[6];
+    const char* optionLabels[6];
     uint8_t optionCount;
     uint8_t arrayLength;
     float displayScale;

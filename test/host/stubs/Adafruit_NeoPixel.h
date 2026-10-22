@@ -3,7 +3,13 @@
 #include <cstdint>
 #include <vector>
 
+#define NEO_RGB 0
 #define NEO_GRB 1
+#define NEO_BRG 2
+#define NEO_RBG 3
+#define NEO_GBR 4
+#define NEO_BGR 5
+typedef uint8_t neoPixelType;
 #define NEO_KHZ800 2
 
 class Adafruit_NeoPixel

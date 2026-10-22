@@ -25,8 +25,8 @@ struct FieldSpec
     uint8_t size;
     int minimum;
     int maximum;
-    const char* optionValues[2];
-    const char* optionLabels[2];
+    const char* optionValues[6];
+    const char* optionLabels[6];
     uint8_t optionCount;
     uint8_t arrayLength;
     float displayScale;
@@ -111,50 +111,50 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
 }
 
 inline const DeviceTypeSpec kKnownDeviceTypeWidgetSpecs[] = {
-    {60, "Garden irrigation controller", "type_GARDEN_IRRIGATION", {{"nozzle1Pin", "Nozzle 1 GPIO", "gpio-select", 0, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"nozzle2Pin", "Nozzle 2 GPIO", "gpio-select", 1, 1, 0, 48, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"outputsActiveHigh", "Relay polarity", "select", 2, 1, 0, 255, {"1", "0"}, {"Active HIGH", "Active LOW"}, 2, 0, 1.0, 0},
-        {"sensorEnabled", "DHT22 sensor connected", "checkbox", 7, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"wateringDurationSeconds", "Default watering duration [s]", "number", 3, 2, 1, 3600, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"dryThreshold", "Dry threshold [%]", "number", 5, 1, 0, 100, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"wetThreshold", "Wet threshold [%]", "number", 6, 1, 0, 100, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 7},
+    {60, "Garden irrigation controller", "type_GARDEN_IRRIGATION", {{"nozzle1Pin", "Nozzle 1 GPIO", "gpio-select", 0, 1, 0, 48, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"nozzle2Pin", "Nozzle 2 GPIO", "gpio-select", 1, 1, 0, 48, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"outputsActiveHigh", "Relay polarity", "select", 2, 1, 0, 255, {"1", "0", "", "", "", ""}, {"Active HIGH", "Active LOW", "", "", "", ""}, 2, 0, 1.0, 0},
+        {"sensorEnabled", "DHT22 sensor connected", "checkbox", 7, 1, 0, 255, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"wateringDurationSeconds", "Default watering duration [s]", "number", 3, 2, 1, 3600, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"dryThreshold", "Dry threshold [%]", "number", 5, 1, 0, 100, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"wetThreshold", "Wet threshold [%]", "number", 6, 1, 0, 100, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}}, 7},
     #ifdef LED_STRIP_SUPPORTED
-    {44, "LedStrip", "type_LED_STRIP", {{"ledsCount", "LEDs num.", "number", 0, 2, 1, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"ledsSideFlip", "Sides flip", "select", 2, 1, 0, 255, {"0", "1"}, {"Not inversed", "Inversed"}, 2, 0, 1.0, 0},
-        {"curLim", "Current limiter", "range", 3, 1, 15, 254, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
+    {44, "LedStrip", "type_LED_STRIP", {{"ledsCount", "LEDs num.", "number", 0, 2, 1, 255, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"ledsSideFlip", "Sides flip", "select", 2, 1, 0, 255, {"0", "1", "", "", "", ""}, {"Not inversed", "Inversed", "", "", "", ""}, 2, 0, 1.0, 0},
+        {"curLim", "Current limiter", "range", 3, 1, 15, 254, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"colorOrder", "Color order", "select", 4, 1, 0, 255, {"0", "1", "2", "3", "4", "5"}, {"Default (GRB)", "RGB", "BRG", "RBG", "GBR", "BGR"}, 6, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}}, 4},
     #endif
-    {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1"}, {"No", "Yes"}, 2, 0, 1.0, 1},
-        {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1"}, {"LOW (0)", "HIGH (1)"}, 2, 0, 1.0, 0},
-        {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"pwmMax", "Max PWM", "range", 3, 1, 0, 255, {"", ""}, {"", ""}, 0, 0, 1.0, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 4},
+    {43, "OnOff", "type_ONOFFDEVICE", {{"brightnessSupported", "Brightness support", "select", 0, 1, 0, 255, {"0", "1", "", "", "", ""}, {"No", "Yes", "", "", "", ""}, 2, 0, 1.0, 1},
+        {"activationState", "Active state", "select", 1, 1, 0, 255, {"0", "1", "", "", "", ""}, {"LOW (0)", "HIGH (1)", "", "", "", ""}, 2, 0, 1.0, 0},
+        {"pwmMin", "Min PWM", "range", 2, 1, 0, 255, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"pwmMax", "Max PWM", "range", 3, 1, 0, 255, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}}, 4},
     #ifdef TEMP_SENSOR_SUPPORTED
-    {45, "TempSensor", "type_TEMP_SENSOR", {{"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 0},
+    {45, "TempSensor", "type_TEMP_SENSOR", {{"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}}, 0},
     #endif
-    {50, "WindowDoorSensor", "type_WINDOW_DOOR_SENSOR", {{"contactClosedLevel", "Closed contact level", "select", 0, 1, 0, 255, {"0", "1"}, {"LOW = closed", "HIGH = closed"}, 2, 0, 1.0, 0},
-        {"contactPullup", "Input mode", "select", 1, 1, 0, 255, {"0", "1"}, {"External bias", "Internal pull-up"}, 2, 0, 1.0, 1},
-        {"contactDebounce", "Debounce [ms]", "number", 2, 2, 10, 5000, {"", ""}, {"", ""}, 0, 0, 1.0, 50},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0},
-        {"", "", "", 0, 0, 0, 0, {"", ""}, {"", ""}, 0, 0, 1, 0}}, 3},
+    {50, "WindowDoorSensor", "type_WINDOW_DOOR_SENSOR", {{"contactClosedLevel", "Closed contact level", "select", 0, 1, 0, 255, {"0", "1", "", "", "", ""}, {"LOW = closed", "HIGH = closed", "", "", "", ""}, 2, 0, 1.0, 0},
+        {"contactPullup", "Input mode", "select", 1, 1, 0, 255, {"0", "1", "", "", "", ""}, {"External bias", "Internal pull-up", "", "", "", ""}, 2, 0, 1.0, 1},
+        {"contactDebounce", "Debounce [ms]", "number", 2, 2, 10, 5000, {"", "", "", "", "", ""}, {"", "", "", "", "", ""}, 0, 0, 1.0, 50},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0},
+        {"", "", "", 0, 0, 0, 0, {}, {}, 0, 0, 1, 0}}, 3},
 };
 
 /** @brief Emits the device type selector for one NVM configuration slot. */

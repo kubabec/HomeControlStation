@@ -75,6 +75,8 @@ class LedWS1228bDeviceType : public Device {
     void stopLiveAnimation();
 
     void updateAnimationSpeed();
+    uint8_t* getAnimationPropertiesStorage();
+    void saveAnimationProperties();
 
     public:
     LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk);

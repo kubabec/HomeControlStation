@@ -44,6 +44,7 @@
       { "name": "physicalLedCount", "type": "uint16", "label": "LEDs num.", "fieldId": "ledsCount", "htmlType": "number", "offset": 0, "size": 2, "minimum": 1, "byteOrder": "native", "widget": "number" },
       { "name": "reverseOrder", "type": "boolean", "label": "Sides flip", "fieldId": "ledsSideFlip", "htmlType": "select", "offset": 2, "size": 1, "widget": "checkbox", "options": [{"value": 0, "label": "Not inversed"}, {"value": 1, "label": "Inversed"}] },
       { "name": "currentLimit", "type": "uint8", "label": "Current limiter", "fieldId": "curLim", "htmlType": "range", "offset": 3, "size": 1, "minimum": 15, "maximum": 254, "unit": "pwm", "widget": "range", "zeroMeans": "100 percent" },
+      { "name": "colorOrder", "type": "uint8", "label": "Color order", "fieldId": "colorOrder", "htmlType": "select", "offset": 4, "size": 1, "widget": "select", "options": [{"value": 0, "label": "Default (GRB)"}, {"value": 1, "label": "RGB"}, {"value": 2, "label": "BRG"}, {"value": 3, "label": "RBG"}, {"value": 4, "label": "GBR"}, {"value": 5, "label": "BGR"}], "default": 0 },
       { "name": "currentLimitSafetyCopy", "type": "uint8", "label": "Current limiter copy", "fieldId": "currentLimitSafetyCopy", "htmlType": "hidden", "offset": 19, "size": 1, "widget": null, "mustEqual": "currentLimit" }
     ]
   },
@@ -174,8 +175,8 @@
   },
   "extendedMemory": {
     "required": true,
-    "size": "4 * virtualLedCount * sizeof(LedColor)",
-    "layout": ["active content", "saved slot 1", "saved slot 2", "saved slot 3"]
+    "size": "4 * virtualLedCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)",
+    "layout": ["active content", "saved slot 1", "saved slot 2", "saved slot 3", "animation properties (5 bytes)"]
   },
   "limitations": [
     "The runtime animation buffer is separately heap-allocated after extended memory is assigned.",

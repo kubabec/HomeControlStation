@@ -12,6 +12,30 @@ const uint8_t maxVirtualLeds = 50;
 const uint8_t maxVirtualLeds = 100;
 #endif
 
+/**
+ * Maps the configured color-order index to the NeoPixel wire order of the strip.
+ * 0 keeps the historic behavior (GRB wire order) so devices configured before this field existed are unchanged.
+ * Stored content, advanced controls and average colors always stay true RGB; the NeoPixel driver does the remap.
+ */
+static neoPixelType stripColorOrder(uint8_t configured)
+{
+    switch (configured)
+    {
+    case 1:
+        return NEO_RGB;
+    case 2:
+        return NEO_BRG;
+    case 3:
+        return NEO_RBG;
+    case 4:
+        return NEO_GBR;
+    case 5:
+        return NEO_BGR;
+    default:
+        return NEO_GRB;
+    }
+}
+
 LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::function<void(void)> reportNvmDataChangedCbk)
 {
     m_reportNvmDataChangedCbk = reportNvmDataChangedCbk;
@@ -47,7 +71,7 @@ LedWS1228bDeviceType::LedWS1228bDeviceType(DeviceConfigSlotType nvmData, std::fu
         // nvmData.pinNumber,
         diodesCount,
         pinNumber,
-        NEO_GRB + NEO_KHZ800);
+        stripColorOrder(nvmData.customBytes[4]) + NEO_KHZ800);
 
     adafruit_ws2812b->begin();
 
@@ -71,6 +95,9 @@ ServiceRequestErrorCode LedWS1228bDeviceType::updateExtendedMemoryPtr(uint8_t *p
         stripContent[eSAVED_CONTENT_SLOT1] = (LedColor *)((uint8_t *)stripContent[eACTIVE_CURRENT_CONTENT] + (virtualDiodesCount * sizeof(LedColor)));
         stripContent[eSAVED_CONTENT_SLOT2] = (LedColor *)((uint8_t *)stripContent[eSAVED_CONTENT_SLOT1] + (virtualDiodesCount * sizeof(LedColor)));
         stripContent[eSAVED_CONTENT_SLOT3] = (LedColor *)((uint8_t *)stripContent[eSAVED_CONTENT_SLOT2] + (virtualDiodesCount * sizeof(LedColor)));
+
+        /* animation properties are persisted right after the color slots */
+        memcpy(&animationProperties, getAnimationPropertiesStorage(), sizeof(LedStripAnimationProperties));
 
         // We will be using runtime buffer for runtime operations
         // like animations, so we allocate it here
@@ -410,9 +437,22 @@ void LedWS1228bDeviceType::updateAveragedColor(LedStripContentIndex content)
     averagedColors[content].b = (uint8_t)avgBlue;
 }
 
+uint8_t *LedWS1228bDeviceType::getAnimationPropertiesStorage()
+{
+    return extendedMemoryPointer + (virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT * sizeof(LedColor));
+}
+
+void LedWS1228bDeviceType::saveAnimationProperties()
+{
+    if (extendedMemoryPointer != nullptr)
+    {
+        memcpy(getAnimationPropertiesStorage(), &animationProperties, sizeof(LedStripAnimationProperties));
+    }
+}
+
 uint16_t LedWS1228bDeviceType::getExtendedMemoryLength()
 {
-    return ((virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor));
+    return ((virtualDiodesCount * eDIFFERENT_CONTENTS_COUNT) * sizeof(LedColor)) + sizeof(LedStripAnimationProperties);
 }
 
 uint8_t LedWS1228bDeviceType::getDeviceIdentifier()
@@ -583,6 +623,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
                 m_queuedAction = [this, payload]()
                 {
                     memcpy(&animationProperties, payload.data(), sizeof(LedStripAnimationProperties));
+                    saveAnimationProperties();
                     setColors((LedColor *)(payload.data() + sizeof(LedStripAnimationProperties)),
                               ((payload.size() - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
 
@@ -598,6 +639,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             {
                 // Logger::log("Color change requested");
                 memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
+                saveAnimationProperties();
                 param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
                 setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
 
