@@ -15,12 +15,12 @@ namespace GeneratedAdvancedControlTemplates
 inline const char advancedControlsTemplate_type_LED_STRIP[] = R"HCSADV(<style>
   .advanced-led-controls .advanced-led-actions { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
   .advanced-led-controls .advanced-led-presets { display:grid; grid-template-columns:minmax(0, 1fr); gap:8px; width:100%; margin-top:6px; }
-  .advanced-led-controls .advanced-led-preset { display:grid; grid-template-columns:minmax(0, 1fr) 36px 36px; align-items:center; gap:8px; min-width:0; padding:6px 8px; border:1px solid rgba(110, 130, 153, 0.55); border-radius:6px; background:rgba(19, 25, 32, 0.45); }
-  .advanced-led-controls .advanced-led-preset .color-display { width:100%; min-width:0; height:28px; border:1px solid rgba(220, 230, 240, 0.45); border-radius:3px; }
-  .advanced-led-controls .advanced-led-preset .icon-btn { min-width:0; width:36px; height:36px; min-height:36px; margin:0; padding:0; flex:0 0 36px; border-radius:6px; font-size:1.2rem; }
+  .advanced-led-controls .advanced-led-preset { display:grid; grid-template-columns:minmax(0, 1fr) 36px 36px; align-items:center; gap:8px; min-width:0; padding:6px 8px; border:1px solid rgba(169, 191, 217, 0.13); border-radius:13px; background:rgba(8, 14, 22, 0.42); }
+  .advanced-led-controls .advanced-led-preset .color-display { width:100%; min-width:0; height:28px; border:1px solid rgba(220, 230, 240, 0.3); border-radius:8px; }
+  .advanced-led-controls .advanced-led-preset .icon-btn { min-width:0; width:36px; height:36px; min-height:36px; margin:0; padding:0; flex:0 0 36px; border-radius:10px; font-size:1.2rem; }
   .advanced-led-controls .led-strip { display:grid; gap:0; width:100%; min-width:0; overflow:visible; }
   .advanced-led-controls .ledContainer { min-width:0; width:auto; padding:5px 0; cursor:pointer; }
-  .advanced-led-controls .ledContainer.marked { background-color:rgba(93, 190, 255, 0.9); }
+  .advanced-led-controls .ledContainer.marked { background-color:rgba(111, 186, 255, 0.75); }
   .advanced-led-controls .ledContainer .led { width:100%; height:8px; }
 </style>
 <div class="advanced-led-controls">
@@ -152,25 +152,25 @@ context.root.querySelector('[data-action="save"]').addEventListener('click', asy
 #endif
 #ifdef TEMP_SENSOR_SUPPORTED
 inline const char advancedControlsTemplate_type_TEMP_SENSOR[] = R"HCSADV(<style>
-  .sensor-history { width:100%; min-width:0; color:#E7ECF3; text-align:left; }
-  .sensor-history header { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .sensor-history h3 { font-size:16px; line-height:1.25; margin:0; }
-  .sensor-history .period { color:#98A6B8; font-size:11px; white-space:nowrap; }
+  .sensor-history { width:100%; min-width:0; color:#F2F7FF; text-align:left; }
+  .sensor-history header { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .sensor-history h3 { font-size:17px; font-weight:650; line-height:1.25; margin:0; }
+  .sensor-history .period { color:#9DACBF; font-size:11px; white-space:nowrap; }
   .sensor-history .summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
   .sensor-history .extremes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
-  .sensor-history .extreme { min-width:0; padding:8px 9px; background:#1D232B; border:1px solid #3B4654; border-radius:5px; }
-  .sensor-history .extreme strong { display:block; font-size:14px; line-height:1.2; }
-  .sensor-history .extreme span { display:block; margin-top:3px; color:#98A6B8; font-size:10px; line-height:1.25; }
-  .sensor-history .metric { min-width:0; border-top:2px solid #FF796B; padding:8px 9px; background:#1D232B; border-radius:5px; }
-  .sensor-history .metric.humidity { border-color:#45B9DE; }
-  .sensor-history .metric strong { display:block; font-size:18px; line-height:1.2; }
-  .sensor-history .metric span { display:block; margin-top:3px; color:#98A6B8; font-size:10px; line-height:1.25; }
-  .sensor-history .chart { margin:0 0 10px; }
+  .sensor-history .extreme { min-width:0; padding:10px 11px; background:rgba(8,14,22,.42); border:1px solid rgba(169,191,217,.13); border-radius:13px; }
+  .sensor-history .extreme strong { display:block; font-size:15px; font-weight:700; line-height:1.2; }
+  .sensor-history .extreme span { display:block; margin-top:3px; color:#9DACBF; font-size:10px; line-height:1.25; }
+  .sensor-history .metric { min-width:0; border-top:3px solid #FF9B86; padding:10px 11px; background:rgba(8,14,22,.42); border-radius:13px; }
+  .sensor-history .metric.humidity { border-color:#7FE0D8; }
+  .sensor-history .metric strong { display:block; font-size:20px; font-weight:700; line-height:1.2; }
+  .sensor-history .metric span { display:block; margin-top:3px; color:#9DACBF; font-size:10px; line-height:1.25; }
+  .sensor-history .chart { margin:0 0 12px; }
   .sensor-history .chart:last-child { margin-bottom:0; }
-  .sensor-history .chart-title { display:flex; justify-content:space-between; gap:8px; margin-bottom:4px; color:#C5CEDA; font-size:11px; font-weight:600; }
-  .sensor-history .chart-title span:last-child { color:#7F8C9D; font-weight:400; text-align:right; }
-  .sensor-history canvas { box-sizing:border-box; width:100%; height:120px; display:block; background:#1D232B; border:1px solid #3B4654; border-radius:5px; }
-  .sensor-history .empty { padding:24px 12px; text-align:center; color:#AAB5C3; background:#1D232B; border:1px solid #3B4654; border-radius:5px; }
+  .sensor-history .chart-title { display:flex; justify-content:space-between; gap:8px; margin-bottom:6px; color:#C9D6E6; font-size:12px; font-weight:650; }
+  .sensor-history .chart-title span:last-child { color:#9DACBF; font-weight:400; text-align:right; }
+  .sensor-history canvas { box-sizing:border-box; width:100%; height:120px; display:block; background:rgba(8,14,22,.42); border:1px solid rgba(169,191,217,.13); border-radius:13px; }
+  .sensor-history .empty { padding:24px 12px; text-align:center; color:#9DACBF; background:rgba(8,14,22,.42); border:1px solid rgba(169,191,217,.13); border-radius:13px; }
   @media (max-width:380px) { .sensor-history header { align-items:flex-start; flex-direction:column; } .sensor-history .summary { grid-template-columns:1fr; } }
 </style>
 <div class="sensor-history" data-role="sensor-history">
@@ -259,18 +259,18 @@ const drawChart = (canvas, averageKey, minKey, maxKey, color, suffix) => {
   if (low === high) high += 1;
   const x = index => padding.left + index * (width - padding.left - padding.right) / (days.length - 1);
   const y = value => padding.top + (high - value) * (height - padding.top - padding.bottom) / (high - low);
-  draw.font = '10px sans-serif'; draw.fillStyle = '#98A6B8'; draw.strokeStyle = '#36414E'; draw.lineWidth = 1;
+  draw.font = '10px sans-serif'; draw.fillStyle = '#9DACBF'; draw.strokeStyle = 'rgba(168,196,226,.16)'; draw.lineWidth = 1;
   [0, 0.5, 1].forEach(step => { const value = high - (high - low) * step; const position = y(value); draw.beginPath(); draw.moveTo(padding.left, position); draw.lineTo(width - padding.right, position); draw.stroke(); draw.fillText(`${Math.round(value)}${suffix}`, 3, position + 4); });
   draw.fillStyle = color; draw.globalAlpha = 0.13; draw.beginPath();
   days.forEach((day, index) => index ? draw.lineTo(x(index), y(day[maxKey])) : draw.moveTo(x(index), y(day[maxKey])));
   [...days].reverse().forEach((day, reverseIndex) => { const index = days.length - reverseIndex - 1; draw.lineTo(x(index), y(day[minKey])); });
   draw.closePath(); draw.fill(); draw.globalAlpha = 1; draw.strokeStyle = color; draw.lineWidth = 2.5; draw.beginPath();
   days.forEach((day, index) => index ? draw.lineTo(x(index), y(day[averageKey])) : draw.moveTo(x(index), y(day[averageKey]))); draw.stroke();
-  days.forEach((day, index) => { draw.fillStyle = color; draw.beginPath(); draw.arc(x(index), y(day[averageKey]), 2.5, 0, Math.PI * 2); draw.fill(); draw.fillStyle = '#98A6B8'; draw.textAlign = 'center'; draw.fillText(formatDay(day.date), x(index), height - 7); });
+  days.forEach((day, index) => { draw.fillStyle = color; draw.beginPath(); draw.arc(x(index), y(day[averageKey]), 2.5, 0, Math.PI * 2); draw.fill(); draw.fillStyle = '#9DACBF'; draw.textAlign = 'center'; draw.fillText(formatDay(day.date), x(index), height - 7); });
 };
 if (days.length > 1) {
-  drawChart(content.querySelector('[data-chart="temperature"]'), 'tempAvg', 'tempMin', 'tempMax', '#FF796B', ' C');
-  drawChart(content.querySelector('[data-chart="humidity"]'), 'humidAvg', 'humidMin', 'humidMax', '#45B9DE', '%');
+  drawChart(content.querySelector('[data-chart="temperature"]'), 'tempAvg', 'tempMin', 'tempMax', '#FF9B86', ' C');
+  drawChart(content.querySelector('[data-chart="humidity"]'), 'humidAvg', 'humidMin', 'humidMax', '#7FE0D8', '%');
 }
 </script>)HCSADV";
 #endif

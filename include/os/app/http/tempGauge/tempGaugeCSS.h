@@ -11,17 +11,17 @@
 const char* tempGaugeCSS = "\
 <style>\
         .temperature-container { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; width:100%; min-width:0; margin:0 auto; }\
-        .temperature-widget, .humidity-widget { min-width:0; padding:10px 11px 8px; background:#1D232B; border:1px solid #3B4654; border-radius:6px; color:#E7ECF3; }\
-        .meter-heading { display:flex; align-items:baseline; justify-content:space-between; gap:5px; min-width:0; margin-bottom:9px; }\
-        .meter-label { min-width:0; overflow:hidden; color:#98A6B8; font-size:10px; font-weight:600; letter-spacing:.04em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap; }\
-        .temperature-value, .value-display { flex:0 0 auto; color:#F2F5F8; font-size:17px; font-weight:700; line-height:1; white-space:nowrap; }\
-        .temperature-value { color:#FF796B; }\
-        .humidity-value { color:#45B9DE; }\
-        .temperature-meter, .humidity-meter { position:relative; height:10px; overflow:hidden; background:#2C3540; border-radius:5px; }\
-        .temperature-fill { width:0%; height:100%; background:linear-gradient(90deg,#45B9DE 0%,#F3C969 52%,#FF796B 100%); border-radius:inherit; transition:width .25s ease; }\
-        .temperature-marker { position:absolute; top:50%; left:0%; width:8px; height:8px; border:2px solid #F2F5F8; border-radius:50%; background:#FF796B; transform:translate(-50%,-50%); transition:left .25s ease; }\
-        .humidity-fill { width:0%; height:100%; background:#45B9DE; border-radius:inherit; box-shadow:0 0 10px rgba(69,185,222,.35); transition:width .25s ease; }\
-        .meter-scale { display:flex; justify-content:space-between; margin-top:5px; color:#7F8C9D; font-size:9px; line-height:1; }\
+        .temperature-widget, .humidity-widget { min-width:0; padding:11px 12px 9px; background:rgba(8,14,22,.42); border:1px solid rgba(169,191,217,.13); border-radius:13px; color:#F2F7FF; }\
+        .meter-heading { display:flex; align-items:baseline; justify-content:space-between; gap:5px; min-width:0; margin-bottom:10px; }\
+        .meter-label { min-width:0; overflow:hidden; color:#9DACBF; font-size:10px; font-weight:700; letter-spacing:.08em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap; }\
+        .temperature-value, .value-display { flex:0 0 auto; color:#F2F7FF; font-size:18px; font-weight:700; line-height:1; white-space:nowrap; }\
+        .temperature-value { color:#FF9B86; }\
+        .humidity-value { color:#7FE0D8; }\
+        .temperature-meter, .humidity-meter { position:relative; height:8px; overflow:hidden; background:rgba(215,231,247,.12); border-radius:99px; }\
+        .temperature-fill { width:0%; height:100%; background:linear-gradient(90deg,#5CB2FF 0%,#F3C969 52%,#FF9B86 100%); border-radius:inherit; transition:width .25s ease; }\
+        .temperature-marker { position:absolute; top:50%; left:0%; width:8px; height:8px; border:2px solid #F2F7FF; border-radius:50%; background:#FF9B86; transform:translate(-50%,-50%); transition:left .25s ease; }\
+        .humidity-fill { width:0%; height:100%; background:linear-gradient(90deg,#5CB2FF 0%,#7FE0D8 100%); border-radius:inherit; box-shadow:0 0 10px rgba(127,224,216,.3); transition:width .25s ease; }\
+        .meter-scale { display:flex; justify-content:space-between; margin-top:6px; color:#9DACBF; font-size:9px; line-height:1; }\
     </style>\
 ";
 

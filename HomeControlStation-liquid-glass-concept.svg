@@ -1,0 +1,327 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1320" viewBox="0 0 1800 1320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a111a"/>
+      <stop offset=".52" stop-color="#111d2b"/>
+      <stop offset="1" stop-color="#090e16"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b6d7ff" stop-opacity=".14"/>
+      <stop offset=".48" stop-color="#7799c3" stop-opacity=".075"/>
+      <stop offset="1" stop-color="#b3d2ed" stop-opacity=".04"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#77c8ff"/>
+      <stop offset="1" stop-color="#428af5"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#77e6df"/>
+      <stop offset="1" stop-color="#3abac5"/>
+    </linearGradient>
+    <linearGradient id="lavender" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b9b5ff"/>
+      <stop offset="1" stop-color="#8178ee"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffbd94"/>
+      <stop offset="1" stop-color="#f78183"/>
+    </linearGradient>
+    <radialGradient id="orb">
+      <stop offset="0" stop-color="#4c9dff" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#4c9dff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dy="8"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".25"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+      .white { fill: #f2f7ff; }
+      .muted { fill: #9dacbf; }
+      .tiny { font-size: 12px; }
+      .small { font-size: 14px; }
+      .body { font-size: 16px; }
+      .label { font-size: 13px; font-weight: 600; letter-spacing: 1px; }
+      .glass { fill: url(#glass); stroke: #a8c4e2; stroke-opacity: .19; stroke-width: 1.2; }
+      .line { stroke: #a9bfd9; stroke-opacity: .16; }
+      .pill { fill: #1c2a3a; stroke: #a8c4e2; stroke-opacity: .17; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1320" fill="url(#bg)"/>
+  <circle cx="1450" cy="80" r="390" fill="url(#orb)"/>
+  <circle cx="190" cy="820" r="350" fill="url(#orb)" opacity=".45"/>
+
+  <!-- Header -->
+  <g>
+    <path d="M76 77 L87 58 L105 78 L93 91 Z" fill="none" stroke="#6fc6ff" stroke-width="2.4"/>
+    <circle cx="87" cy="58" r="4" fill="#6fc6ff"/>
+    <circle cx="76" cy="77" r="4" fill="#6fc6ff"/>
+    <circle cx="105" cy="78" r="4" fill="#6fc6ff"/>
+    <circle cx="93" cy="91" r="4" fill="#6fc6ff"/>
+    <text x="117" y="82" class="white" font-size="21" font-weight="650">Home<tspan fill="#70c4ff">Control</tspan>Station</text>
+    <text x="78" y="142" class="white" font-size="37" font-weight="700">Dom, który reaguje lekko.</text>
+    <text x="79" y="174" class="muted" font-size="17">Koncepcje interfejsu · liquid glass · grafit + chłodny błękit · 22.10.2026</text>
+    <rect x="1379" y="57" width="344" height="52" rx="26" fill="#6fbaff" fill-opacity=".11" stroke="#80c9ff" stroke-opacity=".4"/>
+    <circle cx="1407" cy="83" r="6" fill="#72d8b1"/>
+    <text x="1424" y="89" fill="#c8e7ff" font-size="14" font-weight="650" letter-spacing=".6">3 KIERUNKI · 4 WIDOKI</text>
+  </g>
+
+  <!-- Palette directions -->
+  <g>
+    <text x="80" y="224" class="label muted">KIERUNKI STYLISTYCZNE</text>
+    <g transform="translate(80 244)">
+      <rect width="520" height="110" rx="20" class="glass" stroke="#78c8ff" stroke-opacity=".55"/>
+      <rect x="18" y="19" width="70" height="70" rx="15" fill="#111b28" stroke="#9dcdf5" stroke-opacity=".3"/>
+      <rect x="28" y="29" width="50" height="34" rx="9" fill="#96cfff" fill-opacity=".18" stroke="#8ccaff" stroke-opacity=".4"/>
+      <rect x="28" y="69" width="30" height="10" rx="5" fill="url(#blue)"/>
+      <circle cx="70" cy="74" r="5" fill="#72d8b1"/>
+      <text x="108" y="42" class="white" font-size="19" font-weight="700">01 · BLUE TIDE</text>
+      <text x="108" y="66" class="muted small">Najbliżej logo · miękki błękit i szkło</text>
+      <text x="108" y="89" fill="#8dcbff" class="tiny" font-weight="700">REKOMENDOWANY</text>
+      <rect x="367" y="33" width="30" height="30" rx="9" fill="#101925" stroke="#bacfe5" stroke-opacity=".22"/>
+      <rect x="405" y="33" width="30" height="30" rx="9" fill="#80c9ff"/>
+      <rect x="443" y="33" width="30" height="30" rx="9" fill="#f2f7ff"/>
+      <rect x="481" y="33" width="22" height="30" rx="8" fill="#72d8b1"/>
+      <text x="367" y="83" class="tiny muted">GRAPHITE</text>
+    </g>
+    <g transform="translate(640 244)">
+      <rect width="520" height="110" rx="20" class="glass"/>
+      <rect x="18" y="19" width="70" height="70" rx="15" fill="#111b28" stroke="#9dcdf5" stroke-opacity=".3"/>
+      <rect x="28" y="29" width="50" height="34" rx="9" fill="#8ce4dc" fill-opacity=".14" stroke="#80e4dd" stroke-opacity=".44"/>
+      <rect x="28" y="69" width="30" height="10" rx="5" fill="url(#teal)"/>
+      <circle cx="70" cy="74" r="5" fill="#72d8b1"/>
+      <text x="108" y="42" class="white" font-size="19" font-weight="700">02 · ARCTIC MINT</text>
+      <text x="108" y="66" class="muted small">Spokojniejszy · morski akcent</text>
+      <text x="108" y="89" class="muted tiny">Więcej zieleni, mniej nasycenia</text>
+      <rect x="367" y="33" width="30" height="30" rx="9" fill="#101925" stroke="#bacfe5" stroke-opacity=".22"/>
+      <rect x="405" y="33" width="30" height="30" rx="9" fill="#79ded6"/>
+      <rect x="443" y="33" width="30" height="30" rx="9" fill="#edf8f8"/>
+      <rect x="481" y="33" width="22" height="30" rx="8" fill="#a6dfad"/>
+      <text x="367" y="83" class="tiny muted">GRAPHITE</text>
+    </g>
+    <g transform="translate(1200 244)">
+      <rect width="520" height="110" rx="20" class="glass"/>
+      <rect x="18" y="19" width="70" height="70" rx="15" fill="#111b28" stroke="#9dcdf5" stroke-opacity=".3"/>
+      <rect x="28" y="29" width="50" height="34" rx="9" fill="#b7b2ff" fill-opacity=".15" stroke="#aaa3ff" stroke-opacity=".46"/>
+      <rect x="28" y="69" width="30" height="10" rx="5" fill="url(#lavender)"/>
+      <circle cx="70" cy="74" r="5" fill="#72d8b1"/>
+      <text x="108" y="42" class="white" font-size="19" font-weight="700">03 · DUSK LAVENDER</text>
+      <text x="108" y="66" class="muted small">Bardziej nastrojowy · subtelny fiolet</text>
+      <text x="108" y="89" class="muted tiny">Akcenty tylko dla wykresów i detali</text>
+      <rect x="367" y="33" width="30" height="30" rx="9" fill="#101925" stroke="#bacfe5" stroke-opacity=".22"/>
+      <rect x="405" y="33" width="30" height="30" rx="9" fill="#aaa3ff"/>
+      <rect x="443" y="33" width="30" height="30" rx="9" fill="#f4f1ff"/>
+      <rect x="481" y="33" width="22" height="30" rx="8" fill="#f6ac9e"/>
+      <text x="367" y="83" class="tiny muted">GRAPHITE</text>
+    </g>
+  </g>
+
+  <!-- View 1: dashboard -->
+  <g transform="translate(80 387)" filter="url(#shadow)">
+    <rect width="800" height="407" rx="24" class="glass"/>
+    <rect x="1" y="1" width="798" height="4" rx="2" fill="url(#blue)" opacity=".9"/>
+    <g transform="translate(27 22)">
+      <text x="0" y="25" class="white" font-size="19" font-weight="700">HomeControlStation</text>
+      <text x="0" y="49" class="muted small">CZWARTEK, 22 PAŹDZIERNIKA</text>
+      <circle cx="735" cy="22" r="19" fill="#8fcfff" fill-opacity=".13" stroke="#8bcaff" stroke-opacity=".4"/>
+      <path d="M735 11 C727 21 727 26 735 30 C743 26 743 21 735 11Z" fill="none" stroke="#a8dcff" stroke-width="1.7"/>
+      <text x="0" y="93" class="white" font-size="27" font-weight="700">Dobry wieczór, Jakub</text>
+      <text x="0" y="119" class="muted body">W domu jest przyjemnie. Wszystko pod kontrolą.</text>
+      <g transform="translate(0 143)">
+        <rect width="235" height="105" rx="17" class="glass"/>
+        <circle cx="27" cy="29" r="14" fill="#ffbd94" fill-opacity=".15"/>
+        <path d="M27 19 C20 28 20 35 27 38 C34 35 34 28 27 19Z" fill="none" stroke="#ffc39d" stroke-width="1.7"/>
+        <text x="51" y="34" class="muted small">TEMPERATURA</text>
+        <text x="20" y="77" class="white" font-size="28" font-weight="700">23,4°</text>
+        <text x="112" y="76" class="muted small">Salon</text>
+        <path d="M20 89 H215" stroke="url(#coral)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="250" width="235" height="105" rx="17" class="glass"/>
+        <circle cx="277" cy="29" r="14" fill="#71d9d1" fill-opacity=".14"/>
+        <path d="M270 28 Q277 17 284 28 Q284 36 277 38 Q270 36 270 28Z" fill="none" stroke="#85e4de" stroke-width="1.7"/>
+        <text x="301" y="34" class="muted small">WILGOTNOŚĆ</text>
+        <text x="270" y="77" class="white" font-size="28" font-weight="700">60%</text>
+        <text x="350" y="76" class="muted small">Optymalna</text>
+        <path d="M270 89 H465" stroke="url(#teal)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="500" width="235" height="105" rx="17" class="glass"/>
+        <circle cx="527" cy="29" r="14" fill="#8fcfff" fill-opacity=".14"/>
+        <path d="M520 30 Q527 20 534 30 M522 34 Q527 28 532 34 M527 38 H527" fill="none" stroke="#9dd6ff" stroke-width="1.8" stroke-linecap="round"/>
+        <text x="551" y="34" class="muted small">URZĄDZENIA</text>
+        <text x="520" y="77" class="white" font-size="28" font-weight="700">8 <tspan font-size="16" fill="#9dacbf" font-weight="500">aktywnych</tspan></text>
+        <circle cx="527" cy="92" r="4" fill="#72d8b1"/>
+        <text x="539" y="97" class="muted tiny">wszystko działa poprawnie</text>
+      </g>
+      <text x="0" y="284" class="white" font-size="17" font-weight="700">Pokoje</text>
+      <text x="700" y="284" fill="#8dcbff" class="small" font-weight="600">Zobacz wszystkie  ›</text>
+      <g transform="translate(0 300)">
+        <rect width="173" height="72" rx="15" class="glass"/>
+        <rect x="15" y="15" width="38" height="38" rx="12" fill="#86c9ff" fill-opacity=".14"/>
+        <path d="M25 32 L34 24 L43 32 V43 H26Z M31 43 V35 H37 V43" fill="none" stroke="#a9dcff" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="65" y="32" class="white small" font-weight="650">Salon</text><text x="65" y="51" class="muted tiny">3 urządzenia</text>
+        <circle cx="156" cy="17" r="4" fill="#72d8b1"/>
+        <rect x="186" width="173" height="72" rx="15" class="glass"/>
+        <rect x="201" y="15" width="38" height="38" rx="12" fill="#aaa3ff" fill-opacity=".13"/>
+        <path d="M208 40 L220 26 L232 40 M210 39 H230" fill="none" stroke="#c0bbff" stroke-width="1.6" stroke-linecap="round"/>
+        <text x="251" y="32" class="white small" font-weight="650">Sypialnia</text><text x="251" y="51" class="muted tiny">2 urządzenia</text>
+        <circle cx="342" cy="17" r="4" fill="#72d8b1"/>
+        <rect x="372" width="173" height="72" rx="15" class="glass"/>
+        <rect x="387" y="15" width="38" height="38" rx="12" fill="#8de1d8" fill-opacity=".12"/>
+        <path d="M395 28 H417 V43 H395Z M400 24 H412 V28" fill="none" stroke="#9ce9e2" stroke-width="1.5"/>
+        <text x="437" y="32" class="white small" font-weight="650">Kuchnia</text><text x="437" y="51" class="muted tiny">2 urządzenia</text>
+        <circle cx="528" cy="17" r="4" fill="#72d8b1"/>
+        <rect x="558" width="177" height="72" rx="15" fill="#8fcfff" fill-opacity=".075" stroke="#8fcfff" stroke-opacity=".36" stroke-dasharray="5 5"/>
+        <text x="578" y="32" fill="#b9e2ff" class="small" font-weight="650">+ Dodaj pokój</text>
+        <text x="578" y="51" class="muted tiny">Rozbuduj swój dom</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- View 2: room devices -->
+  <g transform="translate(920 387)" filter="url(#shadow)">
+    <rect width="800" height="407" rx="24" class="glass"/>
+    <rect x="1" y="1" width="798" height="4" rx="2" fill="url(#blue)" opacity=".9"/>
+    <g transform="translate(27 22)">
+      <text x="0" y="22" class="muted small">‹  POKOJE</text>
+      <text x="0" y="56" class="white" font-size="27" font-weight="700">Salon</text>
+      <text x="0" y="80" class="muted small">3 urządzenia · 23,4°C</text>
+      <rect x="684" y="21" width="52" height="29" rx="15" fill="#55c69a" fill-opacity=".23" stroke="#67d5a9" stroke-opacity=".75"/>
+      <circle cx="720" cy="35.5" r="11" fill="#6bdfad"/>
+      <text x="0" y="124" class="label muted">OŚWIETLENIE</text>
+      <g transform="translate(0 140)">
+        <rect width="735" height="82" rx="17" class="glass"/>
+        <circle cx="35" cy="41" r="20" fill="#8fcfff" fill-opacity=".16"/>
+        <path d="M35 28 C25 28 23 41 30 46 L30 53 H40 V46 C47 41 45 28 35 28Z M31 57 H39" fill="none" stroke="#aedcff" stroke-width="1.6" stroke-linecap="round"/>
+        <text x="69" y="36" class="white body" font-weight="650">Lampa sufitowa</text>
+        <text x="69" y="59" class="muted small">Jasność · 72%</text>
+        <rect x="420" y="34" width="192" height="12" rx="6" fill="#d7e7f7" fill-opacity=".12"/>
+        <rect x="420" y="34" width="138" height="12" rx="6" fill="url(#blue)"/>
+        <circle cx="558" cy="40" r="10" fill="#f5fbff" stroke="#6cb8ff" stroke-width="3"/>
+        <rect x="640" y="23" width="74" height="36" rx="18" fill="#173652" stroke="#6cb8ff" stroke-opacity=".5"/>
+        <circle cx="688" cy="41" r="13" fill="#79c5ff"/>
+        <text x="655" y="77" class="muted tiny">WŁĄCZONA</text>
+      </g>
+      <g transform="translate(0 235)">
+        <rect width="735" height="82" rx="17" class="glass"/>
+        <circle cx="35" cy="41" r="20" fill="#aaa3ff" fill-opacity=".15"/>
+        <path d="M25 43 L35 34 L45 43 V52 H26Z M32 52 V45 H38 V52" fill="none" stroke="#c8c4ff" stroke-width="1.5"/>
+        <text x="69" y="36" class="white body" font-weight="650">TV bulbs</text>
+        <text x="69" y="59" class="muted small">Światło ambient · niebieski</text>
+        <rect x="420" y="35" width="192" height="10" rx="5" fill="url(#blue)"/>
+        <rect x="420" y="31" width="192" height="18" rx="9" fill="#55aaff" opacity=".35" filter="url(#softglow)"/>
+        <rect x="640" y="23" width="74" height="36" rx="18" fill="#172332" stroke="#a8c4e2" stroke-opacity=".2"/>
+        <circle cx="657" cy="41" r="13" fill="#93a4b7"/>
+        <text x="655" y="77" class="muted tiny">WYŁĄCZONA</text>
+      </g>
+      <g transform="translate(0 330)">
+        <rect width="354" height="44" rx="13" fill="url(#blue)"/>
+        <path d="M21 22 H36 M29 15 V29" stroke="#f4faff" stroke-width="2" stroke-linecap="round"/>
+        <text x="50" y="28" class="white small" font-weight="700">Dodaj urządzenie</text>
+        <rect x="369" width="366" height="44" rx="13" fill="#1d2b3b" stroke="#9bb4d0" stroke-opacity=".22"/>
+        <text x="391" y="28" class="muted small" font-weight="600">Sceny i automatyzacje</text>
+        <path d="M708 17 L714 22 L708 27" fill="none" stroke="#a8b9cc" stroke-width="1.6"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- View 3: climate analytics -->
+  <g transform="translate(80 820)" filter="url(#shadow)">
+    <rect width="800" height="414" rx="24" class="glass"/>
+    <rect x="1" y="1" width="798" height="4" rx="2" fill="url(#teal)" opacity=".84"/>
+    <g transform="translate(27 20)">
+      <text x="0" y="24" class="muted small">‹  SALON</text>
+      <text x="0" y="58" class="white" font-size="25" font-weight="700">Klimat w salonie</text>
+      <text x="0" y="82" class="muted small">Pomiar na żywo · aktualizacja 2 min temu</text>
+      <rect x="659" y="19" width="76" height="34" rx="17" class="pill"/>
+      <text x="677" y="41" class="muted tiny" font-weight="650">7 DNI⌄</text>
+      <g transform="translate(0 101)">
+        <rect width="354" height="95" rx="16" class="glass"/>
+        <text x="20" y="29" class="muted tiny" font-weight="700" letter-spacing=".7">TEMPERATURA</text>
+        <text x="20" y="67" class="white" font-size="30" font-weight="700">23,4<tspan font-size="17">°C</tspan></text>
+        <text x="261" y="62" fill="#ffab91" class="small" font-weight="650">+0,1° ↗</text>
+        <text x="20" y="85" class="muted tiny">Cel komfortu: 21–24°C</text>
+        <rect x="380" width="355" height="95" rx="16" class="glass"/>
+        <text x="400" y="29" class="muted tiny" font-weight="700" letter-spacing=".7">WILGOTNOŚĆ</text>
+        <text x="400" y="67" class="white" font-size="30" font-weight="700">60<tspan font-size="17">%</tspan></text>
+        <text x="643" y="62" fill="#7fe0d8" class="small" font-weight="650">optymalna</text>
+        <text x="400" y="85" class="muted tiny">Zalecany zakres: 40–60%</text>
+      </g>
+      <g transform="translate(0 212)">
+        <rect width="735" height="166" rx="16" fill="#111b28" fill-opacity=".36" stroke="#acc7e1" stroke-opacity=".15"/>
+        <text x="18" y="27" class="white small" font-weight="650">Temperatura</text>
+        <text x="615" y="27" class="muted tiny">MIN · ŚREDNIA · MAX</text>
+        <path d="M53 57 H716 M53 92 H716 M53 127 H716" class="line" fill="none"/>
+        <text x="16" y="61" class="muted tiny">27°</text><text x="16" y="96" class="muted tiny">24°</text><text x="16" y="131" class="muted tiny">21°</text>
+        <path d="M58 95 C100 79 126 90 157 84 S216 111 256 107 S315 93 355 96 S415 78 454 87 S510 101 552 93 S614 99 653 88 S691 94 715 83" fill="none" stroke="#ff9b86" stroke-opacity=".23" stroke-width="21" stroke-linecap="round"/>
+        <path d="M58 95 C100 79 126 90 157 84 S216 111 256 107 S315 93 355 96 S415 78 454 87 S510 101 552 93 S614 99 653 88 S691 94 715 83" fill="none" stroke="#ff9b86" stroke-width="3" stroke-linecap="round"/>
+        <g fill="#ffb29b"><circle cx="58" cy="95" r="4"/><circle cx="157" cy="84" r="4"/><circle cx="256" cy="107" r="4"/><circle cx="355" cy="96" r="4"/><circle cx="454" cy="87" r="4"/><circle cx="552" cy="93" r="4"/><circle cx="653" cy="88" r="4"/><circle cx="715" cy="83" r="4"/></g>
+        <text x="48" y="153" class="muted tiny">pt. 16</text><text x="146" y="153" class="muted tiny">sob. 17</text><text x="245" y="153" class="muted tiny">niedz. 18</text><text x="344" y="153" class="muted tiny">pon. 19</text><text x="444" y="153" class="muted tiny">wt. 20</text><text x="540" y="153" class="muted tiny">śr. 21</text><text x="641" y="153" class="muted tiny">czw. 22</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- View 4: settings -->
+  <g transform="translate(920 820)" filter="url(#shadow)">
+    <rect width="800" height="414" rx="24" class="glass"/>
+    <rect x="1" y="1" width="798" height="4" rx="2" fill="url(#lavender)" opacity=".84"/>
+    <g transform="translate(27 20)">
+      <text x="0" y="24" class="muted small">‹  HOME</text>
+      <text x="0" y="58" class="white" font-size="25" font-weight="700">Ustawienia</text>
+      <text x="0" y="82" class="muted small">Konfiguracja i informacje systemowe</text>
+      <g transform="translate(0 101)">
+        <rect width="354" height="140" rx="16" class="glass"/>
+        <circle cx="30" cy="30" r="17" fill="#8fcfff" fill-opacity=".15"/>
+        <path d="M23 28 H37 M24 33 H35 M26 38 H33" stroke="#a8dcff" stroke-width="1.6" stroke-linecap="round"/>
+        <text x="58" y="35" class="white body" font-weight="650">Dane panelu</text>
+        <text x="20" y="75" class="muted small">Hasło dostępu</text>
+        <rect x="20" y="87" width="314" height="38" rx="10" fill="#101a26" stroke="#aac3de" stroke-opacity=".2"/>
+        <text x="34" y="112" class="muted small">••••••••••••</text>
+        <g transform="translate(380)">
+          <rect width="355" height="140" rx="16" class="glass"/>
+          <circle cx="30" cy="30" r="17" fill="#9eddb5" fill-opacity=".12"/>
+          <path d="M22 37 V27 L30 22 L38 27 V37 M26 37 V31 H34 V37" fill="none" stroke="#a8e6bd" stroke-width="1.6" stroke-linejoin="round"/>
+          <text x="58" y="35" class="white body" font-weight="650">Stan systemu</text>
+          <text x="20" y="71" class="muted small">Pamięć</text>
+          <rect x="93" y="61" width="219" height="9" rx="5" fill="#e2f0ff" fill-opacity=".1"/>
+          <rect x="93" y="61" width="82" height="9" rx="5" fill="url(#blue)"/>
+          <text x="319" y="71" class="white tiny">38%</text>
+          <text x="20" y="105" class="muted small">Uruchomiono</text>
+          <text x="132" y="105" class="white small">18:12 · 22.10.2026</text>
+          <circle cx="26" cy="124" r="4" fill="#72d8b1"/>
+          <text x="38" y="128" fill="#9adfbb" class="tiny">Wszystkie usługi dostępne</text>
+        </g>
+      </g>
+      <text x="0" y="267" class="label muted">KONFIGURACJA</text>
+      <g transform="translate(0 281)">
+        <rect width="231" height="80" rx="15" class="glass"/>
+        <circle cx="33" cy="40" r="18" fill="#8fcfff" fill-opacity=".14"/>
+        <path d="M27 39 H39 M33 33 V45 M25 48 H41" stroke="#a9dcff" stroke-width="1.6" stroke-linecap="round"/>
+        <text x="61" y="37" class="white small" font-weight="650">Sieć</text><text x="61" y="57" class="muted tiny">Połączenie i urządzenia</text>
+        <path d="M210 37 L216 42 L210 47" fill="none" stroke="#91a7bf" stroke-width="1.5"/>
+        <rect x="251" width="231" height="80" rx="15" class="glass"/>
+        <circle cx="284" cy="40" r="18" fill="#aaa3ff" fill-opacity=".14"/>
+        <rect x="276" y="33" width="16" height="13" rx="2" fill="none" stroke="#c7c2ff" stroke-width="1.5"/>
+        <path d="M279 49 H289" stroke="#c7c2ff" stroke-width="1.5" stroke-linecap="round"/>
+        <text x="312" y="37" class="white small" font-weight="650">Ekrany</text><text x="312" y="57" class="muted tiny">Terminale i wygląd</text>
+        <path d="M461 37 L467 42 L461 47" fill="none" stroke="#91a7bf" stroke-width="1.5"/>
+        <rect x="502" width="233" height="80" rx="15" class="glass"/>
+        <circle cx="535" cy="40" r="18" fill="#8de1d8" fill-opacity=".13"/>
+        <path d="M535 29 L537 35 L543 35 L538 39 L540 46 L535 42 L530 46 L532 39 L527 35 L533 35Z" fill="none" stroke="#a2e8e0" stroke-width="1.2" stroke-linejoin="round"/>
+        <text x="563" y="37" class="white small" font-weight="650">Urządzenia</text><text x="563" y="57" class="muted tiny">Pokoje i integracje</text>
+        <path d="M714 37 L720 42 L714 47" fill="none" stroke="#91a7bf" stroke-width="1.5"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer notes -->
+  <g transform="translate(80 1264)">
+    <circle cx="5" cy="0" r="5" fill="#70c4ff"/>
+    <text x="19" y="5" class="muted small">Grafitowe tło · szkło bez ciężkich ramek · błękit tylko dla akcji i aktywnego stanu</text>
+    <text x="1130" y="5" class="muted small">Czytelne sterowanie przed dekoracją</text>
+    <path d="M0 27 H1640" stroke="#b4cde5" stroke-opacity=".12"/>
+  </g>
+</svg>

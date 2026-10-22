@@ -574,6 +574,22 @@ function updateLocalDateTime(initialDateTime, elementId = 'currentDateTime') {\
     updateDateTime();\
     return setInterval(updateDateTime, 1000);\
 }\
+(function() {\
+  const syncRange = range => {\
+    const min = parseFloat(range.min) || 0;\
+    const max = range.max === '' ? 100 : parseFloat(range.max);\
+    const fill = max > min ? (parseFloat(range.value) - min) * 100 / (max - min) : 0;\
+    range.style.setProperty('--fill', fill + '%');\
+  };\
+  const syncAllRanges = () => document.querySelectorAll('input[type=range]').forEach(syncRange);\
+  document.addEventListener('input', event => {\
+    if (event.target && event.target.type === 'range') syncRange(event.target);\
+  }, true);\
+  document.addEventListener('DOMContentLoaded', () => {\
+    syncAllRanges();\
+    new MutationObserver(syncAllRanges).observe(document.body, { childList: true, subtree: true });\
+  });\
+})();\
 </script>";
 
 const String javascript = legacyJavascript + generatedDeviceConfigurationJs;
