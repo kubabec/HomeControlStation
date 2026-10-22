@@ -13,6 +13,10 @@
 #include "devices/LedStrip/Animations/WaveInAnimation.hpp"
 #include "devices/LedStrip/Animations/TwinkleInAnimation.hpp"
 #include "devices/LedStrip/Animations/BounceInAnimation.hpp"
+#include "devices/LedStrip/Animations/FallingStarsAnimation.hpp"
+#include "devices/LedStrip/Animations/ColorShuffleAnimation.hpp"
+#include "devices/LedStrip/Animations/BlinkingSkyAnimation.hpp"
+#include "devices/LedStrip/Animations/SupernovaAnimation.hpp"
 
 #include "devices/LedStrip/Animations/live/SingleWaveAnimation.hpp"
 

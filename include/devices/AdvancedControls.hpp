@@ -17,9 +17,9 @@ enum class Direction {
  */
 struct LedStripAnimationProperties{
     /** Animation type used when enabling the strip. */
-    uint8_t enableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink 
+    uint8_t enableAnimation = 0; // 0/1 - roll left/right, 2 - fade, 3 - bounce, 4 - falling stars, 5 - color shuffle
     /** Animation type used when disabling the strip. */
-    uint8_t disableAnimation = 0; // 0 - switch, 1 - fade, 2 - blink
+    uint8_t disableAnimation = 0; // 0 - fade out, 1/2 - roll out right/left, 3 - blinking sky, 4 - supernova
     /** Overall speed of the animation cycle. */
     uint8_t animationSpeed = 0; // 0 - slow, 1 - medium, 2 - fast
     /** Enum value selecting the currently active live animation pattern. */

@@ -633,11 +633,28 @@ void LedWS1228bDeviceType::createEnablingAnimation()
         ongoingAnimation = new FadeInAnimation(
             runtimeBuffer,
             virtualDiodesCount);
+        break;
     case 3:
         ongoingAnimation = new BounceInAnimation(
             runtimeBuffer,
             virtualDiodesCount,
-            (diodesCount / 2));
+            (virtualDiodesCount / 2));
+        break;
+    case 4:
+        ongoingAnimation = new FallingStarsAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    case 5:
+        ongoingAnimation = new ColorShuffleAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    default: /* unknown selection, fall back to the first animation */
+        ongoingAnimation = new RollInAnimation(
+            runtimeBuffer,
+            virtualDiodesCount,
+            Direction::LeftToRight);
         break;
     }
 
@@ -663,6 +680,21 @@ void LedWS1228bDeviceType::createDisablingAnimation()
             runtimeBuffer,
             virtualDiodesCount,
             Direction::RightToLeft);
+        break;
+    case 3:
+        switchOffAnimation = new BlinkingSkyAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    case 4:
+        switchOffAnimation = new SupernovaAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    default: /* unknown selection, fall back to the first animation */
+        switchOffAnimation = new FadeOutAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
         break;
     }
 

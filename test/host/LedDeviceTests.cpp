@@ -10,11 +10,16 @@
 #include "devices/LedStrip/Animations/TwinkleInAnimation.hpp"
 #include "devices/LedStrip/Animations/WaveInAnimation.hpp"
 #include "devices/LedStrip/Animations/BounceInAnimation.hpp"
+#include "devices/LedStrip/Animations/FallingStarsAnimation.hpp"
+#include "devices/LedStrip/Animations/ColorShuffleAnimation.hpp"
+#include "devices/LedStrip/Animations/BlinkingSkyAnimation.hpp"
+#include "devices/LedStrip/Animations/SupernovaAnimation.hpp"
 #include "devices/LedStrip/Animations/live/SingleWaveAnimation.hpp"
 #include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
 
 #include <array>
 #include <cstring>
+#include <vector>
 
 namespace
 {
@@ -80,6 +85,56 @@ TEST_CASE("Additional finite LED animations complete without corrupting target b
     for (int step = 0; step < 1000 && twinkle.isInProgress(); ++step) twinkle.process();
     EXPECT_FALSE(twinkle.isInProgress()); twinkle.restoreColors();
 
+}
+
+TEST_CASE("Spectacular enable animations end exactly on the target colors")
+{
+    for (uint16_t count : {1, 7, 50, 100})
+    {
+        std::vector<LedColor> target(count), strip(count);
+        for (uint16_t i = 0; i < count; ++i) target[i] = LedColor(10 + i, 200 - i, (i * 7) % 256);
+
+        strip = target;
+        FallingStarsAnimation stars(strip.data(), count); stars.start(true);
+        int steps = 0;
+        while (stars.isInProgress() && steps < 500) { stars.process(); ++steps; }
+        EXPECT_FALSE(stars.isInProgress()); EXPECT_TRUE(steps < 500);
+        EXPECT_TRUE(std::memcmp(strip.data(), target.data(), count * sizeof(LedColor)) == 0);
+
+        strip = target;
+        ColorShuffleAnimation shuffle(strip.data(), count); shuffle.start(true);
+        steps = 0;
+        while (shuffle.isInProgress() && steps < 500) { shuffle.process(); ++steps; }
+        EXPECT_FALSE(shuffle.isInProgress()); EXPECT_TRUE(steps < 500);
+        EXPECT_TRUE(std::memcmp(strip.data(), target.data(), count * sizeof(LedColor)) == 0);
+    }
+}
+
+TEST_CASE("Spectacular disable animations end dark and restore the original colors")
+{
+    for (uint16_t count : {1, 2, 7, 50, 100})
+    {
+        std::vector<LedColor> original(count), strip(count);
+        for (uint16_t i = 0; i < count; ++i) original[i] = LedColor(10 + i, 200 - i, (i * 7) % 256);
+
+        strip = original;
+        BlinkingSkyAnimation sky(strip.data(), count); sky.start(false);
+        int steps = 0;
+        while (sky.isInProgress() && steps < 500) { sky.process(); ++steps; }
+        EXPECT_FALSE(sky.isInProgress()); EXPECT_TRUE(steps < 500);
+        for (uint16_t i = 0; i < count; ++i) EXPECT_EQ(strip[i], LedColor(0, 0, 0));
+        sky.restoreColors();
+        EXPECT_TRUE(std::memcmp(strip.data(), original.data(), count * sizeof(LedColor)) == 0);
+
+        strip = original;
+        SupernovaAnimation nova(strip.data(), count); nova.start(false);
+        steps = 0;
+        while (nova.isInProgress() && steps < 500) { nova.process(); ++steps; }
+        EXPECT_FALSE(nova.isInProgress()); EXPECT_TRUE(steps < 500);
+        for (uint16_t i = 0; i < count; ++i) EXPECT_EQ(strip[i], LedColor(0, 0, 0));
+        nova.restoreColors();
+        EXPECT_TRUE(std::memcmp(strip.data(), original.data(), count * sizeof(LedColor)) == 0);
+    }
 }
 
 TEST_CASE("WaveInAnimation eventually completes")

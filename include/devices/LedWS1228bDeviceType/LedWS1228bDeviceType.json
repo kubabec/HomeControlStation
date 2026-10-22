@@ -179,6 +179,8 @@
   },
   "limitations": [
     "The runtime animation buffer is separately heap-allocated after extended memory is assigned.",
+    "Advanced-controls enableAnimation values: 0 roll left, 1 roll right, 2 fade, 3 bounce, 4 falling stars, 5 color shuffle. Unknown values fall back to 0.",
+    "Advanced-controls disableAnimation values: 0 fade out, 1 roll out right, 2 roll out left, 3 blinking sky, 4 supernova. Unknown values fall back to 0.",
     "Animation cadence is cycle-count based and therefore depends on DeviceManager call frequency."
   ]
 }

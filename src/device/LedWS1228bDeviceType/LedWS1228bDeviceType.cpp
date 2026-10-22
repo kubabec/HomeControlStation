@@ -1,4 +1,5 @@
 #include "devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp"
+#include <vector>
 #include "generated/GeneratedEnablingConditions.hpp"
 #include "os/Logger.hpp"
 #ifdef LED_STRIP_SUPPORTED
@@ -577,12 +578,13 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
             // Colors cannot be updated during ongoin LIVE show
             if (liveAnimation != nullptr)
             {
-                m_queuedAction = [&]()
+                /* param.buff is only valid during this call, keep a copy for the deferred action */
+                std::vector<uint8_t> payload(param.buff, param.buff + param.size);
+                m_queuedAction = [this, payload]()
                 {
-                    // Logger::log("Color change requested");
-                    memcpy(&animationProperties, param.buff, sizeof(LedStripAnimationProperties));
-                    param.buff += sizeof(LedStripAnimationProperties); // skip animation properties
-                    setColors((LedColor *)param.buff, ((param.size - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
+                    memcpy(&animationProperties, payload.data(), sizeof(LedStripAnimationProperties));
+                    setColors((LedColor *)(payload.data() + sizeof(LedStripAnimationProperties)),
+                              ((payload.size() - sizeof(LedStripAnimationProperties)) / sizeof(LedColor)));
 
                     /* this action will affect NVM data */
                     if (m_reportNvmDataChangedCbk)
@@ -658,11 +660,28 @@ void LedWS1228bDeviceType::createEnablingAnimation()
         ongoingAnimation = new FadeInAnimation(
             runtimeBuffer,
             virtualDiodesCount);
+        break;
     case 3:
         ongoingAnimation = new BounceInAnimation(
             runtimeBuffer,
             virtualDiodesCount,
-            (diodesCount / 2));
+            (virtualDiodesCount / 2));
+        break;
+    case 4:
+        ongoingAnimation = new FallingStarsAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    case 5:
+        ongoingAnimation = new ColorShuffleAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    default: /* unknown selection, fall back to the first animation */
+        ongoingAnimation = new RollInAnimation(
+            runtimeBuffer,
+            virtualDiodesCount,
+            Direction::LeftToRight);
         break;
     }
 
@@ -688,6 +707,21 @@ void LedWS1228bDeviceType::createDisablingAnimation()
             runtimeBuffer,
             virtualDiodesCount,
             Direction::RightToLeft);
+        break;
+    case 3:
+        switchOffAnimation = new BlinkingSkyAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    case 4:
+        switchOffAnimation = new SupernovaAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
+        break;
+    default: /* unknown selection, fall back to the first animation */
+        switchOffAnimation = new FadeOutAnimation(
+            runtimeBuffer,
+            virtualDiodesCount);
         break;
     }
 

@@ -30,12 +30,14 @@ inline const char advancedControlsTemplate_type_LED_STRIP[] = R"HCSADV(<style>
     <select data-field="enableAnimation">
       <option value="0">Roll (left)</option><option value="1">Roll (right)</option>
       <option value="2">Fade</option><option value="3">Bounce</option>
+      <option value="4">Falling stars</option><option value="5">Color shuffle</option>
     </select>
   </label>
   <label>Disable animation
     <select data-field="disableAnimation">
       <option value="0">Fade out</option><option value="1">Roll out (right)</option>
       <option value="2">Roll out (left)</option>
+      <option value="3">Blinking sky</option><option value="4">Supernova</option>
     </select>
   </label>
   <label>Animation speed
