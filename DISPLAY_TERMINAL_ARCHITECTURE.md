@@ -1,5 +1,15 @@
 # HomeControlStation Display Terminal Architecture
 
+> **Document status:** This file is a legacy system-design proposal, not a
+> description of the current firmware. It assumes that the display lives in a
+> separate Guition repository, uses a display thread, and cannot own local
+> devices. Those assumptions have been superseded. The current display is the
+> `DisplayS34inch` target in this repository; it runs `DisplayClient` and the
+> LVGL UI on the HCS operating system and can control locally hosted devices
+> without the master. For current behavior and source links, see the
+> [README display section](README.md#guition-4-inch-display-target) and the
+> [architecture overview](ARCHITECTURE.md#display-terminal-and-local-device-control).
+
 ## 1. Executive Summary
 
 This document defines the architecture for a multi-display terminal system integrated into HomeControlStation. Display terminals (ESP32 devices running LVGL) function as sophisticated UI clients that mirror the HTTP webUI functionality without access to the device layer. The system employs:

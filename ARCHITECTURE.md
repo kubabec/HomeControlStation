@@ -340,6 +340,51 @@ The service overloads are common transport shapes:
 
 Device-specific byte interpretation stays in the concrete device implementation and, for browser popups, its device-owned HTML controller.
 
+### Display terminal and local device control
+
+The `DisplayS34inch` PlatformIO environment builds the Guition 480×480 UI in
+this repository, on top of the normal HCS operating system and device manager.
+The display role runs `DisplayClient` rather than `DisplayServer`; it does not
+prevent the node from hosting its own configured GPIO devices or selecting
+Master/Slave operation.
+
+The client reads `SIG_LOCAL_COLLECTION` after OS initialization and places
+those devices first in the UI. It merges the synchronized master device list
+after local devices. Local toggle, brightness, and LED-slot actions call
+`SIG_LOCAL_DEVICE_SERVICES` directly, so they do not depend on a master
+connection. `DeviceManager` publishes local state changes through the existing
+device-description and remote-control synchronization path.
+
+When the master sends a device list, `DisplayServer` excludes entries whose
+device MAC matches the requesting display's MAC. State updates and action
+responses carry the device MAC so same-numbered local and remote IDs remain
+distinct; state changes for a display's own devices are not sent back to that
+display. After 15 seconds without protocol activity, a non-interactive warning
+covers only the display's top bar. Local controls remain visible and actionable,
+and the warning clears after communication resumes.
+
+Source map: `src/os/app/display/DisplayClient.cpp`,
+`src/os/app/display/DisplayServer.cpp`, `src/os/app/display/DisplayRuntime.cpp`,
+and `src/display/HomeControlScreen.cpp`.
+
+### Firmware updates
+
+The service-mode configuration UI links to a target-aware software updater.
+`SoftwareUpdater` fetches a manifest from
+`<HCS_UPDATE_SERVER>/software/<target>/manifest.json`; the build target selects
+`s3-c1`, `s3-supermini`, or `s3-display4inch`. A release supplies a firmware
+path, byte size, and SHA-256 digest. The updater uses the configured CA to
+validate TLS, checks the downloaded size and digest, writes the image to the
+inactive OTA partition, and exposes progress and status to the web UI. The user
+must confirm restart after a successful install.
+
+The service-mode endpoints are `/softwareUpdateVersions`,
+`/softwareUpdateStatus`, `/softwareUpdateInstall&<version>`, and
+`/softwareUpdateRestart`. The update server base URL is configured by
+`HCS_UPDATE_SERVER` in `platformio.ini`. Core implementation:
+`src/os/drivers/softwareupdater.cpp` and
+`src/os/app/http/requestCallbacks/constantHandlers.cpp`.
+
 ## 6. Adding a new device type
 
 Create matching active include and source directories:
@@ -507,6 +552,8 @@ The UDP protocol transports numeric type IDs and `DeviceDescription` bytes, not 
 | Device enabling-condition registry and evaluator | `include/generated/GeneratedEnablingConditions.hpp` |
 | Digital-event mapping and NVM compatibility | `src/os/app/DigitalEvent/DigitalEventReceiver.cpp` |
 | Wi-Fi, UDP dispatch and OTA | `src/os/drivers/networkdriver.cpp` |
+| HTTP-triggered firmware updates | `src/os/drivers/softwareupdater.cpp` and `src/os/app/http/requestCallbacks/` |
+| Guition 4-inch display client and UI | `src/os/app/display/DisplayClient.cpp`, `src/os/app/display/DisplayRuntime.cpp`, and `src/display/` |
 | Master discovery and RC transport | `src/os/app/remoteControl/remotecontrolserver.cpp` |
 | Slave discovery responses and RC handling | `src/os/app/remoteControl/remoteControlClient.cpp` |
 | Master remote ID mapping | `src/os/app/RemoteDevicesManager.cpp` |

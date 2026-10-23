@@ -14,7 +14,7 @@ HomeControlApp::DeviceList keepCurrent(
     const HomeControlApp::DeviceList &current,
     const DisplayDeviceView &device)
 {
-    DisplayClient::requestToggle(device.deviceId);
+    DisplayClient::requestToggle(device.deviceId, device.isLocal);
     return current;
 }
 

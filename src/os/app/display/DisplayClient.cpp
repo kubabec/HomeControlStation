@@ -8,8 +8,22 @@
 #include "os/datacontainer/DataContainer.hpp"
 #include "os/datacontainer/datacontainertypes.hpp"
 #include "os/drivers/NetworkDriver.hpp"
+#include "devices/device.hpp"
 
 DisplayClient::DeviceList DisplayClient::deviceList;
+DisplayClient::DeviceList DisplayClient::remoteList;
+DisplayClient::DeviceList DisplayClient::localList;
+std::queue<DisplayClient::LocalAction> DisplayClient::localActions;
+bool DisplayClient::localChanged = true;
+bool DisplayClient::localSubscribed = false;
+unsigned long DisplayClient::lastMasterRxTime = 0;
+bool DisplayClient::uiConnected = true;
+
+namespace {
+constexpr unsigned long MASTER_TIMEOUT_MS = 15000;
+constexpr unsigned long KEEP_ALIVE_PERIOD_MS = 5000;
+constexpr unsigned long LOCAL_ACTION_TIMEOUT_MS = 3000;
+}
 std::vector<DisplayDeviceWire> DisplayClient::pendingDevices;
 DisplayClient::RoomNames DisplayClient::pendingRoomNames;
 std::queue<MessageUDP> DisplayClient::receptionQueue;
@@ -25,6 +39,12 @@ void DisplayClient::init(HomeControlApp* uiApplication)
 {
     application = uiApplication;
     deviceList.clear();
+    remoteList.clear();
+    localList.clear();
+    localActions = {};
+    localChanged = true;
+    lastMasterRxTime = 0;
+    uiConnected = true;
     pendingDevices.clear();
     pendingRoomNames.clear();
     receptionQueue = {};
@@ -39,6 +59,9 @@ void DisplayClient::init(HomeControlApp* uiApplication)
 void DisplayClient::deinit()
 {
     deviceList.clear();
+    remoteList.clear();
+    localList.clear();
+    localActions = {};
     pendingDevices.clear();
     pendingRoomNames.clear();
     receptionQueue = {};
@@ -48,6 +71,11 @@ void DisplayClient::deinit()
 
 void DisplayClient::cyclic()
 {
+    subscribeLocalDevices();
+    processLocalActions();
+    refreshLocalDevices();
+    updateConnectionState();
+
     if (!receptionQueue.empty()) {
         MessageUDP message = receptionQueue.front();
         receptionQueue.pop();
@@ -59,7 +87,7 @@ void DisplayClient::cyclic()
         lastPresenceTime = millis();
     }
 
-    if (connected && millis() - lastKeepAliveTime >= 20000) {
+    if (connected && millis() - lastKeepAliveTime >= KEEP_ALIVE_PERIOD_MS) {
         DisplayMessageHeader header;
         header.sequence = sequence++;
         send(static_cast<uint8_t>(DisplayMessageIds::KEEP_ALIVE), &header, sizeof(header), masterIp);
@@ -82,6 +110,8 @@ void DisplayClient::processMessage(MessageUDP& message)
 {
     const auto id = static_cast<DisplayMessageIds>(message.getId());
     auto& payload = message.getPayload();
+    lastMasterRxTime = millis();
+    connected = true;
 
     if (id == DisplayMessageIds::DISCOVER_DISPLAYS) {
         masterIp = message.getIPAddress();
@@ -99,27 +129,28 @@ void DisplayClient::processMessage(MessageUDP& message)
     } else if (id == DisplayMessageIds::DEVICE_STATE_UPDATE && payload.size() == sizeof(DisplayStateUpdate)) {
         DisplayStateUpdate update;
         memcpy(&update, payload.data(), sizeof(update));
-        for (auto& device : deviceList) {
+        // Updates about devices hosted on this display are ignored - local state is authoritative
+        const uint64_t mac = localMac();
+        if (mac != 0 && update.device.macAddress == mac) return;
+        for (auto& device : remoteList) {
             if (device.deviceId == update.device.deviceId) {
                 device.isEnabled = update.device.isEnabled;
                 memcpy(device.customBytes, update.device.customBytes, sizeof(device.customBytes));
             }
         }
-        if (application != nullptr) application->reloadDevices(deviceList);
+        rebuildAndReload();
     } else if (id == DisplayMessageIds::DEVICE_ACTION_RESPONSE && payload.size() == sizeof(DisplayActionResponse)) {
         DisplayActionResponse response;
         memcpy(&response, payload.data(), sizeof(response));
         if (response.status == 0) {
-            for (auto& device : deviceList) {
+            for (auto& device : remoteList) {
                 if (device.deviceId == response.device.deviceId) {
                     device.isEnabled = response.device.isEnabled;
                     memcpy(device.customBytes, response.device.customBytes, sizeof(device.customBytes));
                 }
             }
-            if (application != nullptr) application->reloadDevices(deviceList);
+            rebuildAndReload();
         }
-    } else if (id == DisplayMessageIds::KEEP_ALIVE_ACK) {
-        connected = true;
     }
 }
 
@@ -181,11 +212,15 @@ void DisplayClient::handleRoomNamesChunk(const std::vector<uint8_t>& payload)
 
 void DisplayClient::finishDeviceList()
 {
-    deviceList.clear();
-    for (const auto& device : pendingDevices) deviceList.push_back(convertDevice(device));
+    remoteList.clear();
+    const uint64_t mac = localMac();
+    for (const auto& device : pendingDevices) {
+        if (mac != 0 && device.macAddress == mac) continue;
+        remoteList.push_back(convertDevice(device));
+    }
     pendingDevices.clear();
     connected = true;
-    if (application != nullptr) application->reloadDevices(deviceList);
+    rebuildAndReload();
 }
 
 DisplayDeviceView DisplayClient::convertDevice(const DisplayDeviceWire& source)
@@ -228,23 +263,120 @@ bool DisplayClient::sendAction(uint8_t deviceId, DisplayAction action, uint8_t p
                 &request, sizeof(request), masterIp);
 }
 
-bool DisplayClient::requestToggle(uint8_t deviceId)
+bool DisplayClient::requestToggle(uint8_t deviceId, bool isLocal)
 {
+    if (isLocal) return requestLocal(deviceId, DEVSERVICE_STATE_SWITCH, 0, true);
     return sendAction(deviceId, DisplayAction::TOGGLE, 0);
 }
 
-bool DisplayClient::requestBrightness(uint8_t deviceId, uint8_t percent)
+bool DisplayClient::requestBrightness(uint8_t deviceId, uint8_t percent, bool isLocal)
 {
+    if (isLocal) return requestLocal(deviceId, DEVSERVICE_BRIGHTNESS_CHANGE, percent, false);
     if (percent > 100) percent = 100;
     return sendAction(deviceId, DisplayAction::SET_BRIGHTNESS, percent);
 }
 
-bool DisplayClient::requestLedSlot(uint8_t deviceId, uint8_t slot)
+bool DisplayClient::requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal)
 {
+    if (isLocal) return requestLocal(deviceId, DEVSERVICE_LED_STRIP_SWITCH_CONTENT, slot, false);
     return sendAction(deviceId, DisplayAction::LOAD_LED_SLOT, slot);
 }
 
 bool DisplayClient::isConnected() { return connected; }
 const DisplayClient::DeviceList& DisplayClient::devices() { return deviceList; }
+
+void DisplayClient::subscribeLocalDevices()
+{
+    if (localSubscribed) return;
+    localSubscribed = true;
+    DataContainer::subscribe(SIG_LOCAL_COLLECTION, [](std::any) { localChanged = true; });
+}
+
+void DisplayClient::refreshLocalDevices()
+{
+    if (!localChanged) return;
+    localChanged = false;
+    localList.clear();
+    const std::any value = DataContainer::getSignalValue(SIG_LOCAL_COLLECTION);
+    if (const auto devices = std::any_cast<std::vector<DeviceDescription>>(&value)) {
+        const uint64_t mac = localMac();
+        for (const auto& source : *devices) {
+            DisplayDeviceView device;
+            device.deviceType = source.deviceType;
+            device.macAddress = mac;
+            device.deviceId = source.deviceId;
+            device.roomId = source.roomId;
+            device.isEnabled = source.isEnabled;
+            device.isLocal = true;
+            memcpy(device.customBytes, source.customBytes, sizeof(device.customBytes));
+            device.deviceName = source.deviceName.c_str();
+            localList.push_back(device);
+        }
+    }
+    rebuildAndReload();
+}
+
+void DisplayClient::rebuildAndReload()
+{
+    deviceList = localList;
+    deviceList.insert(deviceList.end(), remoteList.begin(), remoteList.end());
+    if (application != nullptr) application->reloadDevices(deviceList);
+}
+
+bool DisplayClient::requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle)
+{
+    LocalAction action;
+    action.deviceId = deviceId;
+    action.service = service;
+    action.parameter = parameter;
+    action.toggle = toggle;
+    action.deadline = millis() + LOCAL_ACTION_TIMEOUT_MS;
+    localActions.push(action);
+    return true;
+}
+
+void DisplayClient::processLocalActions()
+{
+    if (localActions.empty()) return;
+    const LocalAction action = localActions.front();
+
+    const std::any servicesValue = DataContainer::getSignalValue(SIG_LOCAL_DEVICE_SERVICES);
+    const auto services = std::any_cast<DeviceServicesAPI>(&servicesValue);
+    if (services == nullptr) {
+        localActions.pop();
+        return;
+    }
+
+    ServiceParameters_set1 params;
+    params.a = action.parameter;
+    if (action.toggle) {
+        const auto it = std::find_if(localList.begin(), localList.end(), [&action](const DisplayDeviceView& view) {
+            return view.deviceId == action.deviceId;
+        });
+        const DisplayDeviceView* device = it == localList.end() ? nullptr : &*it;
+        if (device == nullptr) {
+            localActions.pop();
+            return;
+        }
+        params.a = device->isEnabled ? 0 : 1;
+    }
+
+    const ServiceRequestErrorCode result = services->serviceCall_set1(
+        action.deviceId, static_cast<DeviceServicesType>(action.service), params);
+    const bool retry = (result == SERV_PENDING || result == SERV_BUSY) && millis() < action.deadline;
+    if (!retry) localActions.pop();
+    if (result == SERV_SUCCESS) localChanged = true;
+}
+
+void DisplayClient::updateConnectionState()
+{
+    if (connected && lastMasterRxTime != 0 && millis() - lastMasterRxTime > MASTER_TIMEOUT_MS) {
+        connected = false;
+    }
+    if (uiConnected != connected) {
+        uiConnected = connected;
+        if (application != nullptr) application->setMasterConnected(connected);
+    }
+}
 
 #endif

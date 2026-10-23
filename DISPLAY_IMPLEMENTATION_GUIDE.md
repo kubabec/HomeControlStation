@@ -1,11 +1,22 @@
 # Display Terminal Architecture - Implementation Guide
 
+> **Current implementation:** The display client, LVGL application, hardware driver,
+> and master-side server are all part of this HomeControlStation repository. The
+> active target is `DisplayS34inch`; it builds `DisplayClient` and local display
+> UI code with the regular HCS operating system. See the
+> [current implementation overview](README.md#guition-4-inch-display-target) and
+> [source map](ARCHITECTURE.md#display-terminal-and-local-device-control).
+>
+> The detailed sections below are legacy design guidance. In particular, their
+> separate Guition repository, `DisplayUIThread`, and proposed protocol details
+> do not describe the current implementation and should not be used as a source
+> of truth for code behavior.
+
 ## 1. Header Files Organization
 
-This guide describes two independently built repositories. `DisplayServer` and the master-side display
-model belong to HomeControlStation. `DisplayClient`, `DisplayUIThread`, LVGL, and Guition hardware code
-belong only to the Guition repository. HomeControlStation must not link to or compile client/hardware
-files from Guition.
+The current code is built as one repository with role-specific PlatformIO
+environments. The master compiles `DisplayServer`; `DisplayS34inch` compiles
+`DisplayClient`, `DisplayRuntime`, LVGL UI, and the Guition hardware driver.
 
 ### 1.1 Repository-owned files
 
@@ -13,15 +24,14 @@ files from Guition.
 HomeControlStation repository:
 include/os/app/display/
 ├── DisplayServer.hpp              ← Master-side multi-display coordinator
-├── Display.hpp                    ← Master-side display endpoint state
-├── DisplayDatatypes.hpp           ← Wire protocol copied into Guition
-└── DeviceDescriptionPacker.hpp    ← Protocol packing utility
+├── DisplayClient.hpp              ← Display-side protocol client
+├── DisplayRuntime.hpp             ← Display runtime lifecycle
+├── DisplayDatatypes.hpp           ← Shared wire protocol
+└── Display.hpp                    ← Master-side display endpoint state
 
-Guition repository:
-include/os/app/display/
-├── DisplayClient.hpp              ← Display-side protocol application
-├── DisplayUIThread.hpp            ← LVGL rendering thread
-└── DisplayDatatypes.hpp           ← Physical copy of the wire protocol
+src/os/app/display/                 ← Client/server/runtime implementation
+src/display/                        ← LVGL application and fonts
+src/os/drivers/display/             ← Guition display hardware/touch driver
 ```
 
 ### 1.2 Message Header Template

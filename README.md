@@ -35,6 +35,7 @@ Built for **PlatformIO** and **Arduino IDE**, every single ESP32 runs standalone
 * **🚫 Serverless & Decentralized:** No host PC / RPI required
 * **👑 Master / Slave Topology:** One node acts as the primary gateway while lightweight slave nodes seamlessly join the HCS network.
 * **🌐 Embedded Web Interface:** Configured nodes serve a local, high-speed interface via `home.local` accessible across your local network using web browser on any device.
+* **🔄 Over-the-air updates:** The service-mode web interface can install firmware releases for the current hardware target.
 * **🛠 Dynamic Pin Mapping:** Define relay switches, sensors, or dimmers directly on pinouts via software without rewriting code for every hardware variant.
 <br><br>
 
@@ -90,6 +91,34 @@ The display is a UI role, not a restricted network role. Its HCS configuration
 can therefore still host local devices and select master or slave operation.
 The display role only determines that the local display endpoint uses
 `DisplayClient` instead of `DisplayServer`.
+
+The display starts with locally hosted devices and keeps them actionable even
+when the master is unavailable: those actions call the display's local device
+services directly. The master synchronizes other devices over the display UDP
+protocol and omits devices hosted by that display. When communication is lost,
+a non-interactive warning covers the top bar only; the device controls remain
+available. See the [display implementation overview](ARCHITECTURE.md#display-terminal-and-local-device-control).
+
+## Firmware updates
+
+In the web interface's service-mode configuration page, choose **Software
+Update** to view releases for the current hardware target, install a release,
+monitor download progress, and confirm when to restart. The updater downloads
+the target-specific manifest and firmware over TLS, checks the published image
+size and SHA-256 digest, and writes to the OTA partition before offering restart.
+Targets currently map to `s3-c1`, `s3-supermini`, and `s3-display4inch`.
+
+The release server is selected with `HCS_UPDATE_SERVER` in `platformio.ini`.
+The service-mode HTTP endpoints are `/softwareUpdateVersions`,
+`/softwareUpdateStatus`, `/softwareUpdateInstall&<version>`, and
+`/softwareUpdateRestart`. The [architecture guide](ARCHITECTURE.md#firmware-updates)
+describes the flow and implementation files.
+
+> **Display design documents:** The older [terminal architecture](DISPLAY_TERMINAL_ARCHITECTURE.md),
+> [requirements](DISPLAY_SOFTWARE_REQUIREMENTS.md), [roadmap](DISPLAY_IMPLEMENTATION_ROADMAP.md),
+> and [implementation guide](DISPLAY_IMPLEMENTATION_GUIDE.md) are retained as planning references.
+> Their separate-Guition-repository and display-thread assumptions are not the current implementation.
+> Use the implementation overview and source links in [ARCHITECTURE.md](ARCHITECTURE.md) as the current reference.
 
 
 ---

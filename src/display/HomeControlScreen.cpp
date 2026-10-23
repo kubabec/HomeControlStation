@@ -226,6 +226,24 @@ void HomeControlApp::buildUi()
     lv_obj_set_style_text_color(clockLabel_, lv_color_hex(kAccentStrong), 0);
     lv_obj_set_style_text_font(clockLabel_, FONT_TITLE, 0);
 
+    // The banner covers the top bar only and does not intercept input.
+    masterOfflineBanner_ = lv_obj_create(lv_layer_top());
+    lv_obj_set_size(masterOfflineBanner_, lv_pct(100), kAppBarHeight);
+    lv_obj_align(masterOfflineBanner_, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_clear_flag(masterOfflineBanner_, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(masterOfflineBanner_, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(masterOfflineBanner_, lv_color_hex(kSurface1), 0);
+    lv_obj_set_style_bg_opa(masterOfflineBanner_, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(masterOfflineBanner_, 0, 0);
+    lv_obj_set_style_radius(masterOfflineBanner_, 0, 0);
+    lv_obj_set_style_pad_all(masterOfflineBanner_, 2, 0);
+    lv_obj_t *bannerLabel = lv_label_create(masterOfflineBanner_);
+    lv_label_set_text(bannerLabel, "No connection to HCS Master");
+    lv_obj_set_style_text_align(bannerLabel, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_style_text_color(bannerLabel, lv_color_hex(0xFF3B30), 0);
+    lv_obj_center(bannerLabel);
+    lv_obj_add_flag(masterOfflineBanner_, LV_OBJ_FLAG_HIDDEN);
+
     // Main content container with navigation buttons
     contentContainer_ = lv_obj_create(screen_);
     lv_obj_set_width(contentContainer_, lv_pct(100));
@@ -410,6 +428,22 @@ void HomeControlApp::buildUi()
     lv_obj_set_style_text_font(closeOverlayLabel, FONT_TITLE, 0);
 }
 
+void HomeControlApp::setMasterConnected(bool connected)
+{
+    if (!masterOfflineBanner_)
+    {
+        return;
+    }
+    if (connected)
+    {
+        lv_obj_add_flag(masterOfflineBanner_, LV_OBJ_FLAG_HIDDEN);
+    }
+    else
+    {
+        lv_obj_clear_flag(masterOfflineBanner_, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
 void HomeControlApp::reloadDevices(const DeviceList &newDevices)
 {
     recordTemperatureSamples(newDevices);
@@ -423,6 +457,7 @@ void HomeControlApp::reloadDevices(const DeviceList &newDevices)
             if (current.deviceType != incoming.deviceType ||
                 current.macAddress != incoming.macAddress ||
                 current.deviceId != incoming.deviceId ||
+                current.isLocal != incoming.isLocal ||
                 current.roomId != incoming.roomId ||
                 current.isEnabled != incoming.isEnabled ||
                 current.deviceName != incoming.deviceName ||
@@ -1004,7 +1039,7 @@ void HomeControlApp::buildBrightnessControl(const DisplayDeviceView &dev)
     lv_obj_set_style_bg_color(slider, lv_color_hex(0xF2F7FF), LV_PART_KNOB);
     lv_obj_set_style_pad_all(slider, 8, LV_PART_KNOB);
 
-    SlotCtx *ctx = new SlotCtx{this, dev.deviceId, 0};
+    SlotCtx *ctx = new SlotCtx{this, dev.deviceId, 0, dev.isLocal};
     slotContexts_.emplace_back(ctx);
     lv_obj_add_event_cb(slider, &HomeControlApp::brightnessSliderEvent, LV_EVENT_VALUE_CHANGED, ctx);
     lv_obj_add_event_cb(slider, &HomeControlApp::brightnessSliderEvent, LV_EVENT_RELEASED, ctx);
@@ -1059,7 +1094,7 @@ void HomeControlApp::buildLedSlotControls(const DisplayDeviceView &dev)
         lv_obj_set_flex_flow(button, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_flex_align(button, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-        SlotCtx *ctx = new SlotCtx{this, dev.deviceId, slot};
+        SlotCtx *ctx = new SlotCtx{this, dev.deviceId, slot, dev.isLocal};
         slotContexts_.emplace_back(ctx);
         lv_obj_add_event_cb(button, &HomeControlApp::ledSlotEvent, LV_EVENT_CLICKED, ctx);
 
@@ -1096,7 +1131,7 @@ void HomeControlApp::buildTemperatureStatistics(const DisplayDeviceView &dev)
         return;
     }
 
-    const auto it = temperatureStats_.find(dev.deviceId);
+    const auto it = temperatureStats_.find(static_cast<uint16_t>((dev.isLocal ? 0x100 : 0) | dev.deviceId));
     if (it == temperatureStats_.end() || it->second.samples == 0)
     {
         lv_obj_t *note = lv_label_create(overlayControls_);
@@ -1151,7 +1186,7 @@ void HomeControlApp::recordTemperatureSamples(const DeviceList &newDevices)
         }
         const float temperature = readFloat(device.customBytes, 3);
         const uint8_t humidity = device.customBytes[2];
-        TempStats &stats = temperatureStats_[device.deviceId];
+        TempStats &stats = temperatureStats_[static_cast<uint16_t>((device.isLocal ? 0x100 : 0) | device.deviceId)];
         if (stats.samples == 0)
         {
             stats.minTemp = stats.maxTemp = temperature;
@@ -1202,7 +1237,7 @@ void HomeControlApp::brightnessSliderEvent(lv_event_t *e)
     }
     if (lv_event_get_code(e) == LV_EVENT_RELEASED)
     {
-        DisplayClient::requestBrightness(ctx->deviceId, static_cast<uint8_t>(value));
+        DisplayClient::requestBrightness(ctx->deviceId, static_cast<uint8_t>(value), ctx->isLocal);
     }
 }
 
@@ -1214,7 +1249,7 @@ void HomeControlApp::ledSlotEvent(lv_event_t *e)
         return;
     }
     ctx->app->resetInactivityTimer();
-    DisplayClient::requestLedSlot(ctx->deviceId, ctx->slot);
+    DisplayClient::requestLedSlot(ctx->deviceId, ctx->slot, ctx->isLocal);
 }
 
 // Static callback wrappers

@@ -103,7 +103,9 @@ void DisplayServer::handleNewDisplay(MessageUDP &msg){
         DisplayHandshake handshake;
         handshake.displayId = static_cast<uint8_t>(std::distance(knownDisplays.begin(), it));
         auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
-        handshake.deviceCount = devices.size();
+        handshake.deviceCount = std::count_if(devices.begin(), devices.end(), [&newDisplayInfo](const DeviceDescription& device) {
+            return !(newDisplayInfo.macAddress != 0 && device.macAddress == newDisplayInfo.macAddress);
+        });
         MessageUDP response((uint8_t)DisplayMessageIds::DISPLAY_HANDSHAKE, msg.getIPAddress(), DISPLAY_UDP_PORT);
         response.pushData(reinterpret_cast<byte*>(&handshake), sizeof(handshake));
         NetworkDriver::send(response);
@@ -121,6 +123,13 @@ const std::vector<Display>& DisplayServer::getKnownDisplays()
 void DisplayServer::sendDeviceList(const Display& display)
 {
     auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+    // Devices hosted by the display itself are controlled and kept locally - no need to synchronize them
+    const uint64_t displayMac = display.getInfo().macAddress;
+    if (displayMac != 0) {
+        devices.erase(std::remove_if(devices.begin(), devices.end(), [displayMac](const DeviceDescription& device) {
+            return device.macAddress == displayMac;
+        }), devices.end());
+    }
     const uint8_t totalChunks = static_cast<uint8_t>((devices.size() + DISPLAY_MAX_DEVICES_PER_CHUNK - 1) / DISPLAY_MAX_DEVICES_PER_CHUNK);
     for (uint8_t chunkIndex = 0; chunkIndex < totalChunks; ++chunkIndex) {
         DisplayDeviceListChunk chunk;
@@ -269,6 +278,7 @@ void DisplayServer::sendActionResponse(const MessageUDP& request, uint16_t seque
     auto it = std::find_if(devices.begin(), devices.end(), [deviceId](const DeviceDescription& device) { return device.deviceId == deviceId; });
     if (it != devices.end()) {
         response.device.deviceType = it->deviceType;
+        response.device.macAddress = it->macAddress;
         response.device.deviceId = it->deviceId;
         response.device.roomId = it->roomId;
         response.device.isEnabled = it->isEnabled;
@@ -288,11 +298,13 @@ void DisplayServer::broadcastDeviceState(uint8_t deviceId)
     if (it == devices.end()) return;
     DisplayStateUpdate update;
     update.device.deviceType = it->deviceType;
+    update.device.macAddress = it->macAddress;
     update.device.deviceId = it->deviceId;
     update.device.roomId = it->roomId;
     update.device.isEnabled = it->isEnabled;
     memcpy(update.device.customBytes, it->customBytes, NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION);
     for (const auto& display : knownDisplays) {
+        if (it->macAddress != 0 && display.getInfo().macAddress == it->macAddress) continue;
         MessageUDP message((uint8_t)DisplayMessageIds::DEVICE_STATE_UPDATE, display.getInfo().ip, DISPLAY_UDP_PORT);
         message.pushData(reinterpret_cast<byte*>(&update), sizeof(update));
         NetworkDriver::send(message);

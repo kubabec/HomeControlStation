@@ -5,6 +5,12 @@
 **Target Timeline**: ~12-16 weeks (phased development)  
 **Author**: Architecture Planning  
 
+> **Document status:** This 2026-09 roadmap is retained as a historical planning
+> artifact; its proposed separate Guition repository and `DisplayUIThread`
+> phases have been superseded by the integrated `DisplayS34inch` target in this
+> repository. See the [current display overview](README.md#guition-4-inch-display-target)
+> and [architecture guide](ARCHITECTURE.md#display-terminal-and-local-device-control).
+
 ---
 
 ## Overview

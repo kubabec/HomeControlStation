@@ -17,13 +17,28 @@ public:
     static void cyclic();
     static void receiveUDP(MessageUDP& message);
     static bool isConnected();
-    static bool requestToggle(uint8_t deviceId);
-    static bool requestBrightness(uint8_t deviceId, uint8_t percent);
-    static bool requestLedSlot(uint8_t deviceId, uint8_t slot);
+    static bool requestToggle(uint8_t deviceId, bool isLocal = false);
+    static bool requestBrightness(uint8_t deviceId, uint8_t percent, bool isLocal = false);
+    static bool requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal = false);
     static const DeviceList& devices();
 
 private:
-    static DeviceList deviceList;
+    struct LocalAction {
+        uint8_t deviceId = 0;
+        uint8_t service = 0;
+        uint8_t parameter = 0;
+        bool toggle = false;
+        unsigned long deadline = 0;
+    };
+
+    static DeviceList deviceList;   // merged list shown in UI: local devices first, then master devices
+    static DeviceList remoteList;   // devices synchronized from the master
+    static DeviceList localList;    // devices hosted by this display terminal
+    static std::queue<LocalAction> localActions;
+    static bool localChanged;
+    static bool localSubscribed;
+    static unsigned long lastMasterRxTime;
+    static bool uiConnected;
     static std::vector<DisplayDeviceWire> pendingDevices;
     static RoomNames pendingRoomNames;
     static std::queue<MessageUDP> receptionQueue;
@@ -36,6 +51,12 @@ private:
     static HomeControlApp* application;
 
     static uint64_t localMac();
+    static void subscribeLocalDevices();
+    static void refreshLocalDevices();
+    static void rebuildAndReload();
+    static void processLocalActions();
+    static bool requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle);
+    static void updateConnectionState();
     static void processMessage(MessageUDP& message);
     static void sendPresent(const MessageUDP::IPAddr& target);
     static void requestDeviceList();

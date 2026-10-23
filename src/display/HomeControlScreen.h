@@ -27,6 +27,7 @@ struct DisplayDeviceView {
     uint8_t deviceId = 0;
     uint8_t roomId = 0;
     uint8_t isEnabled = 0;
+    bool isLocal = false;  // hosted by this display terminal (controlled without the master)
     uint8_t customBytes[NUMBER_OF_CUSTOM_BYTES_IN_DESCRIPTION] = {};
     std::string deviceName;
     
@@ -56,6 +57,9 @@ public:
     void init();
 
     void reloadDevices(const DeviceList& newDevices);
+
+    // Shows/hides the top-bar warning about lost communication with the master
+    void setMasterConnected(bool connected);
 
     void setRoomNames(const std::vector<std::pair<uint8_t, std::string>>& names);
 
@@ -95,6 +99,7 @@ private:
         HomeControlApp* app = nullptr;
         uint8_t deviceId = 0;
         uint8_t slot = 0;
+        bool isLocal = false;
     };
 
     /** Rolling readings collected from the device list updates of a temperature sensor. */
@@ -169,6 +174,7 @@ private:
     // UI Objects
     lv_obj_t* screen_ = nullptr;
     lv_obj_t* appBar_ = nullptr;
+    lv_obj_t* masterOfflineBanner_ = nullptr;
     lv_obj_t* roomHeaderLabel_ = nullptr;  // Room name in header
     lv_obj_t* titleUnderline_ = nullptr;
     lv_obj_t* contentContainer_ = nullptr;  // Main container with nav buttons
@@ -213,7 +219,7 @@ private:
     std::vector<std::unique_ptr<TileCtx>> tileContexts_;
     std::vector<std::unique_ptr<RoomCtx>> roomContexts_;
     std::vector<std::unique_ptr<SlotCtx>> slotContexts_;
-    std::unordered_map<uint8_t, TempStats> temperatureStats_;
+    std::unordered_map<uint16_t, TempStats> temperatureStats_;
 
     // Room navigation
     std::vector<uint8_t> orderedRooms_;  // Sorted list of room IDs

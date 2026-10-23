@@ -2,8 +2,14 @@
 
 **Document Version**: 1.0  
 **Date**: 2026-09-07  
-**Status**: Design Phase  
+**Status**: Superseded by the current implementation
 **Author**: Architectural Analysis  
+
+> **Document status:** This is a historical requirements document. Its
+> independent-repository constraint and exclusion of display-hosted physical
+> devices no longer describe the implementation. The current code and behavior
+> are summarized in the [README display section](README.md#guition-4-inch-display-target)
+> and [architecture guide](ARCHITECTURE.md#display-terminal-and-local-device-control).
 
 ---
 
