@@ -18,13 +18,23 @@ enum class DisplayMessageIds : uint8_t {
     KEEP_ALIVE,
     KEEP_ALIVE_ACK,
     ROOM_NAMES_CHUNK,
-
+    ROOM_STATE_CHUNK,
+    ROOM_TOGGLE_REQUEST,
 };
 
 static constexpr uint8_t DISPLAY_PROTOCOL_VERSION = 1;
 static constexpr uint8_t DISPLAY_MAX_DEVICES_PER_CHUNK = 5;
 static constexpr uint8_t DISPLAY_MAX_ROOMS_PER_CHUNK = 8;
 static constexpr uint8_t DISPLAY_ROOM_NAME_MAX_LENGTH = 24;
+static constexpr uint8_t DISPLAY_MAX_ROOM_STATES_PER_CHUNK = 16;
+
+/** Aggregated room state computed by the DisplayServer (same rule as the web UI room switch). */
+enum class DisplayRoomState : uint8_t {
+    OFF = 0,
+    ON = 1,
+    /** Room contains only devices which cannot be switched (e.g. temperature sensors). */
+    NOT_TOGGLABLE = 2,
+};
 static constexpr uint16_t DISPLAY_UDP_PORT = 9001;
 
 enum class DisplayAction : uint8_t {
@@ -101,6 +111,24 @@ struct DisplayRoomNamesChunk {
     uint8_t totalChunks = 0;
     uint8_t roomCount = 0;
     DisplayRoomNameWire rooms[DISPLAY_MAX_ROOMS_PER_CHUNK] = {};
+};
+
+struct DisplayRoomStateWire {
+    uint8_t roomId = 0;
+    uint8_t state = 0;
+};
+
+struct DisplayRoomStatesChunk {
+    DisplayMessageHeader header;
+    uint8_t chunkIndex = 0;
+    uint8_t totalChunks = 0;
+    uint8_t roomCount = 0;
+    DisplayRoomStateWire rooms[DISPLAY_MAX_ROOM_STATES_PER_CHUNK] = {};
+};
+
+struct DisplayRoomToggleRequest {
+    DisplayMessageHeader header;
+    uint8_t roomId = 0;
 };
 #pragma pack(pop)
 /**

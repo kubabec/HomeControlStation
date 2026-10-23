@@ -84,6 +84,13 @@ private:
     static void sendActionResponse(const MessageUDP& request, uint16_t sequence, uint8_t status, uint8_t deviceId);
     static void broadcastDeviceState(uint8_t deviceId);
 
+    /** Room states (roomId, DisplayRoomState) last shared with displays. */
+    static std::vector<std::pair<uint8_t, uint8_t>> roomStates;
+    static std::vector<std::pair<uint8_t, uint8_t>> computeRoomStates();
+    static void sendRoomStates(const Display& display);
+    static void refreshRoomStates();
+    static void handleRoomToggle(uint8_t roomId);
+
     /**
      * Sends discovery requests to discover currently reachable displays on the LAN.
      */

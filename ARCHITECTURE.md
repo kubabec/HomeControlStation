@@ -363,6 +363,17 @@ display. After 15 seconds without protocol activity, a non-interactive warning
 covers only the display's top bar. Local controls remain visible and actionable,
 and the warning clears after communication resumes.
 
+The top-left app-bar switch toggles the whole current room and is driven only
+by the master. `DisplayServer` computes a per-room state from
+`SIG_DEVICE_COLLECTION` using the web UI rule (`isEnabled == 1` is on, `0` is
+off, `2`/`3` are non-switchable) and sends it as `ROOM_STATE_CHUNK` on list
+sync, whenever the device collection changes the result, and with each
+keep-alive. A tap sends `ROOM_TOGGLE_REQUEST`; the server picks the direction
+(any device on turns the room off, otherwise on) and calls
+`DEVSERVICE_ROOM_STATE_CHANGE`, as the web room toggle does. The switch is dimmed
+and inactive for rooms with only non-switchable devices, unknown rooms, or when
+the master is offline. Local devices are ignored by this feature.
+
 Source map: `src/os/app/display/DisplayClient.cpp`,
 `src/os/app/display/DisplayServer.cpp`, `src/os/app/display/DisplayRuntime.cpp`,
 and `src/display/HomeControlScreen.cpp`.

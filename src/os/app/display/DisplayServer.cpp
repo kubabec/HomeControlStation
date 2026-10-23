@@ -5,6 +5,7 @@
 #include "os/datacontainer/DataContainer.hpp"
 #include "devices/device.hpp"
 #include <algorithm>
+#include <map>
 #include <cstring>
 
 /**
@@ -17,6 +18,7 @@ std::vector<Display> DisplayServer::knownDisplays;
 unsigned long DisplayServer::lastDiscoveryTime = 0;
 std::queue<MessageUDP> DisplayServer::receptionUdpQueue;
 DisplayServer::PendingAction DisplayServer::pendingAction;
+std::vector<std::pair<uint8_t, uint8_t>> DisplayServer::roomStates;
 
 void DisplayServer::init()
 {
@@ -25,9 +27,11 @@ void DisplayServer::init()
     knownDisplays.clear();
     receptionUdpQueue = {};
     pendingAction = {};
+    roomStates.clear();
     DataContainer::subscribe(SIG_DEVICE_COLLECTION, [](std::any) {
         auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
         for (const auto& device : devices) DisplayServer::broadcastDeviceState(device.deviceId);
+        DisplayServer::refreshRoomStates();
     });
     DataContainer::subscribe(SIG_ROOM_NAMES_MAPPING, [](std::any) {
         for (const auto& display : knownDisplays) DisplayServer::sendRoomNames(display);
@@ -156,6 +160,7 @@ void DisplayServer::sendDeviceList(const Display& display)
     MessageUDP end((uint8_t)DisplayMessageIds::DEVICE_LIST_END, display.getInfo().ip, DISPLAY_UDP_PORT);
     NetworkDriver::send(end);
     sendRoomNames(display);
+    sendRoomStates(display);
 }
 
 void DisplayServer::sendRoomNames(const Display& display)
@@ -234,7 +239,18 @@ void DisplayServer::handleMessage(MessageUDP& msg)
         sendActionResponse(msg, request.header.sequence, 1, request.deviceId);
         return;
     }
+    if (msg.getId() == (uint8_t)DisplayMessageIds::ROOM_TOGGLE_REQUEST && payload.size() == sizeof(DisplayRoomToggleRequest)) {
+        DisplayRoomToggleRequest request;
+        memcpy(&request, payload.data(), sizeof(request));
+        handleRoomToggle(request.roomId);
+        return;
+    }
     if (msg.getId() == (uint8_t)DisplayMessageIds::KEEP_ALIVE) {
+        // Periodic resync makes room states resilient to lost UDP datagrams
+        auto display = std::find_if(knownDisplays.begin(), knownDisplays.end(), [&msg](const Display& candidate) {
+            return candidate.getInfo().ip == msg.getIPAddress();
+        });
+        if (display != knownDisplays.end()) sendRoomStates(*display);
         MessageUDP ack((uint8_t)DisplayMessageIds::KEEP_ALIVE_ACK, msg.getIPAddress(), DISPLAY_UDP_PORT);
         if (!payload.empty()) ack.pushData(payload.data(), payload.size());
         NetworkDriver::send(ack);
@@ -309,4 +325,69 @@ void DisplayServer::broadcastDeviceState(uint8_t deviceId)
         message.pushData(reinterpret_cast<byte*>(&update), sizeof(update));
         NetworkDriver::send(message);
     }
+}
+
+std::vector<std::pair<uint8_t, uint8_t>> DisplayServer::computeRoomStates()
+{
+    // Rule shared with the web UI: isEnabled == 1 means ON, 0 means OFF, 2/3 mean the device cannot be switched
+    std::map<uint8_t, uint8_t> states;
+    const auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+    for (const auto& device : devices) {
+        auto entry = states.emplace(device.roomId, (uint8_t)DisplayRoomState::NOT_TOGGLABLE).first;
+        if (device.isEnabled == 1) {
+            entry->second = (uint8_t)DisplayRoomState::ON;
+        } else if (device.isEnabled == 0 && entry->second != (uint8_t)DisplayRoomState::ON) {
+            entry->second = (uint8_t)DisplayRoomState::OFF;
+        }
+    }
+    return std::vector<std::pair<uint8_t, uint8_t>>(states.begin(), states.end());
+}
+
+void DisplayServer::sendRoomStates(const Display& display)
+{
+    const auto states = computeRoomStates();
+    const size_t chunkCount = std::max<size_t>(1,
+        (states.size() + DISPLAY_MAX_ROOM_STATES_PER_CHUNK - 1) / DISPLAY_MAX_ROOM_STATES_PER_CHUNK);
+    auto room = states.begin();
+    for (size_t chunkIndex = 0; chunkIndex < chunkCount; ++chunkIndex) {
+        DisplayRoomStatesChunk chunk;
+        chunk.chunkIndex = static_cast<uint8_t>(chunkIndex);
+        chunk.totalChunks = static_cast<uint8_t>(chunkCount);
+        while (room != states.end() && chunk.roomCount < DISPLAY_MAX_ROOM_STATES_PER_CHUNK) {
+            chunk.rooms[chunk.roomCount].roomId = room->first;
+            chunk.rooms[chunk.roomCount].state = room->second;
+            ++chunk.roomCount;
+            ++room;
+        }
+        MessageUDP message((uint8_t)DisplayMessageIds::ROOM_STATE_CHUNK, display.getInfo().ip, DISPLAY_UDP_PORT);
+        message.pushData(reinterpret_cast<byte*>(&chunk), sizeof(chunk));
+        NetworkDriver::send(message);
+    }
+}
+
+void DisplayServer::refreshRoomStates()
+{
+    auto states = computeRoomStates();
+    if (states == roomStates) return;
+    roomStates = std::move(states);
+    for (const auto& display : knownDisplays) sendRoomStates(display);
+}
+
+void DisplayServer::handleRoomToggle(uint8_t roomId)
+{
+    // Same evaluation as the web UI: any switchable device ON -> turn the room OFF, otherwise turn it ON
+    const auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
+    bool roomExists = false;
+    bool anyOn = false;
+    for (const auto& device : devices) {
+        if (device.roomId != roomId) continue;
+        roomExists = true;
+        if (device.isEnabled == 1) anyOn = true;
+    }
+    if (!roomExists) return;
+
+    ServiceParameters_set1 parameters;
+    parameters.a = anyOn ? 0 : 1;
+    const auto services = std::any_cast<DeviceServicesAPI>(DataContainer::getSignalValue(SIG_DEVICE_SERVICES));
+    services.serviceCall_set1(roomId, DEVSERVICE_ROOM_STATE_CHANGE, parameters);
 }

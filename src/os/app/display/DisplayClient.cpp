@@ -26,6 +26,7 @@ constexpr unsigned long LOCAL_ACTION_TIMEOUT_MS = 3000;
 }
 std::vector<DisplayDeviceWire> DisplayClient::pendingDevices;
 DisplayClient::RoomNames DisplayClient::pendingRoomNames;
+std::vector<std::pair<uint8_t, uint8_t>> DisplayClient::pendingRoomStates;
 std::queue<MessageUDP> DisplayClient::receptionQueue;
 MessageUDP::IPAddr DisplayClient::masterIp{0, 0, 0, 0};
 bool DisplayClient::connected = false;
@@ -126,6 +127,8 @@ void DisplayClient::processMessage(MessageUDP& message)
         finishDeviceList();
     } else if (id == DisplayMessageIds::ROOM_NAMES_CHUNK) {
         handleRoomNamesChunk(payload);
+    } else if (id == DisplayMessageIds::ROOM_STATE_CHUNK) {
+        handleRoomStatesChunk(payload);
     } else if (id == DisplayMessageIds::DEVICE_STATE_UPDATE && payload.size() == sizeof(DisplayStateUpdate)) {
         DisplayStateUpdate update;
         memcpy(&update, payload.data(), sizeof(update));
@@ -210,6 +213,24 @@ void DisplayClient::handleRoomNamesChunk(const std::vector<uint8_t>& payload)
     }
 }
 
+void DisplayClient::handleRoomStatesChunk(const std::vector<uint8_t>& payload)
+{
+    if (payload.size() != sizeof(DisplayRoomStatesChunk)) return;
+    DisplayRoomStatesChunk chunk;
+    memcpy(&chunk, payload.data(), sizeof(chunk));
+    if (chunk.totalChunks == 0 || chunk.chunkIndex >= chunk.totalChunks ||
+        chunk.roomCount > DISPLAY_MAX_ROOM_STATES_PER_CHUNK) return;
+
+    if (chunk.chunkIndex == 0) pendingRoomStates.clear();
+    for (uint8_t index = 0; index < chunk.roomCount; ++index) {
+        pendingRoomStates.emplace_back(chunk.rooms[index].roomId, chunk.rooms[index].state);
+    }
+    if (chunk.chunkIndex + 1 == chunk.totalChunks) {
+        if (application != nullptr) application->setRoomToggleStates(pendingRoomStates);
+        pendingRoomStates.clear();
+    }
+}
+
 void DisplayClient::finishDeviceList()
 {
     remoteList.clear();
@@ -280,6 +301,16 @@ bool DisplayClient::requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal)
 {
     if (isLocal) return requestLocal(deviceId, DEVSERVICE_LED_STRIP_SWITCH_CONTENT, slot, false);
     return sendAction(deviceId, DisplayAction::LOAD_LED_SLOT, slot);
+}
+
+bool DisplayClient::requestRoomToggle(uint8_t roomId)
+{
+    if (!connected) return false;
+    DisplayRoomToggleRequest request;
+    request.header.sequence = sequence++;
+    request.roomId = roomId;
+    return send(static_cast<uint8_t>(DisplayMessageIds::ROOM_TOGGLE_REQUEST),
+                &request, sizeof(request), masterIp);
 }
 
 bool DisplayClient::isConnected() { return connected; }

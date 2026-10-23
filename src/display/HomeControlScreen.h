@@ -77,10 +77,8 @@ public:
     void updateClock();
     void syncClockWithPlatform();
 
-    // Weather management
-    void updateWeather();
-    void fetchWeatherData();
-    void setWeatherInfo(const std::string& info);
+    // Room states (roomId, 0 = off, 1 = on, 2 = not togglable) published by the master
+    void setRoomToggleStates(const std::vector<std::pair<uint8_t, uint8_t>>& states);
 
 private:
     struct TileCtx {
@@ -153,7 +151,7 @@ private:
     static void standbyScreenTouchEvent(lv_event_t* e);
     static void updateClockTimer(lv_timer_t* t);
     static void syncClockTimer(lv_timer_t* t);
-    static void updateWeatherTimer(lv_timer_t* t);
+    static void roomToggleEvent(lv_event_t* e);
     static void brightnessSliderEvent(lv_event_t* e);
     static void ledSlotEvent(lv_event_t* e);
 
@@ -203,12 +201,12 @@ private:
     lv_timer_t* clockSyncTimer_ = nullptr;
     static const uint32_t CLOCK_SYNC_PERIOD_MS = 10 * 60 * 1000;
 
-    // Weather widget
-    lv_obj_t* weatherLabel_ = nullptr;
-    lv_obj_t* weatherButton_ = nullptr;
-    std::string lastWeatherInfo_ = "Warszawa\n25°C\n10%";
-    std::string lastFetchedCity_ = "Warszawa";
-    lv_timer_t* weatherUpdateTimer_ = nullptr;
+    // Room toggle button in the app bar (master driven)
+    lv_obj_t* roomToggleButton_ = nullptr;
+    lv_obj_t* roomToggleThumb_ = nullptr;
+    std::unordered_map<uint8_t, uint8_t> roomToggleStates_;
+    bool masterConnected_ = true;
+    void updateRoomToggleButton();
 
     // Deferred update handling
     DeviceList pendingDevices_;

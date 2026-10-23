@@ -20,6 +20,7 @@ public:
     static bool requestToggle(uint8_t deviceId, bool isLocal = false);
     static bool requestBrightness(uint8_t deviceId, uint8_t percent, bool isLocal = false);
     static bool requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal = false);
+    static bool requestRoomToggle(uint8_t roomId);
     static const DeviceList& devices();
 
 private:
@@ -41,6 +42,7 @@ private:
     static bool uiConnected;
     static std::vector<DisplayDeviceWire> pendingDevices;
     static RoomNames pendingRoomNames;
+    static std::vector<std::pair<uint8_t, uint8_t>> pendingRoomStates;
     static std::queue<MessageUDP> receptionQueue;
     static MessageUDP::IPAddr masterIp;
     static bool connected;
@@ -62,6 +64,7 @@ private:
     static void requestDeviceList();
     static void handleChunk(const std::vector<uint8_t>& payload);
     static void handleRoomNamesChunk(const std::vector<uint8_t>& payload);
+    static void handleRoomStatesChunk(const std::vector<uint8_t>& payload);
     static void finishDeviceList();
     static DisplayDeviceView convertDevice(const DisplayDeviceWire& source);
     static bool sendAction(uint8_t deviceId, DisplayAction action, uint8_t parameter);

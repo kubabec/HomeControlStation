@@ -152,12 +152,6 @@ void HomeControlApp::init()
     clockSyncTimer_ = lv_timer_create(&HomeControlApp::syncClockTimer, CLOCK_SYNC_PERIOD_MS, this);
     // syncClockWithPlatform();
 
-    // Initialize weather timer - update every 30 minutes (1800000 ms)
-    weatherUpdateTimer_ = lv_timer_create(&HomeControlApp::updateWeatherTimer, 1800000, this);
-
-    // Fetch weather data immediately on startup
-    fetchWeatherData();
-
     reloadDevices(devices_);
 }
 
@@ -191,23 +185,25 @@ void HomeControlApp::buildUi()
     lv_obj_set_flex_flow(appBar_, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(appBar_, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    // Weather widget - left side
-    weatherButton_ = lv_btn_create(appBar_);
-    lv_obj_set_width(weatherButton_, 92);
-    lv_obj_set_height(weatherButton_, LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_opa(weatherButton_, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_width(weatherButton_, 0, 0);
-    lv_obj_set_style_pad_hor(weatherButton_, 2, 0);
-    lv_obj_set_style_pad_ver(weatherButton_, 0, 0);
-    lv_obj_set_style_shadow_width(weatherButton_, 0, 0);
+    // Room toggle - left side, state is owned by the master (DisplayServer)
+    roomToggleButton_ = lv_btn_create(appBar_);
+    lv_obj_set_size(roomToggleButton_, 64, 32);
+    lv_obj_clear_flag(roomToggleButton_, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(roomToggleButton_, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_border_width(roomToggleButton_, 1, 0);
+    lv_obj_set_style_border_opa(roomToggleButton_, LV_OPA_COVER, 0);
+    lv_obj_set_style_shadow_width(roomToggleButton_, 0, 0);
+    lv_obj_set_style_pad_all(roomToggleButton_, 0, 0);
+    lv_obj_add_event_cb(roomToggleButton_, &HomeControlApp::roomToggleEvent, LV_EVENT_CLICKED, this);
 
-    weatherLabel_ = lv_label_create(weatherButton_);
-    lv_label_set_text(weatherLabel_, "Warszawa\n25°C\n10%");
-    lv_obj_set_width(weatherLabel_, LV_SIZE_CONTENT);
-    lv_label_set_long_mode(weatherLabel_, LV_LABEL_LONG_DOT);
-    lv_obj_set_style_text_align(weatherLabel_, LV_TEXT_ALIGN_LEFT, 0);
-    lv_obj_set_style_text_color(weatherLabel_, lv_color_hex(kTextMuted), 0);
-    lv_obj_set_style_text_font(weatherLabel_, FONT_BODY, 0);
+    roomToggleThumb_ = lv_obj_create(roomToggleButton_);
+    lv_obj_set_size(roomToggleThumb_, 24, 24);
+    lv_obj_clear_flag(roomToggleThumb_, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(roomToggleThumb_, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(roomToggleThumb_, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_border_width(roomToggleThumb_, 0, 0);
+    lv_obj_set_style_bg_opa(roomToggleThumb_, LV_OPA_COVER, 0);
+    updateRoomToggleButton();
 
     // Room name header - centered
     roomHeaderLabel_ = lv_label_create(appBar_);
@@ -430,6 +426,8 @@ void HomeControlApp::buildUi()
 
 void HomeControlApp::setMasterConnected(bool connected)
 {
+    masterConnected_ = connected;
+    updateRoomToggleButton();
     if (!masterOfflineBanner_)
     {
         return;
@@ -441,6 +439,64 @@ void HomeControlApp::setMasterConnected(bool connected)
     else
     {
         lv_obj_clear_flag(masterOfflineBanner_, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+void HomeControlApp::setRoomToggleStates(const std::vector<std::pair<uint8_t, uint8_t>> &states)
+{
+    std::unordered_map<uint8_t, uint8_t> next(states.begin(), states.end());
+    if (next == roomToggleStates_)
+    {
+        return;
+    }
+    roomToggleStates_ = std::move(next);
+    updateRoomToggleButton();
+}
+
+void HomeControlApp::roomToggleEvent(lv_event_t *e)
+{
+    auto *app = static_cast<HomeControlApp *>(lv_event_get_user_data(e));
+    if (app == nullptr || app->orderedRooms_.empty() || app->currentRoomIndex_ >= app->orderedRooms_.size())
+    {
+        return;
+    }
+    DisplayClient::requestRoomToggle(app->orderedRooms_[app->currentRoomIndex_]);
+}
+
+void HomeControlApp::updateRoomToggleButton()
+{
+    if (!roomToggleButton_ || !roomToggleThumb_)
+    {
+        return;
+    }
+
+    // Unknown rooms, rooms with only non-switchable devices and a lost master leave the switch inactive
+    int state = -1;
+    if (masterConnected_ && !orderedRooms_.empty() && currentRoomIndex_ < orderedRooms_.size())
+    {
+        auto it = roomToggleStates_.find(orderedRooms_[currentRoomIndex_]);
+        if (it != roomToggleStates_.end() && it->second <= 1)
+        {
+            state = it->second;
+        }
+    }
+    const bool on = state == 1;
+
+    lv_obj_set_style_bg_opa(roomToggleButton_, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(roomToggleButton_, lv_color_hex(on ? 0x1F5C4A : kSurface2), 0);
+    lv_obj_set_style_border_color(roomToggleButton_, lv_color_hex(on ? kSuccess : kSteel), 0);
+    lv_obj_set_style_bg_color(roomToggleThumb_, lv_color_hex(on ? 0x6BDFAD : 0x93A4B7), 0);
+    lv_obj_align(roomToggleThumb_, on ? LV_ALIGN_RIGHT_MID : LV_ALIGN_LEFT_MID, on ? -3 : 3, 0);
+
+    if (state < 0)
+    {
+        lv_obj_clear_flag(roomToggleButton_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_style_opa(roomToggleButton_, LV_OPA_40, 0);
+    }
+    else
+    {
+        lv_obj_add_flag(roomToggleButton_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_style_opa(roomToggleButton_, LV_OPA_COVER, 0);
     }
 }
 
@@ -526,6 +582,7 @@ void HomeControlApp::updateRoomDisplay()
     if (orderedRooms_.empty())
     {
         lv_label_set_text(roomHeaderLabel_, "NO ROOMS");
+        updateRoomToggleButton();
         return;
     }
 
@@ -534,6 +591,7 @@ void HomeControlApp::updateRoomDisplay()
 
     // Update header with room name
     lv_label_set_text(roomHeaderLabel_, roomLabel(currentRoomId, roomNames_).c_str());
+    updateRoomToggleButton();
 
     // Get devices in current room
     DeviceList roomDevices;
@@ -1576,53 +1634,6 @@ void HomeControlApp::syncClockTimer(lv_timer_t *t)
     {
         app->syncClockWithPlatform();
     }
-}
-
-void HomeControlApp::updateWeather()
-{
-    if (!weatherLabel_)
-    {
-        return;
-    }
-    lv_label_set_text(weatherLabel_, lastWeatherInfo_.c_str());
-}
-
-void HomeControlApp::updateWeatherTimer(lv_timer_t *t)
-{
-    HomeControlApp *app = static_cast<HomeControlApp *>(t->user_data);
-    if (app)
-    {
-        app->fetchWeatherData();
-    }
-}
-
-void HomeControlApp::fetchWeatherData()
-{
-    // This function fetches weather data from OpenWeatherMap API
-    // For now, it displays default values. In production, integrate real API
-
-    if (!WiFi.isConnected())
-    {
-        // If not connected, show default weather
-        setWeatherInfo("Warszawa\n22°C\n60%");
-        return;
-    }
-
-    // TODO: Implement weather API call
-    // Example using OpenWeatherMap Free API:
-    // 1. Get API key from openweathermap.org
-    // 2. Use HTTPClient to fetch: http://api.openweathermap.org/data/2.5/weather?q=Warsaw&units=metric&appid=YOUR_API_KEY
-    // 3. Parse JSON response for temperature and humidity
-    // 4. Call setWeatherInfo() with formatted string
-
-    // For testing, set default weather
-    setWeatherInfo("Warszawa\n22°C\n60%");
-}
-
-void HomeControlApp::setWeatherInfo(const std::string &info)
-{
-    lastWeatherInfo_ = info;
-    updateWeather();
 }
 
 #endif

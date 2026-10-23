@@ -97,7 +97,8 @@ when the master is unavailable: those actions call the display's local device
 services directly. The master synchronizes other devices over the display UDP
 protocol and omits devices hosted by that display. When communication is lost,
 a non-interactive warning covers the top bar only; the device controls remain
-available. See the [display implementation overview](ARCHITECTURE.md#display-terminal-and-local-device-control).
+available. A master-driven room switch in the top-left corner toggles the whole
+room the way the web UI does. See the [display implementation overview](ARCHITECTURE.md#display-terminal-and-local-device-control).
 
 ## Firmware updates
 
