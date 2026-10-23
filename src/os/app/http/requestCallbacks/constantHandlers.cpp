@@ -115,13 +115,14 @@ void HomeLightHttpServer::constantHandler_configPage(WiFiClient &client)
 void HomeLightHttpServer::constantHandler_softwareUpdatePage(WiFiClient &client)
 {
   client.println("<div class=\"wrapper\"><div class=\"header\">Software Update</div>");
-  client.println("<div id=\"software-update-message\">Loading available software versions...</div>");
+  client.println("<div class=\"settings-panel\">");
+  client.println("<div id=\"software-update-message\" class=\"settings-note\">Loading available software versions...</div>");
   client.println("<div id=\"software-update-list\"></div>");
   client.println("<div id=\"software-update-installing\" style=\"display:none\">");
   client.println("<div id=\"software-update-selected\" class=\"software-update-selected\"></div>");
   client.println("<div class=\"software-update-progress\"><div id=\"software-update-progress-fill\" class=\"software-update-progress-fill\"></div></div>");
   client.println("<div class=\"software-update-progress-value\"><span id=\"software-update-progress-value\">0</span>%</div></div>");
-  client.println("<br><a href=\"/config\" class=\"button\">Back</a></div>");
+  client.println("</div><a href=\"/config\" class=\"button\">Back</a></div>");
   client.println("<script>\
     const updateMessage = document.getElementById('software-update-message');\
     const updateList = document.getElementById('software-update-list');\
@@ -329,8 +330,8 @@ void HomeLightHttpServer::constantHandler_asyncTest(WiFiClient &client)
 void HomeLightHttpServer::constantHandler_displayDevices(WiFiClient &client)
 {
   client.println("<div class=\"wrapper\"><div class=\"header\">Display terminals</div>");
-  client.println("<p>Displays discovered on the local network.</p>");
-  client.println("<table><tr><th>Display</th><th>IP address</th><th>Resolution</th></tr>");
+  client.println("<div class=\"settings-panel\"><p class=\"settings-note\">Displays discovered on the local network.</p>");
+  client.println("<table class=\"table-graphite table-simple\"><thead><tr><th>Display</th><th>IP address</th><th>Resolution</th></tr></thead><tbody>");
   const auto& displays = DisplayServer::getKnownDisplays();
   if (displays.empty()) {
     client.println("<tr><td colspan=\"3\">No display terminals discovered yet.</td></tr>");
@@ -342,7 +343,7 @@ void HomeLightHttpServer::constantHandler_displayDevices(WiFiClient &client)
                      "</td><td>" + String(info.resWidth) + " x " + String(info.resHeight) + "</td></tr>");
     }
   }
-  client.println("</table><br><a href=\"/config\" class=\"button\">Settings</a></div>");
+  client.println("</tbody></table></div><a href=\"/config\" class=\"button\">Settings</a></div>");
 }
 
 void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)
@@ -354,7 +355,7 @@ void HomeLightHttpServer::constantHandler_networkInspecion(WiFiClient &client)
   if (auto p = std::any_cast<std::vector<NetworkNodeInfo>>(&localAny))
   {
     std::vector<NetworkNodeInfo> networkNodes = *p;
-    client.println("<table class=\"table-graphite\">");
+    client.println("<table class=\"table-graphite table-simple\">");
     client.println("<thead><tr><th>Type</th><th>IP</th><th>Web interface</th></tr></thead>");
     client.println("<tbody>");
     for (auto &node : networkNodes)
@@ -383,7 +384,7 @@ void HomeLightHttpServer::constantHandler_systemDetails(WiFiClient &client)
         <div class=\"header\">System details</div>");
 
   std::vector<NetworkNodeInfo> networkNodes = std::any_cast<std::vector<NetworkNodeInfo>>(DataContainer::getSignalValue(SIG_NETWORK_NODES_INFO));
-  client.println("<table class=\"table-graphite\">");
+  client.println("<table class=\"table-graphite table-simple\">");
   client.println("<thead><tr><th>Parameter</th><th>Value</th></tr></thead>");
   client.println("<tbody>");
   client.println("<tr><td>free RAM</td><td>" + String((int)ESP.getFreeHeap()) + " bytes</td></tr>");

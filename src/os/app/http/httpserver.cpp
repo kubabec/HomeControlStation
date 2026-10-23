@@ -649,6 +649,8 @@ static void convertPostToGetRequest(String& requestLine, WiFiClient& client)
 
 extern const uint8_t logo_hcs_png_start[] asm("_binary_res_logo_hcs_png_start");
 extern const uint8_t logo_hcs_png_end[] asm("_binary_res_logo_hcs_png_end");
+extern const uint8_t fav_logo_png_start[] asm("_binary_res_favLogo_png_start");
+extern const uint8_t fav_logo_png_end[] asm("_binary_res_favLogo_png_end");
 
 void HomeLightHttpServer::handleClientRequest()
 {
@@ -670,9 +672,11 @@ void HomeLightHttpServer::handleClientRequest()
             // that's the end of the client HTTP request, so send a response:
             if (currentLine.length() == 0) {
               convertPostToGetRequest(header, client);
-              if (header.startsWith("GET /logo_hcs.png"))
+              const bool favRequested = header.startsWith("GET /favLogo.png") || header.startsWith("GET /favicon.ico");
+              if (favRequested || header.startsWith("GET /logo_hcs.png"))
               {
-                const size_t logoSize = logo_hcs_png_end - logo_hcs_png_start;
+                const uint8_t *logoStart = favRequested ? fav_logo_png_start : logo_hcs_png_start;
+                const size_t logoSize = favRequested ? (fav_logo_png_end - fav_logo_png_start) : (logo_hcs_png_end - logo_hcs_png_start);
                 client.println("HTTP/1.1 200 OK");
                 client.println("Content-Type: image/png");
                 client.println("Cache-Control: public, max-age=86400");
@@ -680,7 +684,7 @@ void HomeLightHttpServer::handleClientRequest()
                 client.println(logoSize);
                 client.println("Connection: close");
                 client.println();
-                client.write(logo_hcs_png_start, logoSize);
+                client.write(logoStart, logoSize);
                 header = "";
                 client.stop();
                 return;
@@ -1004,6 +1008,20 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       client.println("<label>Type:<input type=\"text\" value=\"" +
                      String(hardwareNodeTypeName(currentConfig.nodeType)) +
                      "\" readonly></label>");
+
+      /* MAC address - bytes are stored little-endian (first MAC octet in the lowest byte) */
+      String macString = "N/A";
+      std::any macAny = DataContainer::getSignalValue(SIG_MAC_ADDRESS);
+      if (auto macPtr = std::any_cast<uint64_t>(&macAny))
+      {
+        char macBuffer[18];
+        snprintf(macBuffer, sizeof(macBuffer), "%02X:%02X:%02X:%02X:%02X:%02X",
+                 (unsigned)(*macPtr & 0xFF), (unsigned)((*macPtr >> 8) & 0xFF),
+                 (unsigned)((*macPtr >> 16) & 0xFF), (unsigned)((*macPtr >> 24) & 0xFF),
+                 (unsigned)((*macPtr >> 32) & 0xFF), (unsigned)((*macPtr >> 40) & 0xFF));
+        macString = macBuffer;
+      }
+      client.println("<label>MAC address:<input type=\"text\" value=\"" + macString + "\" readonly></label>");
 
   if(secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("</div>");

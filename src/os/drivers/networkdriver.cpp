@@ -122,15 +122,15 @@ void NetworkDriver::init()
 
     // esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
     uint64_t _chipmacid = 0LL;
-#ifdef SUPERMINI
-// WiFi.macAddress((uint8_t *)(&_chipmacid));
-// LOGGER::log("MAC address: " + String((long)_chipmacid));
-// fix MAC issue
-_chipmacid = 1234567LL;
-    // _chipmacid = ESP.getEfuseMac();
-#else
+// #ifdef SUPERMINI
+// // WiFi.macAddress((uint8_t *)(&_chipmacid));
+// // LOGGER::log("MAC address: " + String((long)_chipmacid));
+// // fix MAC issue
+// _chipmacid = 1234567LL;
+//     // _chipmacid = ESP.getEfuseMac();
+// #else
     esp_efuse_mac_get_default((uint8_t *)(&_chipmacid));
-#endif
+// #endif
 
     Logger::log(String((long)_chipmacid));
 

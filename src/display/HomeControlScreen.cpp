@@ -24,20 +24,20 @@ namespace
     }
 
     // Palette mirrors the "control-surface" theme served by the built-in HTTP server.
-    constexpr uint32_t kSurface0 = 0x101419;
-    constexpr uint32_t kSurface1 = 0x191F26;
-    constexpr uint32_t kSurface2 = 0x222A33;
-    constexpr uint32_t kSurface3 = 0x2C3540;
-    constexpr uint32_t kSteel = 0x465464;
-    constexpr uint32_t kSteelSoft = 0x34404D;
-    constexpr uint32_t kAccent = 0x5B91F2;
-    constexpr uint32_t kAccentStrong = 0x76A8FF;
-    constexpr uint32_t kTextStrong = 0xF2F5F8;
-    constexpr uint32_t kTextNormal = 0xC8D0DA;
-    constexpr uint32_t kTextMuted = 0x8E9AAA;
-    constexpr uint32_t kSuccess = 0x55C98A;
-    constexpr uint32_t kSuccessDeep = 0x236947;
-    constexpr uint32_t kDanger = 0xF06A72;
+    constexpr uint32_t kSurface0 = 0x0A111A;
+    constexpr uint32_t kSurface1 = 0x101B29;
+    constexpr uint32_t kSurface2 = 0x16263A;
+    constexpr uint32_t kSurface3 = 0x213650;
+    constexpr uint32_t kSteel = 0x3C5878;
+    constexpr uint32_t kSteelSoft = 0x243A55;
+    constexpr uint32_t kAccent = 0x3B7FF0;
+    constexpr uint32_t kAccentStrong = 0x8DCBFF;
+    constexpr uint32_t kTextStrong = 0xF2F7FF;
+    constexpr uint32_t kTextNormal = 0xC9D6E6;
+    constexpr uint32_t kTextMuted = 0x9DACBF;
+    constexpr uint32_t kSuccess = 0x72D8B1;
+    constexpr uint32_t kSuccessDeep = 0x1F5CA8;
+    constexpr uint32_t kDanger = 0xFF8A8F;
 
 #define FONT_TITLE (&lv_font_montserrat_20)
 #define FONT_BODY (&lv_font_montserrat_14)
@@ -317,7 +317,7 @@ void HomeControlApp::buildUi()
     overlay_ = lv_obj_create(lv_layer_top());
     lv_obj_set_size(overlay_, lv_pct(100), lv_pct(100));
     lv_obj_set_pos(overlay_, 0, 0);
-    lv_obj_set_style_bg_color(overlay_, lv_color_hex(0x070A0F), 0);
+    lv_obj_set_style_bg_color(overlay_, lv_color_hex(0x04080D), 0);
     lv_obj_set_style_bg_opa(overlay_, LV_OPA_80, 0);
     lv_obj_set_style_border_width(overlay_, 0, 0);
     lv_obj_set_style_pad_all(overlay_, 0, 0);
@@ -334,7 +334,7 @@ void HomeControlApp::buildUi()
     lv_obj_set_style_border_width(overlayCard_, 1, 0);
     lv_obj_set_style_border_color(overlayCard_, lv_color_hex(kSteel), 0);
     lv_obj_set_style_border_opa(overlayCard_, LV_OPA_COVER, 0);
-    lv_obj_set_style_radius(overlayCard_, 8, 0);
+    lv_obj_set_style_radius(overlayCard_, 18, 0);
     lv_obj_set_style_pad_all(overlayCard_, 18, 0);
     lv_obj_set_style_pad_gap(overlayCard_, 12, 0);
     lv_obj_set_style_shadow_width(overlayCard_, 28, 0);
@@ -394,12 +394,12 @@ void HomeControlApp::buildUi()
     lv_obj_t *closeOverlayBtn = lv_btn_create(overlayCard_);
     lv_obj_set_width(closeOverlayBtn, lv_pct(100));
     lv_obj_set_height(closeOverlayBtn, 44);
-    lv_obj_set_style_radius(closeOverlayBtn, 6, 0);
+    lv_obj_set_style_radius(closeOverlayBtn, 14, 0);
     lv_obj_set_style_bg_color(closeOverlayBtn, lv_color_hex(kSteelSoft), 0);
     lv_obj_set_style_bg_color(closeOverlayBtn, lv_color_hex(kSteel), LV_STATE_PRESSED);
     lv_obj_set_style_bg_opa(closeOverlayBtn, LV_OPA_COVER, 0);
     lv_obj_set_style_border_width(closeOverlayBtn, 1, 0);
-    lv_obj_set_style_border_color(closeOverlayBtn, lv_color_hex(0x566576), 0);
+    lv_obj_set_style_border_color(closeOverlayBtn, lv_color_hex(0x4B6F99), 0);
     lv_obj_set_style_shadow_width(closeOverlayBtn, 0, 0);
     lv_obj_add_event_cb(closeOverlayBtn, &HomeControlApp::closeOverlayEvent, LV_EVENT_CLICKED, this);
 
@@ -590,28 +590,37 @@ void HomeControlApp::createTile(lv_obj_t *parent, const DisplayDeviceView &dev, 
     lv_obj_t *tile = lv_btn_create(parent);
     lv_obj_set_width(tile, lv_pct(32));
     lv_obj_set_height(tile, height);
-    lv_obj_set_style_radius(tile, 8, 0);
+    lv_obj_set_style_radius(tile, 14, 0);
     lv_obj_set_style_border_width(tile, 1, 0);
 
     if (active)
     {
         lv_obj_set_style_bg_color(tile, lv_color_hex(kSuccessDeep), 0);
-        lv_obj_set_style_bg_color(tile, lv_color_hex(0x2B7A55), LV_STATE_PRESSED);
-        lv_obj_set_style_border_color(tile, lv_color_hex(kSuccess), 0);
+        lv_obj_set_style_bg_color(tile, lv_color_hex(0x2B72C8), LV_STATE_PRESSED);
+        lv_obj_set_style_bg_grad_color(tile, lv_color_hex(0x143F75), 0);
+        lv_obj_set_style_bg_grad_dir(tile, LV_GRAD_DIR_VER, 0);
+        lv_obj_set_style_border_color(tile, lv_color_hex(0x6FBAFF), 0);
+        lv_obj_set_style_shadow_color(tile, lv_color_hex(0x3B8CFF), 0);
+        lv_obj_set_style_shadow_opa(tile, LV_OPA_40, 0);
     }
     else
     {
         lv_obj_set_style_bg_color(tile, lv_color_hex(kSurface2), 0);
         lv_obj_set_style_bg_color(tile, lv_color_hex(kSurface3), LV_STATE_PRESSED);
+        lv_obj_set_style_bg_grad_color(tile, lv_color_hex(kSurface1), 0);
+        lv_obj_set_style_bg_grad_dir(tile, LV_GRAD_DIR_VER, 0);
         lv_obj_set_style_border_color(tile, lv_color_hex(toggleable ? kSteel : kSteelSoft), 0);
     }
 
     lv_obj_set_style_bg_opa(tile, LV_OPA_COVER, 0);
     lv_obj_set_style_border_opa(tile, LV_OPA_COVER, 0);
     lv_obj_set_style_shadow_width(tile, 8, 0);
-    lv_obj_set_style_shadow_opa(tile, LV_OPA_20, 0);
+    if (!active)
+    {
+        lv_obj_set_style_shadow_opa(tile, LV_OPA_20, 0);
+        lv_obj_set_style_shadow_color(tile, lv_color_hex(0x000000), 0);
+    }
     lv_obj_set_style_shadow_ofs_y(tile, 4, 0);
-    lv_obj_set_style_shadow_color(tile, lv_color_hex(0x000000), 0);
     lv_obj_set_style_pad_all(tile, 6, 0);
     lv_obj_set_style_pad_gap(tile, 3, 0);
 
@@ -902,7 +911,7 @@ lv_obj_t *HomeControlApp::createReadout(lv_obj_t *parent, const char *label, con
     lv_obj_set_style_bg_opa(cell, LV_OPA_COVER, 0);
     lv_obj_set_style_border_width(cell, 1, 0);
     lv_obj_set_style_border_color(cell, lv_color_hex(kSteelSoft), 0);
-    lv_obj_set_style_radius(cell, 6, 0);
+    lv_obj_set_style_radius(cell, 10, 0);
     lv_obj_set_style_pad_all(cell, 8, 0);
     lv_obj_set_style_pad_gap(cell, 2, 0);
     lv_obj_clear_flag(cell, LV_OBJ_FLAG_SCROLLABLE);
@@ -992,7 +1001,7 @@ void HomeControlApp::buildBrightnessControl(const DisplayDeviceView &dev)
     lv_slider_set_value(slider, dev.customBytes[2], LV_ANIM_OFF);
     lv_obj_set_style_bg_color(slider, lv_color_hex(kSteelSoft), LV_PART_MAIN);
     lv_obj_set_style_bg_color(slider, lv_color_hex(kAccent), LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(slider, lv_color_hex(kAccentStrong), LV_PART_KNOB);
+    lv_obj_set_style_bg_color(slider, lv_color_hex(0xF2F7FF), LV_PART_KNOB);
     lv_obj_set_style_pad_all(slider, 8, LV_PART_KNOB);
 
     SlotCtx *ctx = new SlotCtx{this, dev.deviceId, 0};
@@ -1038,7 +1047,7 @@ void HomeControlApp::buildLedSlotControls(const DisplayDeviceView &dev)
         lv_obj_t *button = lv_btn_create(row);
         lv_obj_set_flex_grow(button, 1);
         lv_obj_set_height(button, 64);
-        lv_obj_set_style_radius(button, 6, 0);
+        lv_obj_set_style_radius(button, 12, 0);
         lv_obj_set_style_bg_color(button, lv_color_hex(kSurface3), 0);
         lv_obj_set_style_bg_color(button, lv_color_hex(kSteel), LV_STATE_PRESSED);
         lv_obj_set_style_bg_opa(button, LV_OPA_COVER, 0);
@@ -1060,7 +1069,7 @@ void HomeControlApp::buildLedSlotControls(const DisplayDeviceView &dev)
         lv_obj_clear_flag(swatch, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_width(swatch, lv_pct(100));
         lv_obj_set_height(swatch, 26);
-        lv_obj_set_style_radius(swatch, 4, 0);
+        lv_obj_set_style_radius(swatch, 8, 0);
         lv_obj_set_style_bg_color(swatch, lv_color_hex(color), 0);
         lv_obj_set_style_bg_opa(swatch, LV_OPA_COVER, 0);
         lv_obj_set_style_border_width(swatch, 1, 0);

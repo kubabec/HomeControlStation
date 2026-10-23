@@ -13,6 +13,7 @@ const char* pageHead = " \
     <meta charset=\"UTF-8\">\
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\
     <meta name=\"theme-color\" content=\"#101419\">\
-    <title>HomeControlStation</title>";
+    <title>HomeControlStation</title>\
+    <link rel=\"icon\" type=\"image/png\" href=\"/favLogo.png\">";
 #endif
 
