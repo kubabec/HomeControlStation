@@ -19,6 +19,7 @@ const unsigned long reconnectDelayMs = 1000; // starting retry delay (1s)
 unsigned long nextReconnectAt = 3000;        // kiedy spróbować ponownie (millis)
 const unsigned long statusCheckInterval = 2000;
 unsigned long lastStatusCheck = 0;
+uint8_t WiFiAdapter::retryCount = 0;
 
 void WiFiAdapter::waitForConnection500ms()
 {
@@ -65,6 +66,7 @@ void WiFiAdapter::WiFiEvent(WiFiEvent_t event)
     case SYSTEM_EVENT_STA_GOT_IP:
 #endif
     {
+        retryCount = 0;
         currentStatus = CONNECTED_TO_NETWORK;
         Logger::log("WiFiAdapter://Connected.");
         updateDataContainerIpAddress();
@@ -166,11 +168,16 @@ void WiFiAdapter::manualStatusCheck()
     {
         // event nie został złapany (może wersja core), więc synchronizujemy
         Logger::log("WiFiAdapter://Connected (Manual check).");
+        retryCount = 0;
         updateDataContainerIpAddress();
 
         isConnectedFlag = true;
         currentStatus = CONNECTED_TO_NETWORK;
         nextReconnectAt = 0;
+    }
+    else if (isNowConnected)
+    {
+        retryCount = 0;
     }
     else if (!isNowConnected && isConnectedFlag)
     {
@@ -206,6 +213,8 @@ void WiFiAdapter::handleReconnection()
             WiFi.disconnect();
             WiFi.begin(mSsid.c_str(), mPassword.c_str());
             nextReconnectAt = millis() + reconnectDelayMs;
+
+            retryCount++;
         }
     }
 }

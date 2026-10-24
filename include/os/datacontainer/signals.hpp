@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 49
+#define NUMBER_OF_SIGNALS 50
 
 /**
  * @file include/os/datacontainer/signals.hpp
@@ -117,6 +117,8 @@ enum Signal
     CBK_RECONNECT_WIFI,
 
     /* Type: RoomNamesMapping - configured room ID-to-name mapping */
-    SIG_ROOM_NAMES_MAPPING
+    SIG_ROOM_NAMES_MAPPING,
+    /* Type: std::function<void(void)> - restore old WiFi credentials and reboot */
+    CBK_RESTORE_OLD_WIFI_CREDENTIALS_AND_REBOOT
 };
 #endif

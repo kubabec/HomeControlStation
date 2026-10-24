@@ -133,9 +133,8 @@ public:
      * @param pwd Password used for the connection attempt.
      */
     static void runIpDetectionTrick(String ssid, String pwd);
-    
 
-
+    static bool isWifiFirstConnectionTry;
 };
 
 

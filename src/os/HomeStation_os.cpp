@@ -108,6 +108,7 @@ void OperatingSystem::init()
     // Initialize network settings such as
     // WiFi network connection etc.
     NetworkDriver::init();
+    
 
     if (isHttpServerRunning)
     {

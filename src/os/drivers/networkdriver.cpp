@@ -20,8 +20,8 @@
  * @brief Driver implementations for the Home Control Station OS.
  */
 
-
 bool NetworkDriver::networkCredentialsAvailable = false;
+bool NetworkDriver::isWifiFirstConnectionTry = false;
 
 std::vector<int> NetworkDriver::packetRanges;
 std::queue<MessageUDP> NetworkDriver::pendingToSendPackets;
@@ -39,6 +39,7 @@ void NetworkDriver::deinit()
 void NetworkDriver::init()
 {
     Logger::log("NetworkDriver init ...");
+
     SoftwareUpdater::init();
 
     WiFiAdapter::init();
@@ -106,31 +107,31 @@ void NetworkDriver::init()
         packetReceivers.push_back(DigitalEventTransmitter::receiveUdp);
     }
 
- #if defined(HCS_TARGET_DISPLAY_S3_4INCH)
+#if defined(HCS_TARGET_DISPLAY_S3_4INCH)
     packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
     packetReceivers.push_back(DisplayClient::receiveUDP);
- #else
+#else
     if (isRcServer)
     {
         packetRanges.push_back(DISPLAY_CONTROLS_RANGE);
         packetReceivers.push_back(DisplayServer::receiveUDP);
     }
- #endif
+#endif
 
     packetRanges.push_back(USR_DATA_RANGE_BEGIN);
     packetReceivers.push_back(dummyTobeRemoved);
 
     // esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac.bytes);
     uint64_t _chipmacid = 0LL;
-// #ifdef SUPERMINI
-// // WiFi.macAddress((uint8_t *)(&_chipmacid));
-// // LOGGER::log("MAC address: " + String((long)_chipmacid));
-// // fix MAC issue
-// _chipmacid = 1234567LL;
-//     // _chipmacid = ESP.getEfuseMac();
-// #else
+    // #ifdef SUPERMINI
+    // // WiFi.macAddress((uint8_t *)(&_chipmacid));
+    // // LOGGER::log("MAC address: " + String((long)_chipmacid));
+    // // fix MAC issue
+    // _chipmacid = 1234567LL;
+    //     // _chipmacid = ESP.getEfuseMac();
+    // #else
     esp_efuse_mac_get_default((uint8_t *)(&_chipmacid));
-// #endif
+    // #endif
 
     Logger::log(String((long)_chipmacid));
 
@@ -168,6 +169,21 @@ void NetworkDriver::cyclic()
     /*******     WiFi connection section       ******/
     // Update WiFi Adapter to be updated with connection lost status
     WiFiAdapter::task();
+
+    if (isWifiFirstConnectionTry && WiFi.status() == WL_CONNECTED)
+    {
+        isWifiFirstConnectionTry = false;
+        WiFiAdapter::retryCount = 0;
+        Logger::log("WiFi credentials accepted; rollback protection disabled.");
+    }
+    else if (isWifiFirstConnectionTry && WiFiAdapter::retryCount > 10)
+    {
+        // We need to restore legacy WiFi credentials as it looks like
+        // newly applied WiFi credentials are not working or network is unreachable.
+        isWifiFirstConnectionTry = false;
+        Logger::log("WiFi credentials connection failed; restoring previous credentials.");
+        std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_RESTORE_OLD_WIFI_CREDENTIALS_AND_REBOOT))();
+    }
 
     /*******     UDP communication section       ******/
     // Update UDP task to be able to receive UDP packets

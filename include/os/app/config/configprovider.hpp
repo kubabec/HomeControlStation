@@ -25,7 +25,10 @@ typedef struct
     char networkSSID[SSID_LENGTH] = {'\0'};
     char networkPassword[PASSWORD_LENGTH] = {'\0'};
     char panelPassword[PASSWORD_LENGTH] = {'\0'};
-    uint8_t reserved[149]; // Future usecase reservation
+    uint8_t wifiCredentialsChanged = 0;
+    char legacySSID[SSID_LENGTH] = {'\0'};
+    char legacyPassword[PASSWORD_LENGTH] = {'\0'};
+    uint8_t reserved[88]; // Future usecase reservation
     uint8_t configurationState = 0;
 
     uint16_t getSize()
@@ -37,6 +40,9 @@ typedef struct
             SSID_LENGTH + // networkSSID
             PASSWORD_LENGTH + // Password
             PASSWORD_LENGTH + // user password
+            sizeof(wifiCredentialsChanged) + // wifi credentials changed
+            SSID_LENGTH + // legacySSID
+            PASSWORD_LENGTH + // legacyPassword
             sizeof(reserved) + // reserved
             sizeof(configurationState); // configuration state
     }
@@ -52,6 +58,9 @@ typedef struct
             "network SSID: " + String(networkSSID) + " "
             "network Password: " + String(networkPassword) + " "
             "Panel Password: " + String(panelPassword) + " "
+            "Wi-Fi Credentials Changed: " + String(wifiCredentialsChanged) + " "
+            "Legacy SSID: " + String(legacySSID) + " "
+            "Legacy Password: " + String(legacyPassword) + " "
             "<<<<< - - - - - - - - - - - - - - - >>>>>"
         );
 
@@ -64,8 +73,12 @@ typedef struct
     void setSSID(String& str)
     {
         const char* c_str = str.c_str();
-        memset(networkSSID, '\0', SSID_LENGTH);
+    
         if(str.length() < SSID_LENGTH){
+            // Save backup to legacySSID    
+            memcpy(legacySSID, networkSSID, SSID_LENGTH);
+
+            memset(networkSSID, '\0', SSID_LENGTH);
             for(uint8_t i = 0; i < str.length(); i++)
             {
                 networkSSID[i] = c_str[i];
@@ -84,10 +97,16 @@ typedef struct
     void setPassword(String& str)
     {
         const char* c_str = str.c_str();
-        memset(networkPassword, '\0', PASSWORD_LENGTH);
+        
         if(str.length() < PASSWORD_LENGTH){
+            // Save backup to legacyPassword
+            memcpy(legacyPassword, networkPassword, PASSWORD_LENGTH);
+            
+            memset(networkPassword, '\0', PASSWORD_LENGTH);
             for(uint8_t i = 0; i < str.length(); i++)
             {
+
+                
                 networkPassword[i] = c_str[i];
             }
         }
@@ -159,6 +178,7 @@ public:
     static void eraseDatablockMemory();
     static void massErase();
         
+    static void restoreOldWiFiCredentialsAndReboot();
 };
 
 

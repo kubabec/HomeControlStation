@@ -140,6 +140,9 @@ public:
      * Runs the task loop for the Wi-Fi adapter. Intended to be used by the scheduler.
      */
     static void task();
+
+
+    static uint8_t retryCount;
 };
 
 
