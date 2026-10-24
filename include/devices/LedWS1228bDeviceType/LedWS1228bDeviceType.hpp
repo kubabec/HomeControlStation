@@ -88,6 +88,7 @@ class LedWS1228bDeviceType : public Device {
     virtual DeviceDescription getDeviceDescription();
     virtual uint16_t getExtendedMemoryLength();
     bool isStripInitialized();
+    bool isSwitchAnimationInProgress();
 
     ServiceRequestErrorCode updateExtendedMemoryPtr(uint8_t* ptr, uint16_t size);
     void stripOn();

@@ -254,6 +254,11 @@ void LedWS1228bDeviceType::stopLiveAnimation()
     }
 }
 
+bool LedWS1228bDeviceType::isSwitchAnimationInProgress()
+{
+    return ongoingAnimation != nullptr || switchOffAnimation != nullptr || m_queuedAction != nullptr;
+}
+
 bool LedWS1228bDeviceType::isStripInitialized()
 {
     return (adafruit_ws2812b != nullptr);
@@ -474,6 +479,14 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
 }
 ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType serviceType, ServiceParameters_set1 param)
 {
+    /* ON/OFF animation must always finish, so state/content changes are rejected meanwhile */
+    if ((serviceType == DEVSERVICE_STATE_SWITCH || serviceType == DEVSERVICE_LED_STRIP_SWITCH_CONTENT) &&
+        isSwitchAnimationInProgress())
+    {
+        Logger::log("Ongoing animation in progress, service request cannot be processed");
+        return SERV_BUSY;
+    }
+
     switch (serviceType)
     {
     case DEVSERVICE_STATE_SWITCH:
@@ -519,7 +532,7 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         Logger::log("<" + deviceName + "> Service: DEVSERVICE_LED_STRIP_SWITCH_CONTENT, param.a: " + String((int)param.a));
         return applyContent((LedStripContentIndex)param.a);
     case DEVSERVICE_LIVE_ANIMATION:
-        if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+        if (isSwitchAnimationInProgress())
         {
             Logger::log("Ongoing animation in progress, service request cannot be processed");
             return SERV_BUSY;
@@ -591,27 +604,18 @@ ServiceRequestErrorCode LedWS1228bDeviceType::service(DeviceServicesType service
         {
             return saveContentAs((LedStripContentIndex)param.additionalParam);
         }
-        if (param.additionalParam >= 4 && param.additionalParam <= 6)
-        {
-            if (ongoingAnimation != nullptr)
-            {
-                delete ongoingAnimation;
-                ongoingAnimation = nullptr;
-            }
-            if (switchOffAnimation != nullptr)
-            {
-                delete switchOffAnimation;
-                switchOffAnimation = nullptr;
-            }
-            return applyContent((LedStripContentIndex)(param.additionalParam - 3));
-        }
-        if (ongoingAnimation != nullptr || switchOffAnimation != nullptr)
+        [[fallthrough]];
+    case DEVSERVICE_SET_DETAILED_COLORS:
+        if (isSwitchAnimationInProgress())
         {
             Logger::log("Ongoing animation in progress, service request cannot be processed");
             return SERV_BUSY;
         }
-        [[fallthrough]];
-    case DEVSERVICE_SET_DETAILED_COLORS:
+        if (serviceType == DEVSERVICE_SET_ADVANCED_CONTROLS &&
+            param.additionalParam >= 4 && param.additionalParam <= 6)
+        {
+            return applyContent((LedStripContentIndex)(param.additionalParam - 3));
+        }
         Logger::log("<" + deviceName + "> Service: SET_ADVANCED_CONTROLS/SET_DETAILED_COLORS, size: " + String((int)param.size));
         if (isStripInitialized() && param.size == (virtualDiodesCount * sizeof(LedColor) + sizeof(LedStripAnimationProperties)))
         {
