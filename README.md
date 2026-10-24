@@ -48,6 +48,7 @@ Built for **PlatformIO** and **Arduino IDE**, every single ESP32 runs standalone
 5. **Add a Slave Device:** Take another ESP32 device, follow the initial configuration steps, and assign it as a **Slave** within your HomeControlStation network.
 6. **Slave Hardware Setup:** Configure the Slave's GPIO pins to run another end device in another location or room.
 7. **Distributed Automation:** Enjoy using the powerful distributed architecture of HomeControlStation with zero external server dependencies!
+8. **Changing Wi-Fi / panel password later:** Once a node is configured, *Settings → Network credentials* is a separate action from **Apply**. On a Master it first updates every other node in the network through their web panels (nodes running 1.x firmware included; the Master's current panel password must unlock them), lists `<IP> : UpdateOk / UpdateNOK`, and only then lets you change the Master itself or abort. Without other nodes the Master changes immediately. Allowed characters: printable ASCII except `" \ % # & + ?`, max 29 characters.
 
 <br><br>
 

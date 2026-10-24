@@ -146,6 +146,11 @@ public:
 
     static bool loadConfigFromFile(JsonDocument& doc);
     static bool setConfigViaString(String& configString);
+    /**
+     * Updates only WiFi SSID, WiFi password and panel password in the RAM mirror (persisted on restart).
+     * Requires an unlocked device. Role and node type are left untouched.
+     */
+    static bool setCredentialsOnly(const String& ssid, const String& wifiPassword, const String& panelPassword);
     static String getConfigJson();
 
     static bool setDatablock(PersistentDatablockID blockID, uint8_t* data);

@@ -77,6 +77,90 @@ let isNotificationPollingActive = 1;\
             window.location.href = '/';\
         });\
     }\
+    function hcsMasonry(container) {\
+        if (!container || container.hcsMasonryInit || typeof ResizeObserver === 'undefined') return;\
+        container.hcsMasonryInit = true;\
+        container.classList.add('masonry');\
+        var layout = function() {\
+            var cs = getComputedStyle(container);\
+            var isGrid = cs.display === 'grid';\
+            var gap = parseFloat(cs.columnGap) || 0;\
+            Array.prototype.forEach.call(container.children, function(child) {\
+                child.style.gridRowEnd = isGrid ? 'span ' + Math.ceil(child.getBoundingClientRect().height + gap) : '';\
+            });\
+        };\
+        var resizeObserver = new ResizeObserver(layout);\
+        var watch = function() {\
+            Array.prototype.forEach.call(container.children, function(child) { resizeObserver.observe(child); });\
+            layout();\
+        };\
+        resizeObserver.observe(container);\
+        new MutationObserver(watch).observe(container, {childList: true});\
+        watch();\
+    }\
+    document.addEventListener('DOMContentLoaded', function() {\
+        hcsMasonry(document.getElementById('rooms'));\
+        hcsMasonry(document.querySelector('.container.settings-wide > form'));\
+    });\
+    function changeCredentials() {\
+        var payload = {\
+            network: document.getElementById('newSSID').value,\
+            netPwd: document.getElementById('newWifiPassword').value,\
+            cfgPwd: document.getElementById('newPanelPassword').value\
+        };\
+        fetch('/credentialsApply&', {method: 'POST', body: JSON.stringify(payload)})\
+        .then(function(r) { return r.json(); })\
+        .then(function(res) {\
+            if (!res.ok) {\
+                showMessage(res.error || 'Change failed.', function() { hidePopup('popup-overlay', 'popup-content'); });\
+                return;\
+            }\
+            if (res.mode === 'local') {\
+                showMessage('Settings saved. Device is restarting.', function() { window.location.href = '/'; });\
+                return;\
+            }\
+            hidePopup('popup-overlay', 'popup-content');\
+            showPopup('credentials-popup-overlay', 'credentials-popup-content');\
+            document.getElementById('credentials-continue').disabled = true;\
+            document.getElementById('credentials-node-list').innerHTML = '';\
+            pollCredentialsStatus();\
+        })\
+        .catch(function() {\
+            showMessage('Request failed.', function() { hidePopup('popup-overlay', 'popup-content'); });\
+        });\
+    }\
+    function pollCredentialsStatus() {\
+        fetch('/credentialsStatus')\
+        .then(function(r) { return r.json(); })\
+        .then(function(s) {\
+            var html = '';\
+            s.nodes.forEach(function(n) {\
+                var label = n.status === 'ok' ? 'UpdateOk' : (n.status === 'nok' ? 'UpdateNOK' : (n.status === 'progress' ? 'Updating...' : 'Waiting...'));\
+                var color = n.status === 'ok' ? '#5fd38d' : (n.status === 'nok' ? '#ff8a8f' : 'inherit');\
+                html += '<div style=\"color:' + color + '\">' + n.ip + ' : ' + label + (n.reason ? ' (' + n.reason + ')' : '') + '</div>';\
+            });\
+            document.getElementById('credentials-node-list').innerHTML = html;\
+            var finished = s.state === 'finished';\
+            document.getElementById('credentials-continue').disabled = !finished;\
+            document.getElementById('credentials-popup-message').textContent = finished ?\
+                'Nodes marked UpdateOk already use the new settings and cannot be reached by this Master until it is changed too.' :\
+                'Updating other nodes, please wait...';\
+            if (s.state === 'running') { setTimeout(pollCredentialsStatus, 1000); }\
+        })\
+        .catch(function() { setTimeout(pollCredentialsStatus, 2000); });\
+    }\
+    function continueCredentialsChange() {\
+        document.getElementById('credentials-continue').disabled = true;\
+        fetch('/credentialsCommit').finally(function() {\
+            document.getElementById('credentials-popup-message').textContent = 'Master is restarting with the new settings.';\
+            setTimeout(function() { window.location.href = '/'; }, 8000);\
+        });\
+    }\
+    function abortCredentialsChange() {\
+        fetch('/credentialsAbort').finally(function() {\
+            hidePopup('credentials-popup-overlay', 'credentials-popup-content');\
+        });\
+    }\
     function onRangeTimChanged(value) {\
         value = parseInt(value);\
         window.location.assign(\"/?tim\"+value+\"&\");\

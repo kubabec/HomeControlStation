@@ -171,6 +171,8 @@ class HomeLightHttpServer
     static bool processParameterizedAsyncRequests(String& request, WiFiClient& client);
 
     static bool processSoftwareUpdateApiRequest(WiFiClient& client);
+    /** JSON API of the "change credentials for all nodes" feature (apply, status, commit, abort). */
+    static bool processCredentialsApiRequest(WiFiClient& client);
 
     /**
      * Restores server metadata from the persistent NVM block.

@@ -53,6 +53,7 @@ border:1px solid rgba(242,198,109,.55);border-radius:var(--r-l);background:rgba(
 color:#FFD98A;font-size:16px;font-weight:700;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,.5);transform:translate(-50%,-50%);pointer-events:none;\
 }\
 #rooms { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:16px;width:100%;align-items:start; }\
+#rooms.masonry { grid-auto-rows:1px;row-gap:0; }\
 #rooms > .room-container:only-child { width:min(100%,620px);justify-self:center; }\
 .room-container {\
 position:relative;width:100%;min-width:0;margin:0;padding:16px 14px 14px;\
@@ -269,10 +270,22 @@ background:rgba(22,34,49,.96);color:var(--text-soft);border:1px solid var(--line
 .settings-menu-section { display:flex;flex-direction:column;align-items:stretch;width:min(100%,460px);margin:14px auto 0;padding-top:12px;border-top:1px solid var(--line-soft); }\
 .maintenance-button { align-self:center;width:min(100%,300px); }\
 .container > form { display:flex;flex-direction:column;align-items:stretch;gap:8px; }\
-.container > form > .header,.container > form > label,.container > form > hr,.container > form > br,.container > form > .access-level-hidder { grid-column:1 / -1; }\
-.container > form > .access-level-hidder label { width:100%; }\
-.container > form > .button-link { align-self:center;width:min(100%,300px);margin:0; }\
-.container > form > .error-button { align-self:flex-start;margin:0; }\
+.container :is(form,.settings-card) > .header,.container :is(form,.settings-card) > label,.container :is(form,.settings-card) > hr,.container :is(form,.settings-card) > br,.container :is(form,.settings-card) > .access-level-hidder { grid-column:1 / -1; }\
+.container :is(form,.settings-card) > .access-level-hidder label { width:100%; }\
+.container :is(form,.settings-card) > .button-link { align-self:center;width:min(100%,300px);margin:0; }\
+.container :is(form,.settings-card) > .error-button { align-self:flex-start;margin:0; }\
+.settings-card { display:contents; }\
+@media (min-width:901px) {\
+.container.settings-wide { width:100%;padding:0;background:none;border:0;box-shadow:none; }\
+.container.settings-wide > form { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;align-items:start; }\
+.container.settings-wide > form.masonry { grid-auto-rows:1px;row-gap:0; }\
+.container.settings-wide > form > hr,.container.settings-wide > form > br,.container.settings-wide > form > .settings-section-title { display:none; }\
+.settings-card,.container.settings-wide > form > .settings-menu-section {\
+position:relative;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:auto;min-width:0;margin:0;padding:16px;\
+background:var(--glass-card);border:1px solid var(--line-soft);border-radius:var(--r-l);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.2);\
+}\
+.settings-card > .settings-section-title { display:block;margin:0 0 6px;font-size:17px;color:var(--text);letter-spacing:0;text-transform:none;font-weight:650; }\
+}\
 .access-level-hidder { visibility:hidden;display:none; }\
 .device-container { opacity:0;max-height:1100px;overflow:hidden;animation:fadeInSlide .5s forwards;transition:max-height .5s ease-in-out,padding .5s ease-in-out,background-color .3s; }\
 .device-container.disabled { min-height:58px;max-height:58px;padding:10px 16px;background:rgba(255,255,255,.025); }\
@@ -387,7 +400,7 @@ body .table-simple td:last-child:has(.error-button),body .table-simple td:last-c
 }\
 @media (max-width:520px) {\
 body .wrapper > .button,body .wrapper > .button-link { width:min(100%,420px);flex:none; }\
-.container > form > .button-link,.container > form > .error-button,.maintenance-button { width:100%;align-self:stretch; }\
+.container :is(form,.settings-card) > .button-link,.container :is(form,.settings-card) > .error-button,.maintenance-button { width:100%;align-self:stretch; }\
 .popup-overlay { padding:8px;align-items:center; }\
 .popup-content { width:100%;max-height:calc(100dvh - 16px);padding:16px; }\
 .popup-header { padding-bottom:11px;font-size:17px; }\

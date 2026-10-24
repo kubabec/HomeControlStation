@@ -297,6 +297,28 @@ bool ConfigProvider::setConfigViaString(String& configString)
 }
 
 
+bool ConfigProvider::setCredentialsOnly(const String& ssid, const String& wifiPassword, const String& panelPassword)
+{
+    SecurityAccessLevelType currentAccessLevel =
+        std::any_cast<SecurityAccessLevelType>(DataContainer::getSignalValue(SIG_SECURITY_ACCESS_LEVEL));
+    if(currentAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE ||
+       ssid.length() == 0 || ssid.length() >= SSID_LENGTH ||
+       panelPassword.length() == 0 || panelPassword.length() >= PASSWORD_LENGTH ||
+       wifiPassword.length() >= PASSWORD_LENGTH)
+    {
+        return false;
+    }
+
+    String ssidCopy = ssid;
+    String wifiPasswordCopy = wifiPassword;
+    String panelPasswordCopy = panelPassword;
+    configRamMirror.setSSID(ssidCopy);
+    configRamMirror.setPassword(wifiPasswordCopy);
+    configRamMirror.setPanelPassword(panelPasswordCopy);
+    configRamMirror.configurationState = CONFIGURATION_INITIALIZED_MARKER;
+    return true;
+}
+
 bool ConfigProvider::saveRamMirrorToNvm()
 {
     bool retVal = false;

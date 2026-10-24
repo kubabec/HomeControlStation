@@ -19,6 +19,7 @@
 #include "os/Logger.hpp"
 #include "os/app/display/DisplayServer.hpp"
 #include "os/drivers/softwareupdater.hpp"
+#include "os/app/config/credentialsrollout.hpp"
 
 /**
  * @file src/os/app/http/httpserver.cpp
@@ -553,6 +554,90 @@ bool HomeLightHttpServer::processParameterizedAsyncRequests(String& request, WiF
   return retVal;
 }
 
+bool HomeLightHttpServer::processCredentialsApiRequest(WiFiClient& client)
+{
+  const String linkRequest = header.substring(
+      String("GET /").length(),
+      header.length() - (String(" HTTP/1.1").length() + 2));
+
+  const bool isApply = linkRequest.startsWith("credentialsApply&");
+  if (!isApply && linkRequest != "credentialsStatus" && linkRequest != "credentialsCommit" && linkRequest != "credentialsAbort")
+    return false;
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: application/json; charset=UTF-8");
+  client.println("Cache-Control: no-store");
+  client.println();
+
+  if (secAccessLevel < e_ACCESS_LEVEL_SERVICE_MODE)
+  {
+    client.println("{\"ok\":false,\"error\":\"Service access required.\"}");
+    return true;
+  }
+
+  if (linkRequest == "credentialsStatus")
+  {
+    client.println(CredentialsRollout::statusJson());
+  }
+  else if (linkRequest == "credentialsAbort")
+  {
+    CredentialsRollout::abort();
+    if (CredentialsRollout::getState() != CredentialsRollout::State::Running)
+      CredentialsRollout::reset();
+    client.println("{\"ok\":true}");
+  }
+  else if (linkRequest == "credentialsCommit")
+  {
+    const bool applied = CredentialsRollout::commitLocal();
+    client.println(applied ? "{\"ok\":true}" : "{\"ok\":false,\"error\":\"Nothing to apply.\"}");
+    client.flush();
+    if (applied)
+      std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
+  }
+  else
+  {
+    JsonDocument doc;
+    const String body = linkRequest.substring(String("credentialsApply&").length());
+    if (deserializeJson(doc, body.c_str()) != DeserializationError::Code::Ok)
+    {
+      client.println("{\"ok\":false,\"error\":\"Invalid request.\"}");
+      return true;
+    }
+    const String ssid = String(doc["network"] | "");
+    const String wifiPassword = String(doc["netPwd"] | "");
+    const String panelPassword = String(doc["cfgPwd"] | "");
+    String error;
+
+    if (!CredentialsRollout::validate(ssid, wifiPassword, panelPassword, error))
+    {
+      client.println("{\"ok\":false,\"error\":\"" + error + "\"}");
+    }
+    else if (CredentialsRollout::knownSlaveCount() == 0)
+    {
+      /* Nobody else to update - change this node right away */
+      if (CredentialsRollout::applyLocalDirectly(ssid, wifiPassword, panelPassword, error))
+      {
+        client.println("{\"ok\":true,\"mode\":\"local\"}");
+        client.flush();
+        std::any_cast<std::function<void(uint16_t)>>(DataContainer::getSignalValue(CBK_RESET_DEVICE))(2000);
+      }
+      else
+      {
+        client.println("{\"ok\":false,\"error\":\"" + error + "\"}");
+      }
+    }
+    else if (CredentialsRollout::start(ssid, wifiPassword, panelPassword, error))
+    {
+      client.println("{\"ok\":true,\"mode\":\"rollout\"}");
+    }
+    else
+    {
+      client.println("{\"ok\":false,\"error\":\"" + error + "\"}");
+    }
+  }
+  return true;
+}
+
 bool HomeLightHttpServer::processSoftwareUpdateApiRequest(WiFiClient& client)
 {
   const String linkRequest = header.substring(
@@ -685,6 +770,13 @@ void HomeLightHttpServer::handleClientRequest()
                 client.println("Connection: close");
                 client.println();
                 client.write(logoStart, logoSize);
+                header = "";
+                client.stop();
+                return;
+              }
+
+              if (processCredentialsApiRequest(client))
+              {
                 header = "";
                 client.stop();
                 return;
@@ -967,8 +1059,9 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   
 
   client.println("\
-    <div class=\"container\">\
+    <div class=\"container settings-wide\">\
     <form onsubmit=\"return false;\">");
+  client.println("<div class=\"settings-card\">");
   client.println("<div class=\"header\">General configuration</div>");
   
   /* exclusion for ServiceMode Access level only */
@@ -1027,24 +1120,46 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     client.println("</div>");
   }
 
-  /* Network SSID */
-  client.println("<label>SSID:<input value=\"");
-  client.println(currentConfig.networkSSID);
-  client.println("\" type=\"text\" name=\"SSID\"></label>");
+  const bool credentialsManagedSeparately = currentConfig.configurationInitialized;
+  if(!credentialsManagedSeparately){
+    /* Network SSID */
+    client.println("<label>SSID:<input value=\"");
+    client.println(currentConfig.networkSSID);
+    client.println("\" type=\"text\" name=\"SSID\"></label>");
 
-  /* Network Password */
-  client.println("<label>WiFi Password:<input value=\"");
-  client.println(currentConfig.networkPassword);
-  client.println("\" type=\"text\" name=\"Password\"></label>");
+    /* Network Password */
+    client.println("<label>WiFi Password:<input value=\"");
+    client.println(currentConfig.networkPassword);
+    client.println("\" type=\"text\" name=\"Password\"></label>");
 
-  /* Network Password */
-  client.println("<label>Panel Password:<input value=\"");
-  client.println(currentConfig.panelPassword);
-  client.println("\" type=\"text\" name=\"UserPassword\"></label>");
+    /* Panel Password */
+    client.println("<label>Panel Password:<input value=\"");
+    client.println(currentConfig.panelPassword);
+    client.println("\" type=\"text\" name=\"UserPassword\"></label>");
+  }else{
+    /* Already configured: Apply keeps the stored credentials, they are changed by a dedicated feature below */
+    client.println("<input type=\"hidden\" name=\"SSID\" value=\"" + currentConfig.networkSSID + "\">");
+    client.println("<input type=\"hidden\" name=\"Password\" value=\"" + currentConfig.networkPassword + "\">");
+    client.println("<input type=\"hidden\" name=\"UserPassword\" value=\"" + currentConfig.panelPassword + "\">");
+  }
 
     /* Apply button*/
   client.println("<div class=\"error-button\" onclick=\"showMessage('Sure you wanna change Node settings? Device will be restarted afterwards.', applySettings)\">Apply</div>");  
+  client.println("</div>");
+  if(credentialsManagedSeparately){
+    client.println("<hr class=\"custom-hr\">");
+    client.println("<div class=\"settings-card\">");
+    client.println("<div class=\"header\">Network credentials</div>");
+    client.println("<label>SSID:<input value=\"" + currentConfig.networkSSID + "\" type=\"text\" id=\"newSSID\"></label>");
+    client.println("<label>WiFi Password:<input value=\"" + currentConfig.networkPassword + "\" type=\"text\" id=\"newWifiPassword\"></label>");
+    client.println("<label>Panel Password:<input value=\"" + currentConfig.panelPassword + "\" type=\"text\" id=\"newPanelPassword\"></label>");
+    client.println("<div class=\"error-button\" onclick=\"showMessage('Change WiFi credentials and panel password? " +
+      String(currentConfig.isRcServer ? "Other nodes will be updated first. " : "") +
+      "Device will be restarted afterwards.', changeCredentials)\">Change credentials</div>");
+    client.println("</div>");
+  }
   client.println("<hr class=\"custom-hr\"><br>");
+  client.println("<div class=\"settings-card\">");
   client.println("<div class=\"header\">System info</div>");
 
   /* Extended memory usage */
@@ -1080,6 +1195,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
   client.println("<label>Build info:<input value=\"");
   client.println("Time: [" BUILD_TIMESTAMP "], Git: [" BUILD_GITHASH "], Version: [" BUILD_VERSION "], Author: [" DEVELOPER "]");
   client.println("\" type=\"text\" disabled></label>");
+  client.println("</div>");
 
   client.println("<hr class=\"custom-hr\">");
   client.println("<div class=\"settings-section-title\">Configuration pages</div>");
@@ -1115,6 +1231,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
 
   if(secAccessLevel >= e_ACCESS_LEVEL_SERVICE_MODE){
     client.println("<hr class=\"custom-hr\">");
+    client.println("<div class=\"settings-card\">");
     client.println("<div class=\"settings-section-title\">Maintenance</div>");
 
     /* Temporary disabled */
@@ -1128,6 +1245,7 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
     /* Clear all settings */
   client.println("<div class=\"maintenance-button danger\" onclick=\"showMessage('Do you really wanna clear all node settings? WiFi configuration will also be cleared. Device will not restart automatically, you must reset device on your own when this option is selected!', massErase)\">Restore default</div>");
   client.println("<div class=\"maintenance-button update-button\" onclick=\"softwareUpdate()\">Software Update</div>");
+    client.println("</div>");
   }
 
   /* Common HTML tags closure */
