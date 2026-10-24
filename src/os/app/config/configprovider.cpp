@@ -113,7 +113,38 @@ void ConfigProvider::init()
         CBK_RESTORE_OLD_WIFI_CREDENTIALS_AND_REBOOT,
         static_cast<std::function<void(void)>>(ConfigProvider::restoreOldWiFiCredentialsAndReboot));
 
+    DataContainer::setSignalValue(
+        CBK_SET_DAY_TIME_CONFIG,
+        static_cast<std::function<bool(const DayTimeRanges &, int8_t)>>(ConfigProvider::setDayTimeConfig));
+
     Logger::log("... done");
+}
+
+bool ConfigProvider::setDayTimeConfig(const DayTimeRanges &ranges, int8_t timeZone)
+{
+    if (!DayTime::isTimeZoneValid(timeZone) || !(DayTime::isUnset(ranges) || DayTime::isValid(ranges)))
+    {
+        Logger::log("ConfigProvider:// Invalid day time configuration rejected");
+        return false;
+    }
+
+    memcpy(configRamMirror.dayTimeRanges, &ranges, sizeof(DayTimeRanges));
+    configRamMirror.timeZoneOffset = (uint8_t)(timeZone + DayTime::TIME_ZONE_NVM_BIAS);
+    updateNodeConfigurationSignal();
+
+    if (!flushNvmData())
+    {
+        Logger::log("ConfigProvider:// Day time configuration NVM commit failed");
+        return false;
+    }
+
+    /* TimeMaster registers this callback; it is absent on nodes without time service */
+    std::any notify = DataContainer::getSignalValue(CBK_DAY_TIME_CONFIG_CHANGED);
+    if (auto cbk = std::any_cast<std::function<void(const DayTimeRanges &, int8_t)>>(&notify))
+    {
+        (*cbk)(ranges, timeZone);
+    }
+    return true;
 }
 
 void ConfigProvider::updateNodeConfigurationSignal()
@@ -126,6 +157,11 @@ void ConfigProvider::updateNodeConfigurationSignal()
     validConfiguration.nodeType = configRamMirror.nodeType;
     validConfiguration.configurationInitialized = isConfigurationInitialized();
     validConfiguration.panelPassword = String(configRamMirror.panelPassword);
+    memcpy(&validConfiguration.dayTimeRanges, configRamMirror.dayTimeRanges, sizeof(DayTimeRanges));
+    {
+        const int zone = (int)configRamMirror.timeZoneOffset - DayTime::TIME_ZONE_NVM_BIAS;
+        validConfiguration.timeZoneOffset = DayTime::isTimeZoneValid(zone) ? (int8_t)zone : DayTime::DEFAULT_TIME_ZONE;
+    }
 
     if (validConfiguration.networkSSID.length() > 0)
     {

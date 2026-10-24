@@ -79,6 +79,7 @@ std::vector<String> parameterizedRequests = {
   "ledColor",
   "newDigEvntTab",
   "saveEnablingConditions",
+  "saveDayTime",
   "saveRtcEvents",
   "softwareUpdateInstall"
 };
@@ -130,6 +131,7 @@ std::vector<std::pair<std::function<void(String&, WiFiClient&)>, SecurityAccessL
   {HomeLightHttpServer::parameterizedHandler_ledColor, e_ACCESS_LEVEL_NONE},
   {HomeLightHttpServer::parameterizedHandler_newDigEvntTab, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_enablingConditions, e_ACCESS_LEVEL_SERVICE_MODE},
+  {HomeLightHttpServer::parameterizedHandler_dayTimeConfig, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_rtcEvents, e_ACCESS_LEVEL_SERVICE_MODE},
   {HomeLightHttpServer::parameterizedHandler_softwareUpdateInstall, e_ACCESS_LEVEL_SERVICE_MODE},
 };
@@ -1158,6 +1160,40 @@ void HomeLightHttpServer::printConfigPage(WiFiClient& client)
       "Device will be restarted afterwards.', changeCredentials)\">Change credentials</div>");
     client.println("</div>");
   }
+  client.println("<hr class=\"custom-hr\"><br>");
+  client.println("<div class=\"settings-card\">");
+  client.println("<div class=\"header\">Day time configuration</div>");
+  {
+    auto timeValue = [](uint8_t hh, uint8_t mm) -> String {
+      if (hh > 23 || mm > 59) return String("");
+      char buf[6];
+      snprintf(buf, sizeof(buf), "%02u:%02u", hh, mm);
+      return String(buf);
+    };
+    const DayTimeRanges &dt = currentConfig.dayTimeRanges;
+    client.println("<label>Morning start:<input type=\"time\" id=\"dtMorningStart\" value=\"" + timeValue(dt.morningStart_hh, dt.morningStart_mm) + "\"></label>");
+    client.println("<label>Morning end:<input type=\"time\" id=\"dtMorningEnd\" value=\"" + timeValue(dt.morningEnd_hh, dt.morningEnd_mm) + "\"></label>");
+    client.println("<label>Evening start:<input type=\"time\" id=\"dtEveningStart\" value=\"" + timeValue(dt.eveningStart_hh, dt.eveningStart_mm) + "\"></label>");
+    client.println("<label>Evening end:<input type=\"time\" id=\"dtEveningEnd\" value=\"" + timeValue(dt.eveningEnd_hh, dt.eveningEnd_mm) + "\"></label>");
+    client.println("<label>Time zone (UTC offset, hours):<input type=\"number\" id=\"dtTimeZone\" min=\"-12\" max=\"14\" step=\"1\" value=\"" + String((int)currentConfig.timeZoneOffset) + "\"></label>");
+  }
+  client.println("<div class=\"settings-note\">Leave all four time fields empty to disable day time conditions. Morning start &lt; Morning end &le; Evening start &lt; Evening end.</div>");
+  client.println("<div class=\"button-link\" onclick=\"saveDayTime()\">Save day time</div>");
+  client.println(R"DTSCRIPT(<script>
+  function saveDayTime() {
+    const ids = ['dtMorningStart', 'dtMorningEnd', 'dtEveningStart', 'dtEveningEnd'];
+    const values = ids.map(id => document.getElementById(id).value);
+    const filled = values.filter(Boolean).length;
+    const zone = Number(document.getElementById('dtTimeZone').value);
+    if (filled !== 0 && filled !== 4) { alert('Fill all four time fields or leave all of them empty.'); return; }
+    if (!Number.isInteger(zone) || zone < -12 || zone > 14) { alert('Time zone must be an integer between -12 and 14.'); return; }
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/saveDayTime&ms=' + values[0] + '&me=' + values[1] + '&es=' + values[2] + '&ee=' + values[3] + '&tz=' + zone, true);
+    xhr.onreadystatechange = () => { if (xhr.readyState === 4) window.location.href = '/config'; };
+    xhr.send();
+  }
+  </script>)DTSCRIPT");
+  client.println("</div>");
   client.println("<hr class=\"custom-hr\"><br>");
   client.println("<div class=\"settings-card\">");
   client.println("<div class=\"header\">System info</div>");

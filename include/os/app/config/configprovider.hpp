@@ -28,7 +28,9 @@ typedef struct
     uint8_t wifiCredentialsChanged = 0;
     char legacySSID[SSID_LENGTH] = {'\0'};
     char legacyPassword[PASSWORD_LENGTH] = {'\0'};
-    uint8_t reserved[88]; // Future usecase reservation
+    uint8_t dayTimeRanges[8] = {255, 255, 255, 255, 255, 255, 255, 255};
+    uint8_t timeZoneOffset = 130; // zone + DayTime::TIME_ZONE_NVM_BIAS, default +2
+    uint8_t reserved[79]; // Future usecase reservation
     uint8_t configurationState = 0;
 
     uint16_t getSize()
@@ -43,6 +45,8 @@ typedef struct
             sizeof(wifiCredentialsChanged) + // wifi credentials changed
             SSID_LENGTH + // legacySSID
             PASSWORD_LENGTH + // legacyPassword
+            sizeof(dayTimeRanges) + // dayTimeRanges
+            sizeof(timeZoneOffset) + // timeZoneOffset
             sizeof(reserved) + // reserved
             sizeof(configurationState); // configuration state
     }
@@ -157,6 +161,7 @@ class ConfigProvider
     static void updateNodeConfigurationSignal();
     static bool saveRamMirrorToNvm();
     static bool readRamMirrorFromNvm();
+    static bool setDayTimeConfig(const DayTimeRanges& ranges, int8_t timeZone);
 public:
     static void init();
     static void deinit();

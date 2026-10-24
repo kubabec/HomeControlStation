@@ -258,7 +258,8 @@ void DigitalEventReceiver::updateDigitalEventMappingViaJson(String &json)
                 {
                     if (conditionIndex >= DigitalEvent::MAX_CONDITIONS_PER_MAPPING) break;
                     const uint8_t conditionId = conditionValue.as<uint8_t>();
-                    const bool exists = std::any_of(enablingConditions.begin(), enablingConditions.end(),
+                    const bool exists = SystemCondition::isKnownId(conditionId) ||
+                                        std::any_of(enablingConditions.begin(), enablingConditions.end(),
                                                     [conditionId](const auto &condition) { return condition.conditionId == conditionId; });
                     const bool duplicate = std::find(std::begin(assignment.conditionIds), std::end(assignment.conditionIds), conditionId) != std::end(assignment.conditionIds);
                     if (conditionId != 0 && exists && !duplicate) assignment.conditionIds[conditionIndex++] = conditionId;
@@ -367,7 +368,7 @@ void DigitalEventReceiver::updateEnablingConditionsViaJson(String &json)
         const uint8_t conditionId = object["conditionId"].as<uint8_t>();
         const uint32_t deviceId = object["deviceId"].as<uint32_t>();
         const uint8_t predicateId = object["predicateId"].as<uint8_t>();
-        if (conditionId == 0 || deviceId == 0 || predicateId == 0) continue;
+        if (conditionId == 0 || conditionId > SystemCondition::MAX_USER_CONDITION_ID || deviceId == 0 || predicateId == 0) continue;
         const bool duplicate = std::any_of(updated.begin(), updated.end(), [conditionId](const auto &condition)
                                            { return condition.conditionId == conditionId; });
         auto device = std::find_if(devices.begin(), devices.end(), [deviceId](const auto &item)
@@ -386,7 +387,7 @@ void DigitalEventReceiver::updateEnablingConditionsViaJson(String &json)
         {
             const bool exists = std::any_of(enablingConditions.begin(), enablingConditions.end(),
                                             [conditionId](const auto &condition) { return condition.conditionId == conditionId; });
-            if (!exists) conditionId = 0;
+            if (!exists && !SystemCondition::isKnownId(conditionId)) conditionId = 0;
         }
     }
     std::any_cast<std::function<void()>>(DataContainer::getSignalValue(CBK_START_NVM_SAVE_TIMER))();
@@ -551,6 +552,25 @@ void DigitalEventReceiver::processPendingConditions()
     }
 
     const uint8_t conditionId = pending.conditionIds[pending.conditionIndex];
+    if (SystemCondition::isSystemId(conditionId))
+    {
+        /* System conditions are owned by TimeMaster; missing provider or unconfigured day time never blocks the mapping */
+        bool met = true;
+        std::any evaluator = DataContainer::getSignalValue(CBK_EVALUATE_SYSTEM_CONDITION);
+        if (auto cbk = std::any_cast<std::function<bool(uint8_t)>>(&evaluator))
+        {
+            met = (*cbk)(conditionId);
+        }
+        if (!met)
+        {
+            Logger::log("DigitalEventReceiver:// Mapping " + String((int)pending.action.mappingId) + " blocked by system condition " + String((int)conditionId));
+            pendingConditionalActions.pop();
+            return;
+        }
+        ++pending.conditionIndex;
+        return;
+    }
+
     if (pending.activeDeviceId == 0)
     {
         auto condition = std::find_if(enablingConditions.begin(), enablingConditions.end(), [conditionId](const auto &item)

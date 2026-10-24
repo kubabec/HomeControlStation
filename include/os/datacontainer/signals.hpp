@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define NUMBER_OF_SIGNALS 50
+#define NUMBER_OF_SIGNALS 56
 
 /**
  * @file include/os/datacontainer/signals.hpp
@@ -119,6 +119,15 @@ enum Signal
     /* Type: RoomNamesMapping - configured room ID-to-name mapping */
     SIG_ROOM_NAMES_MAPPING,
     /* Type: std::function<void(void)> - restore old WiFi credentials and reboot */
-    CBK_RESTORE_OLD_WIFI_CREDENTIALS_AND_REBOOT
+    CBK_RESTORE_OLD_WIFI_CREDENTIALS_AND_REBOOT,
+    /* Type: std::function<bool(const DayTimeRanges&, int8_t)> - ConfigProvider: validate and persist day time ranges and time zone */
+    CBK_SET_DAY_TIME_CONFIG,
+    /* Type: std::function<void(const DayTimeRanges&, int8_t)> - TimeMaster: notified after day time config was persisted */
+    CBK_DAY_TIME_CONFIG_CHANGED,
+    /* Type: std::function<bool(uint8_t)> - TimeMaster: evaluates system enabling condition by ID (true when day time is not configured) */
+    CBK_EVALUATE_SYSTEM_CONDITION,
+    /* Type: std::vector<uint8_t> - IDs of system enabling conditions currently provided by TimeMaster */
+    SIG_SYSTEM_ENABLING_CONDITIONS
 };
+static_assert(SIG_SYSTEM_ENABLING_CONDITIONS < NUMBER_OF_SIGNALS, "NUMBER_OF_SIGNALS too small for Signal enum");
 #endif

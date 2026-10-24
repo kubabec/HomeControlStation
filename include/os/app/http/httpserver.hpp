@@ -464,6 +464,7 @@ public:
 
     /** Applies the reusable enabling-condition table submitted by the UI. */
     static void parameterizedHandler_enablingConditions(String& request, WiFiClient& client);
+    static void parameterizedHandler_dayTimeConfig(String& request, WiFiClient& client);
 
     /** Applies the RTC DigitalEvent schedule table submitted by the UI. */
     static void parameterizedHandler_rtcEvents(String& request, WiFiClient& client);

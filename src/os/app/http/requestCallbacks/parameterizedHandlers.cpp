@@ -135,6 +135,59 @@ void HomeLightHttpServer::parameterizedHandler_enablingConditions(String &reques
   }
 }
 
+void HomeLightHttpServer::parameterizedHandler_dayTimeConfig(String &request, WiFiClient &client)
+{
+  /* Expected: /saveDayTime&ms=HH:MM&me=HH:MM&es=HH:MM&ee=HH:MM&tz=N (empty HH:MM = not configured) */
+  auto readParam = [&request](const char *key) -> String {
+    const String token = String("&") + key + "=";
+    const int start = request.indexOf(token);
+    if (start < 0) return String("");
+    const int valueStart = start + token.length();
+    int end = request.indexOf('&', valueStart);
+    if (end < 0) end = request.length();
+    String value = request.substring(valueStart, end);
+    value.trim();
+    return value;
+  };
+  auto parseTime = [](const String &text, uint8_t &hh, uint8_t &mm) {
+    hh = 255;
+    mm = 255;
+    if (text.length() != 5 || text.charAt(2) != ':') return;
+    const int h = text.substring(0, 2).toInt();
+    const int m = text.substring(3, 5).toInt();
+    if (h < 0 || h > 23 || m < 0 || m > 59) return;
+    hh = (uint8_t)h;
+    mm = (uint8_t)m;
+  };
+
+  DayTimeRanges ranges;
+  parseTime(readParam("ms"), ranges.morningStart_hh, ranges.morningStart_mm);
+  parseTime(readParam("me"), ranges.morningEnd_hh, ranges.morningEnd_mm);
+  parseTime(readParam("es"), ranges.eveningStart_hh, ranges.eveningStart_mm);
+  parseTime(readParam("ee"), ranges.eveningEnd_hh, ranges.eveningEnd_mm);
+  const int timeZone = readParam("tz").toInt();
+
+  bool saved = false;
+  std::any setter = DataContainer::getSignalValue(CBK_SET_DAY_TIME_CONFIG);
+  if (DayTime::isTimeZoneValid(timeZone))
+  {
+    if (auto cbk = std::any_cast<std::function<bool(const DayTimeRanges &, int8_t)>>(&setter))
+    {
+      saved = (*cbk)(ranges, (int8_t)timeZone);
+    }
+  }
+
+  if (!saved)
+  {
+    UserInterfaceNotification notif;
+    notif.title = "Day time not saved";
+    notif.body = "Invalid day time configuration. Morning start < Morning end <= Evening start < Evening end is required.";
+    notif.type = UserInterfaceNotification::ERROR;
+    std::any_cast<UINotificationsControlAPI>(DataContainer::getSignalValue(SIG_UI_NOTIFICATIONS_CONTROL)).createNotification(notif);
+  }
+  client.println("<meta http-equiv='refresh' content='0; url=/config'>");
+}
+
 void HomeLightHttpServer::parameterizedHandler_rtcEvents(String &request, WiFiClient &client)
 {
   SecurityAccessLevelType currentAccessLevel =

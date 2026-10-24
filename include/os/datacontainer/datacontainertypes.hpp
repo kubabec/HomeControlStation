@@ -73,6 +73,73 @@ inline const char* hardwareNodeTypeName(uint8_t nodeType)
     }
 }
 
+typedef struct{
+    uint8_t morningStart_hh = 255;
+    uint8_t morningStart_mm = 255;
+    uint8_t morningEnd_hh = 255;
+    uint8_t morningEnd_mm = 255;
+    uint8_t eveningStart_hh = 255;
+    uint8_t eveningStart_mm = 255;
+    uint8_t eveningEnd_hh = 255;
+    uint8_t eveningEnd_mm = 255;
+}DayTimeRanges;
+
+namespace DayTime
+{
+    inline constexpr int8_t DEFAULT_TIME_ZONE = 2;
+    inline constexpr int8_t MIN_TIME_ZONE = -12;
+    inline constexpr int8_t MAX_TIME_ZONE = 14;
+    /* Time zone is stored in NVM as a non-negative byte: stored = zone + TIME_ZONE_NVM_BIAS */
+    inline constexpr uint8_t TIME_ZONE_NVM_BIAS = 128;
+
+    inline bool isTimeZoneValid(int zone) { return zone >= MIN_TIME_ZONE && zone <= MAX_TIME_ZONE; }
+
+    inline bool isUnset(const DayTimeRanges& r)
+    {
+        const uint8_t* b = &r.morningStart_hh;
+        for (uint8_t i = 0; i < sizeof(DayTimeRanges); i++) if (b[i] != 255) return false;
+        return true;
+    }
+
+    /* All fields set and morningStart < morningEnd <= eveningStart < eveningEnd */
+    inline bool isValid(const DayTimeRanges& r)
+    {
+        const uint8_t hh[4] = {r.morningStart_hh, r.morningEnd_hh, r.eveningStart_hh, r.eveningEnd_hh};
+        const uint8_t mm[4] = {r.morningStart_mm, r.morningEnd_mm, r.eveningStart_mm, r.eveningEnd_mm};
+        uint16_t t[4];
+        for (uint8_t i = 0; i < 4; i++)
+        {
+            if (hh[i] > 23 || mm[i] > 59) return false;
+            t[i] = hh[i] * 60 + mm[i];
+        }
+        return t[0] < t[1] && t[1] <= t[2] && t[2] < t[3];
+    }
+}
+
+/* Enabling-condition IDs: 1..MAX_USER_CONDITION_ID belong to the user, the rest is system-owned and never stored in NVM tables */
+namespace SystemCondition
+{
+    inline constexpr uint8_t MAX_USER_CONDITION_ID = 150;
+    inline constexpr uint8_t MORNING = 201;
+    inline constexpr uint8_t DAY_TIME = 202;
+    inline constexpr uint8_t EVENING = 203;
+    inline constexpr uint8_t NIGHT = 204;
+
+    inline bool isSystemId(uint8_t id) { return id > MAX_USER_CONDITION_ID; }
+    inline bool isKnownId(uint8_t id) { return id >= MORNING && id <= NIGHT; }
+    inline const char* label(uint8_t id)
+    {
+        switch (id)
+        {
+        case MORNING: return "Morning";
+        case DAY_TIME: return "Day time";
+        case EVENING: return "Evening";
+        case NIGHT: return "Night";
+        default: return "";
+        }
+    }
+}
+
 /* Basic node (ESP32) configuration data */
 typedef struct {
     bool isHttpServer = 1;
@@ -83,6 +150,8 @@ typedef struct {
     String networkSSID = "";
     String networkPassword = "";
     String panelPassword = "";
+    DayTimeRanges dayTimeRanges;
+    int8_t timeZoneOffset = DayTime::DEFAULT_TIME_ZONE;
 }NodeConfiguration;
 
 /* NVM datablocks identifiers */

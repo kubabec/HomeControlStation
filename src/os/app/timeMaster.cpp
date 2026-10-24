@@ -23,6 +23,8 @@ bool TimeMaster::startupTimeInitialized = false;
 uint8_t TimeMaster::timeSyncFailureCount = 0;
 std::vector<RtcEvent::Schedule> TimeMaster::rtcEvents;
 uint32_t TimeMaster::lastEvaluatedMinute = UINT32_MAX;
+DayTimeRanges TimeMaster::dayTimeRanges;
+int8_t TimeMaster::timeZoneOffset = DayTime::DEFAULT_TIME_ZONE;
 
 namespace
 {
@@ -80,7 +82,24 @@ void TimeMaster::init()
     DataContainer::setSignalValue(SIG_STARTUP_TIME, static_cast<RtcTime>(startupTime));
 
     timeClient.begin();
-    setTimeZone(1); // Ustawienie strefy czasowej na GMT+1
+
+    /* Day time ranges and time zone come from the node configuration */
+    std::any nodeCfgAny = DataContainer::getSignalValue(SIG_DEVICE_CONFIGURATION);
+    if (auto nodeCfg = std::any_cast<NodeConfiguration>(&nodeCfgAny))
+    {
+        dayTimeRanges = nodeCfg->dayTimeRanges;
+        timeZoneOffset = DayTime::isTimeZoneValid(nodeCfg->timeZoneOffset) ? nodeCfg->timeZoneOffset : DayTime::DEFAULT_TIME_ZONE;
+    }
+    else
+    {
+        dayTimeRanges = DayTimeRanges();
+        timeZoneOffset = DayTime::DEFAULT_TIME_ZONE;
+    }
+    setTimeZone(timeZoneOffset);
+
+    DataContainer::setSignalValue(CBK_DAY_TIME_CONFIG_CHANGED, static_cast<std::function<void(const DayTimeRanges &, int8_t)>>(TimeMaster::applyDayTimeConfig));
+    DataContainer::setSignalValue(CBK_EVALUATE_SYSTEM_CONDITION, static_cast<std::function<bool(uint8_t)>>(TimeMaster::evaluateSystemCondition));
+    publishSystemConditions();
     DataContainer::setSignalValue(CBK_GET_CURRENT_TIME, static_cast<std::function<RtcTime()>>(TimeMaster::getRtcTime));
 
     // Próba synchronizacji z NTP
@@ -347,7 +366,63 @@ RtcTime TimeMaster::getRtcTime()
 // Ustawienie przesunięcia strefy czasowej (w godzinach)
 void TimeMaster::setTimeZone(int timeZoneOffset)
 {
-    TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 7200);
+    TimeMaster::timeClient.setTimeOffset(timeZoneOffset * 3600);
+}
+
+void TimeMaster::applyDayTimeConfig(const DayTimeRanges& ranges, int8_t timeZone)
+{
+    dayTimeRanges = ranges;
+    if (timeZone != timeZoneOffset)
+    {
+        /* Already synchronized epoch includes the old offset - shift it instead of waiting for the next NTP sync */
+        if (wasNtpEverSynced)
+        {
+            lastNTPTime += (long)(timeZone - timeZoneOffset) * 3600L;
+        }
+        timeZoneOffset = timeZone;
+        setTimeZone(timeZone);
+    }
+    publishSystemConditions();
+}
+
+void TimeMaster::publishSystemConditions()
+{
+    std::vector<uint8_t> ids;
+    if (DayTime::isValid(dayTimeRanges))
+    {
+        ids = {SystemCondition::MORNING, SystemCondition::DAY_TIME, SystemCondition::EVENING, SystemCondition::NIGHT};
+    }
+    DataContainer::setSignalValue(SIG_SYSTEM_ENABLING_CONDITIONS, ids);
+}
+
+bool TimeMaster::evaluateSystemCondition(uint8_t conditionId)
+{
+    /* Not configured (or unreliable clock) must never block user mappings */
+    if (!DayTime::isValid(dayTimeRanges) || !wasNtpEverSynced)
+    {
+        return true;
+    }
+
+    const RtcTime now = getRtcTime();
+    const uint16_t t = now.hour * 60 + now.min;
+    const uint16_t morningStart = dayTimeRanges.morningStart_hh * 60 + dayTimeRanges.morningStart_mm;
+    const uint16_t morningEnd = dayTimeRanges.morningEnd_hh * 60 + dayTimeRanges.morningEnd_mm;
+    const uint16_t eveningStart = dayTimeRanges.eveningStart_hh * 60 + dayTimeRanges.eveningStart_mm;
+    const uint16_t eveningEnd = dayTimeRanges.eveningEnd_hh * 60 + dayTimeRanges.eveningEnd_mm;
+
+    switch (conditionId)
+    {
+    case SystemCondition::MORNING:
+        return t >= morningStart && t < morningEnd;
+    case SystemCondition::DAY_TIME:
+        return t >= morningEnd && t < eveningStart;
+    case SystemCondition::EVENING:
+        return t >= eveningStart && t < eveningEnd;
+    case SystemCondition::NIGHT:
+        return t >= eveningEnd || t < morningStart;
+    default:
+        return false;
+    }
 }
 
 unsigned long TimeMaster::getEpochTime()

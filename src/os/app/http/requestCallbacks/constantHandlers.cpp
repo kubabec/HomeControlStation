@@ -666,6 +666,20 @@ void HomeLightHttpServer::constantHandler_digitalEvents(WiFiClient &client)
     label.replace("\"", "\\\"");
     client.println("{id:" + String((int)condition.conditionId) + ",label:\"" + label + "\"},");
   }
+  /* System (TimeMaster) conditions: offered when provided, and kept when already assigned to a mapping */
+  {
+    std::any systemAny = DataContainer::getSignalValue(SIG_SYSTEM_ENABLING_CONDITIONS);
+    const auto *provided = std::any_cast<std::vector<uint8_t>>(&systemAny);
+    for (uint8_t id = SystemCondition::MORNING; id <= SystemCondition::NIGHT; id++)
+    {
+      bool offer = provided != nullptr && std::find(provided->begin(), provided->end(), id) != provided->end();
+      for (const auto &assignment : DigitalEventReceiver::getMappingConditions())
+      {
+        for (uint8_t assigned : assignment.conditionIds) offer = offer || assigned == id;
+      }
+      if (offer) client.println("{id:" + String((int)id) + ",label:\"" + String(SystemCondition::label(id)) + "\"},");
+    }
+  }
   client.println("]; ");
   client.println(R"SCRIPT3(
   let activeActionRow = null;
@@ -788,13 +802,13 @@ void HomeLightHttpServer::constantHandler_enablingConditions(WiFiClient &client)
   client.println("<table class=\"table-graphite\" id=\"condition-table\"><thead><tr><th>Condition ID</th><th>Device</th><th>Condition</th><th>&nbsp;</th></tr></thead><tbody>");
   for (const auto &condition : conditions)
   {
-    client.println("<tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"255\" value=\"" + String((int)condition.conditionId) + "\"></td>");
+    client.println("<tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"150\" value=\"" + String((int)condition.conditionId) + "\"></td>");
     client.println("<td><select class=\"condition-device\" data-selected=\"" + String((int)condition.deviceId) + "\"></select></td>");
     client.println("<td><select class=\"condition-predicate\" data-selected=\"" + String((int)condition.predicateId) + "\"></select></td>");
     client.println("<td><button type=\"button\" class=\"error-button\">Remove</button></td></tr>");
   }
   client.println("</tbody></table><div class=\"controls\"><button type=\"button\" id=\"add-condition\" class=\"button\">(+) New condition</button><button type=\"button\" id=\"save-conditions\" class=\"button\">Save table</button></div><a href=\"/config\" class=\"button\">BACK</a>");
-  client.println("<template id=\"condition-row-template\"><tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"255\"></td><td><select class=\"condition-device\"></select></td><td><select class=\"condition-predicate\"></select></td><td><button type=\"button\" class=\"error-button\">Remove</button></td></tr></template>");
+  client.println("<template id=\"condition-row-template\"><tr><td><input class=\"condition-id\" type=\"number\" min=\"1\" max=\"150\"></td><td><select class=\"condition-device\"></select></td><td><select class=\"condition-predicate\"></select></td><td><button type=\"button\" class=\"error-button\">Remove</button></td></tr></template>");
 
   client.println("<script>const conditionDevices=[");
   for (const auto &device : descriptionVector)
@@ -842,7 +856,7 @@ document.getElementById('add-condition').onclick=()=>{
 };
 document.getElementById('save-conditions').onclick=()=>{
   const data=Array.from(tbody.children).map(row=>({conditionId:Number(row.querySelector('.condition-id').value),deviceId:Number(row.querySelector('.condition-device').value),predicateId:Number(row.querySelector('.condition-predicate').value)}));
-  const ids=data.map(item=>item.conditionId);if(data.some(item=>!item.conditionId||!item.deviceId||!item.predicateId)||new Set(ids).size!==ids.length){alert('Use unique condition IDs and complete every row.');return;}
+  const ids=data.map(item=>item.conditionId);if(data.some(item=>!item.conditionId||item.conditionId>150||!item.deviceId||!item.predicateId)||new Set(ids).size!==ids.length){alert('Use unique condition IDs (1-150) and complete every row.');return;}
   const xhr=new XMLHttpRequest();xhr.open('POST','/saveEnablingConditions&'+JSON.stringify(data),true);xhr.onreadystatechange=()=>{if(xhr.readyState===4)window.location.href='/enablingConditions';};xhr.send();
 };
 })();

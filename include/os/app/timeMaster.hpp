@@ -124,6 +124,16 @@ private:
     static void restoreRtcEvents();
     static bool saveRtcEvents();
     static void evaluateRtcEvents();
+
+    /** Local copy of the user-configured day time ranges (all 255 when not configured). */
+    static DayTimeRanges dayTimeRanges;
+    static int8_t timeZoneOffset;
+
+    /** Stores new ranges/time zone and republishes the system enabling conditions. */
+    static void applyDayTimeConfig(const DayTimeRanges& ranges, int8_t timeZone);
+    static void publishSystemConditions();
+    /** Returns true when the condition is met or when day time ranges are not configured. */
+    static bool evaluateSystemCondition(uint8_t conditionId);
 };
 
 #endif // MASTERTIMER_HPP
