@@ -7,9 +7,11 @@
 #include "os/Logger.hpp"
 
 #ifdef SUPERMINI
-#define MAX_EXT_MEMORY_SIZE_TOTAL 600 /* bytes */
+/* 50 virtual LEDs * 4 colour slots * 3 B + 5 B animation properties = 605 B must fit */
+#define MAX_EXT_MEMORY_SIZE_TOTAL 620 /* bytes */
 #else
-#define MAX_EXT_MEMORY_SIZE_TOTAL 1200 /* bytes */
+/* 100 virtual LEDs * 4 colour slots * 3 B + 5 B animation properties = 1205 B must fit */
+#define MAX_EXT_MEMORY_SIZE_TOTAL 1220 /* bytes */
 #endif
 #define SLOTS_FOR_EXT_MEMORY_BUFFERS 10 /* number of slots for independent data pointers */
 

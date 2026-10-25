@@ -366,6 +366,9 @@ def generate_registry(descriptions):
             if claim_when:
                 claim = f"config.customBytes[{int(claim_when['offset'])}] == {int(claim_when['equals'])} && {claim}"
             pin_checks.append(f"if ({claim}) return false;")
+        cross_field_validator = impl.get("configurationValidator")
+        if cross_field_validator:
+            pin_checks.append(f"if (!{cross_field_validator}(config)) return false;")
         validation_case = (
             f"case {device_type['enumSymbol']}:\n"
             + "        " + "\n        ".join(pin_checks)
@@ -866,6 +869,22 @@ def generate_widget_javascript(description):
             "colorPicker.appendChild(colorDisplay);deviceContainer.appendChild(colorPicker);"
         )
 
+    segment_readout = next((item for item in readouts if item["widget"] == "segment-color-array"), None)
+    if segment_readout:
+        count_source = segment_readout.get("countSource", "segCount")
+        color_source = segment_readout.get("colorSource", "segColors")
+        state_source = segment_readout.get("stateSource", "segOn")
+        rows.append(
+            f"const segmentTotal=Number(device.{count_source})||0;"
+            "const segmentRow=document.createElement('div');segmentRow.className='segment-colors';"
+            "segmentRow.style.cssText='display:flex;gap:6px;margin:8px 0;width:100%;';"
+            "for(let i=0;i<segmentTotal;i++){const rect=document.createElement('div');"
+            f"const segmentOn=!!device.{state_source}[i];"
+            f"rect.style.cssText='flex:1;height:34px;border-radius:6px;border:1px solid #888;background:'+device.{color_source}[i]+';opacity:'+(segmentOn?'1':'0.5')+';';"
+            "rect.title='Segment '+(i+1)+(segmentOn?' (on)':' (off)');segmentRow.appendChild(rect);}"
+            "deviceContainer.appendChild(segmentRow);"
+        )
+
     if any(item["widget"] in ("temperature-gauge", "humidity-gauge") for item in readouts):
         error = next((item for item in readouts if item["widget"] == "error-message"), None)
         error_source = error.get("source", "Err") if error else "Err"
@@ -934,7 +953,51 @@ def generate_widget_javascript(description):
         (item for item in controls if item["widget"] in ("toggle-button", "settings-button", "play-stop-button")),
         key=lambda item: item.get("displayOrder", controls.index(item)),
     )
-    if button_controls:
+    segment_select = next((item for item in controls if item["widget"] == "segment-select"), None)
+    if button_controls and segment_select:
+        count_source = segment_select.get("countSource", "segCount")
+        state_source = segment_select.get("stateSource", "segOn")
+        live_source = segment_select.get("liveSource", "segLive")
+        rows.append(
+            "window.hcsSegSel=window.hcsSegSel||{};"
+            f"const selectTotal=Number(device.{count_source})||0;"
+            "const segmentSelect=document.createElement('select');segmentSelect.className='segment-select';"
+            "segmentSelect.innerHTML='<option value=\"all\">ALL</option>';"
+            "for(let i=0;i<selectTotal;i++){segmentSelect.innerHTML+='<option value=\"'+i+'\">Segment '+(i+1)+'</option>';}"
+            "if(window.hcsSegSel[device.id]===undefined||Number(window.hcsSegSel[device.id])>=selectTotal)window.hcsSegSel[device.id]='all';"
+            "segmentSelect.value=String(window.hcsSegSel[device.id]);"
+            "deviceContainer.appendChild(segmentSelect);"
+            "const buttons=document.createElement('div');buttons.className='button-container';"
+            "const renderButtons=()=>{buttons.innerHTML='';const selected=String(window.hcsSegSel[device.id]);const all=selected==='all';const idx=Number(selected);"
+            f"const enabled=all?device.status=='on':!!device.{state_source}[idx];"
+            f"const live=all?device.{live_source}.slice(0,selectTotal).some(Boolean):!!device.{live_source}[idx];"
+        )
+        for control in button_controls:
+            widget = control["widget"]
+            if widget == "toggle-button":
+                rows.append(
+                    "const power=document.createElement('a');"
+                    "power.className=`icon-btn device-state ${enabled?'state-enabled':'state-disabled'}`;"
+                    "power.textContent=enabled?'OFF':'ON';"
+                    "power.setAttribute('aria-label',enabled?'Turn off':'Turn on');power.title=enabled?'Turn off':'Turn on';"
+                    "power.onclick=()=>all?asyncDeviceStateSwitch(device.id,enabled?0:1):asyncSegSwitch(device.id,idx,enabled?0:1);"
+                    "power.id=`switchBtn${device.id}`;buttons.appendChild(power);"
+                )
+            elif widget == "settings-button":
+                rows.append(
+                    "const settings=document.createElement('a');settings.className='icon-btn settings';"
+                    "settings.onclick=()=>getExtendedControlsRequest(device.id,deviceContainer);buttons.appendChild(settings);"
+                )
+            elif widget == "play-stop-button":
+                rows.append(
+                    "const animation=document.createElement('a');animation.className=live?'icon-btn stop':'icon-btn play';"
+                    "animation.onclick=()=>all?asyncLiveAnimation(device.id,live?0:1):asyncLiveAnimation(device.id,live?0:1,idx);buttons.appendChild(animation);"
+                )
+        rows.append(
+            "};segmentSelect.onchange=()=>{window.hcsSegSel[device.id]=segmentSelect.value;renderButtons();};"
+            "renderButtons();deviceContainer.appendChild(buttons);"
+        )
+    elif button_controls:
         rows.append("const buttons=document.createElement('div');buttons.className='button-container';")
         for control in button_controls:
             widget = control["widget"]
@@ -1162,6 +1225,17 @@ def generate_configuration_javascript(descriptions):
                 continue
             offset = int(field["offset"])
             size = int(field["size"])
+            if field.get("htmlType") == "segment-layout":
+                length = int(field.get("arrayLength", 0))
+                statements.append(
+                    f"{{let flips=0;const active=Number(document.getElementById('segCount-'+id).value)||0;"
+                    f"for(let item=0;item<{length};item++){{"
+                    f"if(item>=active)continue;"
+                    f"bytes[{offset}+item]=Number(document.getElementById('segLeds'+item+'-'+id).value)||0;"
+                    f"if(document.getElementById('segFlip'+item+'-'+id).checked)flips|=(1<<item);}}"
+                    f"bytes[{offset + length}]=flips;}}"
+                )
+                continue
             if field.get("htmlType") == "segment-array":
                 length = int(field.get("arrayLength", 0))
                 companion = next(

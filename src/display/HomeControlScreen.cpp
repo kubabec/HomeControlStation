@@ -97,7 +97,7 @@ std::string HomeControlApp::deviceLabel(const DisplayDeviceView &d)
 bool HomeControlApp::supportsToggle(uint8_t deviceType)
 {
     return deviceType == type_ONOFFDEVICE || deviceType == type_LED_STRIP ||
-           deviceType == type_GARDEN_IRRIGATION;
+           deviceType == type_SEGMENTED_LED_STRIP || deviceType == type_GARDEN_IRRIGATION;
 }
 
 std::string HomeControlApp::deviceDetails(const DisplayDeviceView &device)
@@ -119,6 +119,10 @@ std::string HomeControlApp::deviceDetails(const DisplayDeviceView &device)
         snprintf(values, sizeof(values), "Power: %s\nColor: #%02X%02X%02X\nAnimation: %s",
                  device.isEnabled ? "ON" : "OFF", device.customBytes[2], device.customBytes[3],
                  device.customBytes[4], device.customBytes[15] ? "running" : "stopped");
+        return values;
+    case type_SEGMENTED_LED_STRIP:
+        snprintf(values, sizeof(values), "Power: %s\nSegments: %u",
+                 device.isEnabled ? "ON" : "OFF", device.customBytes[1]);
         return values;
     case type_WINDOW_DOOR_SENSOR:
         return device.customBytes[0] ? "Contact: CLOSED" : "Contact: OPEN";
@@ -530,6 +534,19 @@ void HomeControlApp::reloadDevices(const DeviceList &newDevices)
     }
     devices_ = newDevices;
     rebuildContent();
+
+    // Keep the segment popup in sync with the real segment states reported by the device
+    if (overlayDeviceSegmented_ && !lv_obj_has_flag(overlay_, LV_OBJ_FLAG_HIDDEN))
+    {
+        for (const auto &d : devices_)
+        {
+            if (d.deviceId == overlayDeviceId_ && d.isLocal == overlayDeviceLocal_)
+            {
+                buildAdvancedControls(d);
+                break;
+            }
+        }
+    }
 }
 
 void HomeControlApp::setRoomNames(const std::vector<std::pair<uint8_t, std::string>> &names)
@@ -722,7 +739,7 @@ void HomeControlApp::createTile(lv_obj_t *parent, const DisplayDeviceView &dev, 
     lv_obj_add_flag(tile, LV_OBJ_FLAG_CLICKABLE);
     if (toggleable)
     {
-        lv_obj_add_event_cb(tile, &HomeControlApp::tileEvent, LV_EVENT_CLICKED, ctx);
+        lv_obj_add_event_cb(tile, &HomeControlApp::tileEvent, LV_EVENT_SHORT_CLICKED, ctx);
     }
     lv_obj_add_event_cb(tile, &HomeControlApp::tileEvent, LV_EVENT_LONG_PRESSED, ctx);
 
@@ -770,6 +787,36 @@ void HomeControlApp::createTile(lv_obj_t *parent, const DisplayDeviceView &dev, 
         lv_obj_set_style_bg_color(colorBar, lv_color_hex(((uint32_t)dev.customBytes[2] << 16) | ((uint32_t)dev.customBytes[3] << 8) | (uint32_t)dev.customBytes[4]), 0);
         lv_obj_set_style_bg_opa(colorBar, LV_OPA_COVER, 0);
         lv_obj_set_style_shadow_width(colorBar, 0, 0);
+        break;
+    }
+    case type_SEGMENTED_LED_STRIP:
+    {
+        // customBytes[1] = segment count, [2..9] = segment on flags, [26..49] = segment RGB colours
+        lv_obj_t *row = lv_obj_create(tile);
+        lv_obj_clear_flag(row, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(row, LV_OBJ_FLAG_EVENT_BUBBLE);
+        lv_obj_set_width(row, lv_pct(90));
+        lv_obj_set_height(row, 12);
+        lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_border_width(row, 0, 0);
+        lv_obj_set_style_pad_all(row, 0, 0);
+        lv_obj_set_style_pad_gap(row, 2, 0);
+        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+        const uint8_t segments = std::min<uint8_t>(dev.customBytes[1], 8);
+        for (uint8_t i = 0; i < segments; ++i)
+        {
+            lv_obj_t *rect = lv_obj_create(row);
+            lv_obj_clear_flag(rect, LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_clear_flag(rect, LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_add_flag(rect, LV_OBJ_FLAG_EVENT_BUBBLE);
+            lv_obj_set_height(rect, lv_pct(100));
+            lv_obj_set_flex_grow(rect, 1);
+            lv_obj_set_style_radius(rect, 3, 0);
+            lv_obj_set_style_border_width(rect, 0, 0);
+            lv_obj_set_style_bg_color(rect, lv_color_make(dev.customBytes[26 + i * 3], dev.customBytes[27 + i * 3], dev.customBytes[28 + i * 3]), 0);
+            lv_obj_set_style_bg_opa(rect, dev.customBytes[2 + i] ? LV_OPA_COVER : LV_OPA_40, 0);
+        }
         break;
     }
     case type_TEMP_SENSOR:
@@ -860,7 +907,7 @@ HomeControlApp::TileCtx *HomeControlApp::makeTileCtx(const DisplayDeviceView &de
 
 void HomeControlApp::handleAction(const DisplayDeviceView &dev, lv_event_code_t code)
 {
-    if (code == LV_EVENT_CLICKED)
+    if (code == LV_EVENT_SHORT_CLICKED)
     {
         if (toggleCb_)
         {
@@ -988,6 +1035,9 @@ void HomeControlApp::showOverlay(const DisplayDeviceView &dev, const char *reaso
     // text += dev.isEnabled ? "ON" : "OFF";
     lv_label_set_text(overlayTitle_, deviceLabel(dev).c_str());
     lv_label_set_text(overlayInfo_, text.c_str());
+    overlayDeviceId_ = dev.deviceId;
+    overlayDeviceLocal_ = dev.isLocal;
+    overlayDeviceSegmented_ = dev.deviceType == type_SEGMENTED_LED_STRIP;
     buildAdvancedControls(dev);
     lv_obj_add_flag(overlayLoading_, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(overlay_, LV_OBJ_FLAG_HIDDEN);
@@ -1035,6 +1085,9 @@ void HomeControlApp::buildAdvancedControls(const DisplayDeviceView &dev)
         break;
     case type_LED_STRIP:
         buildLedSlotControls(dev);
+        break;
+    case type_SEGMENTED_LED_STRIP:
+        buildSegmentControls(dev);
         break;
     case type_TEMP_SENSOR:
         // buildTemperatureStatistics(dev);
@@ -1178,6 +1231,71 @@ void HomeControlApp::buildLedSlotControls(const DisplayDeviceView &dev)
     }
 }
 
+void HomeControlApp::buildSegmentControls(const DisplayDeviceView &dev)
+{
+    lv_obj_t *caption = lv_label_create(overlayControls_);
+    lv_label_set_text(caption, "SEGMENTS");
+    lv_obj_set_style_text_color(caption, lv_color_hex(kTextMuted), 0);
+    lv_obj_set_style_text_font(caption, FONT_BODY, 0);
+
+    lv_obj_t *row = lv_obj_create(overlayControls_);
+    lv_obj_set_width(row, lv_pct(100));
+    lv_obj_set_height(row, LV_SIZE_CONTENT);
+    lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(row, 0, 0);
+    lv_obj_set_style_pad_all(row, 0, 0);
+    lv_obj_set_style_pad_gap(row, 8, 0);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW_WRAP);
+
+    const uint8_t segments = std::min<uint8_t>(dev.customBytes[1], 8);
+    for (uint8_t i = 0; i < segments; ++i)
+    {
+        const bool on = dev.customBytes[2 + i] != 0;
+        const uint32_t color = ((uint32_t)dev.customBytes[26 + i * 3] << 16) |
+                               ((uint32_t)dev.customBytes[27 + i * 3] << 8) |
+                               (uint32_t)dev.customBytes[28 + i * 3];
+
+        lv_obj_t *button = lv_btn_create(row);
+        lv_obj_set_width(button, lv_pct(23));
+        lv_obj_set_height(button, 64);
+        lv_obj_set_style_radius(button, 12, 0);
+        lv_obj_set_style_bg_color(button, lv_color_hex(on ? kSuccessDeep : kSurface3), 0);
+        lv_obj_set_style_bg_opa(button, LV_OPA_COVER, 0);
+        lv_obj_set_style_border_width(button, 1, 0);
+        lv_obj_set_style_border_color(button, lv_color_hex(on ? kSuccess : kSteel), 0);
+        lv_obj_set_style_shadow_width(button, 0, 0);
+        lv_obj_set_style_pad_all(button, 6, 0);
+        lv_obj_set_style_pad_gap(button, 4, 0);
+        lv_obj_set_flex_flow(button, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_align(button, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+        SlotCtx *ctx = new SlotCtx{this, dev.deviceId, i, dev.isLocal, on};
+        slotContexts_.emplace_back(ctx);
+        lv_obj_add_event_cb(button, &HomeControlApp::segmentEvent, LV_EVENT_CLICKED, ctx);
+
+        lv_obj_t *swatch = lv_obj_create(button);
+        lv_obj_add_flag(swatch, LV_OBJ_FLAG_EVENT_BUBBLE);
+        lv_obj_clear_flag(swatch, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_clear_flag(swatch, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_width(swatch, lv_pct(100));
+        lv_obj_set_height(swatch, 26);
+        lv_obj_set_style_radius(swatch, 8, 0);
+        lv_obj_set_style_bg_color(swatch, lv_color_hex(color), 0);
+        lv_obj_set_style_bg_opa(swatch, on ? LV_OPA_COVER : LV_OPA_50, 0);
+        lv_obj_set_style_border_width(swatch, 1, 0);
+        lv_obj_set_style_border_color(swatch, lv_color_hex(kSteelSoft), 0);
+
+        char text[12];
+        snprintf(text, sizeof(text), "SEG %u", i + 1);
+        lv_obj_t *label = lv_label_create(button);
+        lv_obj_add_flag(label, LV_OBJ_FLAG_EVENT_BUBBLE);
+        lv_label_set_text(label, text);
+        lv_obj_set_style_text_color(label, lv_color_hex(kTextStrong), 0);
+        lv_obj_set_style_text_font(label, FONT_BODY, 0);
+    }
+}
+
 void HomeControlApp::buildTemperatureStatistics(const DisplayDeviceView &dev)
 {
     if (dev.customBytes[0] != 0)
@@ -1308,6 +1426,23 @@ void HomeControlApp::ledSlotEvent(lv_event_t *e)
     }
     ctx->app->resetInactivityTimer();
     DisplayClient::requestLedSlot(ctx->deviceId, ctx->slot, ctx->isLocal);
+}
+
+void HomeControlApp::segmentEvent(lv_event_t *e)
+{
+    auto *ctx = static_cast<SlotCtx *>(lv_event_get_user_data(e));
+    if (!ctx || !ctx->app)
+    {
+        return;
+    }
+    ctx->app->resetInactivityTimer();
+    ctx->segmentOn = !ctx->segmentOn;
+    DisplayClient::requestSegmentState(ctx->deviceId, ctx->slot, ctx->segmentOn, ctx->isLocal);
+
+    // The overlay is not rebuilt on state updates, so reflect the new state on the button itself
+    lv_obj_t *button = lv_event_get_target(e);
+    lv_obj_set_style_bg_color(button, lv_color_hex(ctx->segmentOn ? kSuccessDeep : kSurface3), 0);
+    lv_obj_set_style_border_color(button, lv_color_hex(ctx->segmentOn ? kSuccess : kSteel), 0);
 }
 
 // Static callback wrappers

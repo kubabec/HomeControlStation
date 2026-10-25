@@ -15,6 +15,7 @@ enum DevType : uint8_t
     type_LED_STRIP = 44,
     type_TEMP_SENSOR = 45,
     type_WINDOW_DOOR_SENSOR = 50,
+    type_SEGMENTED_LED_STRIP = 53,
     type_GARDEN_IRRIGATION = 60
 };
 
@@ -32,6 +33,7 @@ inline constexpr DeviceTypeInfo kKnownTypes[] = {
     {44, "LedStrip"},
     {45, "TempSensor"},
     {50, "WindowDoorSensor"},
+    {53, "SegmentedLedStrip"},
     {60, "Garden Irrigation"}
 };
 

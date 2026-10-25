@@ -205,6 +205,21 @@ inline void emitField(uint8_t slotNumber, const DeviceConfigSlotType& slot, cons
         client.println("<label>" + String(field.label) + ":<input id=\"" + String(field.key) + "-" + String((int)slotNumber) + "\" type=\"number\" min=\"" + minimum + "\" max=\"" + maximum + "\" step=\"" + step + "\" value=\"" + displayedValue + "\"></label>");
         return;
     }
+    if (htmlType == "segment-layout")
+    {
+        const String slotText = String((int)slotNumber);
+        client.println("<div id=\"segLayout-" + slotText + "\">");
+        for (uint8_t index = 0; index < field.arrayLength; ++index)
+        {
+            const bool inverted = (slot.customBytes[field.offset + field.arrayLength] >> index) & 0x01;
+            client.println("<label class=\"seg-row-" + slotText + "\">Segment " + String((int)(index + 1)) + " LEDs:<input id=\"segLeds" + String((int)index) + "-" + slotText + "\" type=\"number\" min=\"1\" max=\"" + String(field.maximum) + "\" value=\"" + String((int)slot.customBytes[field.offset + index]) + "\"> <input id=\"segFlip" + String((int)index) + "-" + slotText + "\" type=\"checkbox\"" + (inverted ? " checked" : "") + "> flip</label>");
+        }
+        client.println("</div>");
+        client.println("<script>(function(){const count=document.getElementById('segCount-" + slotText + "');const rows=document.querySelectorAll('.seg-row-" + slotText + "');"
+                       "const refresh=()=>{const n=Number(count.value)||0;rows.forEach((row,i)=>{row.style.display=i<n?'':'none';});};"
+                       "count.addEventListener('input',refresh);refresh();})();</script>");
+        return;
+    }
     if (htmlType == "segment-array")
     {
         for (uint8_t index = 0; index < field.arrayLength; ++index)

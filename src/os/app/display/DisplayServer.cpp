@@ -209,10 +209,12 @@ void DisplayServer::handleMessage(MessageUDP& msg)
         DisplayActionRequest request;
         memcpy(&request, payload.data(), sizeof(request));
         const auto action = static_cast<DisplayAction>(request.service);
+        Logger::log("DisplayServer// action " + String((int)request.service) + " for device " + String((int)request.deviceId) + " params " + String((int)request.parameter[0]) + "," + String((int)request.parameter[1]));
         const bool isStateChange = action == DisplayAction::TOGGLE || action == DisplayAction::ENABLE ||
                                    action == DisplayAction::DISABLE;
         const bool isParameterChange = action == DisplayAction::SET_BRIGHTNESS ||
-                                       action == DisplayAction::LOAD_LED_SLOT;
+                                       action == DisplayAction::LOAD_LED_SLOT ||
+                                       action == DisplayAction::SET_SEGMENT_STATE;
         if (!pendingAction.active && (isStateChange || isParameterChange)) {
             auto devices = std::any_cast<std::vector<DeviceDescription>>(DataContainer::getSignalValue(SIG_DEVICE_COLLECTION));
             auto device = std::find_if(devices.begin(), devices.end(), [&request](const DeviceDescription& candidate) {
@@ -220,12 +222,17 @@ void DisplayServer::handleMessage(MessageUDP& msg)
             });
             if (device != devices.end()) {
                 pendingAction.active = true;
+                pendingAction.deadline = millis() + 2000;
                 pendingAction.request = msg;
                 pendingAction.action = request;
                 if (isStateChange) {
                     pendingAction.service = DEVSERVICE_STATE_SWITCH;
                     pendingAction.parameters.a = action == DisplayAction::TOGGLE ? (device->isEnabled ? 0 : 1) :
                                                  (action == DisplayAction::ENABLE ? 1 : 0);
+                } else if (action == DisplayAction::SET_SEGMENT_STATE) {
+                    pendingAction.service = DEVSERVICE_SEGMENT_STATE_SWITCH;
+                    pendingAction.parameters.a = request.parameter[0];
+                    pendingAction.parameters.b = request.parameter[1];
                 } else {
                     pendingAction.service = action == DisplayAction::SET_BRIGHTNESS
                         ? DEVSERVICE_BRIGHTNESS_CHANGE
@@ -269,7 +276,14 @@ void DisplayServer::processPendingAction()
         pendingAction.service,
         pendingAction.parameters);
 
+    if (result != SERV_SUCCESS && result != SERV_PENDING) {
+        Logger::log("DisplayServer// service call failed, code " + String((int)result));
+    }
     if (result == SERV_PENDING) {
+        return;
+    }
+    // Device is still animating, keep the request for a short while instead of dropping it
+    if (result == SERV_BUSY && millis() < pendingAction.deadline) {
         return;
     }
 

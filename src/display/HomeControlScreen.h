@@ -36,6 +36,7 @@ struct DisplayDeviceView {
         switch(deviceType) {
             case type_ONOFFDEVICE:
             case type_LED_STRIP:
+            case type_SEGMENTED_LED_STRIP:
                 return true;
             default:
                 return false;
@@ -98,6 +99,7 @@ private:
         uint8_t deviceId = 0;
         uint8_t slot = 0;
         bool isLocal = false;
+        bool segmentOn = false;
     };
 
     /** Rolling readings collected from the device list updates of a temperature sensor. */
@@ -135,6 +137,7 @@ private:
     void buildAdvancedControls(const DisplayDeviceView& dev);
     void buildBrightnessControl(const DisplayDeviceView& dev);
     void buildLedSlotControls(const DisplayDeviceView& dev);
+    void buildSegmentControls(const DisplayDeviceView& dev);
     void buildTemperatureStatistics(const DisplayDeviceView& dev);
     lv_obj_t* createReadout(lv_obj_t* parent, const char* label, const char* value, uint32_t valueColor);
     void recordTemperatureSamples(const DeviceList& newDevices);
@@ -154,6 +157,7 @@ private:
     static void roomToggleEvent(lv_event_t* e);
     static void brightnessSliderEvent(lv_event_t* e);
     static void ledSlotEvent(lv_event_t* e);
+    static void segmentEvent(lv_event_t* e);
 
     // Helper functions
     static std::string roomLabel(uint8_t roomId, const std::unordered_map<uint8_t, std::string>& roomNames);
@@ -186,6 +190,9 @@ private:
     lv_obj_t* overlayTitle_ = nullptr;
     lv_obj_t* overlayInfo_ = nullptr;
     lv_obj_t* overlayControls_ = nullptr;
+    uint8_t overlayDeviceId_ = 0;
+    bool overlayDeviceLocal_ = false;
+    bool overlayDeviceSegmented_ = false;
     lv_obj_t* brightnessValueLabel_ = nullptr;
     lv_obj_t* overlayLoading_ = nullptr;
     lv_obj_t* overlayLoadingSpinner_ = nullptr;

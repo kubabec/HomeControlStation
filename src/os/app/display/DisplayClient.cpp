@@ -272,7 +272,7 @@ bool DisplayClient::send(uint8_t id, const void* payload, size_t payloadSize,
         : NetworkDriver::send(message);
 }
 
-bool DisplayClient::sendAction(uint8_t deviceId, DisplayAction action, uint8_t parameter)
+bool DisplayClient::sendAction(uint8_t deviceId, DisplayAction action, uint8_t parameter, uint8_t parameterB)
 {
     if (!connected) return false;
     DisplayActionRequest request;
@@ -280,6 +280,7 @@ bool DisplayClient::sendAction(uint8_t deviceId, DisplayAction action, uint8_t p
     request.deviceId = deviceId;
     request.service = static_cast<uint8_t>(action);
     request.parameter[0] = parameter;
+    request.parameter[1] = parameterB;
     return send(static_cast<uint8_t>(DisplayMessageIds::DEVICE_ACTION_REQUEST),
                 &request, sizeof(request), masterIp);
 }
@@ -301,6 +302,13 @@ bool DisplayClient::requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal)
 {
     if (isLocal) return requestLocal(deviceId, DEVSERVICE_LED_STRIP_SWITCH_CONTENT, slot, false);
     return sendAction(deviceId, DisplayAction::LOAD_LED_SLOT, slot);
+}
+
+bool DisplayClient::requestSegmentState(uint8_t deviceId, uint8_t segment, bool enable, bool isLocal)
+{
+    Logger::log("DisplayClient// segment request dev " + String((int)deviceId) + " seg " + String((int)segment) + " state " + String((int)enable) + (isLocal ? " local" : " master") + (connected ? "" : " NOT CONNECTED"));
+    if (isLocal) return requestLocal(deviceId, DEVSERVICE_SEGMENT_STATE_SWITCH, segment, false, enable ? 1 : 0);
+    return sendAction(deviceId, DisplayAction::SET_SEGMENT_STATE, segment, enable ? 1 : 0);
 }
 
 bool DisplayClient::requestRoomToggle(uint8_t roomId)
@@ -354,12 +362,13 @@ void DisplayClient::rebuildAndReload()
     if (application != nullptr) application->reloadDevices(deviceList);
 }
 
-bool DisplayClient::requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle)
+bool DisplayClient::requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle, uint8_t parameterB)
 {
     LocalAction action;
     action.deviceId = deviceId;
     action.service = service;
     action.parameter = parameter;
+    action.parameterB = parameterB;
     action.toggle = toggle;
     action.deadline = millis() + LOCAL_ACTION_TIMEOUT_MS;
     localActions.push(action);
@@ -380,6 +389,7 @@ void DisplayClient::processLocalActions()
 
     ServiceParameters_set1 params;
     params.a = action.parameter;
+    params.b = action.parameterB;
     if (action.toggle) {
         const auto it = std::find_if(localList.begin(), localList.end(), [&action](const DisplayDeviceView& view) {
             return view.deviceId == action.deviceId;

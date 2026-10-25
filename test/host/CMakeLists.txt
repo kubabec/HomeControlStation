@@ -40,6 +40,14 @@ foreach(HEADER IN LISTS LED_HEADERS)
     configure_file("${HEADER}" "${GENERATED_DIR}/include/${OUTPUT_HEADER}" COPYONLY)
 endforeach()
 
+file(MAKE_DIRECTORY "${GENERATED_DIR}/include/devices/SegmentedLedStripWS2812")
+configure_file(
+    "${PROJECT_ROOT}/DevicesPredefined/SegmentedLedStripWS2812/include/devices/SegmentedLedStripWS2812/SegmentedLedStripWS2812.hpp.example"
+    "${GENERATED_DIR}/include/devices/SegmentedLedStripWS2812/SegmentedLedStripWS2812.hpp" COPYONLY)
+configure_file(
+    "${PROJECT_ROOT}/DevicesPredefined/SegmentedLedStripWS2812/src/device/SegmentedLedStripWS2812/SegmentedLedStripWS2812.cpp.example"
+    "${GENERATED_DIR}/SegmentedLedStripWS2812.cpp" COPYONLY)
+
 file(MAKE_DIRECTORY "${GENERATED_DIR}/include/devices/LedWS1228bDeviceType")
 configure_file(
     "${PROJECT_ROOT}/DevicesPredefined/LedWS1228bDeviceType/include/devices/LedWS1228bDeviceType/LedWS1228bDeviceType.hpp.example"
@@ -67,6 +75,7 @@ add_executable(host_tests
     ActiveDeviceTests.cpp
     PredefinedDeviceTests.cpp
     LedDeviceTests.cpp
+    SegmentedLedStripTests.cpp
     LoggerStub.cpp
     "${PROJECT_ROOT}/src/os/datacontainer/datacontainer.cpp"
     "${PROJECT_ROOT}/src/os/tools/messageUDP.cpp"
@@ -83,6 +92,7 @@ add_executable(host_tests
     "${GENERATED_DIR}/HwButton.cpp"
     "${GENERATED_DIR}/TempSensorDHT11DeviceType.cpp"
     "${GENERATED_DIR}/LedWS1228bDeviceType.cpp"
+    "${GENERATED_DIR}/SegmentedLedStripWS2812.cpp"
     ${LED_SOURCES}
 )
 

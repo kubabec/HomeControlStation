@@ -20,6 +20,9 @@
 #include "devices/TempSensorDHT11DeviceType/TempSensorDHT11DeviceType.hpp"
 #endif
 #include "devices/WindowDoorSensor/WindowDoorSensor.hpp"
+#ifdef LED_STRIP_SUPPORTED
+#include "devices/SegmentedLedStripWS2812/SegmentedLedStripWS2812.hpp"
+#endif
 #include "devices/GardenIrrigationDevice/GardenIrrigationDevice.hpp"
 
 namespace GeneratedDeviceRegistry
@@ -54,6 +57,9 @@ inline constexpr Registration kEnabledTypes[] = {
     {45, "TempSensor", true, 60000u},
     #endif
     {50, "WindowDoorSensor", true, 0u},
+    #ifdef LED_STRIP_SUPPORTED
+    {53, "SegmentedLedStrip", true, 0u},
+    #endif
     {60, "Garden Irrigation", true, 2500u},
 };
 
@@ -132,6 +138,16 @@ inline bool validateConfiguration(const DeviceConfigSlotType& config, bool* clai
             if (config.customBytes[1] != 0 && config.customBytes[1] != 1) return false;
             if (readU16(config.customBytes, 2) < 10 || readU16(config.customBytes, 2) > 5000) return false;
             break;
+    #ifdef LED_STRIP_SUPPORTED
+    case type_SEGMENTED_LED_STRIP:
+            if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
+            if (readU16(config.customBytes, 0) < 1 || readU16(config.customBytes, 0) > 2040) return false;
+            if (config.customBytes[2] < 15 || config.customBytes[2] > 254) return false;
+            if (config.customBytes[3] != 0 && config.customBytes[3] != 1 && config.customBytes[3] != 2 && config.customBytes[3] != 3 && config.customBytes[3] != 4 && config.customBytes[3] != 5) return false;
+            if (config.customBytes[4] < 1 || config.customBytes[4] > 8) return false;
+            if (!SegmentedLedStripWS2812::isConfigurationValid(config)) return false;
+            break;
+    #endif
     case type_GARDEN_IRRIGATION:
             if (!claimPin(config.pinNumber, false, candidatePins, claimedPinCount)) return false;
             if (config.customBytes[0] < 0 || config.customBytes[0] > 48) return false;
@@ -170,6 +186,10 @@ inline std::unique_ptr<Device> create(
     #endif
     case type_WINDOW_DOOR_SENSOR:
             return std::unique_ptr<Device>(new WindowDoorSensor(config, GeneratedDigitalEventTriggers::bind(config.deviceType, config.deviceId, config.deviceName, context.getNodeMacAddress, context.fireDigitalEventWithSource)));
+    #ifdef LED_STRIP_SUPPORTED
+    case type_SEGMENTED_LED_STRIP:
+            return std::unique_ptr<Device>(new SegmentedLedStripWS2812(config, context.persistentDataChanged));
+    #endif
     case type_GARDEN_IRRIGATION:
             return std::unique_ptr<Device>(new GardenIrrigationDevice(config));
     default:

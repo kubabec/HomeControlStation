@@ -48,6 +48,12 @@ inline constexpr Predicate kPredicates[] = {
     #endif
     {50, 1, "Closed", ValueType::BOOLEAN, Comparator::EQUALS, 0, 1.0f, 1.0f },
     {50, 2, "Opened", ValueType::BOOLEAN, Comparator::EQUALS, 0, 0.0f, 0.0f },
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 1, "Enabled", ValueType::BOOLEAN, Comparator::EQUALS, 255, 1.0f, 1.0f },
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 2, "Disabled", ValueType::BOOLEAN, Comparator::EQUALS, 255, 0.0f, 0.0f },
+    #endif
     {60, 1, "Dry", ValueType::BOOLEAN, Comparator::EQUALS, 11, 1.0f, 1.0f },
     {60, 2, "Wet", ValueType::BOOLEAN, Comparator::EQUALS, 12, 1.0f, 1.0f },
 };

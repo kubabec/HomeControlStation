@@ -46,6 +46,8 @@ enum class DisplayAction : uint8_t {
     SET_BRIGHTNESS = 4,
     /** parameter[0] carries the LED strip memory slot index (1-3). */
     LOAD_LED_SLOT = 5,
+    /** parameter[0] carries the segment index, parameter[1] the requested state (0/1). */
+    SET_SEGMENT_STATE = 6,
 };
 
 #pragma pack(push, 1)

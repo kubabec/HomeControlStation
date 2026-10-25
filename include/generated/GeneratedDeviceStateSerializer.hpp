@@ -65,6 +65,46 @@ inline String serialize(const DeviceDescription& description)
             result += String((int)description.customBytes[0]);
             break;
         }
+    #ifdef LED_STRIP_SUPPORTED
+    case type_SEGMENTED_LED_STRIP:
+        {
+            result += ",\"segCount\":";
+            result += String((int)description.customBytes[1]);
+            result += ",\"segOn\":";
+            result += "[";
+            for (uint8_t item = 0; item < 8; ++item)
+            {
+                if (item) result += ",";
+                result += String((int)description.customBytes[2 + item]);
+            }
+            result += "]";
+            result += ",\"segLive\":";
+            result += "[";
+            for (uint8_t item = 0; item < 8; ++item)
+            {
+                if (item) result += ",";
+                result += String((int)description.customBytes[10 + item]);
+            }
+            result += "]";
+            result += ",\"segVirt\":";
+            result += "[";
+            for (uint8_t item = 0; item < 8; ++item)
+            {
+                if (item) result += ",";
+                result += String((int)description.customBytes[18 + item]);
+            }
+            result += "]";
+            result += ",\"segColors\":";
+            result += "[";
+            for (uint8_t item = 0; item < 8; ++item)
+            {
+                if (item) result += ",";
+                result += "\"#" + rgbHex(description.customBytes[26 + item * 3], description.customBytes[27 + item * 3], description.customBytes[28 + item * 3]) + "\"";
+            }
+            result += "]";
+            break;
+        }
+    #endif
     case type_GARDEN_IRRIGATION:
         {
             result += ",\"sensorError\":";

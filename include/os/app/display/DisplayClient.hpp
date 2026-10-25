@@ -20,6 +20,7 @@ public:
     static bool requestToggle(uint8_t deviceId, bool isLocal = false);
     static bool requestBrightness(uint8_t deviceId, uint8_t percent, bool isLocal = false);
     static bool requestLedSlot(uint8_t deviceId, uint8_t slot, bool isLocal = false);
+    static bool requestSegmentState(uint8_t deviceId, uint8_t segment, bool enable, bool isLocal = false);
     static bool requestRoomToggle(uint8_t roomId);
     static const DeviceList& devices();
 
@@ -28,6 +29,7 @@ private:
         uint8_t deviceId = 0;
         uint8_t service = 0;
         uint8_t parameter = 0;
+        uint8_t parameterB = 0;
         bool toggle = false;
         unsigned long deadline = 0;
     };
@@ -57,7 +59,7 @@ private:
     static void refreshLocalDevices();
     static void rebuildAndReload();
     static void processLocalActions();
-    static bool requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle);
+    static bool requestLocal(uint8_t deviceId, uint8_t service, uint8_t parameter, bool toggle, uint8_t parameterB = 0);
     static void updateConnectionState();
     static void processMessage(MessageUDP& message);
     static void sendPresent(const MessageUDP::IPAddr& target);
@@ -67,7 +69,7 @@ private:
     static void handleRoomStatesChunk(const std::vector<uint8_t>& payload);
     static void finishDeviceList();
     static DisplayDeviceView convertDevice(const DisplayDeviceWire& source);
-    static bool sendAction(uint8_t deviceId, DisplayAction action, uint8_t parameter);
+    static bool sendAction(uint8_t deviceId, DisplayAction action, uint8_t parameter, uint8_t parameterB = 0);
     static bool send(uint8_t id, const void* payload, size_t payloadSize,
                      const MessageUDP::IPAddr& target);
 };

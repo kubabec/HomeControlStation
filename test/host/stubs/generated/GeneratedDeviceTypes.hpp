@@ -11,12 +11,13 @@ enum DevType : uint8_t
     type_WINDOW_BLINDER = 49,
     type_WINDOW_DOOR_SENSOR = 50,
     type_GATE = 51,
-    type_AQUARIUM_CONTROLLER = 52
+    type_AQUARIUM_CONTROLLER = 52,
+    type_SEGMENTED_LED_STRIP = 53
 };
 
 namespace GeneratedDeviceTypes
 {
-inline bool isKnown(uint8_t id) { return id >= 43 && id <= 52 && id != 46 && id != 47; }
+inline bool isKnown(uint8_t id) { return id >= 43 && id <= 53 && id != 46 && id != 47; }
 inline const char* nameOf(uint8_t id)
 {
     switch (id)
@@ -29,6 +30,7 @@ inline const char* nameOf(uint8_t id)
     case type_WINDOW_DOOR_SENSOR: return "WindowDoorSensor";
     case type_GATE: return "Gate";
     case type_AQUARIUM_CONTROLLER: return "AquariumController";
+    case type_SEGMENTED_LED_STRIP: return "SegmentedLedStrip";
     default: return "UNKNOWN";
     }
 }

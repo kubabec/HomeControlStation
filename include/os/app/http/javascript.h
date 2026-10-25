@@ -393,8 +393,9 @@ function asyncRoomStateSwitch(room, state){\
     var url = getRoomChangeUrl(room, state);\
     createAsyncRequestWithRenderRoomsResponse(url);\
 }\
-function asyncLiveAnimation(device, val){\
+function asyncLiveAnimation(device, val, seg){\
     let json = {devId: device, state: val};\
+    if (seg !== undefined) { json.seg = seg; }\
     let jsonString = JSON.stringify(json);\
     const container = document.getElementById('container' + device);\
     let url = '/ledsLiveSwtch&' + jsonString;\
@@ -412,13 +413,8 @@ createAsyncRequestWithRenderRoomsResponse(url, container);\
 }\
 function asyncSegSwitch(device, segment, state){\
 let json = {\"devId\":device, \"seg\":segment, \"state\":state};\
-var url = '/segSwtch&' + JSON.stringify(json);\;\
+var url = '/segSwtch&' + JSON.stringify(json);\
 const container = document.getElementById('container' + device);\
-if(state === 1){\
-    url = url + '1&';\
-}else {\
-    url = url + '0&';\
-}\
 createAsyncRequestWithRenderRoomsResponse(url, container);\
 }\
   function showLoading(container) {\

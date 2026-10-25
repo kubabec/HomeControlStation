@@ -54,6 +54,7 @@ private:
     struct PendingAction
     {
         bool active = false;
+        unsigned long deadline = 0;
         MessageUDP request;
         DisplayActionRequest action;
         ServiceParameters_set1 parameters;

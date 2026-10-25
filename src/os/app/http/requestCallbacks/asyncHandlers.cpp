@@ -279,7 +279,7 @@ void HomeLightHttpServer::parameterizedHandler_segmentStateSwitch(String &reques
       uint8_t parameters[3 + sizeof(ServiceParameters_set1)];
       ServiceParameters_set1 params;
       params.a = segmentIdStr.toInt();
-      params.b = stateStr == "true" ? 1 : 0;                                  // 1 for ON, 0 for OFF
+      params.b = (stateStr == "true" || stateStr.toInt() == 1) ? 1 : 0;      // 1 for ON, 0 for OFF
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;         /* idx 1 */
       parameters[SERVICE_NAME_INDEX] = DEVSERVICE_SEGMENT_STATE_SWITCH;       /* idx 2 */
@@ -304,11 +304,13 @@ void HomeLightHttpServer::parameterizedHandler_ledsLiveSwitch(String &request, W
   {
     String devIdStr = doc["devId"];
     String state = doc["state"];
+    String segmentStr = doc["seg"];
 
     if (devIdStr != "null" && state != "null")
     {
       ServiceParameters_set1 params;
-      params.a = state.toInt() ? state.toInt() : 0; 
+      params.a = state.toInt() ? state.toInt() : 0;
+      params.b = (segmentStr != "null") ? segmentStr.toInt() : 0xFF; /* 0xFF - all segments */
       uint8_t parameters[3 + sizeof(ServiceParameters_set1)];
       parameters[DEVICE_ID_IN_ASYNC_REQUEST_SERVICE_CALL] = devIdStr.toInt(); /* idx 0 */
       parameters[SERVICE_OVERLOADING_FUNCTION_INDEX] = serviceCall_1;  /* idx 1 */

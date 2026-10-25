@@ -274,6 +274,193 @@ if (days.length > 1) {
 }
 </script>)HCSADV";
 #endif
+#ifdef LED_STRIP_SUPPORTED
+inline const char advancedControlsTemplate_type_SEGMENTED_LED_STRIP[] = R"HCSADV(<style>
+  .advanced-led-controls .advanced-led-actions { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
+  .advanced-led-controls .led-strip { display:grid; gap:0; width:100%; min-width:0; overflow:visible; }
+  .advanced-led-controls .ledContainer { min-width:0; width:auto; padding:5px 0; cursor:pointer; }
+  .advanced-led-controls .ledContainer.marked { background-color:rgba(111, 186, 255, 0.75); }
+  .advanced-led-controls .ledContainer.segment-start { border-left:2px solid rgba(220, 230, 240, 0.6); }
+  .advanced-led-controls .ledContainer .led { width:100%; height:8px; }
+</style>
+<div class="advanced-led-controls">
+  <label>Segment
+    <select data-field="segment"></select>
+  </label>
+  <label>Color <input class="color-input" data-field="color" type="color" value="#0010af"></label>
+  <div class="led-strip" data-role="led-strip"></div>
+  <label>Enable animation
+    <select data-field="enableAnimation">
+      <option value="0">Roll (left)</option><option value="1">Roll (right)</option>
+      <option value="2">Fade</option><option value="3">Bounce</option>
+      <option value="4">Falling stars</option><option value="5">Color shuffle</option>
+    </select>
+  </label>
+  <label>Disable animation
+    <select data-field="disableAnimation">
+      <option value="0">Fade out</option><option value="1">Roll out (right)</option>
+      <option value="2">Roll out (left)</option>
+      <option value="3">Blinking sky</option><option value="4">Supernova</option>
+    </select>
+  </label>
+  <label>Animation speed
+    <select data-field="animationSpeed">
+      <option value="0">Normal</option><option value="1">Fast</option><option value="2">Slow</option>
+    </select>
+  </label>
+  <div class="button-container advanced-led-actions">
+    <button class="icon-btn ok" data-action="save" title="Apply"></button>
+  </div>
+</div>
+<script type="application/x-hcs-advanced-controls">
+const PROPERTY_SLOTS = 8;
+const PROPERTY_SIZE = 5;
+const HEADER_SIZE = PROPERTY_SLOTS * PROPERTY_SIZE;
+const payload = context.payload;
+if (payload.length < HEADER_SIZE || (payload.length - HEADER_SIZE) % 3 !== 0) {
+  context.showError('Invalid segmented LED-strip advanced-controls payload.');
+  return;
+}
+const ledCount = (payload.length - HEADER_SIZE) / 3;
+const segmentCount = context.descriptionBytes[1];
+const segments = [];
+let firstLed = 0;
+for (let i = 0; i < segmentCount; i++) {
+  const length = context.descriptionBytes[18 + i];
+  segments.push({start: firstLed, end: firstLed + length});
+  firstLed += length;
+}
+if (segmentCount === 0 || firstLed !== ledCount) {
+  context.showError('Invalid segment layout.');
+  return;
+}
+
+const colors = Array.from({length: ledCount}, (_, index) => {
+  const base = HEADER_SIZE + index * 3;
+  return [payload[base], payload[base + 1], payload[base + 2]];
+});
+const properties = Array.from({length: PROPERTY_SLOTS}, (_, index) => Array.from(payload.slice(index * PROPERTY_SIZE, (index + 1) * PROPERTY_SIZE)));
+
+const strip = context.root.querySelector('[data-role="led-strip"]');
+const colorInput = context.root.querySelector('[data-field="color"]');
+const segmentSelect = context.root.querySelector('[data-field="segment"]');
+const enableAnimation = context.root.querySelector('[data-field="enableAnimation"]');
+const disableAnimation = context.root.querySelector('[data-field="disableAnimation"]');
+const animationSpeed = context.root.querySelector('[data-field="animationSpeed"]');
+
+segmentSelect.innerHTML = '<option value="all">ALL</option>' + segments.map((_, i) => `<option value="${i}">Segment ${i + 1}</option>`).join('');
+window.hcsSegSel = window.hcsSegSel || {};
+const initialSelection = window.hcsSegSel[context.deviceId];
+segmentSelect.value = (initialSelection !== undefined && Number(initialSelection) < segmentCount) ? String(initialSelection) : 'all';
+
+const selected = new Set();
+let dragMode = 0;
+
+const activeSegments = () => segmentSelect.value === 'all' ? segments.map((_, i) => i) : [Number(segmentSelect.value)];
+const visibleRange = () => {
+  const active = activeSegments();
+  return {from: segments[active[0]].start, to: segments[active[active.length - 1]].end};
+};
+
+const renderLed = index => {
+  const element = strip.querySelector(`[data-index="${index}"]`);
+  if (!element) return;
+  const color = colors[index];
+  const led = element.querySelector('.led');
+  led.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  led.style.boxShadow = color.some(value => value !== 0) ? '0 0 6px 8px rgba(0,205,0,.08)' : 'none';
+  element.classList.toggle('marked', selected.has(index));
+};
+const markLed = index => {
+  if (dragMode === 1) selected.add(index);
+  if (dragMode === 2) selected.delete(index);
+  renderLed(index);
+};
+
+const loadProperties = () => {
+  const source = properties[activeSegments()[0]];
+  enableAnimation.value = String(source[0]);
+  disableAnimation.value = String(source[1]);
+  animationSpeed.value = String(source[2]);
+};
+const storeProperties = () => {
+  activeSegments().forEach(segment => {
+    properties[segment][0] = Number(enableAnimation.value);
+    properties[segment][1] = Number(disableAnimation.value);
+    properties[segment][2] = Number(animationSpeed.value);
+  });
+};
+[enableAnimation, disableAnimation, animationSpeed].forEach(select => select.addEventListener('change', storeProperties));
+
+const buildStrip = () => {
+  selected.clear();
+  strip.innerHTML = '';
+  const {from, to} = visibleRange();
+  const starts = new Set(segments.map(segment => segment.start));
+  for (let index = from; index < to; index++) {
+    const container = document.createElement('div');
+    container.className = 'ledContainer';
+    if (starts.has(index) && index !== from) container.classList.add('segment-start');
+    container.dataset.index = String(index);
+    const led = document.createElement('div');
+    led.className = 'led';
+    led.style.borderRadius = '3px';
+    const beginSelection = event => {
+      if (event.target === colorInput) return;
+      event.preventDefault();
+      dragMode = selected.has(index) ? 2 : 1;
+      markLed(index);
+    };
+    container.addEventListener('mousedown', beginSelection);
+    container.addEventListener('mouseenter', () => { if (dragMode) markLed(index); });
+    container.addEventListener('touchstart', beginSelection, {passive:false});
+    container.appendChild(led);
+    strip.appendChild(container);
+    renderLed(index);
+  }
+  strip.style.gridTemplateColumns = `repeat(${to - from}, minmax(0, 1fr))`;
+  loadProperties();
+};
+
+segmentSelect.addEventListener('change', () => {
+  window.hcsSegSel[context.deviceId] = segmentSelect.value;
+  buildStrip();
+});
+
+colorInput.addEventListener('input', () => {
+  const rgb = [1, 3, 5].map(offset => parseInt(colorInput.value.slice(offset, offset + 2), 16));
+  const {from, to} = visibleRange();
+  const targets = selected.size ? Array.from(selected) : Array.from({length: to - from}, (_, i) => from + i);
+  targets.forEach(index => { colors[index] = rgb.slice(); });
+  selected.clear();
+  for (let index = from; index < to; index++) renderLed(index);
+});
+
+const finishDrag = () => { dragMode = 0; };
+document.addEventListener('mouseup', finishDrag, {once:false});
+document.addEventListener('touchend', finishDrag, {once:false});
+context.onCleanup(() => {
+  document.removeEventListener('mouseup', finishDrag);
+  document.removeEventListener('touchend', finishDrag);
+});
+strip.addEventListener('touchmove', event => {
+  event.preventDefault();
+  const touch = event.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.ledContainer');
+  if (target && strip.contains(target) && dragMode) markLed(Number(target.dataset.index));
+}, {passive:false});
+
+buildStrip();
+
+context.root.querySelector('[data-action="save"]').addEventListener('click', async () => {
+  const nextPayload = new Uint8Array(payload.length);
+  properties.forEach((values, index) => nextPayload.set(values, index * PROPERTY_SIZE));
+  colors.forEach((color, index) => nextPayload.set(color, HEADER_SIZE + index * 3));
+  if (await context.save(nextPayload)) context.close();
+});
+</script>
+)HCSADV";
+#endif
 inline const char advancedControlsTemplate_type_GARDEN_IRRIGATION[] = R"HCSADV(<div
     class="advanced-controls-form"
     data-role="garden-irrigation-controls"
@@ -477,6 +664,9 @@ inline const char* find(uint8_t typeId)
     #endif
     #ifdef TEMP_SENSOR_SUPPORTED
     case type_TEMP_SENSOR: return advancedControlsTemplate_type_TEMP_SENSOR;
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    case type_SEGMENTED_LED_STRIP: return advancedControlsTemplate_type_SEGMENTED_LED_STRIP;
     #endif
     case type_GARDEN_IRRIGATION: return advancedControlsTemplate_type_GARDEN_IRRIGATION;
     default:

@@ -586,6 +586,7 @@ The schema also accepts extra `httpConfig` metadata such as `group`, `renderer`,
 | `manager.collection` | yes | Legacy/descriptive collection name; currently not used by the generated factory. Use a meaningful string or `null`. |
 | `manager.includedInDeviceCollection` | yes | Controls publication to the common catalog and eligibility for generated configuration/dashboard UI. Usually `true`. |
 | `factory.arguments` | registered types | Ordered constructor arguments for generated `new ClassName(...)`. |
+| `configurationValidator` | no | Name of a static `bool(const DeviceConfigSlotType&)` function, for example `MyDevice::isConfigurationValid`. The generated server-side validator calls it after the per-field checks, so cross-field rules (such as "segment sizes must add up to the total") reject the configuration before the device is created. |
 
 Allowed factory arguments and exact C++ types:
 
@@ -651,6 +652,7 @@ The current custom configuration renderers are:
 | `range` | `minimum`, `maximum` | HTML range input. Defaults are `0` and `255`. |
 | `number` | `minimum`, `maximum`, optional `displayScale` | HTML number input. Defaults are `0` and `255`. A scale such as `10` displays stored fixed-point value `253` as `25.3` and multiplies it again when saving. |
 | `segment-array` | `arrayLength`, bounds, companion field | Specialized segmented-strip editor described below. |
+| `segment-layout` | `arrayLength`, `maximum`, a visible number field with `fieldId` `segCount` | One row per segment (LED count and flip checkbox); rows beyond `segCount` are hidden. Counts are stored at `offset + index`, the flip bitmask at `offset + arrayLength`, so `size` must be `arrayLength + 1`. |
 
 Important details:
 
@@ -736,6 +738,10 @@ This renderer emits one count input and one inversion selector per segment. Use 
 
 The visible renderer assumes companion bytes begin at `count.offset + count.arrayLength`; keep that equal to the companion's declared offset.
 
+#### Specialized `segment-layout`
+
+Used by `SegmentedLedStripWS2812`. It needs a preceding number field with `"fieldId": "segCount"`; only the first `segCount` rows are saved (the rest are stored as `0`).
+
 ### 5.8 `services`
 
 Each entry requires `name`, `overload`, `status`, and `parameters`. Additional fields such as `availability`, `result`, and parameter descriptions document conditions and behavior but do not generate C++ service logic.
@@ -786,6 +792,7 @@ The current room-widget generator supports these controls:
 | `toggle-button` | `displayOrder` | Calls the common state-switch UI handler. |
 | `settings-button` | `displayOrder` | Opens advanced controls; required when `ui.advancedControls` exists. |
 | `play-stop-button` | `displayOrder` | Uses HTTP field `liveStatus` and calls the live-animation handler. |
+| `segment-select` | optional `countSource`, `stateSource`, `liveSource` (defaults `segCount`, `segOn`, `segLive`) | Adds an `ALL`/segment `<select>` above the buttons. The toggle and play/stop buttons then act on the whole device for `ALL` (`asyncDeviceStateSwitch`, `asyncLiveAnimation`) or on one segment (`asyncSegSwitch`, `asyncLiveAnimation` with `seg`). The selection is kept in `window.hcsSegSel[deviceId]`. |
 | `range` | `minimum`, `maximum`, `source`, optional `visibleWhen` | Calls the common range/brightness handler. `visibleWhen` currently recognizes only `field == true`. |
 
 Supported readouts:
@@ -795,6 +802,7 @@ Supported readouts:
 | `numeric-label` | `source`, optional `label`, `unit`, `valueLabels`, `unknownValue`, `unknownLabel` | Displays a metric tile. `valueLabels` maps numeric codes to readable text; `unknownValue` replaces one sentinel value with `unknownLabel`. |
 | `status-label` | `source`, optional `label`, `trueLabel`, `falseLabel`, `trueTone`, `falseTone` | Maps a boolean/numeric state to two labels. Optional tones are `neutral`, `accent`, `success`, `warning`, or `danger`. |
 | `color-swatch` | `source` | Displays one generated hex-color HTTP field. |
+| `segment-color-array` | optional `countSource`, `colorSource`, `stateSource` | Shows one colored rectangle per segment (`uint8` count, `hex-color[]` colors, `boolean[]` on-state); off segments are dimmed. |
 | `temperature-gauge` + `humidity-gauge` | each has `source` | The current generator renders these as a pair. |
 | `error-message` | `source` | Used by the temperature/humidity pair to show sensor error. |
 

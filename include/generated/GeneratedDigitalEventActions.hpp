@@ -54,6 +54,21 @@ inline constexpr Action kActions[] = {
     #ifdef LED_STRIP_SUPPORTED
     {44, 44, "Stop live animation", DEVSERVICE_LIVE_ANIMATION, {0, 255, 255, 255, 255}, false},
     #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 21, "Turn on (all segments)", DEVSERVICE_STATE_SWITCH, {1, 255, 255, 255, 255}, false},
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 22, "Turn off (all segments)", DEVSERVICE_STATE_SWITCH, {0, 255, 255, 255, 255}, false},
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 23, "Toggle (all segments)", DEVSERVICE_STATE_SWITCH, {255, 255, 255, 255, 255}, true},
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 43, "Start live animation (all segments)", DEVSERVICE_LIVE_ANIMATION, {1, 255, 255, 255, 255}, false},
+    #endif
+    #ifdef LED_STRIP_SUPPORTED
+    {53, 44, "Stop live animation (all segments)", DEVSERVICE_LIVE_ANIMATION, {0, 255, 255, 255, 255}, false},
+    #endif
     {60, 21, "Start irrigation", DEVSERVICE_STATE_SWITCH, {1, 255, 255, 255, 255}, false},
     {60, 22, "Stop irrigation", DEVSERVICE_STATE_SWITCH, {0, 255, 255, 255, 255}, false},
     {60, 23, "Toggle irrigation", DEVSERVICE_STATE_SWITCH, {255, 255, 255, 255, 255}, true},

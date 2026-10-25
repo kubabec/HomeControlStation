@@ -654,7 +654,7 @@ void DigitalEventReceiver::deviceAction(DigitalEvent::Event &action)
     ServiceParameters_set1 parameters = eventAction->parameters;
     if (eventAction->toggleState)
     {
-        parameters.a = (deviceType == type_LED_STRIP) ? 2 : !currentState;
+        parameters.a = (deviceType == type_LED_STRIP || deviceType == type_SEGMENTED_LED_STRIP) ? 2 : !currentState;
     }
     Logger::log("DigitalEventReceiver:// Added DEVICE action");
     pendingServiceCalls.push({action.deviceId, eventAction->service, parameters});
